@@ -5,44 +5,48 @@
  */
 
 [$levelExp, $levelNeeded] = level_progress($hero);
+$characteristics = [
+    'Force' => $hero['forc'],
+    'Dextérité' => $hero['dext'],
+    'Intelligence' => $hero['inti'],
+    'Charisme' => $hero['cha'],
+    'Vitesse' => $hero['vit'],
+    'Endurance' => $hero['end'],
+    'Maniement des armes' => $hero['man'],
+    'Puissance magique' => $hero['ppm'],
+];
 ?>
-<div id="CarteJoueur">
-    <div class="center"><?= e($hero['nom']) ?> : <?= e($hero['libellerace']) ?> - Niveau <?= (int) $hero['codeexp'] ?> - <?= e($hero['libellerang']) ?></div>
+<article class="parchemin fiche-heros">
+    <header class="fiche-titre">
+        <h2 class="titre-blason"><?= e($hero['nom']) ?></h2>
+        <p><?= e($hero['libellerace']) ?> · Niveau <?= (int) $hero['codeexp'] ?> · <?= e($hero['libellerang']) ?></p>
+    </header>
 
-    <div class="stat-block">
-        Expérience : <?= (int) $hero['exp'] ?><br>
-        <strong>Prochain niveau :</strong>
-        <div class="bar-line"><?= progress_bar($levelExp, $levelNeeded, 'exp') ?></div>
+    <div class="fiche-corps">
+        <figure class="fiche-portrait">
+            <img src="<?= e(race_portrait($hero['libellerace'])) ?>" alt="<?= e($hero['libellerace']) ?>">
+        </figure>
+
+        <div class="fiche-jauges">
+            <div class="fiche-combat">
+                <p><img src="<?= asset('game/images/dee/crane.svg') ?>" alt=""><span>Attaque</span><strong><?= attack_score($hero) ?></strong></p>
+                <p><img src="<?= asset('game/images/dee/bouclier-blanc.svg') ?>" alt=""><span>Défense</span><strong><?= defense_score($hero) ?></strong></p>
+            </div>
+            <p class="fiche-jauge"><span>Vie</span> <?= (int) $hero['pv2'] ?> / <?= (int) $hero['pv'] ?>
+                <?= progress_bar((int) $hero['pv2'], (int) $hero['pv'], 'vie') ?></p>
+            <p class="fiche-jauge"><span>Magie</span> <?= (int) $hero['pm2'] ?> / <?= (int) $hero['pm'] ?>
+                <?= progress_bar((int) $hero['pm2'], (int) $hero['pm'], 'magie') ?></p>
+            <p class="fiche-jauge"><span>Expérience</span> <?= (int) $hero['exp'] ?> · prochain niveau
+                <?= progress_bar($levelExp, $levelNeeded, 'exp') ?></p>
+        </div>
     </div>
 
-    <div class="stat-block">
-        Maniement des armes : <?= (int) $hero['man'] ?><br>
-        Puissance magique : <?= (int) $hero['ppm'] ?>
-    </div>
-
-    <table class="hero-stats">
-        <tr>
-            <td>
-                Force : <?= (int) $hero['forc'] ?><br>
-                Dextérité : <?= (int) $hero['dext'] ?><br>
-                Intelligence : <?= (int) $hero['inti'] ?><br>
-                Charisme : <?= (int) $hero['cha'] ?><br>
-                Vitesse : <?= (int) $hero['vit'] ?><br>
-                Endurance : <?= (int) $hero['end'] ?><br>
-                Attaque : <?= attack_score($hero) ?><br>
-                Défense : <?= defense_score($hero) ?>
-            </td>
-            <td><img src="<?= e(race_portrait($hero['libellerace'])) ?>" alt="<?= e($hero['libellerace']) ?>"></td>
-        </tr>
-    </table>
-
-    <div class="stat-block">
-        <strong>Vie :</strong> <?= (int) $hero['pv2'] ?>/<?= (int) $hero['pv'] ?>
-        <div class="bar-line"><?= progress_bar((int) $hero['pv2'], (int) $hero['pv'], 'vie') ?></div>
-        <strong>Magie :</strong> <?= (int) $hero['pm2'] ?>/<?= (int) $hero['pm'] ?>
-        <div class="bar-line"><?= progress_bar((int) $hero['pm2'], (int) $hero['pm'], 'magie') ?></div>
-    </div>
-</div>
+    <dl class="fiche-carac">
+        <?php foreach ($characteristics as $label => $value): ?>
+            <div><dt><?= e($label) ?></dt><dd><?= (int) $value ?></dd></div>
+        <?php endforeach ?>
+    </dl>
+</article>
 
 <?php if ($journey !== null): ?>
     <?= Donjon\View::render('partials/journey-timer', ['journey' => $journey]) ?>

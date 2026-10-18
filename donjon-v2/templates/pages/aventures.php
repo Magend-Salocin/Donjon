@@ -6,12 +6,6 @@
  * @var array|null $current
  */
 ?>
-<p class="center">Votre grade : <strong><?= e($hero['libellerang']) ?></strong>
-    <?php foreach ($missions as $grade => $count): ?>
-        - <?= e($grade) ?> : <?= (int) $count ?>
-    <?php endforeach ?>
-</p>
-
 <?php if ($current !== null): ?>
     <div class="flash flash-info">
         En cours : <strong><?= e($current['libelle']) ?></strong>.
@@ -20,25 +14,33 @@
     </div>
 <?php endif ?>
 
-<div class="parchment-list">
-    <h3>La liste des aventures</h3>
+<section class="parchemin aventures">
+    <h2 class="titre-orne">La liste des aventures</h2>
+    <p class="aventures-grade">Votre grade : <strong><?= e($hero['libellerang']) ?></strong>
+        <?php foreach ($missions as $grade => $count): ?>
+            · <?= e($grade) ?> : <?= (int) $count ?>
+        <?php endforeach ?>
+    </p>
+
     <?php if ($adventures === []): ?>
-        <p>Aucune aventure n'est proposée à votre grade dans ce village. Essayez de voyager.</p>
+        <p class="center">Aucune aventure n'est proposée à votre grade dans ce village. Essayez de voyager.</p>
     <?php endif ?>
-    <?php foreach ($adventures as $adventure): ?>
-        <div class="item-card">
-            <?php if ($adventure['image'] !== ''): ?>
-                <img src="<?= asset('img/' . e($adventure['image'])) ?>" alt="" class="item-image">
-            <?php endif ?>
-            <div class="item-text">
-                <strong><?= e($adventure['libelle']) ?></strong>
-                <hr>
-                <p><?= e($adventure['resumer']) ?></p>
-            </div>
-            <div class="item-footer">
-                Rapporte <?= (int) $adventure['nbor'] ?> pièces d'or et <?= (int) $adventure['nbexp'] ?> points d'expérience
-                <?= action_button('start-adventure', 'Partir', 'aventures', ['aventure' => $adventure['code']]) ?>
-            </div>
-        </div>
-    <?php endforeach ?>
-</div>
+
+    <ul class="aventures-liste">
+        <?php foreach ($adventures as $adventure): ?>
+            <li class="aventure">
+                <img src="<?= e(adventure_illustration((int) $adventure['code'])) ?>" alt="" class="aventure-image">
+                <div>
+                    <h3><?= e($adventure['libelle']) ?></h3>
+                    <p><?= e($adventure['resumer']) ?></p>
+                    <ul class="aventure-infos">
+                        <li class="info-difficulte">Difficulté : <?= e(adventure_difficulty((int) $adventure['rang'])) ?></li>
+                        <li class="info-experience"><?= (int) $adventure['nbexp'] ?> points d'expérience</li>
+                        <li class="info-or"><?= (int) $adventure['nbor'] ?> or</li>
+                    </ul>
+                </div>
+                <?= action_button('start-adventure', 'Partir à l\'aventure ›', 'aventures', ['aventure' => $adventure['code']], '') ?>
+            </li>
+        <?php endforeach ?>
+    </ul>
+</section>

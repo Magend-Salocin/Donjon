@@ -255,7 +255,7 @@
 		for (var j = 0; j < ISO_ACTIONS.length; j++){
 			var A = ISO_ACTIONS[j], P = IsoPositionAction(j);
 			var Lien = document.getElementById(A.Lien);
-			var Jouee = Lien && Lien.style.textDecoration == 'line-through';
+			var Jouee = Lien && Lien.classList.contains('action-jouee');
 			Ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
 			Ctx.fillRect(P.x - 1, P.y - 1, 18, 18);
 			IsoDessiner('icone-' + A.Icone + (Jouee && IsoAtlas['icone-' + A.Icone + '-grise'] ? '-grise' : ''), P.x, P.y);

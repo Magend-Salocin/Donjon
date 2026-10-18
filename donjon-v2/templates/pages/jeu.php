@@ -49,61 +49,65 @@ $dice = static fn (string $prefix): string => implode('', array_map(
         </div>
     </div>
 
-    <p class="center"><button type="button" class="link" id="board-vue" style="display:none" onclick="IsoBasculerVue()">Vue de dessus</button>
-        <button type="button" class="link" id="plein-ecran" style="display:none" onclick="BasculerPleinEcran()">Plein écran</button></p>
-    <canvas id="board-iso" width="728" height="460" style="display:none"></canvas>
-    <table id="board" style="background-image:url('<?= asset('game/quests/quest' . $questNumber . '.jpg') ?>')">
-        <?php for ($row = 0; $row < $boardRows; $row++): ?>
-            <tr>
-                <?php for ($column = 0; $column < $boardColumns; $column++): ?>
-                    <?php $cell = $row * $boardColumns + $column ?>
-                    <td class="FondNoir"><img src="<?= asset('game/images/08.jpg') ?>" id="<?= $cell ?>" alt=""></td>
+    <!-- Plateau à gauche, fiche du héros à droite (dessous sur écran étroit) -->
+    <div class="quest-grille">
+        <div class="plateau-zone">
+            <canvas id="board-iso" width="728" height="460" style="display:none"></canvas>
+            <table id="board" style="background-image:url('<?= asset('game/quests/quest' . $questNumber . '.jpg') ?>')">
+                <?php for ($row = 0; $row < $boardRows; $row++): ?>
+                    <tr>
+                        <?php for ($column = 0; $column < $boardColumns; $column++): ?>
+                            <?php $cell = $row * $boardColumns + $column ?>
+                            <td class="FondNoir"><img src="<?= asset('game/images/08.jpg') ?>" id="<?= $cell ?>" alt=""></td>
+                        <?php endfor ?>
+                    </tr>
                 <?php endfor ?>
-            </tr>
-        <?php endfor ?>
-    </table>
-
-    <div id="CarteJoueurAventure" class="hero-board">
-        <div id="MenuJoueur">
-            <div class="center actions">
-                <a href="javascript:void(0)" class="ActionJeu" onclick="DeactiverLesPieges()" id="Mn_Piege">Piège</a>
-                <a href="javascript:void(0)" class="ActionJeu" onclick="LancerdeeAttaque()" id="Mn_Attaquer">Attaquer</a>
-                <a href="javascript:void(0)" class="ActionJeu" onclick="Lancerdee()" id="Mn_Deplacement">Lancer les dés</a>
-                <a href="javascript:void(0)" class="ActionJeu" onclick="TirerUneCarteTresor()" id="Mn_Tresor">Tirer une carte trésor</a>
-                <a href="javascript:void(0)" class="ActionJeu" onclick="AfficherElement('myHeroItem')" id="Mn_Objet">Utiliser objet</a>
-                <a href="javascript:void(0)" class="ActionJeu" onclick="FinTour()" id="Mn_FinTour">Fin de tour</a>
-            </div>
-            <div class="hero-line">
-                <span><?= e($hero['nom']) ?> : <?= e($hero['libellerace']) ?> - Niveau <?= (int) $hero['codeexp'] ?> - Or : <strong id="MyHeroOrs"><?= (int) $hero['ors'] ?></strong></span>
-                <span>Déplacement : <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee1" class="die" alt="Dé non lancé"> <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee2" class="die" alt="Dé non lancé"> <span id="DeplacementRestant" aria-live="polite"></span></span>
-                <span>Monstres restants : <span id="NbMonstre"></span></span>
-            </div>
-            <div class="hero-line">
-                <span><strong>Vie :</strong> <span id="MyHeroPv"><?= (int) $hero['pv2'] ?></span>/<?= (int) $hero['pv'] ?>
-                    <?= progress_bar((int) $hero['pv2'], (int) $hero['pv'], 'vie', 'MyHeroBarrePv') ?></span>
-                <span><strong>Magie :</strong> <?= (int) $hero['pm2'] ?>/<?= (int) $hero['pm'] ?>
-                    <?= progress_bar((int) $hero['pm2'], (int) $hero['pm'], 'magie') ?></span>
-            </div>
-        </div>
-
-        <div id="MenuCombat" style="display:none;">
-            <table id="FenetreCombat">
-                <tr>
-                    <td rowspan="2"><img id="Attaquant" style="display:none;" src="" alt=""></td>
-                    <td><span class="dice-label">Attaque</span><?= $dice('DA') ?></td>
-                    <td rowspan="2"><img id="Defenceur" style="display:none;" src="" alt=""></td>
-                </tr>
-                <tr>
-                    <td><span class="dice-label">Défense</span><?= $dice('DD') ?></td>
-                </tr>
             </table>
-            <p id="BilanCombat" class="center" aria-live="polite"></p>
-            <span id="TourMonstre" style="display:none;"></span>
         </div>
-    </div>
-    <p id="TourJoueur" class="center"></p>
-    <div class="center">
-        <?= action_button('abandon-adventure', 'Abandonner l\'aventure', 'aventures') ?>
+        <div class="quest-cote">
+            <p class="plateau-outils"><button type="button" id="board-vue" style="display:none" onclick="IsoBasculerVue()">Vue de dessus</button>
+                <button type="button" id="plein-ecran" style="display:none" onclick="BasculerPleinEcran()">Plein écran</button></p>
+            <div id="CarteJoueurAventure" class="parchemin hero-board">
+                <div id="MenuJoueur">
+                    <div class="actions">
+                        <button type="button" class="ActionJeu" onclick="Lancerdee()" id="Mn_Deplacement">Lancer les dés</button>
+                        <button type="button" class="ActionJeu" onclick="LancerdeeAttaque()" id="Mn_Attaquer">Attaquer</button>
+                        <button type="button" class="ActionJeu" onclick="TirerUneCarteTresor()" id="Mn_Tresor">Chercher un trésor</button>
+                        <button type="button" class="ActionJeu" onclick="DeactiverLesPieges()" id="Mn_Piege">Chercher les pièges</button>
+                        <button type="button" class="ActionJeu" onclick="AfficherElement('myHeroItem')" id="Mn_Objet">Utiliser un objet</button>
+                        <button type="button" class="ActionJeu fin-tour" onclick="FinTour()" id="Mn_FinTour">Fin de tour</button>
+                    </div>
+                    <div class="hero-infos">
+                        <p class="hero-nom"><strong><?= e($hero['nom']) ?></strong> <?= e($hero['libellerace']) ?> · Niveau <?= (int) $hero['codeexp'] ?> · <span id="MyHeroOrs"><?= (int) $hero['ors'] ?></span> or</p>
+                        <p class="fiche-jauge hero-vie"><span>Vie</span> <span id="MyHeroPv"><?= (int) $hero['pv2'] ?></span> / <?= (int) $hero['pv'] ?>
+                            <?= progress_bar((int) $hero['pv2'], (int) $hero['pv'], 'vie', 'MyHeroBarrePv') ?></p>
+                        <p class="fiche-jauge hero-magie"><span>Magie</span> <?= (int) $hero['pm2'] ?> / <?= (int) $hero['pm'] ?>
+                            <?= progress_bar((int) $hero['pm2'], (int) $hero['pm'], 'magie') ?></p>
+                        <p class="hero-des">Déplacement <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee1" class="die" alt="Dé non lancé"> <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee2" class="die" alt="Dé non lancé"> <span id="DeplacementRestant" aria-live="polite"></span></p>
+                        <p class="hero-monstres">Monstres restants : <strong id="NbMonstre"></strong></p>
+                    </div>
+                </div>
+
+                <div id="MenuCombat" style="display:none;">
+                    <table id="FenetreCombat">
+                        <tr>
+                            <td rowspan="2"><img id="Attaquant" style="display:none;" src="" alt=""></td>
+                            <td><span class="dice-label">Attaque</span><?= $dice('DA') ?></td>
+                            <td rowspan="2"><img id="Defenceur" style="display:none;" src="" alt=""></td>
+                        </tr>
+                        <tr>
+                            <td><span class="dice-label">Défense</span><?= $dice('DD') ?></td>
+                        </tr>
+                    </table>
+                    <p id="BilanCombat" class="center" aria-live="polite"></p>
+                    <span id="TourMonstre" style="display:none;"></span>
+                </div>
+            </div>
+            <p id="TourJoueur" class="center" aria-live="polite"></p>
+            <div class="center abandon">
+                <?= action_button('abandon-adventure', 'Abandonner l\'aventure', 'aventures') ?>
+            </div>
+        </div>
     </div>
 </div>
 

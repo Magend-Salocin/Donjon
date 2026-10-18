@@ -112,14 +112,12 @@
 
 	function ActiveAction(LienId){
 		/* Action deja utilisee pendant ce tour : Mn_Attaquer Mn_Deplacement Mn_Tresor Mn_Objet Mn_Piege */
-		$(LienId).style.textDecoration="line-through";
-		$(LienId).style.color="DarkRed";
+		$(LienId).classList.add('action-jouee');
 	}
 
 	function DesactiveAction(LienId){
 		/* Action de nouveau disponible */
-		$(LienId).style.textDecoration="";
-		$(LienId).style.color="";
+		$(LienId).classList.remove('action-jouee');
 	}
 
 	function MontreElement(id){

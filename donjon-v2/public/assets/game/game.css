@@ -1,11 +1,21 @@
 /* Plateau du donjon (repris de Javascript/HeroQuest_V2/default.css). */
 
-#body-fullside.quest {
-	float: none;
-	position: relative;
-	background: none;
-	padding: 10px 0;
-	color: #c9b48a;
+#body-fullside.quest { position: relative; color: var(--texte); container: quest / inline-size; }
+.quest > h2 { margin-bottom: 12px; }
+
+/* Plateau à gauche, fiche du héros à droite ; sur écran étroit, la fiche passe dessous.
+   La taille d'affichage du plateau est calculée par ModulePleinEcran.js. */
+.quest-grille { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
+.plateau-zone { min-width: 0; }
+.plateau-outils { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 12px; }
+.plateau-outils button { min-height: 36px; font-size: 0.9em; }
+/* Écran étroit : la colonne de droite se fond dans la grille, ses boutons de vue passent au-dessus du plateau */
+.quest-cote { display: contents; }
+.quest-cote .plateau-outils { order: -1; margin: 0; }
+@container quest (min-width: 1000px) {
+	.quest-grille { grid-template-columns: minmax(0, 1fr) 340px; }
+	.quest-cote { display: block; }
+	.quest-cote .plateau-outils { margin: 0 0 12px; }
 }
 
 .Cache { display: none; }
@@ -18,6 +28,8 @@
 	margin: 0 auto;
 	background-repeat: no-repeat;
 	border-spacing: 2px;
+	outline: 3px solid var(--or);
+	box-shadow: 0 0 0 5px #000, 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 #board td.FondNoir { width: 24px; height: 24px; padding: 1px; }
 
@@ -25,7 +37,10 @@
 #board-iso {
 	display: block;
 	margin: 0 auto;
-	border: 2px solid #3a2a12;
+	border: 3px solid var(--or);
+	outline: 2px solid #000;
+	background: #000;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 	image-rendering: pixelated;
 }
 #board img { width: 24px; height: 24px; vertical-align: top; }
@@ -75,29 +90,65 @@
 .quest-item img { width: 64px; height: 64px; object-fit: contain; }
 .quest-item p { margin: 3px 0; font-size: 0.85em; }
 
-/* Fiche du héros sous le plateau */
-.hero-board {
-	width: 700px !important;
-	height: auto !important;
-	margin: 10px auto 0;
-	padding: 8px 10px !important;
-	background: #f5ead0 !important;
-	color: #2b1a08;
+/* Fiche du héros : parchemin (theme.css) au cadre plus fin */
+#CarteJoueurAventure.hero-board {
+	width: auto;
+	height: auto;
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 4px 8px;
 	box-sizing: border-box;
+	border-width: 42px;
+	border-image-width: 42px;
+	background: url('../img/donjon/parchemin.jpg') 0 0 / 360px border-box;
 }
-.hero-board .actions a { margin: 0 6px; }
-.hero-line { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-.hero-line img { vertical-align: middle; }
+.hero-board .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--parchemin-sombre); }
+.hero-board .ActionJeu { color: #f6e4bd; }	/* old.css l'écrit en noir */
+.ActionJeu.fin-tour { filter: hue-rotate(190deg) saturate(0.6); }
+.ActionJeu.action-jouee, .ActionJeu.action-jouee:hover { filter: grayscale(1) brightness(0.9); opacity: 0.6; text-decoration: line-through; }
+.hero-infos { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "nom monstres" "vie magie" "des des"; gap: 10px 32px; align-items: center; }
+.hero-infos p { margin: 0; }
+.hero-nom { grid-area: nom; }
+.hero-monstres { grid-area: monstres; text-align: right; }
+.hero-vie { grid-area: vie; }
+.hero-magie { grid-area: magie; }
+.hero-des { grid-area: des; text-align: center; font-family: var(--titre); font-weight: 700; color: var(--rouge); }
+.hero-des img { vertical-align: middle; }
 #FenetreCombat { width: 100%; }
 #FenetreCombat td { text-align: center; }
 #FenetreCombat img#Attaquant, #FenetreCombat img#Defenceur { max-height: 90px; margin: auto; }
-.dice-label { display: inline-block; width: 60px; }
+.dice-label { display: inline-block; width: 80px; font-family: var(--titre); font-weight: 700; color: var(--rouge); }
 #FenetreCombat img.die, #FenetreCombat img.Montre, #FenetreCombat td img.Cache { vertical-align: middle; }
 #FenetreCombat td > img.Montre { display: inline-block; }
-#TourJoueur { min-height: 1.2em; color: #fffb8e; }
+#TourJoueur { min-height: 1.2em; margin: 12px 0 0; color: var(--or-clair); }
+#BilanCombat { color: var(--rouge); font-family: var(--titre); }
+.quest .abandon { margin-top: 8px; }
+
+/* Fiche en colonne à droite du plateau : actions empilées, informations sur une colonne, combat en grille */
+@container quest (min-width: 1000px) {
+	.quest-cote .hero-board .actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+	.quest-cote .hero-board .ActionJeu { min-height: 40px; }
+	.quest-cote .hero-infos { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nom" "vie" "magie" "des" "monstres"; gap: 10px; }
+	.quest-cote .hero-monstres { text-align: center; }
+	.quest-cote .hero-des { padding: 6px 0; border-block: 1px solid var(--parchemin-sombre); }
+	.quest-cote .fiche-jauge > span:first-child { min-width: 4.5em; }
+	#FenetreCombat { display: block; }
+	#FenetreCombat tbody { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "attaquant defenseur" "attaque attaque" "defense defense"; gap: 8px; }
+	#FenetreCombat tr { display: contents; }
+	#FenetreCombat tr:first-child td:nth-child(1) { grid-area: attaquant; }
+	#FenetreCombat tr:first-child td:nth-child(2) { grid-area: attaque; }
+	#FenetreCombat tr:first-child td:nth-child(3) { grid-area: defenseur; }
+	#FenetreCombat tr:nth-child(2) td { grid-area: defense; }
+	#FenetreCombat .dice-label { display: block; width: auto; margin-bottom: 2px; }
+}
+@container quest (max-width: 600px) {
+	.hero-infos { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nom" "monstres" "vie" "magie" "des"; }
+	.hero-monstres { text-align: left; }
+}
 
 /* Des (ModuleDes.js) : animation de lancer et des qui comptent en combat */
-img.die, #FenetreCombat td > img.Montre { width: 26px; height: 26px; }
+img.die { width: 32px; height: 32px; }
+#FenetreCombat td > img.Montre { width: 28px; height: 28px; }
 #DeplacementRestant { display: inline-block; min-width: 6em; }
 #BilanCombat { min-height: 1.2em; margin: 4px 0 0; font-weight: bold; }
 .de-roule { animation: de-roule 0.4s ease-out; }
@@ -113,14 +164,12 @@ img.die, #FenetreCombat td > img.Montre { width: 26px; height: 26px; }
 }
 
 /* Plein ecran (ModulePleinEcran.js) : la zone de jeu entiere, plateau agrandi par le script */
-#plein-ecran { margin-left: 12px; }
 #body-fullside.quest:fullscreen {
 	overflow: auto;
 	padding: 10px;
 	box-sizing: border-box;
-	background: #000;
-	font-size: 0.8em;
+	background: #0b0907 url('../img/donjon/mur.jpg') 0 0 / 100% auto repeat-y;
 }
 #body-fullside.quest:fullscreen h2 { margin: 0 0 4px; }
-#body-fullside.quest:fullscreen p.center { margin: 4px 0; }
+#body-fullside.quest:fullscreen .plateau-outils { margin-bottom: 8px; }
 #body-fullside.quest:fullscreen #board-iso { border-width: 1px; }

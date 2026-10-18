@@ -38,6 +38,7 @@ bin/import-heroquest.py  Convertit les quêtes du HeroQuest PC de Gremlin en car
 bin/heroquest-tiles/  Sols et meubles utilisés pour dessiner ces cartes (repris du remake HeroQuest en C#)
 bin/extract-heroquest-graphics.py  Extrait les graphismes du HeroQuest PC pour la vue isométrique
 bin/heroquest-outils.py  Outils pour explorer les fichiers du HeroQuest PC (formats : _Version/HeroQuest (1991 Gremlin)/FORMATS.md)
+bin/decouper-maquette.py  Découpe bin/maquette/maquette-connexion.png en images du thème (public/assets/img/donjon/)
 src/                  Code PHP
   bootstrap.php       Autoload, configuration, session, ouverture de la base
   Database.php        Accès PDO (requêtes préparées, transactions)

@@ -5,7 +5,6 @@
 .inline { display: inline; }
 
 #body { overflow: hidden; }
-#body-rightside h2, #body-rightside h3, .page h2, .page h3 { color: #f0d9a8; }
 #body-fullside.loginBlock { float: none; }
 
 /* Messages flash */

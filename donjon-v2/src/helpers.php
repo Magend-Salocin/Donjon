@@ -151,8 +151,9 @@ function format_date(int $timestamp): string
 /**
  * Petit formulaire POST réduit à un bouton, pour les actions qui modifient la partie.
  * $page est la page affichée après l'action, y compris en cas d'erreur.
+ * $class 'link' affiche le bouton comme un lien ; '' pour un bouton du thème.
  */
-function action_button(string $action, string $label, string $page, array $fields = []): string
+function action_button(string $action, string $label, string $page, array $fields = [], string $class = 'link'): string
 {
     $html = '<form method="post" action="' . e(url($page)) . '" class="inline">' . csrf_field()
         . '<input type="hidden" name="action" value="' . e($action) . '">'
@@ -161,14 +162,42 @@ function action_button(string $action, string $label, string $page, array $field
         $html .= '<input type="hidden" name="' . e($name) . '" value="' . e($value) . '">';
     }
 
-    return $html . '<button type="submit" class="link">' . e($label) . '</button></form>';
+    $classAttribute = $class !== '' ? ' class="' . e($class) . '"' : '';
+
+    return $html . '<button type="submit"' . $classAttribute . '>' . e($label) . '</button></form>';
 }
 
-/** Onglet du menu « épée » en haut de page. */
-function menu_tab(string $page, string $label): string
+/** Difficulté affichée d'une aventure, d'après le grade requis (1 à 4). */
+function adventure_difficulty(int $grade): string
 {
-    $label = e($label);
+    return [1 => 'Facile', 2 => 'Moyen', 3 => 'Difficile'][$grade] ?? 'Héroïque';
+}
 
-    return '<li><a href="' . e(url($page)) . '" class="sword_menu"><span class="shadow">&nbsp;' . $label
-        . '&nbsp;</span><span class="text">&nbsp;' . $label . '&nbsp;</span><span class="tab-l"></span><span class="tab-r"></span></a></li>';
+/**
+ * Illustration d'une aventure (img/donjon/aventure-*.jpg, découpées de la maquette), choisie par thème.
+ * Les images de 2009 (100 px) sont trop petites pour le bandeau de la liste.
+ */
+function adventure_illustration(int $code): string
+{
+    $themes = [
+        'feu' => [4, 103, 108, 111, 119, 123],
+        'glace' => [104, 112, 114, 116],
+        'marais' => [2, 3, 6, 107, 113, 115, 122, 124],
+        'labyrinthe' => [1, 5, 101, 109, 117, 118, 121],
+    ];
+    foreach ($themes as $theme => $codes) {
+        if (in_array($code, $codes, true)) {
+            return asset('img/donjon/aventure-' . $theme . '.jpg');
+        }
+    }
+
+    return asset('img/donjon/aventure-' . array_keys($themes)[$code % count($themes)] . '.jpg');
+}
+
+/** Onglet du menu principal en haut de page ; $current : section de la page affichée. */
+function menu_tab(string $page, string $label, string $current = ''): string
+{
+    $currentAttribute = $page === $current ? ' aria-current="page"' : '';
+
+    return '<li><a href="' . e(url($page)) . '"' . $currentAttribute . '>' . e($label) . '</a></li>';
 }

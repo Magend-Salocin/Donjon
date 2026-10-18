@@ -1,0 +1,398 @@
+/*
+ * Thème « donjon » (2026). Chargé après main.css, old.css et app.css, qu'il remplace page par page.
+ * Images découpées dans la maquette (img/donjon/), sur le modèle de l'ancien design : en-tête, épée en morceaux
+ * avec les onglets en HTML, décors des côtés, mur de pierre, cadre de parchemin, bouton.
+ * L'en-tête est à l'échelle de la maquette (1989 px de large) : --mpx vaut un pixel de la maquette.
+ */
+
+@font-face { font-family: 'Cinzel Decorative'; src: url('../fonts/CinzelDecorative-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Cinzel'; src: url('../fonts/Cinzel.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'Alegreya'; src: url('../fonts/Alegreya.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'Alegreya'; src: url('../fonts/Alegreya-Italic.woff2') format('woff2'); font-weight: 400 900; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Grenze Gotisch'; src: url('../fonts/GrenzeGotisch.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
+
+:root {
+	--or: #d4a43a;
+	--or-clair: #f3d27a;
+	--or-sombre: #6e4c14;
+	--rouge: #8e1b12;
+	--rouge-vif: #b8261a;
+	--rouge-sombre: #4a0d08;
+	--parchemin: #e2c492;
+	--parchemin-sombre: #b08a55;
+	--encre: #2e1b0b;
+	--texte: #e6dcc3;
+	--texte-doux: #a99e88;
+	--titre: 'Alegreya', Georgia, serif;
+	--texte-police: 'Alegreya', Georgia, serif;
+	--gothique: 'Grenze Gotisch', 'Alegreya', Georgia, serif;
+}
+
+/* ---- Fond et typographie ---- */
+
+html { background: #0b0907; }
+body {
+	margin: 0;
+	background: none;
+	color: var(--texte);
+	font: 17px/1.45 var(--texte-police);
+}
+h1, h2, h3, h4 { font-family: var(--titre); font-weight: 800; color: var(--or-clair); }
+h2 { font-size: 1.6em; margin: 0 0 0.6em; }
+h3 { font-size: 1.2em; }
+a:link, a:visited { color: var(--or-clair); }
+a:hover { color: #fff3c4; }
+img { max-width: 100%; }
+
+/* ---- Scène : en-tête, épée, décors des côtés ---- */
+
+.scene {
+	position: relative;
+	min-height: 100vh;
+	max-width: 1989px;
+	margin: 0 auto;
+	container-type: inline-size;
+	/* mur de la page : tranche répétée en hauteur (comme main_bg.png en 2009), piliers éclairés sous les torches */
+	background: url('../img/donjon/mur.jpg') 0 0 / 100% auto repeat-y;
+}
+@media (max-width: 1100px) {
+	.scene { background: url('../img/donjon/mur.jpg') 50% 0 / 1000px auto repeat-y; }	/* seul le centre sombre */
+}
+.scene > * { --mpx: calc(100cqw / 1989); }
+.entete {
+	position: relative;
+	aspect-ratio: 1989 / 300;
+	background: url('../img/donjon/entete.jpg') 0 0 / 100% 100%;
+}
+.entete-accueil {						/* toute la carte mène à l'accueil */
+	position: absolute;
+	left: calc(270 * var(--mpx));
+	top: 0;
+	width: calc(1450 * var(--mpx));
+	height: calc(245 * var(--mpx));
+	font-size: 0;
+}
+
+.epee {
+	position: absolute;
+	left: calc(188 * var(--mpx));
+	top: calc(255 * var(--mpx));
+	width: calc(1612 * var(--mpx));
+	height: calc(45 * var(--mpx));
+	display: flex;
+}
+.epee > span { flex: none; height: 100%; background-size: 100% 100%; background-repeat: no-repeat; }	/* sans raccourci : garde l'image de chaque morceau */
+.epee-pointe { width: calc(141 * var(--mpx)); background-image: url('../img/donjon/epee-pointe.png'); }
+.epee-bande-fin { width: calc(59 * var(--mpx)); background-image: url('../img/donjon/epee-bande-fin.png'); }
+.epee > .epee-lame { flex: 1; background: url('../img/donjon/epee-lame.png') 0 0 / auto 100% repeat-x; }
+.epee-garde { position: relative; width: calc(285 * var(--mpx)); background-image: url('../img/donjon/epee-garde.png'); }
+.epee-garde::after {					/* pointe basse de la garde, sous la lame */
+	content: '';
+	position: absolute;
+	left: calc(77 * var(--mpx));
+	top: 100%;
+	width: calc(30 * var(--mpx));
+	height: calc(50 * var(--mpx));
+	background: url('../img/donjon/epee-garde-bas.png') 0 0 / 100% 100%;
+}
+.epee ul { display: flex; margin: 0; padding: 0; list-style: none; }
+.epee li { padding: 0; }
+.epee a:link, .epee a:visited {
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	height: calc(45 * var(--mpx));
+	padding: 0 calc(6 * var(--mpx)) calc(2 * var(--mpx));
+	border: solid transparent;
+	border-width: 0 calc(46 * var(--mpx));
+	border-image: url('../img/donjon/onglet.png') 0 46 fill / 0 calc(46 * var(--mpx)) stretch;
+	color: #ecdcb4;
+	font: 700 max(12px, calc(22 * var(--mpx)))/1 var(--titre);
+	text-decoration: none;
+	text-shadow: 0 1px 2px #000;
+	white-space: nowrap;
+}
+.epee li:last-child a:link, .epee li:last-child a:visited {	/* la fin de bande dessine le bout du dernier onglet */
+	border-right-width: 0;
+	border-image-width: 0 0 0 calc(46 * var(--mpx));
+	padding-right: calc(4 * var(--mpx));
+}
+.epee a:hover, .epee a[aria-current="page"] { color: #ffd76a; text-shadow: 0 0 8px rgba(255, 190, 80, 0.7), 0 1px 2px #000; }
+.epee a:focus-visible { outline: 2px solid var(--or-clair); outline-offset: -4px; }
+
+.decor {
+	position: absolute;
+	top: calc(300 * var(--mpx));
+	width: calc(255 * var(--mpx));
+	aspect-ratio: 255 / 240;
+	background: 0 0 / 100% 100% no-repeat;
+	pointer-events: none;
+	-webkit-mask-composite: source-in;
+	mask-composite: intersect;
+}
+.decor-gauche {
+	left: 0;
+	background-image: url('../img/donjon/decor-gauche.jpg');
+	-webkit-mask-image: linear-gradient(to right, #000 70%, transparent), linear-gradient(#000 80%, transparent);
+	mask-image: linear-gradient(to right, #000 70%, transparent), linear-gradient(#000 80%, transparent);
+}
+.decor-droite {
+	right: 0;
+	width: calc(254 * var(--mpx));
+	aspect-ratio: 254 / 240;
+	background-image: url('../img/donjon/decor-droite.jpg');
+	-webkit-mask-image: linear-gradient(to left, #000 70%, transparent), linear-gradient(#000 80%, transparent);
+	mask-image: linear-gradient(to left, #000 70%, transparent), linear-gradient(#000 80%, transparent);
+}
+
+/* Corps : entre les décors sur grand écran, menu latéral facultatif, puis contenu. Neutralise main.css. */
+#body {
+	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 20px;
+	overflow: visible;
+	width: auto;
+	height: auto;
+	padding: 24px calc(265 * var(--mpx)) 0;
+}
+#body.avec-menu { grid-template-columns: 250px minmax(0, 1fr); }
+#body[data-page="jeu"] { padding-inline: calc(60 * var(--mpx)); }	/* le plateau prend la place des piliers */
+#body > .flash { grid-column: 1 / -1; }
+#body-leftside, #body-rightside, #body-fullside { float: none; width: auto; padding: 0; background: none; font-size: 1em; }
+
+/* Pied de page : mobilier à gauche et à droite, mur et sol répétés entre les deux (maquette-pied.png,
+   à l'échelle de l'en-tête : 265 px de cette maquette valent 299 px de la maquette de connexion). */
+.pied {
+	position: relative;
+	isolation: isolate;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	align-content: flex-start;
+	gap: 8px 18px;
+	box-sizing: border-box;
+	min-height: calc(299 * var(--mpx));
+	margin-top: 28px;
+	padding: calc(95 * var(--mpx)) calc(460 * var(--mpx)) 16px;
+	color: var(--texte-doux);
+	font-size: 0.85em;
+	text-shadow: 0 1px 2px #000;
+}
+.pied::before {
+	content: '';
+	position: absolute;
+	inset: auto 0 0;
+	height: 100%;
+	z-index: -1;
+	background:
+		url('../img/donjon/pied-gauche.jpg') left bottom / auto 100% no-repeat,
+		url('../img/donjon/pied-droite.jpg') right bottom / auto 100% no-repeat,
+		url('../img/donjon/pied-milieu.jpg') 0 100% / auto 100% repeat-x;
+	-webkit-mask-image: linear-gradient(transparent, #000 25%);
+	mask-image: linear-gradient(transparent, #000 25%);
+}
+.pied a:link, .pied a:visited { color: var(--texte-doux); }
+.pied a:hover { color: var(--or-clair); }
+.pied .designedby { margin-left: auto; float: none; font-size: 1em; color: var(--texte-doux); }
+.pied .music { flex-wrap: wrap; max-width: 100%; color: var(--texte-doux); font-size: 1em; }
+.pied .music audio { max-width: 100%; }
+
+/* Écran moyen : plus de décors latéraux, contenu sur toute la largeur */
+@container (max-width: 1100px) {
+	.decor { display: none; }
+	#body { padding-inline: 16px; }
+	.pied { padding-inline: calc(400 * var(--mpx)); }
+}
+/* Petit écran : la carte en bandeau, l'épée laisse la place à des onglets sur plusieurs lignes */
+@container (max-width: 760px) {
+	.entete { aspect-ratio: auto; padding-top: 116px; background: url('../img/donjon/entete.jpg') 38% 0 / auto 138px no-repeat, #0c0a08; }	/* l'épée de l'image commence à 85 % de sa hauteur */
+	.entete-accueil { left: 0; width: 100%; height: 116px; }
+	.epee { position: static; width: auto; height: auto; padding: 8px 12px; background: #0c0a08; }
+	.epee > span { display: none; }
+	.epee ul { flex-wrap: wrap; justify-content: center; gap: 6px 0; }
+	.epee a:link, .epee a:visited, .epee li:last-child a:link, .epee li:last-child a:visited { height: 34px; border-width: 0 22px; border-image-width: 0 22px; padding-inline: 4px; font-size: 15px; }
+	.connexion-action button { font-size: 1.05em; }
+	#body.avec-menu { grid-template-columns: minmax(0, 1fr); }
+	#body.avec-menu > #body-leftside { order: 1; }		/* le contenu de la page d'abord, le menu ensuite */
+	.pied { min-height: 0; padding: 24px 16px 140px; }
+	.pied::before { height: 140px; }
+}
+
+/* ---- Composants ---- */
+
+/* Parchemin dans son cadre de bois et de fer (panneau de la maquette) */
+.parchemin, .panneau {
+	padding: 4px 10px;
+	border: 58px solid transparent;
+	border-image: url('../img/donjon/cadre-parchemin.png') 60 / 58px stretch;
+	background: url('../img/donjon/parchemin.jpg') 0 0 / 360px;
+	background-origin: border-box;	/* passe aussi sous le cadre, dont l'intérieur est transparent */
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+	color: var(--encre);
+}
+.parchemin > :first-child, .panneau > :first-child { margin-top: 0; }
+.parchemin > :last-child, .panneau > :last-child { margin-bottom: 0; }
+.parchemin h2, .parchemin h3, .panneau h2, .panneau h3 { color: var(--encre); }
+.parchemin a:link, .parchemin a:visited, .panneau a:link, .panneau a:visited { color: var(--rouge); }
+.parchemin a:hover, .panneau a:hover { color: var(--rouge-vif); }
+.titre-blason { display: flex; align-items: center; gap: 14px; }
+.titre-blason::before { content: ''; flex: none; width: 1.5em; aspect-ratio: 60 / 81; background: url('../img/donjon/blason.png') 0 0 / 100% 100%; }
+.panneau-titre { margin: 0 0 10px; text-align: center; font: 800 1.2em var(--titre); color: var(--encre); }
+
+/* Boutons rouges à pointes dorées */
+button, .bouton {
+	min-height: 42px;
+	padding: 2px 6px 4px;
+	border: solid transparent;
+	border-width: 0 29px;
+	border-image: url('../img/donjon/bouton.png') 0 50 0 48 fill / 0 29px stretch;
+	background: none;
+	color: #f6e4bd;
+	font: 700 1em var(--titre);
+	text-shadow: 0 1px 2px #000;
+	cursor: pointer;
+}
+button:hover, .bouton:hover { filter: brightness(1.15); }
+button:focus-visible { outline: 2px solid var(--or-clair); outline-offset: 2px; }
+button.link { min-height: 0; padding: 0; border: 0; border-image: none; background: none; color: var(--or-clair); font: inherit; text-decoration: underline; text-shadow: none; filter: none; }
+.parchemin button.link, .panneau button.link { color: var(--rouge); }
+
+input[type=text], input[type=email], input[type=password], input[type=number], select, textarea {
+	padding: 5px 9px;
+	border: 1px solid #6b4a24;
+	border-radius: 2px;
+	background: #f1e4c6;
+	box-shadow: inset 0 1px 3px rgba(60, 35, 10, 0.4);
+	color: var(--encre);
+	font: inherit;
+}
+
+/* Messages flash */
+.flash { margin: 0; padding: 8px 14px; border: 1px solid; font-size: 0.95em; }
+.flash-ok { background: rgba(29, 58, 26, 0.9); border-color: #4c8a3e; color: #d8f5c8; }
+.flash-erreur { background: rgba(74, 13, 8, 0.9); border-color: var(--rouge-vif); color: #ffd6cf; }
+.flash-info { background: rgba(30, 22, 10, 0.9); border-color: var(--or-sombre); color: #f5e2b8; }
+.flash a:link, .flash a:visited { color: var(--or-clair); }
+
+/* Barres (vie, magie, expérience) */
+.bar { width: 100%; max-width: 260px; height: 12px; border: 1px solid #2a1806; border-radius: 2px; background: #5a4428; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6); }
+.bar > span { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.bar-vie > span { background: linear-gradient(#d8402c, var(--rouge)); }
+.bar-magie > span { background: linear-gradient(#4f7fd8, #23458e); }
+.bar-exp > span { background: linear-gradient(var(--or-clair), var(--or)); }
+
+/* ---- Menu latéral ---- */
+
+.menu-lateral nav a:link, .menu-lateral nav a:visited {
+	display: block;
+	padding: 4px 0 4px 20px;
+	color: var(--encre);
+	font-weight: 700;
+	text-decoration: none;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cpath d='M5 0 10 5 5 10 0 5z' fill='%238e1b12'/%3E%3C/svg%3E") no-repeat 3px center;
+}
+.menu-lateral nav a:hover, .menu-lateral nav a[aria-current="page"] { color: var(--rouge); }
+.menu-lateral .level-up:link, .menu-lateral .level-up:visited { color: var(--rouge-vif) !important; }
+.menu-lateral-heros { margin: 12px 0 4px; padding-top: 10px; border-top: 1px solid var(--parchemin-sombre); text-align: center; font-weight: 800; font-size: 1.1em; }
+.menu-lateral-infos { display: flex; justify-content: space-around; margin: 0; font-size: 0.9em; }
+
+/* ---- Connexion (la page de la maquette) ---- */
+
+.connexion { max-width: 640px; margin: 0 auto; }
+.connexion form p { display: grid; grid-template-columns: 9em minmax(0, 1fr); align-items: center; gap: 12px; margin: 0 0 12px; }
+.connexion label { font-weight: 700; }
+.connexion form p.connexion-action { display: block; margin: 20px 0 10px; text-align: center; }
+.connexion-action button { min-height: 52px; padding-inline: 18px; font-size: 1.2em; white-space: nowrap; }
+.connexion form p.hint { display: block; text-align: center; }
+.intro-flash { margin: 30px auto 0; max-width: 550px; text-align: center; }
+@container (max-width: 760px) {
+	.connexion form p { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}
+
+/* ---- Aventures (maquette-aventures.png) ---- */
+
+.titre-orne { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 0 4px; font: 700 2.1em/1.1 var(--gothique); color: #5a140c !important; }
+.titre-orne::before, .titre-orne::after { content: ''; flex: none; width: 113px; height: 26px; background: url('../img/donjon/ornement-gauche.png') center / contain no-repeat; }
+.titre-orne::after { background-image: url('../img/donjon/ornement-droite.png'); }
+.aventures { max-width: 1000px; margin: 0 auto; }
+.aventures-grade { margin: 0 0 12px; text-align: center; font-style: italic; }
+.aventures-liste, .aventure-infos { margin: 0; padding: 0; list-style: none; }
+.aventures-liste > li, .aventure-infos > li { padding: 0; }						/* main.css décale les li */
+.aventure {
+	display: grid;
+	grid-template-columns: 250px minmax(0, 1fr) auto;
+	gap: 22px;
+	align-items: center;
+	padding: 14px 0;
+	border-top: 1px solid rgba(110, 70, 30, 0.45);
+}
+.aventure-image { width: 250px; aspect-ratio: 234 / 102; object-fit: cover; border: 3px solid #2a1806; border-radius: 4px; box-shadow: 0 0 0 1px #8a6a3a, 0 3px 8px rgba(0, 0, 0, 0.5); }
+.aventure h3 { margin: 0 0 4px; font: 700 1.5em/1.15 var(--gothique); color: var(--encre); }
+.aventure p { margin: 0 0 10px; }
+.aventure-infos { display: flex; flex-wrap: wrap; gap: 6px 28px; font-size: 0.92em; }
+.aventure-infos > li { display: flex; align-items: center; min-height: 25px; padding-left: 31px; background-position: left center; background-size: 24px; background-repeat: no-repeat; }
+.info-difficulte { background-image: url('../img/donjon/icone-difficulte.png'); }
+.info-experience { background-image: url('../img/donjon/icone-experience.png'); }
+.info-or { background-image: url('../img/donjon/icone-or.png'); }
+.aventure button { white-space: nowrap; }
+@container (max-width: 1250px) {
+	.aventure { grid-template-columns: 200px minmax(0, 1fr); }
+	.aventure-image { width: 200px; }
+	.aventure > form { grid-column: 2; justify-self: start; }
+}
+@container (max-width: 760px) {
+	.aventure { grid-template-columns: minmax(0, 1fr); }
+	.aventure-image { width: 100%; }
+	.aventure > form { grid-column: 1; justify-self: center; }
+	.titre-orne { font-size: 1.6em; }
+	.titre-orne::before, .titre-orne::after { display: none; }
+}
+
+/* ---- Fiche du héros (personnage.php) : carte de héros HeroQuest ---- */
+
+.fiche-heros { max-width: 760px; margin: 0 auto; }
+.fiche-titre { margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--rouge); text-align: center; }
+.fiche-titre h2 { justify-content: center; }
+.fiche-titre h2 { margin: 0; font-size: 2em; }
+.fiche-titre p { margin: 2px 0 0; font-style: italic; }
+.fiche-corps { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; }
+.fiche-portrait {
+	margin: 0;
+	padding: 10px;
+	border: 3px solid var(--rouge);
+	outline: 1px solid #000;
+	background: radial-gradient(#fff8e4, #e2c98f);
+	text-align: center;
+}
+.fiche-portrait img { max-height: 240px; }
+.fiche-combat { display: flex; gap: 14px; margin-bottom: 14px; }
+.fiche-combat p {
+	flex: 1;
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 8px 12px;
+	border: 2px solid var(--rouge);
+	background: rgba(255, 248, 228, 0.6);
+	font-family: var(--titre);
+	font-weight: 700;
+}
+.fiche-combat img { width: 30px; }
+.fiche-combat strong { font-size: 1.6em; color: var(--rouge); }
+.fiche-jauge { margin: 0 0 10px; }
+.fiche-jauge > span:first-child { display: inline-block; min-width: 6.5em; font-family: var(--titre); font-weight: 700; color: var(--rouge); }
+.fiche-jauge .bar { display: block; max-width: none; margin-top: 3px; }
+.fiche-carac { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 24px; margin: 20px 0 0; padding-top: 14px; border-top: 1px solid var(--parchemin-sombre); }
+.fiche-carac div { display: flex; justify-content: space-between; border-bottom: 1px dotted var(--parchemin-sombre); }
+.fiche-carac dt { margin: 0; }
+.fiche-carac dd { margin: 0; font-weight: 700; }
+@media (max-width: 600px) {
+	.fiche-corps { grid-template-columns: minmax(0, 1fr); }
+	.fiche-combat { flex-direction: column; }
+}
+
+/* Titres posés sur les anciens parchemins (pages pas encore reprises) */
+.register form h2, .register form h3, .parchment-list h3, .scroll-body h2, .scroll-body h3 { color: var(--encre); }
