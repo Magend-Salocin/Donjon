@@ -67,7 +67,7 @@
 		for (var i=0;i<LesMonstres.length;i++){
 			if (LesMonstres[i][8]==1) {
 				var Combatre=Joueur-LesMonstres[i][7];
-				if( Combatre==1 || Combatre==-1 || Combatre==26 || Combatre==-26 ){
+				if( (Combatre==1 || Combatre==-1 || Combatre==26 || Combatre==-26) && !PassageBloque(Joueur,LesMonstres[i][7]) ){
 					Controle=i;
 				}
 			}
@@ -80,7 +80,7 @@
 		if (LesMonstres[IdMonstre][4] < 1 )
 		{
 			LesMonstres[IdMonstre][8]=-1;
-			CacheCase(LesMonstres[IdMonstre][7]);
+			LibereCase(LesMonstres[IdMonstre][7]);
 			ReAfficheMonstre();
 			NbMonsreRestant();
 		}

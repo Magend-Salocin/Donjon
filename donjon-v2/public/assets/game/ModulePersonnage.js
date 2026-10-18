@@ -27,7 +27,7 @@
 	}
 
 	function RepartiteurPiece(IdSuivant,IdPrecedant,PieceJoueur){	// CONTROLE LES DEPLACEMENTS
-		if (IdSuivant < 0 || IdSuivant >= MesPieces.length || IsCaseOccupee(IdSuivant)) {
+		if (IdSuivant < 0 || IdSuivant >= MesPieces.length || IsCaseOccupee(IdSuivant) || PassageBloque(IdPrecedant, IdSuivant)) {
 			return false;
 		}
 		if(MesPieces[IdSuivant]==PieceJoueur){

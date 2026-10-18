@@ -34,6 +34,9 @@ config/config.php     Chemin de la base, mode debug, limites (duels par jour, d�
 database/schema.sql   Tables SQLite (noms de tables et colonnes de la base MySQL d'origine)
 database/seed.sql     Races, villages, boutiques, objets, aventures (dump MySQL de 2007)
 bin/reset-db.php      Recrée la base et le compte de démonstration
+bin/import-heroquest.py  Convertit les quêtes du HeroQuest PC de Gremlin en cartes 101 à 124
+bin/heroquest-tiles/  Sols et meubles utilisés pour dessiner ces cartes (repris du remake HeroQuest en C#)
+bin/extract-heroquest-graphics.py  Extrait les graphismes du HeroQuest PC pour la vue isométrique
 src/                  Code PHP
   bootstrap.php       Autoload, configuration, session, ouverture de la base
   Database.php        Accès PDO (requêtes préparées, transactions)
@@ -54,10 +57,45 @@ public/               Racine web
 Le plateau (`public/assets/game/`) est le code JavaScript de 2009, nettoyé :
 
 - mootools est remplacé par `compat.js` (fonction `$`) ;
-- chaque aventure `N` charge la carte `quests/questN.js` et son image `quests/questN.jpg` (cartes 1 à 8 disponibles, aventures 1 à 6 en base) ;
+- chaque aventure `N` charge la carte `quests/questN.js` et son image `quests/questN.jpg` (cartes 1 à 8 de 2009, aventures 1 à 6 en base) ;
 - la sauvegarde passe par `api.php` : vie et or du héros, objets trouvés ou utilisés, fin de partie.
 
 Commandes : lancer les dés puis se déplacer avec les flèches du clavier, attaquer un monstre voisin, tirer une carte trésor par pièce, finir le tour pour laisser jouer les monstres.
+
+### Quêtes du HeroQuest PC (aventures 101 à 124)
+
+Les cartes `quest101` à `quest124` sont générées à partir des fichiers `QUESTn.BIN` du jeu de Gremlin (1991), dans `_Version/HeroQuest (1991 Gremlin)` : les 14 quêtes du jeu de base et les 10 de l'extension « Return of the Witch Lord ». Le format est décrit en tête du script.
+
+```powershell
+pip install pillow
+python bin/import-heroquest.py "../_Version/HeroQuest (1991 Gremlin)"
+```
+
+Le script réécrit les fichiers `.js` et `.jpg` et affiche pour chaque quête le nombre de pièces et de monstres. Il vérifie aussi que le héros peut atteindre tous les monstres. Les aventures correspondantes sont dans `database/seed.sql` (grades 1 à 4, réparties entre les trois villages). Pour les ajouter à une base existante, lancer `bin/reset-db.php`.
+
+Ce qui est repris : pièces, couloirs, murs, portes, éboulis, meubles (cases infranchissables), pièges (fosse, chute de pierre, lance : invisibles, un point de vie perdu), monstres, escalier et départ du héros. Ces cartes définissent `MesMurs`, que le moteur utilise pour bloquer les déplacements et les attaques à travers un mur ou un meuble. Sur ces cartes, les monstres actifs poursuivent le héros par le plus court chemin.
+
+Limites :
+
+- les quêtes 5 (Labyrinthe de Melar) et 10 (Château des mystères) ne sont pas converties : leurs passages dépendent de scripts du jeu (passage secret, portails magiques) absents des fichiers de quête ;
+- les événements scriptés (personnage à délivrer, objet à trouver) ne sont pas repris : on gagne en tuant tous les monstres, ou en atteignant l'escalier pour les quêtes d'évasion 1, 6 et 9 ;
+- les portes secrètes sont affichées comme des portes normales ;
+- les boss (Ulag, Balur, le Sorcier-Roi, Bellthor...) utilisent les monstres existants les plus proches (ChamanOrc, Sorcier, MageSquellette, Gargouille) ;
+- sur la vue de dessus, les meubles utilisent les images du remake en C#, qui n'a pas de bibliothèque (remplacée par une armoire).
+
+### Vue isométrique
+
+Sur les cartes 101 à 124, le plateau s'affiche par défaut en vue isométrique avec les graphismes du jeu de Gremlin : sols de chaque pièce, murs du fond, portes (fermées tant qu'un côté n'est pas dévoilé), meubles, escalier, héros et monstres. Chaque attaque s'affiche en gros plan pendant deux secondes : les deux combattants agrandis sur leurs dalles avec l'animation d'attaque du jeu, les dés lancés, les points de vie et le résultat. Le bouton au-dessus du plateau passe à la vue de dessus, et le choix est mémorisé dans le navigateur. Le moteur ne change pas : `ModuleIso.js` redessine en continu l'état du tableau `#board`, qui reste masqué.
+
+Les graphismes viennent de `public/assets/game/iso/atlas.png` et `atlas.js`, générés à partir des fichiers du jeu :
+
+```powershell
+python bin/extract-heroquest-graphics.py "../_Version/HeroQuest (1991 Gremlin)"
+```
+
+Le script décompresse `QUEST.EXE` (compressé avec EXEPACK) pour y lire la palette et les tables des sprites, puis les fichiers `.VGA` (compression LZ77 propre au jeu, retrouvée en désassemblant l'exécutable). Les formats sont décrits en tête du script.
+
+Les flèches du clavier déplacent toujours le héros sur la grille : ↑ va vers le haut à droite de l'écran, → vers le bas à droite.
 
 ## Flash et musique
 

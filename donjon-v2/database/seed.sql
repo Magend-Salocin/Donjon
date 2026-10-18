@@ -45,6 +45,32 @@ INSERT INTO aventure (code, libelle, resumer, nbor, nbexp, rang, image, village)
 (5, 'La caverne du vampire emofile', 'Cette ancien seigneur à refait surface pour dévore le stock de tomate de la region. Le crak boursier est en marche!', 50, 50, 4, '', '01'),
 (6, 'Le gobelin unijambiste', 'Un groupe de gobelin éméché ont pillé le champs du fermier. Seriez vous capable de lutter contre ses gobelins estropied?', 5, 20, 1, '', '03');
 
+-- Aventures 101 à 124 : quêtes du HeroQuest PC de Gremlin (1991), cartes générées par bin/import-heroquest.py.
+-- Les quêtes 5 et 10 (aventures 105 et 110) ne sont pas converties.
+INSERT INTO aventure (code, libelle, resumer, nbor, nbexp, rang, image, village) VALUES
+(101, 'Le labyrinthe', 'Votre dernière épreuve avant de partir à l''aventure : trouvez l''escalier au cœur du labyrinthe. Plusieurs monstres y ont été lâchés pour vous barrer la route.', 20, 20, 1, '', '01'),
+(102, 'Le sauvetage de sir Ragnar', 'Sir Ragnar, l''un des plus puissants chevaliers de l''Empereur, est retenu prisonnier par Ulag, le seigneur orc. Éliminez ses gardes pour le libérer.', 25, 25, 1, '', '02'),
+(103, 'Le repaire du seigneur orc', 'Le prince Magnus veut la tête d''Ulag, responsable de l''enlèvement de sir Ragnar. Le trésor de son repaire revient à qui l''abattra.', 30, 30, 1, '', '03'),
+(104, 'L''or du prince Magnus', 'Trois coffres destinés à l''Empereur ont été volés par une bande d''orcs cachée dans les Montagnes Noires, menée par un guerrier du chaos.', 30, 30, 1, '', '01'),
+(106, 'L''héritage du seigneur orc', 'Grak, le fils d''Ulag, vous a capturés pour venger son père. Vous avez crocheté la serrure de votre cellule avec un vieil os de rat : rejoignez l''escalier pour vous échapper.', 40, 40, 2, '', '02'),
+(107, 'Le chasseur de pierres', 'Karlen, le sorcier de l''Empereur, a disparu. Assassiné ou séduit par la magie du chaos ? Explorez le donjon où il a été vu pour la dernière fois.', 40, 40, 2, '', '03'),
+(108, 'Le mage du feu', 'Balur, le mage du feu, aide les orcs des Montagnes Noires dans leurs raids. Descendez dans son antre, sous le pic de Feu Noir, et détruisez-le.', 45, 45, 2, '', '01'),
+(109, 'Course contre la montre', 'Votre guide vous a abandonnés dans un donjon oublié en éteignant sa torche. Retrouvez l''escalier avant de périr dans les ténèbres.', 45, 45, 2, '', '02'),
+(111, 'Le bastion du chaos', 'Orcs et gobelins pillent les terres de l''Est depuis une forteresse souterraine tenue par des guerriers du chaos. Entrez et tuez tous les monstres.', 50, 50, 3, '', '03'),
+(112, 'Barak Tor, demeure du Sorcier-Roi', 'L''Étoile de l''Ouest repose à Barak Tor, le tombeau du Sorcier-Roi. L''Empereur en a besoin pour unir les royaumes avant la guerre contre les orcs.', 55, 55, 3, '', '01'),
+(113, 'La quête de la Lame de l''esprit', 'Vous avez réveillé le Sorcier-Roi. Seule la Lame de l''esprit, forgée par les nains, peut le blesser : elle se trouve dans un ancien temple en ruine.', 55, 55, 3, '', '02'),
+(114, 'Retour à Barak Tor', 'Armés de la Lame de l''esprit, retournez à Barak Tor et détruisez le Sorcier-Roi avant que son armée de morts-vivants n''attaque l''Empereur.', 60, 60, 3, '', '03'),
+(115, 'La porte du destin', 'L''entrée de la forteresse du Sorcier-Roi est grande ouverte. Traversez ses tunnels jusqu''à la porte du destin : l''ennemi a eu le temps de préparer votre accueil.', 65, 65, 4, '', '01'),
+(116, 'Les salles glacées', 'Dans ces couloirs gelés reposent les cavaliers spectraux qui menaient autrefois la cavalerie squelette du Sorcier-Roi.', 65, 65, 4, '', '02'),
+(117, 'Les couloirs silencieux', 'Ces couloirs sont muets depuis que le roi Agrain et son peuple y ont défendu leur cité il y a mille ans. Une magie ancienne et terrible y est encore à l''œuvre.', 70, 70, 4, '', '03'),
+(118, 'Les salles de vision', 'Le roi Agrain, guerrier redouté et magicien à ses heures, a créé ce dédale de salles magiques dont les clés gardent le secret.', 70, 70, 4, '', '01'),
+(119, 'La porte de Bellthor', 'Ici commence le vrai domaine du Sorcier-Roi. Bellthor, un terrible gardien, veille sur la porte : affrontez-le ensemble.', 75, 75, 4, '', '02'),
+(120, 'Les salles des morts', 'Le Sorcier-Roi rassemble son armée dans les salles des morts. Frappez maintenant, avant qu''il ne s''échappe.', 75, 75, 4, '', '03'),
+(121, 'La légion oubliée', 'Vous avez échappé au Sorcier-Roi, mais ces salles abritent la légion oubliée, l''élite de son armée, menée par Skulmar.', 80, 80, 4, '', '01'),
+(122, 'La cité interdite', 'Nul n''est jamais entré dans la cité interdite. Ses couloirs grouillent de morts-vivants et la cité elle-même menace de s''effondrer.', 80, 80, 4, '', '02'),
+(123, 'La dernière porte', 'Dernière porte avant la cour du Sorcier-Roi. Les guerriers du chaos de la garde du destin qui la défendent sont plus puissants que tous ceux que vous avez combattus.', 90, 90, 4, '', '03'),
+(124, 'La cour du Sorcier-Roi', 'Le Sorcier-Roi s''est réfugié dans sa salle du trône. Cette fois, il ne doit pas s''échapper.', 100, 100, 4, '', '01');
+
 -- Objets 1 à 30 : dump de 2007. Objets 995 à 999 : potions des cartes trésor du donjon (MesItem.js).
 INSERT INTO objet (num, libelle, resumer, effet, valeur, image, catheg, autre) VALUES
 (995, 'Breuvage héroïque', 'Un sac de cuir accroché au mur contient une potion. Il s''agit d''un breuvage héroïque. Celui-ci peut être pris juste avant de lever un combat. Le joueur qui absorbe cette potion pourra, le temps d''un tour seulement, attaquer deux fois au lieu d''une.', 'att', 1, 'biere03.png', 'quete', ''),

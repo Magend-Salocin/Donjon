@@ -10,6 +10,7 @@
 				GetIdPieceAffiche(PieceActiver[jj]);
 			}
 		}
+		ActiveMontrePiece(LesJoueurs[ConstIdJoueur][7]);	// les monstres de la piece de depart jouent des le premier tour
 		AfficheHeros(LesJoueurs[ConstIdJoueur][5]);
 		AfficheAllJoueur();
 		ReAfficheMonstre();
@@ -100,8 +101,9 @@
 		}
 	}
 
-	function AfficheMonstre(id){
+	function AfficheMonstre(id){							// un monstre sur une case jamais vue par le heros reste cache
 		LesMonstres[IdLeMienMonstre][7] = id;
+		if (!CasesDevoilees[id]) { MasqueCase(id); return; }
 		MontreElement(id);
 		ImageCase(id).src=LesMonstres[IdLeMienMonstre][6];
 	}
@@ -126,8 +128,21 @@
 		document.getElementById(String(id)).className = "Montre";
 	}
 
-	function CacheCase(id){
+	/* Cases du plateau deja vues par le heros (pieces devoilees et cases parcourues). */
+	var CasesDevoilees = {};
+
+	function CacheCase(id){								// devoile la case : son image noire disparait
+		if (/^\d+$/.test(String(id))) { CasesDevoilees[parseInt(id, 10)] = true; }
 		document.getElementById(String(id)).className = "Cache";
+	}
+
+	function MasqueCase(id){							// remet l'image noire d'une case jamais vue
+		ImageCase(id).src = Chemin + '/08.jpg';
+		MontreElement(id);
+	}
+
+	function LibereCase(id){							// case quittee par un monstre
+		if (CasesDevoilees[parseInt(id, 10)]) { CacheCase(id); } else { MasqueCase(id); }
 	}
 
 	function UtiliserObjet(id){

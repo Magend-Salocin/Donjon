@@ -29,7 +29,7 @@ Les archives `Donjon_v0a` à `Donjon_v0c` correspondent aux archives d'origine `
 
 ### Sources d'inspiration (2000 - 2007)
 
-- **Jeu de référence** : le jeu PC HeroQuest de Gremlin (1991), dans deux archives et un dossier `_Version/HeroQuest (1991 Gremlin)`. Le jeu de plateau en ligne en reprend les règles : dés de déplacement, dés de combat crâne/bouclier, cartes trésor, pièces révélées à l'entrée du héros, monstres qui jouent après le joueur.
+- **Jeu de référence** : le jeu PC HeroQuest de Gremlin (1991), dans deux archives et un dossier `_Version/HeroQuest (1991 Gremlin)`. Le jeu de plateau en ligne en reprend les règles : dés de déplacement, dés de combat crâne/bouclier, cartes trésor, pièces révélées à l'entrée du héros, monstres qui jouent après le joueur. En 2026, ses quêtes sont converties en cartes de la v2 (aventures 101 à 124, voir le [README de la v2](donjon-v2/README.md#quêtes-du-heroquest-pc-aventures-101-à-124)).
 - **Remake** : un portage de HeroQuest en C# (fichiers datés de 2003 à 2007), avec ses fichiers de quêtes (`_Version/HeroQuest (C#).zip`).
 - **Images** : scans et visuels HeroQuest (2000-2003) ayant servi de référence pour les cartes, les meubles et les monstres.
 

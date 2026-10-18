@@ -20,6 +20,14 @@
 	border-spacing: 2px;
 }
 #board td.FondNoir { width: 24px; height: 24px; padding: 1px; }
+
+/* Vue isométrique (ModuleIso.js), aux graphismes du HeroQuest PC : pixels nets. */
+#board-iso {
+	display: block;
+	margin: 0 auto;
+	border: 2px solid #3a2a12;
+	image-rendering: pixelated;
+}
 #board img { width: 24px; height: 24px; vertical-align: top; }
 
 /* Carte trésor */

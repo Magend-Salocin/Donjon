@@ -61,8 +61,8 @@ var IsTourMonstreTimer = false;
 	}
 
 	function TourMonstreAction(){
-		/*Soit le monstre se trouve ds la piece du joueur et attaque*/
-		if(LesMonstres[IdLeMienMonstre][9]==LesJoueurs[0][7]){
+		/*Soit le monstre se trouve ds la piece du joueur et attaque (cartes avec MesMurs : il le poursuit partout)*/
+		if(LesMonstres[IdLeMienMonstre][9]==LesJoueurs[0][7] || typeof MesMurs != 'undefined'){
 			LesMonstres[IdLeMienMonstre][10] = IATourMonstrePiece(LesMonstres[IdLeMienMonstre],LesJoueurs[0]);
 			if(LesMonstres[IdLeMienMonstre][10]==true){ /*temp=temp+200;*/ UneAttaque(IdLeMienMonstre,0,"MONSTRE");  	}	
 	
@@ -77,7 +77,8 @@ var IsTourMonstreTimer = false;
 	}
 	
 	function RepartiteurPieceMonstre(IdSuivant,IdPrecedant,PieceJoueur){
-		var MyTest = false;	
+		var MyTest = false;
+		if(PassageBloque(LesMonstres[IdLeMienMonstre][7], IdSuivant)){ return false; }
 		if(MesPieces[IdSuivant]==PieceJoueur)
 		{
 			MyTest= true;
@@ -97,7 +98,11 @@ var IsTourMonstreTimer = false;
 	function IATourMonstrePiece(Monstre,Joueur){
 		var controle 	= false; var Combatre 	= false; IdMonstre=Monstre[7]; Id=Joueur[5]-IdMonstre;					
 		//Le joueur se trouve dans la piece	40 haut 39 bas 38 gauche
-		if( Id==26 || Id==-26 || Id==1 || Id==-1  ){ Combatre=true; }
+		if( (Id==26 || Id==-26 || Id==1 || Id==-1) && !PassageBloque(IdMonstre,Joueur[5]) ){ Combatre=true; }
+		else if (typeof MesMurs != 'undefined'){
+			var Pas = PasVersHeros(IdMonstre, Number(Joueur[5]));
+			if (Pas != -1){ DeplacementMonstre(IdMonstre, Pas); Monstre[9] = MesPieces[Pas]; }
+		}
 		else{
 			if(Id>=24  && Id>0 &&  Id!=26){
 				IdPrecedant = Id;	Id =  parseInt(IdMonstre) +26; 
@@ -124,7 +129,32 @@ var IsTourMonstreTimer = false;
 		}	
 		return Combatre
 	}
-		
+
+	/* Premiere case du plus court chemin d'un monstre vers le heros, en contournant murs, meubles et autres
+	   monstres, avec les regles de passage des portes du heros (cartes avec MesMurs). -1 si bloque. */
+	function PasVersHeros(Depart, Cible){
+		var Precedent = {}; Precedent[Depart] = Depart;
+		var File = [Depart];
+		while (File.length > 0){
+			var Case = File.shift();
+			var Voisins = [Case - 26, Case + 1, Case + 26, Case - 1];
+			for (var i = 0; i < Voisins.length; i++){
+				var Voisin = Voisins[i];
+				if (Voisin in Precedent || Voisin < 0 || Voisin >= MesPieces.length || PassageBloque(Case, Voisin)){ continue; }
+				if (Voisin == Cible){
+					if (Case == Depart){ return -1; }
+					while (Precedent[Case] != Depart){ Case = Precedent[Case]; }
+					return Case;
+				}
+				var Passage = MesPieces[Voisin] == MesPieces[Case] || MesPortes[Voisin] != "0";
+				if (MesPieces[Voisin] == "0" || !Passage || IsCaseOccupee(Voisin)){ continue; }
+				Precedent[Voisin] = Case;
+				File.push(Voisin);
+			}
+		}
+		return -1;
+	}
+
 	function IATourMonstreChangePiece(Monstre,Joueur){			// TOUVER LA SORTIE DE LA PIECE AFIN DE REJOINDRE LE HEROS
 					
 		var PieceMonstre 	= false;
@@ -202,7 +232,7 @@ var IsTourMonstreTimer = false;
 	}
 
 	function DeplacementMonstre(IdMonstre,Id){
-		CacheCase(IdMonstre);  
+		LibereCase(IdMonstre);
 		AfficheMonstre(Id)
 	}
 	
@@ -216,7 +246,7 @@ var IsTourMonstreTimer = false;
 	
 	function ReAfficheMonstre(){								//VOID	REAFFICHE LES MONSTRE DANS LEURS PIECES RESPECTIVE
 		for (i=0;i<LesMonstres.length;i++){ 
-			if (LesMonstres[i][8]==1){
+			if (LesMonstres[i][8]==1 && CasesDevoilees[LesMonstres[i][7]]){
 				MontreElement(LesMonstres[i][7]);
 				ImageCase(LesMonstres[i][7]).src=LesMonstres[i][6];
 			}
