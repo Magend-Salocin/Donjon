@@ -1,0 +1,89 @@
+/* Plateau du donjon (repris de Javascript/HeroQuest_V2/default.css). */
+
+#body-fullside.quest {
+	float: none;
+	position: relative;
+	background: none;
+	padding: 10px 0;
+	color: #c9b48a;
+}
+
+.Cache { display: none; }
+.Montre { display: block; }
+
+/* Le plateau : 26 x 19 cases de 24 px. Espacement et marges par défaut du tableau = 731 x 534 px, la taille des cartes. */
+#board {
+	width: 731px;
+	height: 534px;
+	margin: 0 auto;
+	background-repeat: no-repeat;
+	border-spacing: 2px;
+}
+#board td.FondNoir { width: 24px; height: 24px; padding: 1px; }
+#board img { width: 24px; height: 24px; vertical-align: top; }
+
+/* Carte trésor */
+.Centre {
+	position: absolute;
+	top: 60px;
+	left: 50%;
+	margin-left: -125px;
+	width: 250px;
+	z-index: 10;
+}
+.demoElement { display: none; }
+.myClass { display: block; width: 250px; }
+#myOtherElement #scroll_top { background-image: url('images/Cadre/menu_scroll_top.jpg'); height: 87px; text-align: center; }
+#myOtherElement #scroll_middle {
+	background-image: url('images/Cadre/menu_scroll_middle.jpg');
+	height: auto;
+	min-height: 140px;
+	padding: 10px 30px;
+	color: #2b1a08;
+	text-align: justify;
+	font-size: 0.85em;
+}
+#myOtherElement #scroll_bottom { background-image: url('images/Cadre/menu_scroll_bottom.jpg'); height: 109px; text-align: center; }
+#myOtherElement #scroll_bottom a { color: #481e00; font-weight: bold; position: relative; top: 30px; }
+#myOtherElement #scroll_header { top: 50px; font-size: 16px; }
+
+/* Inventaire utilisable pendant la partie */
+.quest-inventory {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 50%;
+	margin-left: -260px;
+	width: 520px;
+	max-height: 480px;
+	overflow-y: auto;
+	padding: 10px 15px;
+	background: #fdf6e3;
+	color: #2b1a08;
+	border: 3px solid #694421;
+	z-index: 11;
+}
+.quest-item { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid #e0cfa5; }
+.quest-item img { width: 64px; height: 64px; object-fit: contain; }
+.quest-item p { margin: 3px 0; font-size: 0.85em; }
+
+/* Fiche du héros sous le plateau */
+.hero-board {
+	width: 700px !important;
+	height: auto !important;
+	margin: 10px auto 0;
+	padding: 8px 10px !important;
+	background: #f5ead0 !important;
+	color: #2b1a08;
+	box-sizing: border-box;
+}
+.hero-board .actions a { margin: 0 6px; }
+.hero-line { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.hero-line img { vertical-align: middle; }
+#FenetreCombat { width: 100%; }
+#FenetreCombat td { text-align: center; }
+#FenetreCombat img#Attaquant, #FenetreCombat img#Defenceur { max-height: 90px; margin: auto; }
+.dice-label { display: inline-block; width: 60px; }
+#FenetreCombat img.die, #FenetreCombat img.Montre, #FenetreCombat td img.Cache { vertical-align: middle; }
+#FenetreCombat td > img.Montre { display: inline-block; }
+#TourJoueur { min-height: 1.2em; color: #fffb8e; }

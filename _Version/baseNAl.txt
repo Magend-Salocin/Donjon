@@ -1,0 +1,475 @@
+-- phpMyAdmin SQL Dump
+-- version 2.6.1
+-- http://www.phpmyadmin.net
+-- 
+-- Serveur: localhost
+-- Généré le : Vendredi 16 Novembre 2007 à 19:27
+-- Version du serveur: 4.1.9
+-- Version de PHP: 4.3.10
+-- 
+-- Base de données: `donjon`
+-- 
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `accomplir`
+-- 
+
+CREATE TABLE `accomplir` (
+  `aven_num` varchar(10) NOT NULL default '',
+  `jou_num` varchar(10) NOT NULL default '',
+  `nb` varchar(10) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `accomplir`
+-- 
+
+INSERT INTO `accomplir` VALUES ('1', '01', '34');
+INSERT INTO `accomplir` VALUES ('2', '01', '28');
+INSERT INTO `accomplir` VALUES ('3', '01', '3');
+INSERT INTO `accomplir` VALUES ('4', '01', '4');
+INSERT INTO `accomplir` VALUES ('5', '01', '0');
+INSERT INTO `accomplir` VALUES ('1', '012752', '0');
+INSERT INTO `accomplir` VALUES ('2', '012752', '0');
+INSERT INTO `accomplir` VALUES ('3', '012752', '0');
+INSERT INTO `accomplir` VALUES ('4', '012752', '0');
+INSERT INTO `accomplir` VALUES ('5', '012752', '0');
+INSERT INTO `accomplir` VALUES ('1', '013817', '0');
+INSERT INTO `accomplir` VALUES ('2', '013817', '0');
+INSERT INTO `accomplir` VALUES ('3', '013817', '0');
+INSERT INTO `accomplir` VALUES ('4', '013817', '0');
+INSERT INTO `accomplir` VALUES ('5', '013817', '0');
+INSERT INTO `accomplir` VALUES ('1', '064422', '1');
+INSERT INTO `accomplir` VALUES ('2', '064422', '1');
+INSERT INTO `accomplir` VALUES ('3', '064422', '0');
+INSERT INTO `accomplir` VALUES ('4', '064422', '0');
+INSERT INTO `accomplir` VALUES ('5', '064422', '0');
+INSERT INTO `accomplir` VALUES ('06', '01', '1');
+INSERT INTO `accomplir` VALUES ('1', '030655', '0');
+INSERT INTO `accomplir` VALUES ('2', '030655', '0');
+INSERT INTO `accomplir` VALUES ('3', '030655', '0');
+INSERT INTO `accomplir` VALUES ('4', '030655', '0');
+INSERT INTO `accomplir` VALUES ('5', '030655', '0');
+INSERT INTO `accomplir` VALUES ('06', '030655', '0');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `avantcombat`
+-- 
+
+CREATE TABLE `avantcombat` (
+  `num` varchar(10) NOT NULL default '',
+  `heros` varchar(10) NOT NULL default '',
+  `MoiHeros` varchar(10) NOT NULL default '',
+  `village` varchar(10) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `avantcombat`
+-- 
+
+INSERT INTO `avantcombat` VALUES ('1183569808', '030655', '030655', '01');
+INSERT INTO `avantcombat` VALUES ('1183570380', '01', '01', '01');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `aventure`
+-- 
+
+CREATE TABLE `aventure` (
+  `code` varchar(10) NOT NULL default '',
+  `libelle` varchar(60) NOT NULL default '',
+  `resumer` text NOT NULL,
+  `nbor` varchar(10) NOT NULL default '',
+  `nbexp` varchar(10) NOT NULL default '',
+  `temps` varchar(10) NOT NULL default '',
+  `rang` varchar(10) NOT NULL default '',
+  `image` varchar(50) NOT NULL default '',
+  `village` varchar(10) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `aventure`
+-- 
+
+INSERT INTO `aventure` VALUES ('1', 'Chasseur de rat', 'Cette mission vous a été confier par le pere magotte dont les rat ont envahie sa grange!', '10', '15', '240', '1', 'aventure\\01.JPG', '01');
+INSERT INTO `aventure` VALUES ('2', 'Tueur de poulet', 'Un changement forme s''est infiltré dans un élevage de poulet. Vous devez  retrouver sa trace.', '15', '10', '560', '1', 'aventure\\05.JPG', '02');
+INSERT INTO `aventure` VALUES ('3', 'Tueur de lutin', 'Un lutin tout bleu à été apercu dans la foret voisin. Malheuresement il à prit tout le sctok de biere! Une mission capital!', '20', '20', '204', '2', 'aventure\\04.JPG', '01');
+INSERT INTO `aventure` VALUES ('4', 'Donjon de nalheubeuk', 'Une statuette ? la profécie de galdeulfera? un sorcier de niv 1. Monté votre compagnie et partée à l''aventure!', '50', '50', '5000', '3', '', '01');
+INSERT INTO `aventure` VALUES ('5', 'La caverne du vampire emofile', 'Cette ancien seigneur à refait surface pour dévore le stock de tomate de la region. Le crak boursier est en marche!', '50', '50', '60000', '4', '', '01');
+INSERT INTO `aventure` VALUES ('06', 'Le gobelin unijambiste', 'Un groupe de gobelin éméché ont pillé le champs du fermier. Seriez vous capable de lutter contre ses gobelins estropied?', '5', '20', '500', '1', '', '03');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `aventureencour`
+-- 
+
+CREATE TABLE `aventureencour` (
+  `aven_num` varchar(10) NOT NULL default '',
+  `jou_num` varchar(10) NOT NULL default '',
+  `sec` varchar(10) NOT NULL default '',
+  `libelle` char(1) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `aventureencour`
+-- 
+
+INSERT INTO `aventureencour` VALUES ('1', '01', '1191948811', 'A');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `grade`
+-- 
+
+CREATE TABLE `grade` (
+  `code` varchar(10) NOT NULL default '',
+  `libelle` varchar(30) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `grade`
+-- 
+
+INSERT INTO `grade` VALUES ('1', 'Novice');
+INSERT INTO `grade` VALUES ('2', 'Ecuyer');
+INSERT INTO `grade` VALUES ('3', 'Aventurier');
+INSERT INTO `grade` VALUES ('4', 'Legende');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `jeu_personnages`
+-- 
+
+CREATE TABLE `jeu_personnages` (
+  `joueur` varchar(5) NOT NULL default '',
+  `carre` varchar(5) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `jeu_personnages`
+-- 
+
+INSERT INTO `jeu_personnages` VALUES ('1', '31');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `joueur`
+-- 
+
+CREATE TABLE `joueur` (
+  `num` varchar(10) NOT NULL default '',
+  `email` text NOT NULL,
+  `login` varchar(10) NOT NULL default '',
+  `mdp` varchar(10) NOT NULL default '',
+  `nom` varchar(10) NOT NULL default '',
+  `pv` varchar(10) NOT NULL default '',
+  `pv2` varchar(10) NOT NULL default '',
+  `pm` varchar(10) NOT NULL default '',
+  `pm2` varchar(10) NOT NULL default '',
+  `forc` varchar(10) NOT NULL default '',
+  `end` varchar(10) NOT NULL default '',
+  `inti` varchar(10) NOT NULL default '',
+  `dext` varchar(10) NOT NULL default '',
+  `vit` varchar(10) NOT NULL default '',
+  `cha` varchar(10) NOT NULL default '',
+  `man` varchar(10) NOT NULL default '',
+  `ppm` varchar(10) NOT NULL default '',
+  `exp` varchar(10) NOT NULL default '',
+  `ors` varchar(10) NOT NULL default '',
+  `codeexp` varchar(10) NOT NULL default '',
+  `nivsuv` varchar(10) NOT NULL default '',
+  `cexp` varchar(10) NOT NULL default '',
+  `nbexp` varchar(10) NOT NULL default '',
+  `libellerace` varchar(10) NOT NULL default '',
+  `libellerang` varchar(10) NOT NULL default '',
+  `village` varchar(10) NOT NULL default '',
+  `image` varchar(10) NOT NULL default '',
+  `Enligne` varchar(10) NOT NULL default '',
+  `nbCombat` varchar(10) NOT NULL default '',
+  `nbVictoire` varchar(10) NOT NULL default '',
+  `NbCombatDay` varchar(10) NOT NULL default '',
+  `Arme` varchar(20) NOT NULL default '',
+  `Bouclier` varchar(20) NOT NULL default '',
+  `Casque` varchar(20) NOT NULL default '',
+  `Plastron` varchar(20) NOT NULL default '',
+  `AvantBras` varchar(20) NOT NULL default '',
+  `Botte` varchar(20) NOT NULL default '',
+  `Jambiere` varchar(20) NOT NULL default '',
+  PRIMARY KEY  (`num`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `joueur`
+-- 
+
+INSERT INTO `joueur` VALUES ('01', 'test@test.fr', 'test', 'test', 'magend', '120', '44', '50', '50', '10', '100', '5', '10', '5', '5', '10', '3', '1830', '771', '6', '4050', '0', '5', 'humain', 'Ecuyer', '01', 'Ranger.jpg', '1190925649', '22', '34', '22', 'rien', 'Rondache', 'Casque', 'rien', 'rien', 'rien', 'rien');
+INSERT INTO `joueur` VALUES ('030655', 'test2@test.fr', 'test2', 'test2', 'test2', '60', '60', '5', '5', '4', '4', '0', '1', '1', '2', '10', '1', '4', '32', '1', '150', '0', '0', 'Ogre', 'novice', '01', 'Ogre.jpg', '1183569890', '1', '3', '1', 'rien', 'rien', 'rien', 'rien', 'rien', 'rien', 'rien');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `magazin`
+-- 
+
+CREATE TABLE `magazin` (
+  `code` varchar(10) NOT NULL default '',
+  `libelle` varchar(20) NOT NULL default '',
+  `coord01` varchar(4) NOT NULL default '',
+  `coord02` varchar(4) NOT NULL default '',
+  `coord03` varchar(4) NOT NULL default '',
+  `coord04` varchar(4) NOT NULL default '',
+  `village` varchar(10) NOT NULL default '',
+  `chemin` varchar(50) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `magazin`
+-- 
+
+INSERT INTO `magazin` VALUES ('01', 'Forgeron', '240', '430', '370', '510', '01', 'obget.php?magazin=01');
+INSERT INTO `magazin` VALUES ('02', 'Chez le père magotte', '240', '430', '370', '510', '01', 'obget.php?magazin=02');
+INSERT INTO `magazin` VALUES ('03', 'Au rat fumant', '240', '30', '340', '130', '01', 'taverne.php');
+INSERT INTO `magazin` VALUES ('04', 'Le cimetierre du dés', '630', '210', '730', '290', '02', 'obget.php?magazin=04');
+INSERT INTO `magazin` VALUES ('05', 'Chez le père serte', '40', '200', '130', '260', '02', 'obget.php?magazin=05');
+INSERT INTO `magazin` VALUES ('06', 'Au cheval bondissant', '310', '60', '450', '160', '02', 'aventure.php');
+INSERT INTO `magazin` VALUES ('07', 'Le bouclier de rock', '540', '45', '650', '180', '03', 'obget.php?magazin=07');
+INSERT INTO `magazin` VALUES ('08', 'Chez pierre', '45', '50', '150', '190', '03', 'obget.php?magazin=08');
+INSERT INTO `magazin` VALUES ('09', 'Le gai souriseau', '35', '240', '145', '440', '03', 'aventure.php');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `message`
+-- 
+
+CREATE TABLE `message` (
+  `code` varchar(10) NOT NULL default '',
+  `a` varchar(20) NOT NULL default '',
+  `de` varchar(20) NOT NULL default '',
+  `date` varchar(10) NOT NULL default '',
+  `sujet` varchar(10) NOT NULL default '',
+  `contenu` text NOT NULL,
+  `lue` char(1) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `message`
+-- 
+
+INSERT INTO `message` VALUES ('122035', 'test2', 'test2', '122035', 'test2', 'gcchh\r\n', '0');
+INSERT INTO `message` VALUES ('074759', 'magend', 'magend', '074759', '1', '1', '1');
+INSERT INTO `message` VALUES ('122046', 'magend', 'test2', '122046', 'salut', 'sdhsdgj\r\n', '1');
+INSERT INTO `message` VALUES ('124531', 'test2', 'magend', '124531', 'bonjour de', 'hello', '1');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `objet`
+-- 
+
+CREATE TABLE `objet` (
+  `num` varchar(10) NOT NULL default '',
+  `libelle` varchar(20) NOT NULL default '',
+  `resumer` text NOT NULL,
+  `effet` varchar(10) NOT NULL default '',
+  `valeur` varchar(10) NOT NULL default '',
+  `image` varchar(20) NOT NULL default '',
+  `catheg` varchar(10) NOT NULL default '',
+  `autre` varchar(10) NOT NULL default '',
+  PRIMARY KEY  (`num`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `objet`
+-- 
+
+INSERT INTO `objet` VALUES ('01', 'Pomme', 'Une belle pomme du verger de votre village. Cet aliment vous redonne 5 point de vie ', 'pv2', '5', 'item02.jpg', 'item', '');
+INSERT INTO `objet` VALUES ('02', 'Epée', 'Une epee pas trop mal , normal elle est forger par le nain du village', 'for', '5', 'epee01.jpg', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('03', 'Armure de cuir', 'Cette armure faite de cuir durci dans de l''huile bouillante et modelée en forme de plastron. Le reste de l''armure est fabriqué à partir de matiière plus souples et plus douce', 'end', '10', 'armure02.jpg', 'equip', 'Plastron');
+INSERT INTO `objet` VALUES ('04', 'Besantine', 'Cette armure faite de cuir souple est renforcée par des rivets métalliques', 'end', '15', 'armure01.jpg', 'equip', 'Plastron');
+INSERT INTO `objet` VALUES ('07', 'Plates d armure', 'Combinaison d''armure en cotte de mailles et de plaques métalliques couvrant les zones vitales telles que le torse , l''abdomen et l''aine. Le poids est distribué sur tout le corps et l''armure est maintenue en place grâce à des boucles et des sangles', 'end', '30', '', 'equip', 'Plastron');
+INSERT INTO `objet` VALUES ('05', 'Cotte de maille', 'La cotte de maille est composée d''anneaux métaliques s''imbriquant les uns dans les autres. Elle se porte toujours par-dessus une couche de tissu matelassé ou de cuir souple pour éviter l''irritation et amortie l''impact des coups', 'end', '20', '', 'equip', 'Plastron');
+INSERT INTO `objet` VALUES ('06', 'Armure Feuilletée', 'Les bandes de métal sont appliquées verticalement au dos de mailles de cuir ou de tissu plutôt qu''horizontalement comme dans l''armure à bandes. L''armure feuilleté offre moin de mobilité lors d''un combat', 'end', '25', '', 'equip', 'Plastron');
+INSERT INTO `objet` VALUES ('08', 'Armure complète', 'Les plaques s''imbriquant parfaitement les unes aux autres sont spécialement orientées pour dévier les flèches et les coups. L''armure est soigneusement décoré de glyphe et d''estamps riches en détails', 'end', '50', '', 'equip', 'Plastron');
+INSERT INTO `objet` VALUES ('09', 'Grand bouclier', 'Ce large bouclier de métal ou de bois protège son utilisateur du menton à la pointe des pieds. Il doit solidement l''''attaché à l''''avant-bras', 'end', '20', 'bouclier01.jpg', 'equip', 'Bouclier');
+INSERT INTO `objet` VALUES ('10', 'Ecu', 'Les écus sont généralement composé de métal , font de 1 m à 1,20m de haut et sont de différente forme. Un écu médiéval typique ressemble à un triangles pointant vers le bas', 'end', '15', 'bouclier02.jpg', 'equip', 'Bouclier');
+INSERT INTO `objet` VALUES ('11', 'Rondache', 'Son poids léger comparé à celui de lécu permet à l''utilisateur de porter d''autre objets dans cette main, même s''il ne peut manier ou porter une autre arme.', 'end', '10', 'bouclier05.jpg', 'equip', 'Bouclier');
+INSERT INTO `objet` VALUES ('12', 'Targe', 'Ce sont des versions légèrement plus petites des rondaches idéal pour les débutant', 'end', '5', '', 'equip', 'Bouclier');
+INSERT INTO `objet` VALUES ('13', 'Bottes', 'Faites à la amin par des cordonniers, fabriquées en seri selon un modèle regional, les plus chères sont faite spécialement au pied d''un individu', 'end', '5', '', 'equip', 'Botte');
+INSERT INTO `objet` VALUES ('14', 'Gantelets', 'Ses gant de protection peuvent être faits de cuir, de plaques de métal ou en cotte de mailles.', 'end', '5', 'gant01.jpg', 'equip', 'AvantBras');
+INSERT INTO `objet` VALUES ('15', 'Casque', 'Les casque protègent une grande partie de la tête, excepté le visage et le cou. ils sont fait de cuir renforcé ou de métal', 'end', '5', 'casque04.jpg', 'equip', 'Casque');
+INSERT INTO `objet` VALUES ('16', 'Dague', 'Lame pointue et à double tranchant, contrairement à un couteau qui a un seul bord coupant et qui est un peu plus court', 'for', '5', 'dague01.jpg', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('17', 'Epée courte', 'Elle a une lame à double tranchant d''environ 60 cm de long. La pointe de l''épée est généralement pointue, idéale pour piquer', 'for', '10', '', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('18', 'Epée à deux mains', 'L''épée à deux main est un dérivé de l''épée longue. La lame a été allongée et la poignée a été étendue. Il faut alors deux mains pour manier l''épée correctement', 'for', '30', '', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('19', 'Poulet', 'Une chair bien tendre, cuit à point. Le repas sur le pouce de tout aventurier\r\nCet aliment vous redonne 20 point de vie', 'pv2', '20', 'item04.jpg', 'item', '');
+INSERT INTO `objet` VALUES ('20', 'Gateau de miel', 'La durée de conservation et ses valeurs nutritives, on permit à bien des aventurier de survivre lors de longue quête.\r\nCet aliment vous redonne 15 point de vie. ', 'pv2', '15', 'item03.jpg', 'item', '');
+INSERT INTO `objet` VALUES ('21', 'Fléau', 'Le fléau est composé d''une boule de fer hérissée de pointe attachée par une chaine à un manche de bois', 'for', '10', 'fléau.jpg', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('22', 'Morgenstern', 'Un manche de bois surmonté d''une tête métalique hérissée de pointes. Elles mesurent généralement 1.20m environ', 'for', '10', 'mosterg.jpg', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('23', 'Hachette', 'La hachette est également connue sous le nom de hache de poing ou hache de jet. Elle présente d''un côté une lame tranchante et de l''autre un appendice pointu. Le manche est souvent doté d''une pointe métallique.', 'for', '10', 'hache02.jpg', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('24', 'Hache d''armes', 'La version la plus communes de la hache d''armes est constitué d''un manche d''environ 1.20m de long surmonté d''une lame tranchante. Les haches d''armes sont aussi appelées grandes haches.', 'for', '15', 'hache03.jpg', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('25', 'Gourdin', 'La plupart des gourdins sont de simple manches de bois, étroits à la poignée et plus large à l''autre extrémité. Cette armeest utilisé depuis que l''humanité à commencé à utiliser des outil. Tout le monde peut trouver un morceau de bois robuste et s''en servir, ce uqi explique l''usage répendu du gourdin', 'for', '5', '', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('26', 'Masse', 'La masse est une descendante directe du gourdin. Un manche de bois surmonté d''un bloc de pierre ou d''une tête métallique', 'for', '10', 'massarme.jpg', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('27', 'Bâton', 'Le bâton est un manche de bois d''une longueur allant de 1.80m à 2.7m. Les bâtons de qulité sont fabriqués dans du chêne et leurs extrémités sont ferrées. Le bâtonse manie à deux mains', 'for', '5', '', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('28', 'Marteau de guerre', 'Le marteau de guerre se compose d''un manche de métal ou de bois surmonté d''une tête de métal généralement carrée. Son poids le rend redoutable contre toutes les créatures, même protégées de lourdes armures.', 'for', '30', '', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('29', 'Lance', 'L''une des premières armes de l''homme, remontant aux époques les plus primitives. les premières lances étaient des bâtons de bois taillés à une des extrémités. Lorque l''homme a commencé à maîtriser les métaux, il ajouta aux lances des pointes de fer et d''acier. Avec le développement d''armures plus résistantes, les fabricants de lances commencèrent à utiliser différents types d''alliage pour leurs pointes', 'for', '10', '', 'equip', 'Arme');
+INSERT INTO `objet` VALUES ('30', 'Hallebarde', 'La hallebarde est constituée d''une lame de hache semblable à un couperet montée sur un bâton d''environ 1.80m de haut. La hallebarde combine les caractéristiques à a fois de la lance et de la hache.', 'for', '20', '', 'equip', 'Arme');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `objethero`
+-- 
+
+CREATE TABLE `objethero` (
+  `hero` varchar(10) NOT NULL default '',
+  `objet` varchar(10) NOT NULL default '',
+  `nb` varchar(10) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `objethero`
+-- 
+
+INSERT INTO `objethero` VALUES ('01', '01', '3');
+INSERT INTO `objethero` VALUES ('01', '03', '4');
+INSERT INTO `objethero` VALUES ('01', '20', '1');
+INSERT INTO `objethero` VALUES ('01', '07', '1');
+INSERT INTO `objethero` VALUES ('01', '11', '1');
+INSERT INTO `objethero` VALUES ('01', '13', '1');
+INSERT INTO `objethero` VALUES ('01', '15', '1');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `objetproposer`
+-- 
+
+CREATE TABLE `objetproposer` (
+  `magazin` varchar(10) NOT NULL default '',
+  `objet` varchar(10) NOT NULL default '',
+  `nb` varchar(10) NOT NULL default '',
+  `prix` varchar(10) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `objetproposer`
+-- 
+
+INSERT INTO `objetproposer` VALUES ('07', '09', '10', '50');
+INSERT INTO `objetproposer` VALUES ('04', '03', '5', '55');
+INSERT INTO `objetproposer` VALUES ('04', '18', '10', '60');
+INSERT INTO `objetproposer` VALUES ('04', '17', '10', '50');
+INSERT INTO `objetproposer` VALUES ('04', '16', '10', '30');
+INSERT INTO `objetproposer` VALUES ('04', '02', '10', '40');
+INSERT INTO `objetproposer` VALUES ('01', '18', '10', '120');
+INSERT INTO `objetproposer` VALUES ('01', '02', '10', '60');
+INSERT INTO `objetproposer` VALUES ('01', '16', '10', '40');
+INSERT INTO `objetproposer` VALUES ('01', '15', '5', '60');
+INSERT INTO `objetproposer` VALUES ('01', '13', '5', '55');
+INSERT INTO `objetproposer` VALUES ('01', '11', '5', '50');
+INSERT INTO `objetproposer` VALUES ('01', '09', '4', '75');
+INSERT INTO `objetproposer` VALUES ('01', '08', '5', '575');
+INSERT INTO `objetproposer` VALUES ('01', '07', '5', '175');
+INSERT INTO `objetproposer` VALUES ('01', '03', '5', '50');
+INSERT INTO `objetproposer` VALUES ('07', '10', '10', '60');
+INSERT INTO `objetproposer` VALUES ('07', '11', '10', '70');
+INSERT INTO `objetproposer` VALUES ('07', '12', '10', '80');
+INSERT INTO `objetproposer` VALUES ('07', '03', '5', '60');
+INSERT INTO `objetproposer` VALUES ('02', '01', '50', '6');
+INSERT INTO `objetproposer` VALUES ('02', '19', '20', '18');
+INSERT INTO `objetproposer` VALUES ('02', '20', '10', '12');
+INSERT INTO `objetproposer` VALUES ('05', '01', '10', '12');
+INSERT INTO `objetproposer` VALUES ('05', '19', '15', '20');
+INSERT INTO `objetproposer` VALUES ('05', '20', '40', '08');
+INSERT INTO `objetproposer` VALUES ('08', '01', '10', '10');
+INSERT INTO `objetproposer` VALUES ('08', '19', '30', '15');
+INSERT INTO `objetproposer` VALUES ('08', '20', '10', '10');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `race`
+-- 
+
+CREATE TABLE `race` (
+  `code` varchar(10) NOT NULL default '',
+  `libelle` varchar(40) NOT NULL default '',
+  `r_pv` varchar(10) NOT NULL default '',
+  `r_pm` varchar(10) NOT NULL default '',
+  `r_for` varchar(10) NOT NULL default '',
+  `r_end` varchar(10) NOT NULL default '',
+  `r_vit` varchar(10) NOT NULL default '',
+  `r_int` varchar(10) NOT NULL default '',
+  `r_dext` varchar(10) NOT NULL default '',
+  `r_cha` varchar(10) NOT NULL default '',
+  `r_man` varchar(10) NOT NULL default '',
+  `r_ppm` varchar(10) NOT NULL default '',
+  `r_village` varchar(10) NOT NULL default '',
+  `r_image` varchar(10) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `race`
+-- 
+
+INSERT INTO `race` VALUES ('03', 'Nain', '50', '5', '3', '4', '1', '1', '1', '2', '8', '2', '02', 'Nain.jpg');
+INSERT INTO `race` VALUES ('02', 'Elfe', '30', '20', '2', '1', '3', '3', '2', '4', '3', '10', '01', 'Elfe.jpg');
+INSERT INTO `race` VALUES ('01', 'Humain', '40', '10', '2', '2', '2', '2', '2', '2', '4', '6', '01', 'Ranger.jpg');
+INSERT INTO `race` VALUES ('04', 'Ogre', '60', '5', '4', '4', '1', '0', '1', '2', '10', '1', '01', 'Ogre.jpg');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `village`
+-- 
+
+CREATE TABLE `village` (
+  `code` varchar(10) NOT NULL default '',
+  `libelle` varchar(10) NOT NULL default '',
+  `coord01` varchar(4) NOT NULL default '',
+  `coord02` varchar(4) NOT NULL default '',
+  `coord03` varchar(4) NOT NULL default '',
+  `coord04` varchar(4) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `village`
+-- 
+
+INSERT INTO `village` VALUES ('01', 'Valtordu', '200', '660', '280', '685');
+INSERT INTO `village` VALUES ('02', 'Waldorg', '1270', '740', '1360', '770');
+INSERT INTO `village` VALUES ('03', 'Gzor', '518', '265', '569', '306');
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `villagealler`
+-- 
+
+CREATE TABLE `villagealler` (
+  `villagedep` varchar(10) NOT NULL default '',
+  `villagearv` varchar(10) NOT NULL default '',
+  `temps` varchar(10) NOT NULL default '',
+  `dure` varchar(20) NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Contenu de la table `villagealler`
+-- 
+
+INSERT INTO `villagealler` VALUES ('01', '02', '10', '1H 30min');
+INSERT INTO `villagealler` VALUES ('02', '01', '10', '1H 25min');
+INSERT INTO `villagealler` VALUES ('01', '03', '20', '2H 45min');
+INSERT INTO `villagealler` VALUES ('02', '03', '30', '2 Jour 5h');
+INSERT INTO `villagealler` VALUES ('03', '01', '50', '3 Jour 2h');
+INSERT INTO `villagealler` VALUES ('03', '02', '60', '1 Jour 5h');
+        

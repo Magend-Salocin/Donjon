@@ -1,0 +1,96 @@
+	#Authentification{
+		background-image:url('../img/img/Ecran.jpg');
+		background-repeat:no-repeat;
+		height:375px;
+		padding:140px 50px 5px 30px;
+		font-size:0.8em;
+	}
+	
+	.ActionJeu{
+	
+		color:black;
+	}
+	.ActionJeu:link{
+	
+		color:black;
+	}
+	 
+	
+	#CarteJoueur{
+		color:black;
+		margin:auto;
+		background-image: url('../img/img/CarteHeroFondDefault.jpg');
+		background-repeat: no-repeat;	
+		width: 339px;
+		height: 475px;
+		padding-top:20px;
+		padding-left:15px;
+	
+	}
+	
+	#CarteJoueurAventure{
+		color:black;
+		margin:auto;
+		background-image: url('../img/img/CarteHeroAventure.jpg');
+		background-repeat: no-repeat;	
+		width: 475px;
+		height: 339px;
+		padding-top:20px;
+		padding-left:15px;
+	
+	}
+
+	#image/imgJoueur{
+		margin-left:120px;
+		margin-top:120px;
+		position:relative;
+	}
+
+	#CarcJoueur{
+		margin-left:20px;
+		margin-top:120px;
+		position:absolute;
+	}
+	.tabover{
+		background-color:blue; 
+		cursor:pointer; 
+		color:white;
+		font-weight:bold;
+		TEXT-ALIGN: center;
+		PADDING-RIGHT: 0px; 
+		PADDING-LEFT: 0px; 
+		PADDING-BOTTOM: 0px; 
+		PADDING-TOP: 0px;
+		FONT-SIZE: 10px ;
+		FONT-FAMILY: Tahoma,sans-serif; 
+		color: black;
+	}
+		
+	.tabheros{
+		BORDER-RIGHT	: 1px solid; 
+		BORDER-TOP		: 1px solid; 
+		BORDER-LEFT		: 1px solid; 
+		WIDTH			: 75%; 
+		BORDER-BOTTOM	: 1px solid; 
+		TEXT-ALIGN		: left  ;
+	}
+		
+	.tabAventure{
+		BORDER-RIGHT: 1px solid; 
+		BORDER-TOP: 1px solid; 
+		BACKGROUND: #ececec; 
+		BORDER-LEFT: 1px solid; 
+		WIDTH: 90%; 
+		BORDER-BOTTOM: 1px solid; 
+		TEXT-ALIGN: left
+	}
+		
+	.td{
+		TEXT-ALIGN: center;
+		FONT-SIZE: 13px ; 
+		FONT-FAMILY: script; 
+		PADDING-RIGHT: 0px; 
+		PADDING-LEFT: 0px; 
+		PADDING-BOTTOM: 0px; 
+		PADDING-TOP: 0px;	
+	}

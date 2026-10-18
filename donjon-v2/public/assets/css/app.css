@@ -1,0 +1,114 @@
+/* Styles ajoutés en v2. main.css et old.css sont les feuilles d'origine (2009). */
+
+.menu-sword-right { float: right; }
+.center { text-align: center; }
+.inline { display: inline; }
+
+#body { overflow: hidden; }
+#body-rightside h2, #body-rightside h3, .page h2, .page h3 { color: #f0d9a8; }
+#body-fullside.loginBlock { float: none; }
+
+/* Messages flash */
+.flash { margin: 8px 20px; padding: 6px 10px; border-radius: 4px; font-size: 0.85em; clear: both; }
+.flash-ok { background: #24461e; color: #d8f5c8; }
+.flash-erreur { background: #5a1a14; color: #ffd6cf; }
+.flash-info { background: #3b2d14; color: #f5e2b8; }
+.flash a { color: #fffb8e; text-decoration: underline; }
+
+/* Formulaires */
+input[type=text], input[type=email], input[type=password], select, textarea {
+    font: inherit; padding: 3px 5px; border: 1px solid #694421; background: #fdf6e3; color: #2b1a08;
+}
+button { font: inherit; cursor: pointer; padding: 3px 10px; background: #694421; color: #fff; border: 1px solid #3a240f; border-radius: 3px; }
+button:hover { background: #902200; }
+button.link { background: none; border: none; padding: 0; color: #902200; text-decoration: underline; }
+button.link:hover { color: #481e00; background: none; }
+
+/* Barres de vie, magie et expérience */
+.bar { display: inline-block; vertical-align: middle; width: 200px; height: 10px; border: 1px solid #000; background: #f3f3f3; }
+.bar > span { display: block; height: 100%; }
+.bar-vie > span { background: #2e9b2e; }
+.bar-magie > span { background: #2e5fb8; }
+.bar-exp > span { background: #c99a1a; }
+
+/* Fiche du héros */
+#CarteJoueur { height: auto; min-height: 475px; padding-bottom: 20px; }
+#CarteJoueur .stat-block { margin: 18px 10px; }
+.hero-stats { width: 300px; margin: 10px auto; }
+.hero-stats td { vertical-align: top; }
+.level-table td { padding: 4px 8px; }
+.journey { text-align: center; }
+.account-form label { display: inline-block; width: 150px; }
+
+/* Pages publiques */
+.page { padding: 10px 20px; }
+.page-full { float: none; padding: 40px 60px; color: #c9b48a; }
+.login { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; justify-content: center; font-family: Georgia, serif; }
+.login form, .register form { background: url('../img/MenuA.jpg') no-repeat; background-size: 100% 100%; color: #2b1a08; padding: 20px 40px; width: 360px; }
+.login label { display: inline-block; width: 120px; }
+.login .hint a { color: #902200; }
+.intro-flash embed, .intro-flash ruffle-embed { max-width: 100%; }
+.register form { width: auto; max-width: 520px; margin: 0 auto; background-image: url('../img/Autre/FondInscription.jpg'); background-size: cover; padding: 120px 40px 30px; }
+.register td { padding: 4px; }
+
+/* Listes sur parchemin (inventaire, boutique, aventures) */
+.parchment-list { width: 470px; margin: 10px auto 20px; padding: 10px 0; background: url('../img/Menu02.jpg') repeat-y; background-size: 100% auto; color: #694421; }
+.parchment-list h3 { text-align: center; color: #481e00 !important; }
+.parchment-list > p { text-align: center; }
+.parchment-list a { color: #902200; }
+.item-card { display: grid; grid-template-columns: 110px 1fr; width: 430px; margin: 10px auto; padding: 12px; background: url('../img/MenuB.jpg') no-repeat; background-size: 100% 100%; }
+.item-image { width: 96px; max-height: 96px; object-fit: contain; }
+.item-text hr { border: 0; border-top: 1px solid #ff0033; }
+.item-text p { text-align: justify; margin: 4px 0; }
+.item-footer { grid-column: 1 / -1; text-align: center; margin-top: 6px; }
+.shopkeeper { display: flex; gap: 10px; align-items: center; width: 470px; height: 86px; margin: 20px auto; background: url('../img/EmoteFn1.png') no-repeat; color: #2b1a08; }
+.shopkeeper img { height: 70px; margin-left: 9px; }
+
+/* Parchemin à rouleaux (équipement, messagerie) */
+.scroll-panel { width: 420px; margin: 0 auto; }
+.scroll-edge { display: block; width: 420px; }
+.scroll-body { width: 420px; background: url('../img/msg_int/menu03.jpg') repeat-y; color: #2b1a08; padding: 5px 15px; box-sizing: border-box; }
+.scroll-body a { color: #902200; }
+table.scroll-body td { padding: 4px; }
+.messages { width: 100%; border-collapse: collapse; }
+.messages th { background: #0066ff; color: #fff; text-align: left; }
+.message-content { background: #fdf6e3; padding: 8px; margin: 8px 0; }
+.message-form input[type=text] { width: 260px; }
+.message-form textarea { width: 100%; box-sizing: border-box; }
+
+/* Village, carte de voyage */
+.map-page { float: none !important; padding: 20px !important; text-align: center; }
+.map-page h2 { color: #f0d9a8; }
+.travel-map { width: 700px; }
+.buildings a, .destinations button { margin: 4px; }
+.buildings a { display: inline-block; padding: 3px 8px; background: #3b2d14; border-radius: 3px; }
+
+/* Taverne */
+.tavern-image { max-width: 100%; }
+.tavern-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.tavern ul.chat { list-style: none; padding: 0; max-height: 250px; overflow-y: auto; background: #fdf6e3; color: #2b1a08; }
+.tavern ul.chat li { padding: 4px 8px; border-bottom: 1px solid #e0cfa5; }
+.tavern input[type=text] { width: 150px; }
+
+/* Défis */
+table.duels { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+table.duels th, table.duels td { border: 1px solid #694421; padding: 3px; text-align: center; }
+table.duels button.link { color: #fffb8e; }
+.rank-novice { color: #ff4040; }
+.rank-ecuyer { color: #30b030; }
+.rank-aventurier { color: #c070ff; }
+.rank-legende { color: #6080ff; }
+.fight-log { list-style: none; padding: 0; }
+.fight-log li { opacity: 0; animation: fight-line 0.3s forwards; padding: 4px 0; }
+.fight-hero { color: #7fb2ff; }
+.fight-opponent { color: #ff7f7f; }
+.fight-fin { color: #8fe08f; font-weight: bold; }
+@keyframes fight-line { to { opacity: 1; } }
+
+/* Pied de page : musiques d'origine */
+.footer-links { display: flex; align-items: center; gap: 10px; }
+.music { display: inline-flex; align-items: center; gap: 6px; color: #c0c0c0; font-size: 0.75em; }
+.music audio { height: 26px; width: 220px; }
+.level-up { color: #c00 !important; font-weight: bold; }
+span.main_menu { display: block; margin: 0 0 10px 50px; color: #694421; font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 15px; }
+#CarteJoueur .bar-line { margin: 4px 0 10px; }

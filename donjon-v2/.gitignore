@@ -1,0 +1,4 @@
+# Base SQLite créée au premier lancement (parties des joueurs)
+/data/*.sqlite
+/data/*.sqlite-wal
+/data/*.sqlite-shm

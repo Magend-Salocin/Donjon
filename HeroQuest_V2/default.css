@@ -1,0 +1,100 @@
+
+body {
+	color:blak;
+	font-family:Arial,Helvetica,sans-serif;
+	margin:0;
+}
+
+.Cache{
+	display:none;
+}
+.Montre{
+	display:block;
+}
+
+
+.CarteTitre{
+
+color:green;
+}
+
+.CarteDescription{
+
+color:black;
+
+}
+
+#scroll_top{
+	background-image:url('images/Cadre/menu_scroll_top.jpg');
+	width:100%;
+	height:87px;
+	text-align:center;
+}
+#scroll_middle{
+	background-image:url('images/Cadre/menu_scroll_middle.jpg');
+	width:100%;
+	height:280px;/*Shall be only multiples of 140px.(140, 280, 320 etc) Otherwise picture will be unclear*/
+	overflow:hidden;
+	text-align:justify;
+	padding-top:20px;
+}
+#scroll_bottom{
+	background-image:url('images/Cadre/menu_scroll_bottom.jpg');
+	width:100%;
+	height:109px;
+	text-align:center;
+}
+#scroll_header{
+	font-family:"Charlemagne Std", "Times New Roman", Times, serif;
+	color:#481e00;
+	font-size:20px;
+	position:relative;
+	top:50px;
+}
+
+.Centre {
+	height:400px;
+	left:40%;
+	position:absolute;
+	width:700px;
+}
+
+
+.demoElement {
+	background-color:#000000;	
+	width:250px;
+	height: 0px;
+	background-color:red;
+	font-size: 12px;
+	color: #000000;
+	position:absolute;
+	display:none;
+}
+
+
+
+.myClass {
+	width: 250px;
+	height: 421px;
+	display:block;
+	background-color:blue;
+	margin-left: auto;
+	margin-right: auto;
+	position:absolute;
+}
+
+.test{
+	filter:alpha(opacity=0);
+}
+
+.FondNoir{
+	/*background-Color:black;*/
+	height:24px;
+	width:24px;
+}
+
+.FondTransparent{
+	height:24px;
+	width:24px;
+	Background:Transparent;
+}
