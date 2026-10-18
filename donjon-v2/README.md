@@ -37,6 +37,7 @@ bin/reset-db.php      Recrée la base et le compte de démonstration
 bin/import-heroquest.py  Convertit les quêtes du HeroQuest PC de Gremlin en cartes 101 à 124
 bin/heroquest-tiles/  Sols et meubles utilisés pour dessiner ces cartes (repris du remake HeroQuest en C#)
 bin/extract-heroquest-graphics.py  Extrait les graphismes du HeroQuest PC pour la vue isométrique
+bin/heroquest-outils.py  Outils pour explorer les fichiers du HeroQuest PC (formats : _Version/HeroQuest (1991 Gremlin)/FORMATS.md)
 src/                  Code PHP
   bootstrap.php       Autoload, configuration, session, ouverture de la base
   Database.php        Accès PDO (requêtes préparées, transactions)
@@ -85,7 +86,7 @@ Limites :
 
 ### Vue isométrique
 
-Sur les cartes 101 à 124, le plateau s'affiche par défaut en vue isométrique avec les graphismes du jeu de Gremlin : sols de chaque pièce, murs du fond, portes (fermées tant qu'un côté n'est pas dévoilé), meubles, escalier, héros et monstres. Chaque attaque s'affiche en gros plan pendant deux secondes : les deux combattants agrandis sur leurs dalles avec l'animation d'attaque du jeu, les dés lancés, les points de vie et le résultat. Le bouton au-dessus du plateau passe à la vue de dessus, et le choix est mémorisé dans le navigateur. Le moteur ne change pas : `ModuleIso.js` redessine en continu l'état du tableau `#board`, qui reste masqué.
+Sur les cartes 101 à 124, le plateau s'affiche par défaut en vue isométrique avec les graphismes du jeu de Gremlin : sols de chaque pièce, murs du fond, portes (fermées tant qu'un côté n'est pas dévoilé), meubles, escalier, héros et monstres. Chaque attaque s'affiche en gros plan pendant deux secondes : les deux combattants agrandis sur leurs dalles avec l'animation d'attaque du jeu, les dés lancés, les points de vie et le résultat. Le bouton au-dessus du plateau fait tourner trois vues : 3D, classique et vue de dessus. Le choix est mémorisé dans le navigateur. La vue classique reprend l'écran du jeu d'origine : seule la pièce du héros (ou les cases de couloir à moins de 4 cases) est dessinée, posée sur le livre devant Morcar ; le portrait du héros et ses caractéristiques (or, attaque, déplacement, défense) sont en haut à gauche, et les icônes d'action en bas (lancer les dés, attaquer, chercher un trésor, chercher les pièges, utiliser un objet, fin de tour), cliquables et grisées une fois jouées. Le moteur ne change pas : `ModuleIso.js` redessine en continu l'état du tableau `#board`, qui reste masqué.
 
 Les graphismes viennent de `public/assets/game/iso/atlas.png` et `atlas.js`, générés à partir des fichiers du jeu :
 
@@ -94,6 +95,8 @@ python bin/extract-heroquest-graphics.py "../_Version/HeroQuest (1991 Gremlin)"
 ```
 
 Le script décompresse `QUEST.EXE` (compressé avec EXEPACK) pour y lire la palette et les tables des sprites, puis les fichiers `.VGA` (compression LZ77 propre au jeu, retrouvée en désassemblant l'exécutable). Les formats sont décrits en tête du script.
+
+Toutes les notes de rétro-ingénierie (formats, adresses dans l'exécutable, tables, pistes non explorées) sont dans [FORMATS.md](../_Version/HeroQuest%20(1991%20Gremlin)/FORMATS.md).
 
 Les flèches du clavier déplacent toujours le héros sur la grille : ↑ va vers le haut à droite de l'écran, → vers le bas à droite.
 

@@ -39,6 +39,12 @@ HEROES = {'barbare': 0x4fa8, 'nain': 0x4fd8, 'elfe': 0x5008, 'magicien': 0x5038,
 MONSTERS = {'gobelin': 0x5098, 'orc': 0x50a8, 'fimir': 0x50b8, 'chaos': 0x50c8, 'squelette': 0x50d8,
             'zombie': 0x50e8, 'momie': 0x50f8, 'gargouille': 0x5108}
 
+# Vue classique : portraits 32 x 45 du panneau (ODDS&SOD, pas 0x5a0) et icônes 16 x 16 (position 0x20 + n x 256).
+PORTRAITS = ['barbare', 'nain', 'elfe', 'magicien', 'guerrier']
+ICONS = {'deplacement': 48, 'attaque': 49, 'objet': 51, 'tresor': 52, 'piege': 53, 'fin': 55,
+         'bottes': 93, 'bras': 94, 'or': 95, 'bouclier': 98}
+ICON_DIMMED = 12                     # même icône, grisée (action déjà jouée)
+
 
 def exepack_unpack(path):
     """Image mémoire d'un exécutable EXEPACK (sans en-tête MZ)."""
@@ -173,6 +179,12 @@ class Extractor:
         for name, table in MONSTERS.items():
             for frame in range(4):
                 self.add(f'{name}{frame}', self.sprite('MONSTERS', table + 4 * frame))
+        for index, name in enumerate(PORTRAITS):
+            self.add(f'portrait-{name}', self.image('ODDS&SOD', index * 0x5a0, (32, 45)))
+        for name, number in ICONS.items():
+            self.add(f'icone-{name}', self.image('ODDS&SOD', 0x20 + number * 256, (16, 16)))
+            if number < 93:
+                self.add(f'icone-{name}-grise', self.image('ODDS&SOD', 0x20 + (number + ICON_DIMMED) * 256, (16, 16)))
 
         zone_floors = [f'sol{self.word(ZONE_FLOORS + 2 * zone):04x}' for zone in range(43)]
         special_floors = {f'{code}': f'sol{offset:04x}' for code, offset in specials.items()}
@@ -197,6 +209,9 @@ class Extractor:
             sheet.paste(image, tuple(placed[key][:2]))
         OUTPUT.mkdir(parents=True, exist_ok=True)
         sheet.save(OUTPUT / 'atlas.png', optimize=True)
+        book = Image.frombytes('P', (320, 200), self.vga('BOOK')[:64000])
+        book.putpalette(self.palette)
+        book.convert('RGB').save(OUTPUT / 'livre.png', optimize=True)   # fond de la vue classique
         script = [
             '// Graphismes du HeroQuest PC de Gremlin (1991), extraits par bin/extract-heroquest-graphics.py.',
             '// IsoAtlas : nom -> [x, y, largeur, hauteur(, dx, dy pour les meubles)] sur atlas.png.',

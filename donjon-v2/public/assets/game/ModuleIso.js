@@ -5,11 +5,18 @@
 	 *
 	 * Case (x, y) : sommet haut du losange en ((x - y) * 24, (x + y) * 12). Seuls les murs du fond (cotes haut et gauche)
 	 * sont dessines, comme dans le jeu d'origine, pour voir l'interieur des pieces.
+	 *
+	 * Trois vues : '3d' (tout ce qui est devoile, camera qui suit le heros), 'classique' (comme le jeu d'origine :
+	 * seulement la piece ou le bout de couloir du heros, pose sur le livre, avec le portrait et les icones d'action),
+	 * 'dessus' (le tableau #board de 2009).
 	 */
 
 	var Iso = {
 		Actif: false,
+		Vue: '3d',
+		Montrees: null,				// cases a dessiner : les cases devoilees, ou la zone du heros en vue classique
 		Planche: null,
+		Livre: null,
 		Canvas: null,
 		Contexte: null,
 		Visibles: CasesDevoilees,	// cases deja vues par le heros (ModuleActionJeu.js)
@@ -37,6 +44,8 @@
 	var ISO_LARGEUR = 26, ISO_DEMI_X = 24, ISO_DEMI_Y = 12;
 	var ISO_HAUT = 1, ISO_DROITE = 2, ISO_BAS = 4, ISO_GAUCHE = 8;
 	var ISO_HEROS = { 'humain': 'guerrier', 'elfe': 'elfe', 'nain': 'nain', 'ogre': 'barbare' };
+	// Le 5e portrait d'ODDS&SOD (vieil homme) n'est pas un heros : l'humain prend celui du barbare.
+	var ISO_PORTRAITS = { 'humain': 'barbare', 'elfe': 'elfe', 'nain': 'nain', 'ogre': 'barbare' };
 	var ISO_MONSTRES = {
 		'Lutin': 'gobelin', 'Orc': 'orc', 'Femir': 'fimir', 'Gargouille': 'gargouille', 'GuerrierChaos': 'chaos',
 		'ChamanOrc': 'orc', 'Squellette': 'squelette', 'Zombie': 'zombie', 'Momie': 'momie',
@@ -54,24 +63,42 @@
 		Iso.Contexte.imageSmoothingEnabled = false;
 		Iso.Planche = new Image();
 		Iso.Planche.src = Chemin.replace('/images', '/iso/atlas.png');
+		Iso.Livre = new Image();
+		Iso.Livre.src = Chemin.replace('/images', '/iso/livre.png');
 		IsoPreparerObjets();
+		Iso.Canvas.addEventListener('click', IsoClic);
+		Iso.Canvas.addEventListener('mousemove', IsoSurvol);
 		document.getElementById('board-vue').style.display = '';
 		var Preference = null;
 		try { Preference = localStorage.getItem('donjon-vue'); } catch (e) {}
-		IsoChoisirVue(Preference != 'dessus');
+		IsoChoisirVue(ISO_VUES[Preference] ? Preference : '3d');
 		window.requestAnimationFrame(IsoBoucle);
 	}
 
-	function IsoChoisirVue(Iso3D){
-		Iso.Actif = Iso3D;
-		Iso.Canvas.style.display = Iso3D ? '' : 'none';
-		document.getElementById('board').style.display = Iso3D ? 'none' : '';
-		document.getElementById('board-vue').textContent = Iso3D ? 'Vue de dessus' : 'Vue 3D';
-		try { localStorage.setItem('donjon-vue', Iso3D ? '3d' : 'dessus'); } catch (e) {}
+	var ISO_VUES = {
+		'3d': { Suivante: 'classique', Nom: 'Vue 3D', Largeur: 728, Hauteur: 460 },
+		'classique': { Suivante: 'dessus', Nom: 'Vue classique', Largeur: 640, Hauteur: 400 },
+		'dessus': { Suivante: '3d', Nom: 'Vue de dessus' }
+	};
+
+	function IsoChoisirVue(Vue){
+		var Choix = ISO_VUES[Vue];
+		Iso.Vue = Vue;
+		Iso.Actif = Vue != 'dessus';
+		Iso.Camera = null;
+		if (Iso.Actif){
+			Iso.Canvas.width = Choix.Largeur;
+			Iso.Canvas.height = Choix.Hauteur;
+			Iso.Contexte.imageSmoothingEnabled = false;
+		}
+		Iso.Canvas.style.display = Iso.Actif ? '' : 'none';
+		document.getElementById('board').style.display = Iso.Actif ? 'none' : '';
+		document.getElementById('board-vue').textContent = Choix.Nom + ' (changer : ' + ISO_VUES[Choix.Suivante].Nom.toLowerCase() + ')';
+		try { localStorage.setItem('donjon-vue', Vue); } catch (e) {}
 	}
 
 	function IsoBasculerVue(){
-		IsoChoisirVue(!Iso.Actif);
+		IsoChoisirVue(ISO_VUES[Iso.Vue].Suivante);
 	}
 
 	function IsoPreparerObjets(){
@@ -112,12 +139,15 @@
 	}
 
 	function IsoBoucle(){
-		if (Iso.Actif && Iso.Planche.complete) { IsoRendu(); }
+		if (Iso.Actif && Iso.Planche.complete && Iso.Livre.complete){
+			if (Iso.Vue == 'classique') { IsoRenduClassique(); } else { IsoRendu(); }
+		}
 		window.requestAnimationFrame(IsoBoucle);
 	}
 
 	function IsoRendu(){
 		var Ctx = Iso.Contexte, Largeur = Iso.Canvas.width, Hauteur = Iso.Canvas.height;
+		Iso.Montrees = Iso.Visibles;
 		var Cible = IsoCibleCamera(Largeur, Hauteur);
 		if (!Iso.Camera) { Iso.Camera = { x: Cible.x, y: Cible.y }; }
 		Iso.Camera.x += (Cible.x - Iso.Camera.x) * 0.15;
@@ -128,16 +158,136 @@
 		Ctx.fillRect(0, 0, Largeur, Hauteur);
 		Ctx.translate(Math.round(Largeur / 2 - Iso.Camera.x), Math.round(Hauteur / 2 + 20 - Iso.Camera.y));
 
+		IsoDessinerCases();
+		if (Iso.Combat && Date.now() - Iso.Combat.Debut < ISO_DUREE_COMBAT) { IsoGrosPlanCombat(Largeur, Hauteur); }
+	}
+
+	/* Sols, puis du fond vers l'avant : murs, meubles et personnages des cases de Iso.Montrees. */
+	function IsoDessinerCases(){
 		var Ordre = IsoOrdreDessin();
 		for (var i = 0; i < Ordre.length; i++){ IsoSol(Ordre[i]); }
 		var Personnages = IsoPersonnagesParCase();
 		for (var j = 0; j < Ordre.length; j++){
 			var Case = Ordre[j];
 			IsoCotesDuFond(Case);
-			if (Iso.MeublesParCase[Case] && Iso.Visibles[Case]) { IsoMeuble(Iso.MeublesParCase[Case]); }
+			if (Iso.MeublesParCase[Case] && Iso.Montrees[Case]) { IsoMeuble(Iso.MeublesParCase[Case]); }
 			if (Personnages[Case]) { IsoPersonnage(Case, Personnages[Case]); }
 		}
-		if (Iso.Combat && Date.now() - Iso.Combat.Debut < ISO_DUREE_COMBAT) { IsoGrosPlanCombat(Largeur, Hauteur); }
+	}
+
+	/* ---- Vue classique : ecran 320 x 200 du jeu d'origine, agrandi deux fois ---- */
+
+	var ISO_CENTRE_LIVRE = { x: 160, y: 118 };		// milieu du dessus du livre (BOOK.VGA)
+	var ISO_RAYON_COULOIR = 4;						// cases de couloir montrees autour du heros
+
+	/* Icones d'action sur la tranche du livre : image, lien du moteur (Mn_*), action. */
+	var ISO_ACTIONS = [
+		{ Icone: 'deplacement', Lien: 'Mn_Deplacement', Action: function(){ Lancerdee(); }, Titre: 'Lancer les dés' },
+		{ Icone: 'attaque', Lien: 'Mn_Attaquer', Action: function(){ LancerdeeAttaque(); }, Titre: 'Attaquer' },
+		{ Icone: 'tresor', Lien: 'Mn_Tresor', Action: function(){ TirerUneCarteTresor(); }, Titre: 'Chercher un trésor' },
+		{ Icone: 'piege', Lien: 'Mn_Piege', Action: function(){ DeactiverLesPieges(); }, Titre: 'Chercher les pièges' },
+		{ Icone: 'objet', Lien: 'Mn_Objet', Action: function(){ AfficherElement('myHeroItem'); }, Titre: 'Utiliser un objet' },
+		{ Icone: 'fin', Lien: 'Mn_FinTour', Action: function(){ FinTour(); }, Titre: 'Fin de tour' }
+	];
+
+	function IsoPositionAction(Index){
+		return { x: 6 + Index * 20, y: 178 };
+	}
+
+	function IsoRenduClassique(){
+		var Ctx = Iso.Contexte;
+		var Heros = LesJoueurs[ConstIdJoueur];
+		Iso.Montrees = IsoZoneDuHeros(Number(Heros[5]));
+
+		Ctx.setTransform(2, 0, 0, 2, 0, 0);
+		Ctx.drawImage(Iso.Livre, 0, 0);
+
+		var Gauche = Infinity, Droite = -Infinity, Haut = Infinity, Bas = -Infinity;
+		for (var Case in Iso.Montrees){
+			var P = IsoPoint(Number(Case));
+			Gauche = Math.min(Gauche, P.x - ISO_DEMI_X); Droite = Math.max(Droite, P.x + ISO_DEMI_X);
+			Haut = Math.min(Haut, P.y); Bas = Math.max(Bas, P.y + 2 * ISO_DEMI_Y);
+		}
+		Ctx.translate(Math.round(ISO_CENTRE_LIVRE.x - (Gauche + Droite) / 2), Math.round(ISO_CENTRE_LIVRE.y - (Haut + Bas) / 2));
+		IsoDessinerCases();
+
+		Ctx.setTransform(2, 0, 0, 2, 0, 0);
+		IsoPanneau(Heros);
+		if (Iso.Combat && Date.now() - Iso.Combat.Debut < ISO_DUREE_COMBAT) { IsoGrosPlanCombat(Iso.Canvas.width, Iso.Canvas.height); }
+	}
+
+	/* Piece du heros, ou cases de son couloir a moins de ISO_RAYON_COULOIR cases (les couloirs forment une seule zone). */
+	function IsoZoneDuHeros(CaseHeros){
+		var Zone = {}, Piece = MesPieces[CaseHeros], Hx = CaseHeros % ISO_LARGEUR, Hy = Math.floor(CaseHeros / ISO_LARGEUR);
+		var Couloir = MesZones[CaseHeros] <= 20;
+		for (var Case = 0; Case < MesPieces.length; Case++){
+			if (MesPieces[Case] != Piece) { continue; }
+			var Dx = Math.abs(Case % ISO_LARGEUR - Hx), Dy = Math.abs(Math.floor(Case / ISO_LARGEUR) - Hy);
+			if (!Couloir || (Dx <= ISO_RAYON_COULOIR && Dy <= ISO_RAYON_COULOIR)) { Zone[Case] = true; }
+		}
+		return Zone;
+	}
+
+	/* Portrait, caracteristiques et icones d'action, aux positions de l'ecran d'origine (portrait en 0,12). */
+	function IsoPanneau(Heros){
+		var Ctx = Iso.Contexte, Race = String(Heros[12][20] || '').toLowerCase();
+		IsoDessiner('portrait-' + (ISO_PORTRAITS[Race] || 'barbare'), 2, 12);
+		Ctx.strokeStyle = '#c8a040';
+		Ctx.lineWidth = 1;
+		Ctx.strokeRect(1.5, 11.5, 34, 47);
+		Ctx.font = 'bold 8px monospace';
+		Ctx.textAlign = 'left';
+		IsoTexte(String(Heros[0]).toUpperCase(), 2, 8, '#e8c060');
+		IsoTexte('PV ' + Heros[3], 2, 68, '#e8c060');
+
+		var Caracteristiques = [
+			['or', 40, 11, Heros[10]], ['bras', 96, 11, Heros[1]],
+			['bottes', 40, 30, MovementJoueur], ['bouclier', 96, 30, Heros[2]]
+		];
+		Ctx.font = 'bold 10px monospace';
+		for (var i = 0; i < Caracteristiques.length; i++){
+			var C = Caracteristiques[i];
+			IsoDessiner('icone-' + C[0], C[1], C[2]);
+			IsoTexte(String(C[3]), C[1] + 19, C[2] + 12, '#e8c060');
+		}
+
+		for (var j = 0; j < ISO_ACTIONS.length; j++){
+			var A = ISO_ACTIONS[j], P = IsoPositionAction(j);
+			var Lien = document.getElementById(A.Lien);
+			var Jouee = Lien && Lien.style.textDecoration == 'line-through';
+			Ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+			Ctx.fillRect(P.x - 1, P.y - 1, 18, 18);
+			IsoDessiner('icone-' + A.Icone + (Jouee && IsoAtlas['icone-' + A.Icone + '-grise'] ? '-grise' : ''), P.x, P.y);
+			if (Iso.Survol === j){
+				Ctx.strokeStyle = '#ffe080';
+				Ctx.strokeRect(P.x - 1.5, P.y - 1.5, 19, 19);
+			}
+		}
+		if (Iso.Survol !== null && Iso.Survol !== undefined){
+			Ctx.font = 'bold 8px sans-serif';
+			IsoTexte(ISO_ACTIONS[Iso.Survol].Titre, 6, 172, '#ffe080');
+		}
+	}
+
+	function IsoActionSous(Evenement){
+		var Rect = Iso.Canvas.getBoundingClientRect();
+		var x = (Evenement.clientX - Rect.left) * 320 / Rect.width, y = (Evenement.clientY - Rect.top) * 200 / Rect.height;
+		for (var i = 0; i < ISO_ACTIONS.length; i++){
+			var P = IsoPositionAction(i);
+			if (x >= P.x && x < P.x + 16 && y >= P.y && y < P.y + 16) { return i; }
+		}
+		return null;
+	}
+
+	function IsoClic(Evenement){
+		if (Iso.Vue != 'classique') { return; }
+		var Index = IsoActionSous(Evenement);
+		if (Index !== null) { ISO_ACTIONS[Index].Action(); }
+	}
+
+	function IsoSurvol(Evenement){
+		Iso.Survol = Iso.Vue == 'classique' ? IsoActionSous(Evenement) : null;
+		Iso.Canvas.style.cursor = Iso.Survol !== null ? 'pointer' : '';
 	}
 
 	/* Gros plan du combat : les deux combattants agrandis sur leurs dalles, les des et le resultat. */
@@ -245,7 +395,7 @@
 	}
 
 	function IsoSol(Case){
-		if (!Iso.Visibles[Case]) { return; }
+		if (!Iso.Montrees[Case]) { return; }
 		var Code = Iso.ObjetsParCase[Case];
 		var Nom = (Code && IsoSolsSpeciaux[Code]) || IsoSols[MesZones[Case]];
 		var P = IsoPoint(Case);
@@ -268,12 +418,12 @@
 		for (var i = 0; i < Cotes.length; i++){
 			var C = Cotes[i];
 			if (IsoPorte(Case, C.Voisin, C.Bit)){
-				if (!Iso.Visibles[Case] && !Iso.Visibles[C.Voisin]) { continue; }
+				if (!Iso.Montrees[Case] && !Iso.Montrees[C.Voisin]) { continue; }
 				var Ouverte = Iso.Visibles[Case] && Iso.Visibles[C.Voisin];
 				var Bas = C.Porte ? 34 : 43;
 				IsoDessiner('porte' + (C.Porte + (Ouverte ? 6 : 0)), C.x, (C.Porte ? P.y : P.y + ISO_DEMI_Y) - Bas);
 			}
-			else if ((MesMurs[Case] & C.Bit) && Iso.Visibles[Case]){
+			else if ((MesMurs[Case] & C.Bit) && Iso.Montrees[Case]){
 				IsoDessiner(C.Mur, C.x, (C.Porte ? P.y : P.y + ISO_DEMI_Y) - (C.Porte ? 39 : 51));
 			}
 		}
@@ -295,7 +445,7 @@
 	function IsoPersonnagesParCase(){
 		var Liste = {};
 		for (var i = 0; i < LesMonstres.length; i++){
-			if (LesMonstres[i][8] == 1 && Iso.Visibles[LesMonstres[i][7]]) { Liste[Number(LesMonstres[i][7])] = { Monstre: LesMonstres[i], Cle: 'm' + i }; }
+			if (LesMonstres[i][8] == 1 && Iso.Montrees[LesMonstres[i][7]]) { Liste[Number(LesMonstres[i][7])] = { Monstre: LesMonstres[i], Cle: 'm' + i }; }
 		}
 		for (var j = 0; j < LesJoueurs.length; j++){
 			Liste[Number(LesJoueurs[j][5])] = { Heros: LesJoueurs[j], Cle: 'h' + j };
