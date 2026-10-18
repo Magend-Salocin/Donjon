@@ -95,6 +95,7 @@
 		document.getElementById('board').style.display = Iso.Actif ? 'none' : '';
 		document.getElementById('board-vue').textContent = Choix.Nom + ' (changer : ' + ISO_VUES[Choix.Suivante].Nom.toLowerCase() + ')';
 		try { localStorage.setItem('donjon-vue', Vue); } catch (e) {}
+		AjusterPlateau();							// ModulePleinEcran.js : taille d'affichage de la nouvelle vue
 	}
 
 	function IsoBasculerVue(){

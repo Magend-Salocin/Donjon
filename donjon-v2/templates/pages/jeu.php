@@ -49,7 +49,8 @@ $dice = static fn (string $prefix): string => implode('', array_map(
         </div>
     </div>
 
-    <p class="center"><button type="button" class="link" id="board-vue" style="display:none" onclick="IsoBasculerVue()">Vue de dessus</button></p>
+    <p class="center"><button type="button" class="link" id="board-vue" style="display:none" onclick="IsoBasculerVue()">Vue de dessus</button>
+        <button type="button" class="link" id="plein-ecran" style="display:none" onclick="BasculerPleinEcran()">Plein écran</button></p>
     <canvas id="board-iso" width="728" height="460" style="display:none"></canvas>
     <table id="board" style="background-image:url('<?= asset('game/quests/quest' . $questNumber . '.jpg') ?>')">
         <?php for ($row = 0; $row < $boardRows; $row++): ?>
@@ -134,6 +135,7 @@ $dice = static fn (string $prefix): string => implode('', array_map(
 <script src="<?= asset('game/ModuleSave.js') ?>"></script>
 <script src="<?= asset('game/ModuleMulti.js') ?>"></script>
 <script src="<?= asset('game/iso/atlas.js') ?>"></script>
+<script src="<?= asset('game/ModulePleinEcran.js') ?>"></script>
 <script src="<?= asset('game/ModuleIso.js') ?>"></script>
 <script>
     SetMesObjet(<?= $json($questItems) ?>);

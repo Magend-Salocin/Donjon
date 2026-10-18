@@ -111,3 +111,16 @@ img.die, #FenetreCombat td > img.Montre { width: 26px; height: 26px; }
 @media (prefers-reduced-motion: reduce) {
 	.de-roule { animation: none; }
 }
+
+/* Plein ecran (ModulePleinEcran.js) : la zone de jeu entiere, plateau agrandi par le script */
+#plein-ecran { margin-left: 12px; }
+#body-fullside.quest:fullscreen {
+	overflow: auto;
+	padding: 10px;
+	box-sizing: border-box;
+	background: #000;
+	font-size: 0.8em;
+}
+#body-fullside.quest:fullscreen h2 { margin: 0 0 4px; }
+#body-fullside.quest:fullscreen p.center { margin: 4px 0; }
+#body-fullside.quest:fullscreen #board-iso { border-width: 1px; }
