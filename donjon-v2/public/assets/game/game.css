@@ -95,3 +95,19 @@
 #FenetreCombat img.die, #FenetreCombat img.Montre, #FenetreCombat td img.Cache { vertical-align: middle; }
 #FenetreCombat td > img.Montre { display: inline-block; }
 #TourJoueur { min-height: 1.2em; color: #fffb8e; }
+
+/* Des (ModuleDes.js) : animation de lancer et des qui comptent en combat */
+img.die, #FenetreCombat td > img.Montre { width: 26px; height: 26px; }
+#DeplacementRestant { display: inline-block; min-width: 6em; }
+#BilanCombat { min-height: 1.2em; margin: 4px 0 0; font-weight: bold; }
+.de-roule { animation: de-roule 0.4s ease-out; }
+@keyframes de-roule {
+	0% { transform: rotate(-30deg) scale(0.8); }
+	60% { transform: rotate(12deg) scale(1.08); }
+	100% { transform: none; }
+}
+#FenetreCombat img.de-compte:not(.de-roule) { border-radius: 6px; box-shadow: 0 0 0 2px #b8860b, 0 0 6px #e0b040; }
+#FenetreCombat img.de-ignore:not(.de-roule) { opacity: 0.4; }
+@media (prefers-reduced-motion: reduce) {
+	.de-roule { animation: none; }
+}

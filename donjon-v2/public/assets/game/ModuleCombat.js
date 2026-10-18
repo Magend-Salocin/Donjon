@@ -1,36 +1,44 @@
 
-	function ValeurdeeAtt(valeur){							// ATTRIBUT UNE IMAGE AU LANCER DE DEE
-		if(valeur==1 || valeur==3){ return Chemin + '/dee/D01.png'; }	// bouclier blanc
-		if(valeur==5){ return Chemin + '/dee/E01.png'; }				// bouclier noir
-		return Chemin + '/dee/A01.png';									// crane
-	}
-
 	function RemiseZero(){									// REMISE A ZERO DES IMAGE DE DEE DE COMBAT
 		for (var i=0;i<8;i++){
+			ArreteDe($('DA'+i));
+			ArreteDe($('DD'+i));
 			CacheCase('DA'+i);
 			CacheCase('DD'+i);
 		}
+		NumeroCombat++;
+		$('BilanCombat').innerHTML = '';
 		$('Defenceur').style.display="none";
 		$('Attaquant').style.display="none";
 	}
 
 	function LancerdeeAtt(NbLancer,Mode){ 					// MODULE DE LANCER DE DEE DE COMBAT RETOUR UN NOMBRE
+		var Prefixe = Mode==0 ? 'DA' : 'DD';
+		var FaceUtile = Mode==0 ? 'crane' : 'bouclier-blanc';	// attaque : un crane touche ; defense : un bouclier blanc pare
 		var dee =0;
 		var NbDes = Math.max(1, Math.min(8, parseInt(NbLancer)));
-		for (var i=0;i<NbDes;i++){
-			var Valeur = Math.floor(Math.random()*6)+1;
-			if(Mode==0){ //MODE ATTAQUE : un crane touche
-				$('DA'+i).src=ValeurdeeAtt(Valeur);
-				MontreElement('DA'+i);
-				if (Valeur==2 || Valeur==4 || Valeur==6){dee=dee+1}
-			}
-			if(Mode==1){ //MODE DEFENCE : un bouclier blanc pare
-				$('DD'+i).src=ValeurdeeAtt(Valeur);
-				MontreElement('DD'+i);
-				if (Valeur==1 || Valeur==3){dee=dee+1}
-			}
+		for (var i=0;i<8;i++){
+			var De = $(Prefixe+i);
+			if (i >= NbDes) { ArreteDe(De); CacheCase(Prefixe+i); continue; }	// des restes d'un lancer precedent plus grand
+			var Face = FaceCombat(Math.floor(Math.random()*6)+1);
+			MontreElement(Prefixe+i);
+			De.classList.add(Face==FaceUtile ? 'de-compte' : 'de-ignore');
+			AnimerDe(De, DES_FACES_COMBAT, Face);
+			if (Face==FaceUtile){dee=dee+1}
 		}
 		return dee
+	}
+
+	var NumeroCombat = 0;									// evite d'afficher le bilan d'un combat deja efface
+
+	function AfficheBilanCombat(Touches,Parades){			// "3 cranes - 1 bouclier = 2 blessures" apres l'animation
+		var Perte = Touches - Parades;
+		var Texte = Pluriel(Touches, 'cr&acirc;ne') + ' - ' + Pluriel(Parades, 'bouclier') + ' : '
+			+ (Perte > 0 ? Pluriel(Perte, 'blessure') : 'coup par&eacute;');
+		var Numero = ++NumeroCombat;
+		ApresLancer(function(){
+			if (Numero == NumeroCombat) { $('BilanCombat').innerHTML = Texte; }
+		});
 	}
 
 	function LancerdeeAttaque(){ 							// ATTAQUE DU JOUEUR SUR UN MONSTRE VOISIN
@@ -49,17 +57,20 @@
 	}
 
 	function UneAttaque(IdMonstre,IdJoueurs,mode){ 			// COMBAT ENTRE UN JOUEUR ET UN MONSTRE
-		var Perte;
+		var Touches, Parades;
 		if(mode=="MONSTRE"){
 			AfficheAttaquantDefenceur(ImageCombatMonstre(LesMonstres[IdMonstre]),LesJoueurs[IdJoueurs][13]);
-			Perte = LancerdeeAtt(LesMonstres[IdMonstre][2],0) - LancerdeeAtt(LesJoueurs[IdJoueurs][2],1);
-			if (Perte > 0 ) { PerteVieJoueur(LesJoueurs,IdJoueurs,Perte) }
+			Touches = LancerdeeAtt(LesMonstres[IdMonstre][2],0);
+			Parades = LancerdeeAtt(LesJoueurs[IdJoueurs][2],1);
+			if (Touches > Parades) { PerteVieJoueur(LesJoueurs,IdJoueurs,Touches - Parades) }
 		}
 		if(mode=="JOUEUR"){
-			Perte = LancerdeeAtt(LesJoueurs[IdJoueurs][1],0)-LancerdeeAtt(LesMonstres[IdMonstre][3],1);
-			if (Perte > 0 ) { PerteVieMonstre(LesMonstres,IdMonstre,Perte) }
+			Touches = LancerdeeAtt(LesJoueurs[IdJoueurs][1],0);
+			Parades = LancerdeeAtt(LesMonstres[IdMonstre][3],1);
+			if (Touches > Parades) { PerteVieMonstre(LesMonstres,IdMonstre,Touches - Parades) }
 			LesJoueurs[IdJoueurs][8]=1;
 		}
+		AfficheBilanCombat(Touches, Parades);
 	}
 
 	function IsCombatre(LesMonstres,Joueur){				// MONSTRE ACTIF SUR UNE CASE VOISINE, OU -1

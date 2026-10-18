@@ -24,7 +24,7 @@ $leMagend = array_map('strval', [
 $json = static fn (mixed $value): string => json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
 $questNumber = (int) $adventure['code'];
 $dice = static fn (string $prefix): string => implode('', array_map(
-    static fn (int $i): string => '<img src="' . asset('game/images/dee/E01.png') . '" class="Cache die" id="' . $prefix . $i . '" alt="">',
+    static fn (int $i): string => '<img src="' . asset('game/images/dee/neutre.svg') . '" class="Cache" id="' . $prefix . $i . '" alt="">',
     range(0, 7)
 ));
 ?>
@@ -74,7 +74,7 @@ $dice = static fn (string $prefix): string => implode('', array_map(
             </div>
             <div class="hero-line">
                 <span><?= e($hero['nom']) ?> : <?= e($hero['libellerace']) ?> - Niveau <?= (int) $hero['codeexp'] ?> - Or : <strong id="MyHeroOrs"><?= (int) $hero['ors'] ?></strong></span>
-                <span>Déplacement : <img src="<?= asset('game/images/dee/Dee.gif') ?>" id="Dee1" alt=""> <img src="<?= asset('game/images/dee/Dee.gif') ?>" id="Dee2" alt=""></span>
+                <span>Déplacement : <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee1" class="die" alt="Dé non lancé"> <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee2" class="die" alt="Dé non lancé"> <span id="DeplacementRestant" aria-live="polite"></span></span>
                 <span>Monstres restants : <span id="NbMonstre"></span></span>
             </div>
             <div class="hero-line">
@@ -96,6 +96,7 @@ $dice = static fn (string $prefix): string => implode('', array_map(
                     <td><span class="dice-label">Défense</span><?= $dice('DD') ?></td>
                 </tr>
             </table>
+            <p id="BilanCombat" class="center" aria-live="polite"></p>
             <span id="TourMonstre" style="display:none;"></span>
         </div>
     </div>
@@ -122,6 +123,7 @@ $dice = static fn (string $prefix): string => implode('', array_map(
         0, 0, <?= (int) $hero['ors'] ?>, 0, LeMagend, <?= $json(race_fighter($hero['libellerace'])) ?>
     ];
 </script>
+<script src="<?= asset('game/ModuleDes.js') ?>"></script>
 <script src="<?= asset('game/ModuleActionJeu.js') ?>"></script>
 <script src="<?= asset('game/ModulePiece.js') ?>"></script>
 <script src="<?= asset('game/ModulePersonnage.js') ?>"></script>

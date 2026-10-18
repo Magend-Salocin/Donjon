@@ -64,8 +64,7 @@
 
 	function ClearAction(){
 		MovementJoueur = 0;
-		$('Dee1').src = Chemin + '/dee/Dee.gif';
-		$('Dee2').src = Chemin + '/dee/Dee.gif';
+		RemiseZeroDesDeplacement();
 		DesactiveAction("Mn_Attaquer");
 		DesactiveAction("Mn_Deplacement");
 		DesactiveAction("Mn_Tresor");
@@ -78,8 +77,7 @@
 	}
 
 	function DesactiveAllAction(){
-		$('Dee1').src = Chemin + '/dee/Dee.gif';
-		$('Dee2').src = Chemin + '/dee/Dee.gif';
+		RemiseZeroDesDeplacement();
 		ActiveAction("Mn_Attaquer");
 		ActiveAction("Mn_Deplacement");
 		ActiveAction("Mn_Tresor");
@@ -224,15 +222,37 @@
 
 	function MoveDee(){								//Controle du deplacement des joueurs
 		MovementJoueur = MovementJoueur  - 1;
+		AfficheDeplacement();
+	}
+
+	var DeplacementTotal = 0;						// somme des deux des du dernier lancer
+
+	function AfficheDeplacement(){					// "= 7 cases" apres le lancer, puis "reste 5 / 7"
+		var Texte = '';
+		if (DeplacementTotal > 0) {
+			Texte = MovementJoueur == DeplacementTotal
+				? '= ' + Pluriel(DeplacementTotal, 'case')
+				: 'reste ' + Math.max(0, MovementJoueur) + ' / ' + DeplacementTotal;
+		}
+		$('DeplacementRestant').innerHTML = Texte;
+	}
+
+	function RemiseZeroDesDeplacement(){
+		AfficheDe($('Dee1'), 'neutre');
+		AfficheDe($('Dee2'), 'neutre');
+		DeplacementTotal = 0;
+		AfficheDeplacement();
 	}
 
 	function Lancerdee(){							//Lancer les dees pour le deplacement du joueur en cours
 		if(!PartieTerminee && LesJoueurs[ConstIdJoueur][11]==0){
 			var Valeur1 = Math.floor(Math.random()*6)+1;
 			var Valeur2 = Math.floor(Math.random()*6)+1;
-			$('Dee1').src = Chemin + '/dee/'+Valeur1+'.bmp';
-			$('Dee2').src = Chemin + '/dee/'+Valeur2+'.bmp';
+			AnimerDe($('Dee1'), DES_FACES_DEPLACEMENT, Valeur1);
+			AnimerDe($('Dee2'), DES_FACES_DEPLACEMENT, Valeur2);
 			MovementJoueur = Valeur1 + Valeur2;
+			DeplacementTotal = MovementJoueur;
+			ApresLancer(AfficheDeplacement);
 			ActiveAction("Mn_Deplacement");
 			LesJoueurs[ConstIdJoueur][11] = 1;
 		}

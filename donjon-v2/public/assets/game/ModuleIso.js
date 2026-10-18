@@ -334,10 +334,16 @@
 		var Des = [];
 		for (var i = 0; i < 8; i++){
 			var Image = document.getElementById(Prefixe + i);
-			if (Image && Image.className != 'Cache' && Image.complete && Image.naturalWidth) { Des.push(Image); }
+			if (Image && !Image.classList.contains('Cache') && Image.complete && Image.naturalWidth) { Des.push(Image); }
 		}
 		var Taille = 30, x = Centre - (Des.length * (Taille + 4)) / 2;
-		for (var j = 0; j < Des.length; j++){ Iso.Contexte.drawImage(Des[j], x + j * (Taille + 4), y, Taille, Taille); }
+		for (var j = 0; j < Des.length; j++){
+			// Comme dans la fenetre de combat : les des qui ne comptent pas sont estompes une fois arretes.
+			var Estompe = Des[j].classList.contains('de-ignore') && !Des[j].classList.contains('de-roule');
+			Iso.Contexte.globalAlpha = Estompe ? 0.4 : 1;
+			Iso.Contexte.drawImage(Des[j], x + j * (Taille + 4), y, Taille, Taille);
+		}
+		Iso.Contexte.globalAlpha = 1;
 	}
 
 	function IsoTexte(Texte, x, y, Couleur){
