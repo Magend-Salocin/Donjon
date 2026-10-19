@@ -36,6 +36,7 @@
 
 	function FinTourMonstre(){
 		IsTourMonstreTimer = true;
+		IsoTerminerTourMonstre();
 		ReloadTimer();
 		window.setTimeout(DebutTour,1399);
 	}
@@ -50,6 +51,7 @@
 
 	function FinPartieVictoire(){					//La quete est accomplie
 		PartieTerminee = true;
+		IsoTerminerTourMonstre();
 		var FinPartie = new Array(42,'Vous &ecirc;tes victorieux !','index.php?page=personnage',0,0,'Bien jou&eacute;. Votre r&eacute;compense vous attend au village.');
 		GetAfficheCarte(FinPartie);
 		MyPartieFin('victoire');
@@ -57,6 +59,7 @@
 
 	function FinPartieDefaite(){					//Le heros n'a plus de point de vie
 		PartieTerminee = true;
+		IsoTerminerTourMonstre();
 		var FinPartie = new Array(42,'Vous &ecirc;tes mort...','index.php?page=personnage',0,0,'Vos compagnons vous ram&egrave;nent au village avec un point de vie.');
 		GetAfficheCarte(FinPartie);
 		MyPartieFin('defaite');

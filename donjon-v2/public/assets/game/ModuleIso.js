@@ -24,7 +24,8 @@
 		MeublesParCase: {},			// meuble dessine avec la case la plus en avant de son emprise
 		Directions: [],				// derniere direction de chaque personnage : 'bas' ou 'haut', miroir ou non
 		Camera: null,
-		Combat: null				// dernier combat, affiche en gros plan pendant ISO_DUREE_COMBAT ms
+		Combat: null,				// dernier combat, affiche en gros plan pendant ISO_DUREE_COMBAT ms
+		VueAvantTourMonstre: null
 	};
 
 	var ISO_DUREE_COMBAT = 2200, ISO_ZOOM_COMBAT = 3;
@@ -100,6 +101,19 @@
 
 	function IsoBasculerVue(){
 		IsoChoisirVue(ISO_VUES[Iso.Vue].Suivante);
+	}
+
+	function IsoDebuterTourMonstre(){
+		//if (!IsoDisponible() || !Iso.Canvas) { return; }
+		Iso.VueAvantTourMonstre = Iso.Vue;
+		IsoChoisirVue('dessus');
+	}
+
+	function IsoTerminerTourMonstre(){
+		if (Iso.VueAvantTourMonstre === null) { return; }
+		var Vue = Iso.VueAvantTourMonstre;
+		Iso.VueAvantTourMonstre = null;
+		IsoChoisirVue(Vue);
 	}
 
 	function IsoPreparerObjets(){

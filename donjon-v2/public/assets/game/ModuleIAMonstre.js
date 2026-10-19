@@ -9,6 +9,7 @@ var IsTourMonstreTimer = false;
 	
 	function TimerTourMonstre(){
 		if(PartieTerminee){ return; }
+		IsoDebuterTourMonstre();
 		$('TourMonstre').innerHTML ='Tour des monstres';
 		AfficheMessage('Tour des monstres...');
 		for (var m=0;m<LesMonstres.length;m++){ LesMonstres[m][10]=false; }
