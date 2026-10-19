@@ -32,6 +32,8 @@
 	box-shadow: 0 0 0 5px #000, 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 #board td.FondNoir { width: 24px; height: 24px; padding: 1px; }
+/* Case jamais vue : le noir déborde sur le padding et la moitié de l'espacement (pas de 28 px), sinon la carte se voit entre les cases. */
+#board img[src$="/08.jpg"] { box-shadow: 0 0 0 2px #000; }
 
 /* Vue isométrique (ModuleIso.js), aux graphismes du HeroQuest PC : pixels nets. */
 #board-iso {
