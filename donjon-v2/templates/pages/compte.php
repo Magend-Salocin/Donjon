@@ -6,11 +6,11 @@
         <tr>
             <td>
                 Nom du héros : <?= e($hero['nom']) ?><br>
-                Race : <?= e($hero['libellerace']) ?><br>
+                Héros : <?= e($hero['libellerace']) ?><br>
                 Niveau : <?= (int) $hero['codeexp'] ?><br>
                 E-mail : <?= e($hero['email']) ?>
             </td>
-            <td><img src="<?= e(race_portrait($hero['libellerace'])) ?>" alt=""></td>
+            <td><img src="<?= e(hero_portrait($hero)) ?>" alt=""></td>
         </tr>
     </table>
 

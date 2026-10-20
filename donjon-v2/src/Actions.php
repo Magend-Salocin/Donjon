@@ -76,6 +76,7 @@ final class Actions
         $email = post_string('email');
         $password = (string) ($_POST['mdp'] ?? '');
         $race = $this->app->world->race(post_string('race'));
+        $sex = post_string('sexe');
 
         $errors = [];
         if (!preg_match('/^[\p{L}]{3,20}$/u', $name)) {
@@ -94,7 +95,10 @@ final class Actions
             $errors[] = 'Les mots de passe doivent être identiques.';
         }
         if ($race === null) {
-            $errors[] = 'Sélectionnez une race dans la liste.';
+            $errors[] = 'Sélectionnez un héros dans la liste.';
+        }
+        if (!in_array($sex, ['H', 'F'], true)) {
+            $errors[] = 'Choisissez un héros ou une héroïne.';
         }
 
         if ($errors !== []) {
@@ -105,7 +109,7 @@ final class Actions
             redirect('inscription');
         }
 
-        $this->app->players->create($email, $name, $password, $race);
+        $this->app->players->create($email, $name, $password, $race, $sex);
         flash('ok', 'Inscription validée ! Connectez-vous avec votre nom de héros.');
         redirect('connexion');
     }

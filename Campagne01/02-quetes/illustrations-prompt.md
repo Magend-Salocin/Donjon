@@ -1,6 +1,6 @@
 # Illustrations des quêtes
 
-Objectif : produire une illustration par quête, au même format que `donjon-v2/public/assets/img/donjon/aventure-labyrinthe.jpg` (bandeau horizontal, ratio 2,3:1, 234 × 102 px aujourd'hui).
+Objectif : produire une illustration par quête, au même format que `donjon-v2/public/assets/img/aventures/aventure-labyrinthe.jpg` (bandeau horizontal, ratio 2,3:1, 234 × 102 px aujourd'hui).
 
 ## Méthode
 
@@ -84,7 +84,7 @@ Ranger la planche dans `Campagne01/assets/illustrations/planche-N.png`, puis dep
 python bin/decouper-planche.py ../Campagne01/assets/illustrations/planche-2.png 7
 ```
 
-Le second argument est le numéro de la première quête de la planche (1, 7 ou 13). Le script repère les gouttières noires, recadre chaque case au ratio du bandeau (744 × 324) et écrit `public/assets/img/donjon/quetes/quete-NN.jpg`. `adventure_illustration()` affiche `quete-NN.jpg` pour l'aventure 100 + NN quand le fichier existe, sinon l'image de thème.
+Le second argument est le numéro de la première quête de la planche (1, 7 ou 13). Le script repère les gouttières noires, recadre chaque case au ratio du bandeau (744 × 324) et écrit `public/assets/img/aventures/quetes/quete-NN.jpg`. `adventure_illustration()` affiche `quete-NN.jpg` pour l'aventure 100 + NN quand le fichier existe, sinon l'image de thème.
 
 | Fichier | Quête | Aventure |
 | --- | --- | ---: |
@@ -103,7 +103,7 @@ Le second argument est le numéro de la première quête de la planche (1, 7 ou 
 | quete-13.jpg | La quête de l'Épée des Esprits | 113 |
 | quete-14.jpg | Le retour à Barak Tor | 114 |
 
-Planche 3 : les cases 3 à 6 (thèmes génériques) sortent en `quete-15.jpg` à `quete-18.jpg`. Les renommer à la main en `aventure-feu.jpg`, `aventure-glace.jpg`, `aventure-marais.jpg`, `aventure-labyrinthe.jpg` dans `img/donjon/`, sinon elles s'afficheraient pour les aventures 115 à 118.
+Planche 3 : les cases 3 à 6 (thèmes génériques) sortent en `quete-15.jpg` à `quete-18.jpg`. Les renommer à la main en `aventure-feu.jpg`, `aventure-glace.jpg`, `aventure-marais.jpg`, `aventure-labyrinthe.jpg` dans `img/aventures/`, sinon elles s'afficheraient pour les aventures 115 à 118.
 
 ## Si une case ratée
 

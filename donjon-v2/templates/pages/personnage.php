@@ -24,7 +24,7 @@ $characteristics = [
 
     <div class="fiche-corps">
         <figure class="fiche-portrait">
-            <img src="<?= e(race_portrait($hero['libellerace'])) ?>" alt="<?= e($hero['libellerace']) ?>">
+            <img src="<?= e(hero_portrait($hero)) ?>" alt="<?= e($hero['libellerace']) ?>">
         </figure>
 
         <div class="fiche-jauges">

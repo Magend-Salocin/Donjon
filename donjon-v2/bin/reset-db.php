@@ -21,7 +21,7 @@ foreach ([$path, $path . '-wal', $path . '-shm'] as $file) {
 require __DIR__ . '/../src/bootstrap.php';
 
 /** @var Donjon\App $app */
-$app->players->create('demo@donjon.local', 'Demo', 'demo123', $app->world->race('01'));
+$app->players->create('demo@donjon.local', 'Demo', 'demo123', $app->world->race('01'), 'H');
 
 echo "Base recréée : $path\n";
 echo "Compte de démonstration : Demo / demo123\n";

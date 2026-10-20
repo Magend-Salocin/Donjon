@@ -44,7 +44,7 @@
 
 	var ISO_LARGEUR = 26, ISO_DEMI_X = 24, ISO_DEMI_Y = 12;
 	var ISO_HAUT = 1, ISO_DROITE = 2, ISO_BAS = 4, ISO_GAUCHE = 8;
-	var ISO_HEROS = { 'humain': 'guerrier', 'elfe': 'elfe', 'nain': 'nain', 'ogre': 'barbare' };
+	var ISO_HEROS = { 'barbare': 'barbare', 'nain': 'nain', 'elfe': 'elfe', 'enchanteur': 'magicien' };
 	// Le 5e portrait d'ODDS&SOD (vieil homme) n'est pas un heros : l'humain prend celui du barbare.
 	var ISO_PORTRAITS = { 'humain': 'barbare', 'elfe': 'elfe', 'nain': 'nain', 'ogre': 'barbare' };
 	var ISO_MONSTRES = {

@@ -39,6 +39,7 @@ bin/heroquest-tiles/  Sols et meubles utilisés pour dessiner ces cartes (repris
 bin/extract-heroquest-graphics.py  Extrait les graphismes du HeroQuest PC pour la vue isométrique
 bin/heroquest-outils.py  Outils pour explorer les fichiers du HeroQuest PC (formats : _Version/HeroQuest (1991 Gremlin)/FORMATS.md)
 bin/decouper-maquette.py  Découpe bin/maquette/maquette-connexion.png en images du thème (public/assets/img/theme/)
+bin/decouper-heros.py     Découpe la planche des héros (Campagne01/01-regles/heros-prompt.md) en portraits, images de combat et pions
 src/                  Code PHP
   bootstrap.php       Autoload, configuration, session, ouverture de la base
   Database.php        Accès PDO (requêtes préparées, transactions)

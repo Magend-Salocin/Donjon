@@ -48,15 +48,15 @@ final class Players
         return $this->db->value('SELECT 1 FROM joueur WHERE email = ?', [$email]) !== null;
     }
 
-    /** Crée un héros avec les caractéristiques de départ de sa race. Le nom sert aussi d'identifiant de connexion. */
-    public function create(string $email, string $name, string $password, array $race): int
+    /** Crée un héros avec les caractéristiques de départ de son type. Le nom sert aussi d'identifiant de connexion. $sex : H ou F. */
+    public function create(string $email, string $name, string $password, array $race, string $sex): int
     {
-        return $this->db->transaction(function () use ($email, $name, $password, $race): int {
+        return $this->db->transaction(function () use ($email, $name, $password, $race, $sex): int {
             $this->db->run(
                 'INSERT INTO joueur (email, login, mdp_hash, nom, pv, pv2, pm, pm2, forc, "end", inti, dext, vit, cha, man, ppm,
-                                     libellerace, village, image)
+                                     libellerace, sexe, village, image)
                  VALUES (:email, :login, :hash, :nom, :pv, :pv, :pm, :pm, :forc, :end, :inti, :dext, :vit, :cha, :man, :ppm,
-                         :race, :village, :image)',
+                         :race, :sexe, :village, :image)',
                 [
                     'email' => $email,
                     'login' => $name,
@@ -73,6 +73,7 @@ final class Players
                     'man' => $race['r_man'],
                     'ppm' => $race['r_ppm'],
                     'race' => $race['libelle'],
+                    'sexe' => $sex,
                     'village' => $race['r_village'],
                     'image' => $race['r_image'],
                 ]

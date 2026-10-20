@@ -21,10 +21,10 @@ INSERT INTO villagealler (villagedep, villagearv, temps, dure) VALUES
 ('03', '02', 60, '1 Jour 5h');
 
 INSERT INTO race (code, libelle, r_pv, r_pm, r_for, r_end, r_vit, r_int, r_dext, r_cha, r_man, r_ppm, r_village, r_image) VALUES
-('01', 'Humain', 40, 10, 2, 2, 2, 2, 2, 2, 4, 6, '01', 'Ranger.jpg'),
-('02', 'Elfe', 30, 20, 2, 1, 3, 3, 2, 4, 3, 10, '01', 'Elfe.jpg'),
-('03', 'Nain', 50, 5, 3, 4, 1, 1, 1, 2, 8, 2, '02', 'Nain.jpg'),
-('04', 'Ogre', 60, 5, 4, 4, 1, 0, 1, 2, 10, 1, '01', 'Ogre.jpg');
+('01', 'Barbare', 60, 5, 4, 4, 1, 0, 1, 2, 10, 1, '01', 'barbare'),
+('02', 'Nain', 50, 5, 3, 4, 1, 1, 1, 2, 8, 2, '02', 'nain'),
+('03', 'Elfe', 30, 20, 2, 1, 3, 3, 2, 4, 3, 10, '01', 'elfe'),
+('04', 'Enchanteur', 25, 30, 1, 2, 2, 4, 2, 3, 2, 14, '01', 'enchanteur');
 
 INSERT INTO magazin (code, libelle, coord01, coord02, coord03, coord04, village, type) VALUES
 ('01', 'Forgeron', 240, 430, 370, 510, '01', 'magasin'),

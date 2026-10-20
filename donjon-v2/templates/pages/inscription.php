@@ -28,8 +28,10 @@
                 </tr>
                 <tr>
                     <td colspan="2" class="center">
+                        <label><input type="radio" name="sexe" value="H" required> Héros</label>
+                        <label><input type="radio" name="sexe" value="F"> Héroïne</label>
                         <select name="race" required>
-                            <option value="">Sélectionnez votre race :</option>
+                            <option value="">Sélectionnez votre héros :</option>
                             <?php foreach ($races as $race): ?>
                                 <option value="<?= e($race['code']) ?>"><?= e($race['libelle']) ?></option>
                             <?php endforeach ?>

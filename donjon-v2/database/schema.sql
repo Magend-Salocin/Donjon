@@ -113,6 +113,7 @@ CREATE TABLE joueur (
     cexp        INTEGER NOT NULL DEFAULT 0,
     nbexp       INTEGER NOT NULL DEFAULT 0,
     libellerace TEXT NOT NULL,
+    sexe        TEXT NOT NULL DEFAULT 'H' CHECK (sexe IN ('H', 'F')),
     libellerang TEXT NOT NULL DEFAULT 'Novice' REFERENCES grade(libelle),
     village     TEXT NOT NULL REFERENCES village(code),
     image       TEXT NOT NULL,

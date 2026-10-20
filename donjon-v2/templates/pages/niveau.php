@@ -6,7 +6,7 @@
 ?>
 <div id="CarteJoueur">
     <h3 class="center"><?= e($hero['nom']) ?> : <?= e($hero['libellerace']) ?> - Niveau <?= (int) $hero['codeexp'] + 1 ?></h3>
-    <p class="center"><img src="<?= asset('img/personnages/' . e($hero['image'])) ?>" alt=""></p>
+    <p class="center"><img src="<?= e(hero_portrait($hero)) ?>" alt=""></p>
     <p class="center"><strong>Vous avez <?= (int) $hero['nbexp'] ?> point(s) de compétence à distribuer.</strong></p>
     <table class="tabheros level-table">
         <?php foreach ($stats as $stat => $label): ?>

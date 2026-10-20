@@ -72,37 +72,52 @@ function limit_text(string $text, int $length): string
     return $match[0] ?? '';
 }
 
-/** Portrait du héros affiché dans les pages du village. */
-function race_portrait(string $race): string
+/**
+ * Image d'un héros selon son type (colonne image : barbare, nain, elfe, enchanteur) et son sexe :
+ * fichier découpé par bin/decouper-heros.py s'il existe ($pattern), sinon l'image de 2009 du type.
+ */
+function hero_image(array $hero, string $pattern, array $fallbacks): string
 {
-    return asset('img/personnages/' . match ($race) {
-        'Nain' => 'NLB_nain.png',
-        'Elfe' => 'NLB_elfe.png',
-        'Ogre' => 'NLB_ogre.png',
-        default => 'NLB_aventurier.png',
-    });
+    $type = (string) $hero['image'];
+    $path = sprintf($pattern, $type . '-' . strtolower((string) $hero['sexe']));
+    if (is_file(ROOT_DIR . '/public/assets/' . $path)) {
+        return asset($path);
+    }
+
+    return asset($fallbacks[$type] ?? reset($fallbacks));
+}
+
+/** Portrait du héros affiché dans les pages du village. */
+function hero_portrait(array $hero): string
+{
+    return hero_image($hero, 'img/personnages/%s.png', [
+        'barbare' => 'img/personnages/NLB_barbare.png',
+        'nain' => 'img/personnages/NLB_nain.png',
+        'elfe' => 'img/personnages/NLB_elfe.png',
+        'enchanteur' => 'img/personnages/NLB_sorcier.png',
+    ]);
 }
 
 /** Pion du héros sur le plateau du donjon. */
-function race_token(string $race): string
+function hero_token(array $hero): string
 {
-    return asset('game/images/avatars/' . match ($race) {
-        'Nain' => '02.jpg',
-        'Elfe' => '03.jpg',
-        'Ogre' => '09.bmp',
-        default => '00.jpg',
-    });
+    return hero_image($hero, 'game/images/avatars/%s-pion.png', [
+        'barbare' => 'game/images/avatars/09.bmp',
+        'nain' => 'game/images/avatars/02.jpg',
+        'elfe' => 'game/images/avatars/03.jpg',
+        'enchanteur' => 'game/images/avatars/00.jpg',
+    ]);
 }
 
 /** Grande image du héros affichée pendant les combats du donjon. */
-function race_fighter(string $race): string
+function hero_fighter(array $hero): string
 {
-    return asset('game/images/avatars/' . match ($race) {
-        'Nain' => 'W02.png',
-        'Elfe' => 'W03.png',
-        'Ogre' => 'W09.png',
-        default => 'W00.png',
-    });
+    return hero_image($hero, 'game/images/avatars/%s-combat.png', [
+        'barbare' => 'game/images/avatars/W09.png',
+        'nain' => 'game/images/avatars/W02.png',
+        'elfe' => 'game/images/avatars/W03.png',
+        'enchanteur' => 'game/images/avatars/W00.png',
+    ]);
 }
 
 /** Barre de progression. $kind : vie, magie ou exp. */

@@ -124,8 +124,8 @@ $dice = static fn (string $prefix): string => implode('', array_map(
     //  Nom - Attaque - Defence - Corp - Esprit - Position - Image - Piece - Attaquer - ChercherTresor - Or - deplacement - JOUEUR - ImageCombat
     LesJoueurs[LesJoueurs.length] = [
         LeMagend[1], Math.min(8, <?= max(1, (int) $hero['forc']) ?>), Math.min(8, <?= max(1, (int) $hero['end']) ?>),
-        <?= max(1, (int) $hero['pv2']) ?>, 2, PositionDepart, <?= $json(race_token($hero['libellerace'])) ?>, PieceDepart,
-        0, 0, <?= (int) $hero['ors'] ?>, 0, LeMagend, <?= $json(race_fighter($hero['libellerace'])) ?>
+        <?= max(1, (int) $hero['pv2']) ?>, 2, PositionDepart, <?= $json(hero_token($hero)) ?>, PieceDepart,
+        0, 0, <?= (int) $hero['ors'] ?>, 0, LeMagend, <?= $json(hero_fighter($hero)) ?>
     ];
 </script>
 <script src="<?= asset('game/ModuleDes.js') ?>"></script>
