@@ -174,11 +174,17 @@ function adventure_difficulty(int $grade): string
 }
 
 /**
- * Illustration d'une aventure (img/donjon/aventure-*.jpg, découpées de la maquette), choisie par thème.
+ * Illustration d'une aventure : celle de la quête (img/donjon/quetes/quete-NN.jpg, aventure 100 + NN,
+ * découpée par bin/decouper-planche.py) si elle existe, sinon une image de thème (img/donjon/aventure-*.jpg).
  * Les images de 2009 (100 px) sont trop petites pour le bandeau de la liste.
  */
 function adventure_illustration(int $code): string
 {
+    $quest = sprintf('img/donjon/quetes/quete-%02d.jpg', $code - 100);
+    if ($code > 100 && is_file(ROOT_DIR . '/public/assets/' . $quest)) {
+        return asset($quest);
+    }
+
     $themes = [
         'feu' => [4, 103, 108, 111, 119, 123],
         'glace' => [104, 112, 114, 116],
