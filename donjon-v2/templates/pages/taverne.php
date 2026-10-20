@@ -6,7 +6,7 @@
 ?>
 <div class="tavern">
     <h2>Bienvenue à la taverne de <?= e($village['libelle']) ?></h2>
-    <img src="<?= asset('img/taverne/' . e($village['code']) . '.png') ?>" alt="" class="tavern-image">
+    <img src="<?= asset('img/lieux/taverne/' . e($village['code']) . '.png') ?>" alt="" class="tavern-image">
 
     <div class="tavern-columns">
         <div>

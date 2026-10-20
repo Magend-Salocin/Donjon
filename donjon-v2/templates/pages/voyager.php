@@ -13,7 +13,7 @@ use Donjon\View;
     <?php if ($journey !== null): ?>
         <?= View::render('partials/journey-timer', ['journey' => $journey]) ?>
     <?php else: ?>
-        <img src="<?= asset('img/carte/' . e($village['code']) . '.jpg') ?>" usemap="#travel-map" alt="Carte du pays de Fangh" class="travel-map">
+        <img src="<?= asset('img/lieux/carte/' . e($village['code']) . '.jpg') ?>" usemap="#travel-map" alt="Carte du pays de Fangh" class="travel-map">
         <map name="travel-map">
             <?php foreach ($destinations as $destination): ?>
                 <area shape="rect"

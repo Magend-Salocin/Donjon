@@ -1,5 +1,5 @@
 	#Authentification{
-		background-image:url('../img/img/Ecran.jpg');
+		background-image:url('../img/theme-2009/Ecran.jpg');
 		background-repeat:no-repeat;
 		height:375px;
 		padding:140px 50px 5px 30px;
@@ -19,7 +19,7 @@
 	#CarteJoueur{
 		color:black;
 		margin:auto;
-		background-image: url('../img/img/CarteHeroFondDefault.jpg');
+		background-image: url('../img/theme-2009/CarteHeroFondDefault.jpg');
 		background-repeat: no-repeat;	
 		width: 339px;
 		height: 475px;
@@ -31,7 +31,7 @@
 	#CarteJoueurAventure{
 		color:black;
 		margin:auto;
-		background-image: url('../img/img/CarteHeroAventure.jpg');
+		background-image: url('../img/theme-2009/CarteHeroAventure.jpg');
 		background-repeat: no-repeat;	
 		width: 475px;
 		height: 339px;

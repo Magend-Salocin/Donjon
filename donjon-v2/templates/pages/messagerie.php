@@ -12,7 +12,7 @@
 </p>
 
 <div class="scroll-panel">
-    <img src="<?= asset('img/msg_int/menu01.jpg') ?>" alt="" class="scroll-edge">
+    <img src="<?= asset('img/theme-2009/msg-menu01.jpg') ?>" alt="" class="scroll-edge">
     <div class="scroll-body">
     <?php if ($mode === 'boite'): ?>
         <table class="messages">
@@ -22,7 +22,7 @@
             <?php endif ?>
             <?php foreach ($inbox as $row): ?>
                 <tr>
-                    <td><img src="<?= asset('img/msg_int/' . ((int) $row['lue']) . '.jpg') ?>" alt="<?= $row['lue'] ? 'lu' : 'non lu' ?>"></td>
+                    <td><img src="<?= asset('img/messagerie/' . ((int) $row['lue']) . '.jpg') ?>" alt="<?= $row['lue'] ? 'lu' : 'non lu' ?>"></td>
                     <td><?= e($row['de']) ?></td>
                     <td><?= e($row['sujet']) ?></td>
                     <td><?= e(format_date((int) $row['date'])) ?></td>
@@ -53,5 +53,5 @@
         </div>
     <?php endif ?>
     </div>
-    <img src="<?= asset('img/msg_int/menu02.jpg') ?>" alt="" class="scroll-edge">
+    <img src="<?= asset('img/theme-2009/msg-menu02.jpg') ?>" alt="" class="scroll-edge">
 </div>

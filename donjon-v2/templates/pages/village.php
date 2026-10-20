@@ -12,7 +12,7 @@ $buildingUrl = static fn (array $building): string => match ($building['type']) 
 ?>
 <div id="body-fullside" class="map-page">
     <h2><?= e($village['libelle']) ?></h2>
-    <img src="<?= asset('img/village/' . e($village['code']) . '.jpg') ?>" usemap="#village-map" alt="Village de <?= e($village['libelle']) ?>">
+    <img src="<?= asset('img/lieux/village/' . e($village['code']) . '.jpg') ?>" usemap="#village-map" alt="Village de <?= e($village['libelle']) ?>">
     <map name="village-map">
         <?php foreach ($buildings as $building): ?>
             <area shape="rect"

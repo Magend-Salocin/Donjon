@@ -1,4 +1,4 @@
-"""Découpe les maquettes (bin/maquette/) en images pour le thème du site (public/assets/img/donjon/),
+"""Découpe les maquettes (bin/maquette/) en images pour le thème du site (public/assets/img/theme/),
 sur le modèle de l'ancien design. Page de connexion (maquette-connexion.png, 1989 x 791) : en-tête,
 épée en morceaux (onglets en HTML par-dessus), torches des côtés, cadre de parchemin, bouton, blason.
 Bas de page (maquette-pied.png, 1839 x 278) : mobilier à gauche et à droite, mur et sol répétés entre les deux.
@@ -24,7 +24,8 @@ maquette = os.path.join(RACINE, 'bin', 'maquette', 'maquette-connexion.png')
 maquette_pied = os.path.join(RACINE, 'bin', 'maquette', 'maquette-pied.png')
 maquette_mur = os.path.join(RACINE, 'bin', 'maquette', 'maquette-mur.png')
 maquette_aventures = os.path.join(RACINE, 'bin', 'maquette', 'maquette-aventures.png')
-sortie = os.path.join(RACINE, 'public', 'assets', 'img', 'donjon')
+sortie = os.path.join(RACINE, 'public', 'assets', 'img', 'theme')
+sortie_aventures = os.path.join(RACINE, 'public', 'assets', 'img', 'aventures')
 
 
 def police_titre(taille):
@@ -145,6 +146,7 @@ def cadre_parchemin(im, echelle=0.6):
 
 
 os.makedirs(sortie, exist_ok=True)
+os.makedirs(sortie_aventures, exist_ok=True)
 im = corriger_carte(cv2.imread(maquette))
 haut, bas = BANDE
 
@@ -181,7 +183,7 @@ print('mur : cadrage (gauche, droite, haut, bas) =', cadrage, 'taille', mur.size
 aventures = Image.open(maquette_aventures).convert('RGB')
 illustrations = {'labyrinthe': 82, 'feu': 215, 'glace': 342, 'marais': 469}
 for nom, y in illustrations.items():
-    aventures.crop((52, y + 2, 286, y + 104)).save(f'{sortie}/aventure-{nom}.jpg', quality=88)
+    aventures.crop((52, y + 2, 286, y + 104)).save(f'{sortie_aventures}/aventure-{nom}.jpg', quality=88)
 detourer(aventures.crop((203, 28, 316, 54))).save(f'{sortie}/ornement-gauche.png')
 detourer(aventures.crop((670, 28, 773, 54))).save(f'{sortie}/ornement-droite.png')
 for nom, x in (('difficulte', 318), ('experience', 471), ('or', 650)):

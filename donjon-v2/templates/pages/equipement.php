@@ -16,7 +16,7 @@ $labels = [
 ?>
 <h2>Équipement</h2>
 <div class="scroll-panel">
-    <img src="<?= asset('img/msg_int/menu01.jpg') ?>" alt="" class="scroll-edge">
+    <img src="<?= asset('img/theme-2009/msg-menu01.jpg') ?>" alt="" class="scroll-edge">
     <table class="tabheros scroll-body">
         <?php foreach ($slots as $slot): ?>
             <tr>
@@ -30,5 +30,5 @@ $labels = [
             </tr>
         <?php endforeach ?>
     </table>
-    <img src="<?= asset('img/msg_int/menu02.jpg') ?>" alt="" class="scroll-edge">
+    <img src="<?= asset('img/theme-2009/msg-menu02.jpg') ?>" alt="" class="scroll-edge">
 </div>

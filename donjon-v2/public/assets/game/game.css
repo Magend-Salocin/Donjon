@@ -102,7 +102,7 @@
 	box-sizing: border-box;
 	border-width: 42px;
 	border-image-width: 42px;
-	background: url('../img/donjon/parchemin.jpg') 0 0 / 360px border-box;
+	background: url('../img/theme/parchemin.jpg') 0 0 / 360px border-box;
 }
 .hero-board .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--parchemin-sombre); }
 .hero-board .ActionJeu { color: #f6e4bd; }	/* old.css l'écrit en noir */
@@ -170,7 +170,7 @@ img.die { width: 32px; height: 32px; }
 	overflow: auto;
 	padding: 10px;
 	box-sizing: border-box;
-	background: #0b0907 url('../img/donjon/mur.jpg') 0 0 / 100% auto repeat-y;
+	background: #0b0907 url('../img/theme/mur.jpg') 0 0 / 100% auto repeat-y;
 }
 #body-fullside.quest:fullscreen h2 { margin: 0 0 4px; }
 #body-fullside.quest:fullscreen .plateau-outils { margin-bottom: 8px; }

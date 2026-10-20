@@ -75,7 +75,7 @@ function limit_text(string $text, int $length): string
 /** Portrait du héros affiché dans les pages du village. */
 function race_portrait(string $race): string
 {
-    return asset('img/personnage/' . match ($race) {
+    return asset('img/personnages/' . match ($race) {
         'Nain' => 'NLB_nain.png',
         'Elfe' => 'NLB_elfe.png',
         'Ogre' => 'NLB_ogre.png',
@@ -174,13 +174,13 @@ function adventure_difficulty(int $grade): string
 }
 
 /**
- * Illustration d'une aventure : celle de la quête (img/donjon/quetes/quete-NN.jpg, aventure 100 + NN,
- * découpée par bin/decouper-planche.py) si elle existe, sinon une image de thème (img/donjon/aventure-*.jpg).
+ * Illustration d'une aventure : celle de la quête (img/aventures/quetes/quete-NN.jpg, aventure 100 + NN,
+ * découpée par bin/decouper-planche.py) si elle existe, sinon une image de thème (img/aventures/aventure-*.jpg).
  * Les images de 2009 (100 px) sont trop petites pour le bandeau de la liste.
  */
 function adventure_illustration(int $code): string
 {
-    $quest = sprintf('img/donjon/quetes/quete-%02d.jpg', $code - 100);
+    $quest = sprintf('img/aventures/quetes/quete-%02d.jpg', $code - 100);
     if ($code > 100 && is_file(ROOT_DIR . '/public/assets/' . $quest)) {
         return asset($quest);
     }
@@ -193,11 +193,11 @@ function adventure_illustration(int $code): string
     ];
     foreach ($themes as $theme => $codes) {
         if (in_array($code, $codes, true)) {
-            return asset('img/donjon/aventure-' . $theme . '.jpg');
+            return asset('img/aventures/aventure-' . $theme . '.jpg');
         }
     }
 
-    return asset('img/donjon/aventure-' . array_keys($themes)[$code % count($themes)] . '.jpg');
+    return asset('img/aventures/aventure-' . array_keys($themes)[$code % count($themes)] . '.jpg');
 }
 
 /** Onglet du menu principal en haut de page ; $current : section de la page affichée. */

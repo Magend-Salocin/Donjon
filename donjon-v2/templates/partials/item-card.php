@@ -7,7 +7,7 @@
  */
 ?>
 <div class="item-card">
-    <img src="<?= asset('img/inventaire/' . e($item['image'])) ?>" alt="" class="item-image">
+    <img src="<?= asset('img/objets/' . e($item['image'])) ?>" alt="" class="item-image">
     <div class="item-text">
         <strong><?= e($item['libelle']) ?></strong>
         <hr>

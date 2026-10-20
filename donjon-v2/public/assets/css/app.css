@@ -43,30 +43,30 @@ button.link:hover { color: #481e00; background: none; }
 .page { padding: 10px 20px; }
 .page-full { float: none; padding: 40px 60px; color: #c9b48a; }
 .login { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; justify-content: center; font-family: Georgia, serif; }
-.login form, .register form { background: url('../img/MenuA.jpg') no-repeat; background-size: 100% 100%; color: #2b1a08; padding: 20px 40px; width: 360px; }
+.login form, .register form { background: url('../img/theme-2009/MenuA.jpg') no-repeat; background-size: 100% 100%; color: #2b1a08; padding: 20px 40px; width: 360px; }
 .login label { display: inline-block; width: 120px; }
 .login .hint a { color: #902200; }
 .intro-flash embed, .intro-flash ruffle-embed { max-width: 100%; }
-.register form { width: auto; max-width: 520px; margin: 0 auto; background-image: url('../img/Autre/FondInscription.jpg'); background-size: cover; padding: 120px 40px 30px; }
+.register form { width: auto; max-width: 520px; margin: 0 auto; background-image: url('../img/theme-2009/FondInscription.jpg'); background-size: cover; padding: 120px 40px 30px; }
 .register td { padding: 4px; }
 
 /* Listes sur parchemin (inventaire, boutique, aventures) */
-.parchment-list { width: 470px; margin: 10px auto 20px; padding: 10px 0; background: url('../img/Menu02.jpg') repeat-y; background-size: 100% auto; color: #694421; }
+.parchment-list { width: 470px; margin: 10px auto 20px; padding: 10px 0; background: url('../img/theme-2009/Menu02.jpg') repeat-y; background-size: 100% auto; color: #694421; }
 .parchment-list h3 { text-align: center; color: #481e00 !important; }
 .parchment-list > p { text-align: center; }
 .parchment-list a { color: #902200; }
-.item-card { display: grid; grid-template-columns: 110px 1fr; width: 430px; margin: 10px auto; padding: 12px; background: url('../img/MenuB.jpg') no-repeat; background-size: 100% 100%; }
+.item-card { display: grid; grid-template-columns: 110px 1fr; width: 430px; margin: 10px auto; padding: 12px; background: url('../img/theme-2009/MenuB.jpg') no-repeat; background-size: 100% 100%; }
 .item-image { width: 96px; max-height: 96px; object-fit: contain; }
 .item-text hr { border: 0; border-top: 1px solid #ff0033; }
 .item-text p { text-align: justify; margin: 4px 0; }
 .item-footer { grid-column: 1 / -1; text-align: center; margin-top: 6px; }
-.shopkeeper { display: flex; gap: 10px; align-items: center; width: 470px; height: 86px; margin: 20px auto; background: url('../img/EmoteFn1.png') no-repeat; color: #2b1a08; }
+.shopkeeper { display: flex; gap: 10px; align-items: center; width: 470px; height: 86px; margin: 20px auto; background: url('../img/theme-2009/EmoteFn1.png') no-repeat; color: #2b1a08; }
 .shopkeeper img { height: 70px; margin-left: 9px; }
 
 /* Parchemin à rouleaux (équipement, messagerie) */
 .scroll-panel { width: 420px; margin: 0 auto; }
 .scroll-edge { display: block; width: 420px; }
-.scroll-body { width: 420px; background: url('../img/msg_int/menu03.jpg') repeat-y; color: #2b1a08; padding: 5px 15px; box-sizing: border-box; }
+.scroll-body { width: 420px; background: url('../img/theme-2009/msg-menu03.jpg') repeat-y; color: #2b1a08; padding: 5px 15px; box-sizing: border-box; }
 .scroll-body a { color: #902200; }
 table.scroll-body td { padding: 4px; }
 .messages { width: 100%; border-collapse: collapse; }

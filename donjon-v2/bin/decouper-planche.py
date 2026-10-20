@@ -1,5 +1,5 @@
 """Découpe une planche d'illustrations de quêtes (2 colonnes x 3 rangées, gouttières noires)
-en 6 images public/assets/img/donjon/quetes/quete-NN.jpg, au ratio du bandeau de la liste des aventures.
+en 6 images public/assets/img/aventures/quetes/quete-NN.jpg, au ratio du bandeau de la liste des aventures.
 Les planches et leur prompt sont dans Campagne01 (assets/illustrations/, 02-quetes/illustrations-prompt.md).
 La quête NN correspond à l'aventure 100 + NN en base.
 
@@ -12,7 +12,7 @@ import sys
 from PIL import Image
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SORTIE = os.path.join(RACINE, 'public', 'assets', 'img', 'donjon', 'quetes')
+SORTIE = os.path.join(RACINE, 'public', 'assets', 'img', 'aventures', 'quetes')
 TAILLE = (744, 324)             # ratio 234 / 102 de .aventure-image
 COLONNES, RANGEES = 2, 3
 MARGE = 3                       # pixels retirés autour de chaque case (bord de gouttière)

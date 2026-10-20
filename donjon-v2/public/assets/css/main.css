@@ -11,7 +11,7 @@ h1{
 	padding:8px 0 8px 0;
 }
 div.hr {
-	background-image: url('../img/img/footer_line.png');
+	background-image: url('../img/theme-2009/footer_line.png');
 	background-repeat: no-repeat;
 	width: 716px;
 	height: 30px;
@@ -23,7 +23,7 @@ div.hr hr {
 }
 /*#################PAGE BLOCKS' IDS###################*/
 #megabg_container{
-	background-image:url('../img/img/main_bg.png');
+	background-image:url('../img/theme-2009/main_bg.png');
 	background-position:center top;
 	background-repeat:repeat-y;
 		width:960px;
@@ -31,7 +31,7 @@ div.hr hr {
 
 }
 #bg_container{
-	background-image:url('../img/img/test_bg.png');
+	background-image:url('../img/theme-2009/test_bg.png');
 	background-position:center top;
 	background-repeat:no-repeat;
 	width:960px;
@@ -41,13 +41,13 @@ div.hr hr {
 #container{
 	width:780px;
 	margin:0 auto;
-	background-image:url('../img/img/body_right_bg.png');
+	background-image:url('../img/theme-2009/body_right_bg.png');
 	background-position:right;
 	background-repeat:repeat-y;
 	height:auto;
 }
 #header{
-	background-image:url('../img/img/top_img.jpg');
+	background-image:url('../img/theme-2009/top_img.jpg');
 	background-position:center center;
 	background-repeat:repeat-x;
 	height:188px;
@@ -59,7 +59,7 @@ div.hr hr {
 	margin-left:15px;
 }
 #menu_sword{
-	background-image:url('../img/img/menu_sword_bg.png');
+	background-image:url('../img/theme-2009/menu_sword_bg.png');
 	height:27px;
 	width:629px;
 	white-space:nowrap;
@@ -80,7 +80,7 @@ div.hr hr {
 
 #body-fullside{
 	float:right;
-	background-image:url('../img/img/body_sword_handle.jpg');
+	background-image:url('../img/theme-2009/body_sword_handle.jpg');
 	background-position:right top;
 	background-repeat:no-repeat;
 	padding:60px  50px 5px 5px;
@@ -89,7 +89,7 @@ div.hr hr {
 
 #body-rightside{
 	float:right;
-	background-image:url('../img/img/body_sword_handle.jpg');
+	background-image:url('../img/theme-2009/body_sword_handle.jpg');
 	background-position:right top;
 	background-repeat:no-repeat;
 	width:475px;
@@ -102,19 +102,19 @@ div.hr hr {
 	height:53px;
 }
 #scroll_top{
-	background-image:url('../img/img/menu_scroll_top.jpg');
+	background-image:url('../img/theme-2009/menu_scroll_top.jpg');
 	width:100%;
 	height:87px;
 	text-align:center;
 }
 #scroll_middle{
-	background-image:url('../img/img/menu_scroll_middle.jpg');
+	background-image:url('../img/theme-2009/menu_scroll_middle.jpg');
 	width:100%;
 	height:400px;/*Shall be only multiples of 140px.(140, 280, 320 etc) Otherwise picture will be unclear*/
 	overflow:hidden;
 }
 #scroll_bottom{
-	background-image:url('../img/img/menu_scroll_bottom.jpg');
+	background-image:url('../img/theme-2009/menu_scroll_bottom.jpg');
 	width:100%;
 	height:109px;
 }
@@ -160,7 +160,7 @@ a.graformix:hover{
 /*---------------------------------*/
 div.menu_separator{
 	border:0px solid red;
-	background-image:url('../img/img/separator_bg.png');
+	background-image:url('../img/theme-2009/separator_bg.png');
 	background-position:center center;
 	background-repeat:no-repeat;
 	height:22px;
@@ -223,7 +223,7 @@ a.low_menu:hover{
 	margin-right: 10px;
 }
 a.sword_menu:link{
-	background:transparent url('../img/img/sword_item_bg.png') repeat-x;
+	background:transparent url('../img/theme-2009/sword_item_bg.png') repeat-x;
 	font-family:"Charlemagne Std", "Times New Roman", Times, serif;
 	font-size:14px;
 	font-weight:bold;
@@ -237,7 +237,7 @@ a.sword_menu:link{
 	z-index:10;
 }
 a.sword_menu:visited{
-	background:transparent url('../img/img/sword_item_bg.png') repeat-x;
+	background:transparent url('../img/theme-2009/sword_item_bg.png') repeat-x;
 	font-family:"Charlemagne Std", "Times New Roman", Times, serif;
 	font-size:14px;
 	font-weight:bold;
@@ -251,7 +251,7 @@ a.sword_menu:visited{
 	z-index:10;
 }
 a.sword_menu:hover{
-	background:transparent url('../img/img/sword_item_bg.png') repeat-x;
+	background:transparent url('../img/theme-2009/sword_item_bg.png') repeat-x;
 	font-family:"Charlemagne Std", "Times New Roman", Times, serif;
 	font-size:14px;
 	font-weight:bold;
@@ -291,14 +291,14 @@ a.sword_menu:hover span.shadow{
 /*---------------------------------*/
 .sword_menu_item{
 /*	display:inline;*/
-	background-image:url('../img/img/sword_item_bg.png');
+	background-image:url('../img/theme-2009/sword_item_bg.png');
 	height:21px;
 	width:120px;
 	white-space:nowrap;
 /*	overflow:hidden;*/
 }
 ul.diamond{
-	list-style-image:url('../img/img/li_diamond.png');
+	list-style-image:url('../img/theme-2009/li_diamond.png');
 /*	margin:0 0 0 10px;*/
 }
 li{
@@ -328,7 +328,7 @@ li{
 	display:none;
 }
 span.tab-r {
-background:transparent url('../img/img/sword_item_right.png') no-repeat 100% 0pt;
+background:transparent url('../img/theme-2009/sword_item_right.png') no-repeat 100% 0pt;
 height:21px;
 position:absolute;
 right:-10px;
@@ -336,7 +336,7 @@ top:0px;
 width:10px;
 }
 span.tab-l {
-background:transparent url('../img/img/sword_item_left.png') no-repeat 0pt;
+background:transparent url('../img/theme-2009/sword_item_left.png') no-repeat 0pt;
 height:21px;
 left:-10px;
 position:absolute;

@@ -6,7 +6,7 @@
 <?php endif ?>
 <?php foreach ($questItems as $index => $item): ?>
     <div class="quest-item">
-        <img src="<?= asset('img/inventaire/' . e($item['image'])) ?>" alt="">
+        <img src="<?= asset('img/objets/' . e($item['image'])) ?>" alt="">
         <div>
             <strong><?= e($item['libelle']) ?></strong>
             <p><?= e($item['resumer']) ?></p>

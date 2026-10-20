@@ -8,7 +8,7 @@
 use Donjon\View;
 ?>
 <div class="shopkeeper">
-    <img src="<?= asset('img/A.png') ?>" alt="">
+    <img src="<?= asset('img/theme-2009/A.png') ?>" alt="">
     <p><strong><?= e($shop['libelle']) ?></strong><br>Bienvenue dans mon échoppe, aventurier ! Vous avez <?= (int) $hero['ors'] ?> pièces d'or.</p>
 </div>
 
