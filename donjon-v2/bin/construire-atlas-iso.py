@@ -1,5 +1,7 @@
-r"""Construit l'atlas de la vue isométrique (public/assets/game/iso/atlas.png et atlas.js) à partir d'une planche
-redessinée sur fond noir. La zone de chaque image sur la planche est dans bin/atlas-iso.json.
+r"""Construit l'atlas de la vue isométrique (public/assets/game/iso/atlas.png et atlas.js) à partir de deux sortes de planches,
+décrites dans bin/atlas-iso.json :
+  - la planche du décor et des sprites fixes, sur fond noir ("planche", "groupes") : une zone relevée par sprite ;
+  - les planches d'animations des personnages, en grille sur fond vert ("grilles") : découpées automatiquement.
 Procédure complète (nouvelle planche, repérage des zones, vérification) : skill atlas-iso, .claude/skills/atlas-iso/SKILL.md
 à la racine du dépôt.
 
@@ -17,10 +19,16 @@ Autres champs : "marge" (pixels ajoutés autour de la zone, 2 par défaut), "mir
 "decalage" (dx, dy des meubles, recopiés tels quels).
 
 Dépendance : pip install pillow numpy
+Planches d'animations : grille à gouttières noires, fond vert uni, une case par image, ANIMATIONS images par
+personnage, lues rangée après rangée. "personnages" donne, dans l'ordre de la planche, le préfixe de chaque personnage
+et sa hauteur au repos sur le plateau : toutes ses images sont réduites dans le même rapport. Chaque image est centrée
+sur les pieds, pour que le personnage ne glisse pas d'une image à l'autre.
+
 Usage (depuis donjon-v2/) : python bin/construire-atlas-iso.py [controle.png]
-La planche est celle de "planche" dans bin/atlas-iso.json : les zones n'ont de sens que pour elle.
+Les zones de "groupes" n'ont de sens que pour la planche de "planche".
 controle.png (facultatif) : planche de vérification, chaque image avec son nom.
 """
+import importlib.util
 import json
 import os
 import sys
@@ -35,6 +43,16 @@ ESPACE = 2              # pixels vides entre deux images (évite que le lissage 
 FOND = 34               # luminosité (max r, g, b) sous laquelle un pixel relié au bord est du fond
 NOIR_ENFERME = 8        # sous ce seuil, un pixel est du fond même enfermé (entre un bras et le corps)
 MORCEAU = 0.03          # morceau gardé s'il fait au moins cette part du plus grand (sinon : bout d'un voisin)
+ANIMATIONS = ['repos', 'marche0', 'marche1', 'marche2', 'attaque0', 'attaque1', 'attaque2',
+              'touche', 'mort0', 'mort1', 'dos-repos', 'dos-marche0', 'dos-marche1', 'dos-marche2']
+GOUTTIERE = 0.9         # part de pixels sombres d'une colonne (ou rangée) de gouttière
+PIEDS = 0.12            # bas de l'image (en part de sa hauteur) qui sert à centrer sur les pieds
+
+# Fond vert retiré comme pour les portraits des héros (vert relié aux bords, vert vif enfermé, reflet vert).
+sys.dont_write_bytecode = True     # pas de __pycache__ dans bin/ pour ce module chargé à la main
+_spec = importlib.util.spec_from_file_location('heros', os.path.join(RACINE, 'bin', 'decouper-heros.py'))
+decoupe_heros = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(decoupe_heros)
 
 
 def morceaux_isoles(dessin):
@@ -131,6 +149,53 @@ def images(planche, correspondance):
             yield nom, image, list(taille) + options.get('decalage', [])
 
 
+def intervalles(sombre, longueur):
+    """Cases entre les gouttières : intervalles de colonnes (ou rangées) non sombres d'au moins 40 pixels."""
+    cases, debut = [], None
+    for i in range(longueur + 1):
+        if i < longueur and not sombre[i]:
+            debut = i if debut is None else debut
+        elif debut is not None:
+            if i - debut >= 40:
+                cases.append((debut, i))
+            debut = None
+    return cases
+
+
+def cases_de_la_grille(planche):
+    """Cases de la planche, rangée après rangée, entre les gouttières réellement dessinées."""
+    sombre = np.asarray(planche.convert('RGB')).astype(int).max(axis=2) < 40
+    colonnes = intervalles(sombre.mean(axis=0) > GOUTTIERE, planche.width)
+    rangees = intervalles(sombre.mean(axis=1) > GOUTTIERE, planche.height)
+    return [planche.crop((x0, y0, x1, y1)) for y0, y1 in rangees for x0, x1 in colonnes]
+
+
+def centrer_sur_les_pieds(image):
+    """Marges transparentes pour que le milieu des pieds soit au milieu de l'image."""
+    alpha = np.asarray(image.getchannel('A')) > 40
+    pieds = np.nonzero(alpha[round(image.height * (1 - PIEDS)):].any(axis=0))[0]
+    milieu = (pieds.min() + pieds.max() + 1) / 2
+    gauche, droite = milieu, image.width - milieu
+    cadre = Image.new('RGBA', (round(2 * max(gauche, droite)), image.height))
+    cadre.paste(image, (round(max(gauche, droite) - gauche), 0))
+    return cadre
+
+
+def animations(grille, echelle):
+    """Images des planches d'animations : (nom, image à la taille de l'atlas, taille sur le plateau)."""
+    personnages = grille['personnages']
+    cases = cases_de_la_grille(Image.open(os.path.join(RACINE, grille['planche'])))
+    if len(cases) != len(personnages) * len(ANIMATIONS):
+        sys.exit(f'{grille["planche"]} : {len(cases)} cases trouvées, {len(personnages) * len(ANIMATIONS)} attendues.')
+    for numero, (prefixe, hauteur) in enumerate(personnages.items()):
+        images_du_personnage = [decoupe_heros.detourer(case) for case in cases[numero * len(ANIMATIONS):(numero + 1) * len(ANIMATIONS)]]
+        rapport = images_du_personnage[0].height / hauteur     # pixels de la planche par pixel du plateau, d'après le repos
+        for animation, image in zip(ANIMATIONS, images_du_personnage):
+            image = centrer_sur_les_pieds(image)
+            taille = [max(1, round(cote / rapport)) for cote in image.size]
+            yield f'{prefixe}-{animation}', reduire(image, (taille[0] * echelle, taille[1] * echelle)), taille
+
+
 def ranger(liste):
     """Rangement en lignes sur LARGEUR_PLANCHE pixels de large."""
     x = y = ligne = 0
@@ -167,11 +232,16 @@ def main():
         sys.exit(__doc__)
     correspondance = json.load(open(CORRESPONDANCE, encoding='utf-8'))
     liste = list(images(Image.open(os.path.join(RACINE, correspondance['planche'])), correspondance))
+    for grille in correspondance.get('grilles', []):
+        liste += animations(grille, correspondance['echelle'])
+    noms = [nom for nom, _, _ in liste]
+    if len(noms) != len(set(noms)):
+        sys.exit('Noms en double : ' + ', '.join(sorted({nom for nom in noms if noms.count(nom) > 1})))
     atlas, positions = ranger(liste)
     atlas.save(os.path.join(SORTIE, 'atlas.png'), optimize=True)
     zones = {nom: list(positions[nom]) + taille for nom, _, taille in liste}
     script = [
-        f'// Vue isométrique : planche redessinée, découpée par bin/construire-atlas-iso.py (zones dans bin/atlas-iso.json).',
+        f'// Vue isométrique : planches redessinées, découpées par bin/construire-atlas-iso.py (bin/atlas-iso.json).',
         f'// IsoAtlas : nom -> [x, y, largeur, hauteur(, dx, dy pour les meubles)]. x, y sur atlas.png ; largeur et hauteur',
         f'// en pixels du plateau. Sur atlas.png, chaque image fait IsoEchelle fois sa taille sur le plateau.',
         f'var IsoEchelle = {correspondance["echelle"]};',

@@ -125,9 +125,9 @@ def scene(sortie):
         x, y = point(0, i)
         dessiner('porte0', x - demi_x, y + demi_y - 43) if i == 3 else dessiner('mur' + str(i % 2), x - demi_x, y + demi_y - 51)
     dessiner('meuble4b', 60, 100)
-    for cx, cy, nom, miroir in [(1, 1, 'barbare-h0', False), (2, 1, 'nain-f0', False), (3, 2, 'elfe-f0', True),
-                                (1, 3, 'enchanteur-h0', False), (4, 1, 'barbare-h-dos', True),
-                                (4, 3, 'orc0', False), (3, 4, 'chaos0', False), (2, 4, 'gobelin0', False)]:
+    for cx, cy, nom, miroir in [(1, 1, 'barbare-h-repos', False), (2, 1, 'nain-f-repos', False), (3, 2, 'elfe-f-repos', True),
+                                (1, 3, 'enchanteur-h-repos', False), (4, 1, 'barbare-f-dos-marche0', True),
+                                (4, 3, 'orc-repos', False), (3, 4, 'chaos-repos', False), (2, 4, 'barbare-f-marche1', False)]:
         x, y = point(cx, cy)
         z = atlas[nom]
         dessiner(nom, x - z[2] / 2, y + demi_y + 4 - z[3], miroir)

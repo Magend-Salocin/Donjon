@@ -1,5 +1,7 @@
 	/*
-	 * Vue isometrique du plateau, avec les graphismes du HeroQuest PC de Gremlin (1991) : iso/atlas.png et iso/atlas.js.
+	 * Vue isometrique du plateau, avec des graphismes redessines d'apres le HeroQuest PC de Gremlin (1991) : iso/atlas.png
+	 * et iso/atlas.js (bin/construire-atlas-iso.py). Les personnages marchent d'une case a l'autre ; en combat, l'attaquant
+	 * frappe et le defenseur recule ou tombe, quand leur planche d'animations a ces images (sinon : image de repos).
 	 * Disponible pour les cartes importees (quest101 a quest124), qui decrivent murs (MesMurs), sols (MesZones)
 	 * et meubles (MesObjets). Le moteur continue de jouer sur le tableau #board ; cette vue le redessine en continu.
 	 *
@@ -50,10 +52,22 @@
 		'MageSquellette': 'mage', 'Sorcier': 'mage'
 	};
 
-	/* Prefixe des images du heros dans l'atlas : type et sexe (barbare-h, elfe-f...). Images : 0 au repos, 1 et 2 en attaque, -dos de dos. */
+	var ISO_DUREE_PAS = 240;					// glissement d'une case a la voisine, avec les 3 images de marche
+	var ISO_FIN_FRAPPE = [150, 300, 600];		// gros plan : fin des images attaque0, attaque1, attaque2 (ms)
+	var ISO_IMPACT = 450, ISO_FIN_TOUCHE = 1100, ISO_CHUTE = 750;	// gros plan : reaction du defenseur (ms)
+
+	/* Prefixe des images du heros dans l'atlas : type et sexe (barbare-h, elfe-f...). */
 	function IsoNomHeros(Heros){
 		var Nom = Heros[12][23] + '-' + String(Heros[12][31] || 'H').toLowerCase();
-		return IsoAtlas[Nom + '0'] ? Nom : 'barbare-h';
+		return IsoAtlas[Nom + '-repos'] ? Nom : 'barbare-h';
+	}
+
+	/* Image d'une animation (repos, marche0, attaque2, touche, mort1, dos-marche1...) d'un personnage.
+	   Sans planche d'animations, le personnage n'a pas toutes les images : on prend son repos (de dos si possible). */
+	function IsoImage(Base, Animation){
+		var Noms = [Base + '-' + Animation, Base + (Animation.indexOf('dos-') == 0 ? '-dos-repos' : '-repos'), Base + '-repos'];
+		for (var i = 0; i < Noms.length; i++){ if (IsoAtlas[Noms[i]]) { return Noms[i]; } }
+		return Noms[2];
 	}
 
 	function IsoDisponible(){
@@ -307,6 +321,19 @@
 		Iso.Canvas.style.cursor = Iso.Survol !== null ? 'pointer' : '';
 	}
 
+	/* Gros plan : l'attaquant frappe une fois (3 images), puis revient au repos. */
+	function IsoAnimationAttaquant(Ecoule){
+		for (var i = 0; i < ISO_FIN_FRAPPE.length; i++){ if (Ecoule < ISO_FIN_FRAPPE[i]) { return 'attaque' + i; } }
+		return 'repos';
+	}
+
+	/* Gros plan : au moment du coup, le defenseur tombe s'il meurt, recule s'il perd des points de vie. */
+	function IsoAnimationDefenseur(Ecoule, Perte, Mort){
+		if (Ecoule < ISO_IMPACT) { return 'repos'; }
+		if (Mort) { return Ecoule < ISO_CHUTE ? 'mort0' : 'mort1'; }
+		return Perte > 0 && Ecoule < ISO_FIN_TOUCHE ? 'touche' : 'repos';
+	}
+
 	/* Gros plan du combat : les deux combattants agrandis sur leurs dalles, les des et le resultat. */
 	function IsoGrosPlanCombat(Largeur, Hauteur){
 		var Ctx = Iso.Contexte, C = Iso.Combat, Z = ISO_ZOOM_COMBAT;
@@ -322,10 +349,10 @@
 		IsoDessinerZoom(SolHeros, Cx - 2 * ISO_DEMI_X * Z, Cy - ISO_DEMI_Y * Z, Z, false);
 		IsoDessinerZoom(SolMonstre, Cx, Cy, Z, false);
 
-		var Frappe = Math.floor(Ecoule / 150) % 4;			// animation de l'attaquant pendant la premiere seconde
-		var Anime = Ecoule < 1200;
-		var NomHeros = IsoNomHeros(C.Heros) + (C.HerosAttaque && Anime ? [0, 1, 2, 1][Frappe] : 0);
-		var NomMonstre = (ISO_MONSTRES[C.Monstre[0]] || 'orc') + (!C.HerosAttaque && Anime ? Frappe : 0);
+		var Mort = C.HerosAttaque ? C.Monstre[8] == -1 : C.Heros[3] < 1;
+		var Attaquant = IsoAnimationAttaquant(Ecoule), Defenseur = IsoAnimationDefenseur(Ecoule, C.Perte, Mort);
+		var NomHeros = IsoImage(IsoNomHeros(C.Heros), C.HerosAttaque ? Attaquant : Defenseur);
+		var NomMonstre = IsoImage(ISO_MONSTRES[C.Monstre[0]] || 'orc', C.HerosAttaque ? Defenseur : Attaquant);
 		IsoPersonnageZoom(NomHeros, Cx - ISO_DEMI_X * Z, Cy, Z, true);
 		IsoPersonnageZoom(NomMonstre, Cx + ISO_DEMI_X * Z, Cy + ISO_DEMI_Y * Z, Z, false);
 
@@ -464,39 +491,58 @@
 		IsoDessiner(Nom, Centre - Zone[2] / 2, Math.min(Bas - 4, (Haut + Bas) / 2 + Zone[3] / 2) - Zone[3]);
 	}
 
+	/* Personnages a dessiner, par case. Pendant un pas, le personnage est dessine avec la plus en avant des deux cases :
+	   il passe ainsi devant les murs et les meubles de l'autre. */
 	function IsoPersonnagesParCase(){
 		var Liste = {};
+		function Placer(Case, Qui){
+			Qui.Direction = IsoDirection(Qui.Cle, Case);
+			var Depart = Qui.Direction.Depart;
+			Liste[IsoEnMarche(Qui.Direction) && IsoProfondeur(Depart) > IsoProfondeur(Case) ? Depart : Case] = Qui;
+		}
 		for (var i = 0; i < LesMonstres.length; i++){
-			if (LesMonstres[i][8] == 1 && Iso.Montrees[LesMonstres[i][7]]) { Liste[Number(LesMonstres[i][7])] = { Monstre: LesMonstres[i], Cle: 'm' + i }; }
+			if (LesMonstres[i][8] == 1 && Iso.Montrees[LesMonstres[i][7]]) { Placer(Number(LesMonstres[i][7]), { Monstre: LesMonstres[i], Cle: 'm' + i }); }
 		}
 		for (var j = 0; j < LesJoueurs.length; j++){
-			Liste[Number(LesJoueurs[j][5])] = { Heros: LesJoueurs[j], Cle: 'h' + j };
+			Placer(Number(LesJoueurs[j][5]), { Heros: LesJoueurs[j], Cle: 'h' + j });
 		}
 		return Liste;
 	}
 
-	/* Direction memorisee a partir du dernier deplacement : de face (bas) ou de dos (haut), en miroir pour l'autre diagonale. */
+	/* Direction et pas en cours, a partir du dernier deplacement : de face (bas) ou de dos (haut), en miroir pour l'autre
+	   diagonale. Un pas vers une case voisine glisse pendant ISO_DUREE_PAS ms ; un saut plus long est immediat. */
 	function IsoDirection(Cle, Case){
-		var D = Iso.Directions[Cle] || { Case: Case, Haut: false, Miroir: false };
+		var D = Iso.Directions[Cle] || { Case: Case, Depart: Case, Debut: 0, Pas: 0, Haut: false, Miroir: false };
 		var Ecart = Case - D.Case;
-		if (Ecart == ISO_LARGEUR) { D.Haut = false; D.Miroir = false; }
-		if (Ecart == 1) { D.Haut = false; D.Miroir = true; }
-		if (Ecart == -ISO_LARGEUR) { D.Haut = true; D.Miroir = true; }
-		if (Ecart == -1) { D.Haut = true; D.Miroir = false; }
-		D.Case = Case;
+		if (Ecart){
+			if (Ecart == ISO_LARGEUR) { D.Haut = false; D.Miroir = false; }
+			if (Ecart == 1) { D.Haut = false; D.Miroir = true; }
+			if (Ecart == -ISO_LARGEUR) { D.Haut = true; D.Miroir = true; }
+			if (Ecart == -1) { D.Haut = true; D.Miroir = false; }
+			var Voisine = Ecart == 1 || Ecart == -1 || Ecart == ISO_LARGEUR || Ecart == -ISO_LARGEUR;
+			D.Depart = Voisine ? D.Case : Case;
+			D.Debut = Date.now();
+			D.Pas++;
+			D.Case = Case;
+		}
 		Iso.Directions[Cle] = D;
 		return D;
 	}
 
+	function IsoEnMarche(D){
+		return D.Depart != D.Case && Date.now() - D.Debut < ISO_DUREE_PAS;
+	}
+
+	/* Au repos sur sa case, ou en train de glisser vers elle avec les images de marche (jambes alternees d'un pas a l'autre). */
 	function IsoPersonnage(Case, Qui){
-		var P = IsoPoint(Case), D = IsoDirection(Qui.Cle, Case), Nom;
-		if (Qui.Heros){
-			Nom = IsoNomHeros(Qui.Heros) + (D.Haut ? '-dos' : '0');
+		var D = Qui.Direction, P = IsoPoint(D.Case), Animation = 'repos';
+		if (IsoEnMarche(D)){
+			var Avance = (Date.now() - D.Debut) / ISO_DUREE_PAS, A = IsoPoint(D.Depart), Image = Math.min(2, Math.floor(Avance * 3));
+			P = { x: A.x + (P.x - A.x) * Avance, y: A.y + (P.y - A.y) * Avance };
+			Animation = 'marche' + (D.Pas % 2 ? 2 - Image : Image);
 		}
-		else {
-			Nom = (ISO_MONSTRES[Qui.Monstre[0]] || 'orc') + '0';
-		}
-		var Zone = IsoAtlas[Nom];
+		var Base = Qui.Heros ? IsoNomHeros(Qui.Heros) : (ISO_MONSTRES[Qui.Monstre[0]] || 'orc');
+		var Nom = IsoImage(Base, (D.Haut ? 'dos-' : '') + Animation), Zone = IsoAtlas[Nom];
 		IsoDessiner(Nom, P.x - Zone[2] / 2, P.y + ISO_DEMI_Y + 4 - Zone[3], D.Miroir);
 	}
 
