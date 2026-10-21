@@ -167,7 +167,26 @@
     }}
   ],
   "grilles": [
-    {"planche": "public/assets/game/iso/planches/barbare.png", "personnages": {"barbare-h": 40, "barbare-f": 38}}
+    {"planche": "public/assets/game/iso/planches/barbare-h-deplacements.png", "prefixe": "barbare-h", "hauteur": 40,
+     "face_vers_la_droite": true, "cases": [
+       "repos", "marche0", "marche1", "marche2",
+       null, null, null, null,
+       "dos-repos", "dos-marche0", "dos-marche1", "dos-marche2",
+       null, null, null, null]},
+    {"planche": "public/assets/game/iso/planches/barbare-h-combat.png", "prefixe": "barbare-h", "hauteur": 40,
+     "face_vers_la_droite": true, "cases": [
+       null, "attaque0", "attaque1", "attaque2",
+       "touche", "mort0", "mort1", "mort2"]},
+    {"planche": "public/assets/game/iso/planches/barbare-f-deplacements.png", "prefixe": "barbare-f", "hauteur": 38,
+     "face_vers_la_droite": true, "cases": [
+       "repos", "marche0", "marche1", "marche2",
+       null, null, null, null,
+       "dos-repos", "dos-marche0", "dos-marche1", "dos-marche2",
+       null, null, null, null]},
+    {"planche": "public/assets/game/iso/planches/barbare-f-combat.png", "prefixe": "barbare-f", "hauteur": 38,
+     "face_vers_la_droite": true, "cases": [
+       null, "attaque0", "attaque1", "attaque2",
+       "touche", "mort0", "mort1", "mort2"]}
   ],
   "sols_des_zones": ["sol0000", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol1f80", "sol6c00", "sol1b00", "sol5e80", "sol3600", "sol2400", "sol2880", "sol2d00", "sol3180", "sol3a80", "sol3f00", "sol4380", "sol4800", "sol4c80", "sol5100", "sol5580", "sol5a00", "sol6300", "sol6780", "sol6c00", "sol7080", "sol7500", "sol7980"],
   "sols_speciaux": {"48": "sol1200", "49": "sol1200", "51": "sol1680", "56": "sol0000", "57": "sol0d80", "58": "sol0480", "59": "sol0900"}

@@ -54,7 +54,8 @@
 
 	var ISO_DUREE_PAS = 240;					// glissement d'une case a la voisine, avec les 3 images de marche
 	var ISO_FIN_FRAPPE = [150, 300, 600];		// gros plan : fin des images attaque0, attaque1, attaque2 (ms)
-	var ISO_IMPACT = 450, ISO_FIN_TOUCHE = 1100, ISO_CHUTE = 750;	// gros plan : reaction du defenseur (ms)
+	var ISO_IMPACT = 450, ISO_FIN_TOUCHE = 1100;	// gros plan : reaction du defenseur (ms)
+	var ISO_FIN_CHUTE = [750, 1000];				// gros plan : fin des images mort0, mort1 ; puis mort2
 
 	/* Prefixe des images du heros dans l'atlas : type et sexe (barbare-h, elfe-f...). */
 	function IsoNomHeros(Heros){
@@ -62,12 +63,15 @@
 		return IsoAtlas[Nom + '-repos'] ? Nom : 'barbare-h';
 	}
 
-	/* Image d'une animation (repos, marche0, attaque2, touche, mort1, dos-marche1...) d'un personnage.
-	   Sans planche d'animations, le personnage n'a pas toutes les images : on prend son repos (de dos si possible). */
+	/* Image d'une animation (repos, marche0, attaque2, touche, mort2, dos-marche1...) d'un personnage.
+	   Une image absente est remplacee par la precedente de l'animation (mort2 par mort1), sinon par le repos
+	   (de dos si possible) : un personnage sans planche d'animations n'a que quelques images. */
 	function IsoImage(Base, Animation){
-		var Noms = [Base + '-' + Animation, Base + (Animation.indexOf('dos-') == 0 ? '-dos-repos' : '-repos'), Base + '-repos'];
+		var Noms = [Base + '-' + Animation], Numero = Animation.match(/^(.*\D)(\d)$/);
+		for (var n = Numero ? Number(Numero[2]) - 1 : -1; n >= 0; n--){ Noms.push(Base + '-' + Numero[1] + n); }
+		Noms.push(Base + (Animation.indexOf('dos-') == 0 ? '-dos-repos' : '-repos'), Base + '-repos');
 		for (var i = 0; i < Noms.length; i++){ if (IsoAtlas[Noms[i]]) { return Noms[i]; } }
-		return Noms[2];
+		return Base + '-repos';
 	}
 
 	function IsoDisponible(){
@@ -330,7 +334,10 @@
 	/* Gros plan : au moment du coup, le defenseur tombe s'il meurt, recule s'il perd des points de vie. */
 	function IsoAnimationDefenseur(Ecoule, Perte, Mort){
 		if (Ecoule < ISO_IMPACT) { return 'repos'; }
-		if (Mort) { return Ecoule < ISO_CHUTE ? 'mort0' : 'mort1'; }
+		if (Mort){
+			for (var i = 0; i < ISO_FIN_CHUTE.length; i++){ if (Ecoule < ISO_FIN_CHUTE[i]) { return 'mort' + i; } }
+			return 'mort' + ISO_FIN_CHUTE.length;
+		}
 		return Perte > 0 && Ecoule < ISO_FIN_TOUCHE ? 'touche' : 'repos';
 	}
 
@@ -416,9 +423,11 @@
 		IsoDessinerZoom(Nom, x - Zone[2] * Z / 2, y + 4 * Z - Zone[3] * Z, Z, Miroir);
 	}
 
-	/* La camera suit le heros sans sortir des cases devoilees (marge d'une case). */
+	/* La camera suit le heros sans sortir des cases devoilees (marge d'une case). Elle vise sa position pendant un pas,
+	   pas sa case d'arrivee : sinon elle le depasse et il semble reculer a l'ecran. */
 	function IsoCibleCamera(Largeur, Hauteur){
-		var Cible = IsoPoint(Number(LesJoueurs[ConstIdJoueur][5]));
+		var D = Iso.Directions['h' + ConstIdJoueur];
+		var Cible = D ? IsoPosition(D) : IsoPoint(Number(LesJoueurs[ConstIdJoueur][5]));
 		var Gauche = Infinity, Droite = -Infinity, Haut = Infinity, Bas = -Infinity;
 		for (var Case in Iso.Visibles){
 			var P = IsoPoint(Number(Case));
@@ -533,12 +542,22 @@
 		return D.Depart != D.Case && Date.now() - D.Debut < ISO_DUREE_PAS;
 	}
 
+	/* Part du pas deja faite (0 a 1), 1 au repos. */
+	function IsoAvance(D){
+		return IsoEnMarche(D) ? (Date.now() - D.Debut) / ISO_DUREE_PAS : 1;
+	}
+
+	/* Position du personnage : sa case, ou entre l'ancienne et la nouvelle pendant un pas. */
+	function IsoPosition(D){
+		var Avance = IsoAvance(D), A = IsoPoint(D.Depart), P = IsoPoint(D.Case);
+		return { x: A.x + (P.x - A.x) * Avance, y: A.y + (P.y - A.y) * Avance };
+	}
+
 	/* Au repos sur sa case, ou en train de glisser vers elle avec les images de marche (jambes alternees d'un pas a l'autre). */
 	function IsoPersonnage(Case, Qui){
-		var D = Qui.Direction, P = IsoPoint(D.Case), Animation = 'repos';
+		var D = Qui.Direction, P = IsoPosition(D), Animation = 'repos';
 		if (IsoEnMarche(D)){
-			var Avance = (Date.now() - D.Debut) / ISO_DUREE_PAS, A = IsoPoint(D.Depart), Image = Math.min(2, Math.floor(Avance * 3));
-			P = { x: A.x + (P.x - A.x) * Avance, y: A.y + (P.y - A.y) * Avance };
+			var Image = Math.min(2, Math.floor(IsoAvance(D) * 3));
 			Animation = 'marche' + (D.Pas % 2 ? 2 - Image : Image);
 		}
 		var Base = Qui.Heros ? IsoNomHeros(Qui.Heros) : (ISO_MONSTRES[Qui.Monstre[0]] || 'orc');

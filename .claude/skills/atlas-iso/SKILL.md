@@ -41,13 +41,13 @@ Toutes les commandes se lancent depuis `donjon-v2/`.
 Personnages :
 
 - `<base>` vaut `<type>-<h|f>` pour un héros. Le type vient de la colonne `image` (barbare, nain, elfe, enchanteur), le sexe de `LeMagend[31]`. Pour un monstre, `<base>` est `gobelin`, `orc`, `fimir`, `chaos`, `mage`, `squelette`, `zombie`, `momie` ou `gargouille` (correspondance dans `ISO_MONSTRES`).
-- Animations : `repos`, `marche0` à `marche2`, `attaque0` à `attaque2`, `touche`, `mort0`, `mort1`, `dos-repos`, `dos-marche0` à `dos-marche2` (liste `ANIMATIONS` du script).
-- Seul `<base>-repos` est obligatoire. `IsoImage` remplace une image absente par `-dos-repos` (pour une animation de dos), puis par `-repos`. On peut donc livrer les planches d'animations une par une.
+- Animations : `repos`, `marche0` à `marche2`, `attaque0` à `attaque2`, `touche`, `mort0` à `mort2`, `dos-repos`, `dos-marche0` à `dos-marche2`.
+- Seul `<base>-repos` est obligatoire. `IsoImage` remplace une image absente par la précédente de son animation (`mort2` par `mort1`), puis par `-dos-repos` (pour une animation de dos), puis par `-repos`. On peut donc livrer les planches d'animations une par une.
 - De face = vers le bas à gauche de l'écran ; de dos = vers le haut à gauche. Le jeu fait le miroir pour les deux autres diagonales. Il ne fait de miroir que pour les personnages : les meubles et les portes doivent exister dans leurs deux orientations.
 
 ## Planche d'animations (grille)
 
-1. **Prompt.** Partir de `docs/animations-iso/prompt-barbare.md` : 7 colonnes × 4 rangées, 14 cases par personnage, dans l'ordre de `ANIMATIONS`, rangée après rangée. Décrire le personnage à partir de son portrait (`public/assets/img/personnages/<type>-<sexe>.png`) et joindre ses sprites actuels en référence.
+1. **Prompt.** Partir de `docs/animations-iso/prompt-barbare.md` : par personnage, une planche de déplacements (4 × 4) puis une planche de combat (4 × 2). Décrire le personnage à partir de son portrait (`public/assets/img/personnages/<type>-<sexe>.png`) et joindre ses sprites actuels en référence.
 2. **Juger la planche** avant de l'intégrer :
    - même personnage dans toutes ses cases ;
    - poses lisibles à 24 × 40 px : réduire chaque case à cette taille et regarder ;
@@ -55,8 +55,14 @@ Personnages :
    - aucun débordement sur les gouttières.
 
    Une rangée ratée se régénère seule (voir la fin du prompt modèle).
-3. **Déclarer** dans `grilles` : `{"planche": "public/assets/game/iso/planches/<nom>.png", "personnages": {"<base>": <hauteur au repos>, ...}}`, les personnages dans l'ordre de la planche. Les hauteurs règlent les tailles relatives : 40 pour un grand héros, 38 pour un plus petit, environ 34 pour un nain. Retirer de `groupes` les images que la grille fournit : le script refuse les noms en double.
-4. **Construire et vérifier** (voir plus bas). Le script s'arrête si le nombre de cases trouvées n'est pas 14 par personnage.
+3. **Déclarer** dans `grilles`, une entrée par planche (exemples du barbare dans `bin/atlas-iso.json`) :
+   - `"prefixe"` : `<base>` du personnage ;
+   - `"cases"` : l'animation de chaque case, rangée après rangée, `null` pour une case à ignorer (direction en double, repos de la planche de combat) ;
+   - `"hauteur"` : hauteur sur le plateau de la case de repos `"reference"` (0 par défaut) : 40 pour un grand héros, 38 pour un plus petit, environ 34 pour un nain ;
+   - `"face_vers_la_droite": true` si la face est dessinée vers le bas à droite : le script la retourne.
+
+   Retirer de `groupes` les images que la grille fournit : le script refuse les noms en double.
+4. **Construire et vérifier** (voir plus bas). Le script s'arrête si le nombre de cases trouvées n'est pas celui de `"cases"`.
 
 Ce que fait le script :
 - il repère les gouttières réelles (les cases d'une planche générée ne sont jamais égales) ;

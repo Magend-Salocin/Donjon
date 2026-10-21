@@ -46,11 +46,11 @@ Deux directions sont dessinées : de face (le personnage descend vers le bas à 
 | Marche | 3 | oui | oui | déplacement d'une case à l'autre |
 | Attaque | 3 | oui | | gros plan du combat |
 | Touché | 1 | oui | | gros plan, défenseur qui perd des points de vie |
-| Mort | 2 | oui | | gros plan, puis le corps reste un instant sur le plateau |
+| Mort | 3 | oui | | gros plan, puis le corps reste un instant sur le plateau |
 
-Héros : 14 images par sexe. Monstres : les mêmes de face (10) ; la marche de dos est un bonus.
+Héros : 15 images par sexe. Monstres : les mêmes de face (11) ; la marche de dos est un bonus.
 
-Noms dans l'atlas : `<type>-<sexe>-repos`, `-marche0` à `-marche2`, `-attaque0` à `-attaque2`, `-touche`, `-mort0`, `-mort1`, `-dos-repos`, `-dos-marche0` à `-dos-marche2`. Pour les monstres, même schéma sans le sexe (`orc-marche1`…).
+Noms dans l'atlas : `<type>-<sexe>-repos`, `-marche0` à `-marche2`, `-attaque0` à `-attaque2`, `-touche`, `-mort0` à `-mort2`, `-dos-repos`, `-dos-marche0` à `-dos-marche2`. Pour les monstres, même schéma sans le sexe (`orc-marche1`…).
 
 ### Ce qu'il faut ajouter au moteur
 
@@ -66,7 +66,7 @@ Noms dans l'atlas : `<type>-<sexe>-repos`, `-marche0` à `-marche2`, `-attaque0`
 
 ## Étapes
 
-1. Fait : planche test du barbare ([animations-iso/prompt-barbare.md](animations-iso/prompt-barbare.md)), rangée dans `public/assets/game/iso/planches/barbare.png`. À reprendre : la marche de face de la barbare (2e et 3e images presque identiques).
+1. Fait : barbare homme et femme en trois-quarts, une planche de déplacements et une de combat chacun ([animations-iso/prompt-barbare.md](animations-iso/prompt-barbare.md)).
 2. Fait : découpage des planches en grille dans `construire-atlas-iso.py` (section `grilles` de `bin/atlas-iso.json`, procédure dans le skill `atlas-iso`).
 3. Fait : marche animée, touché et mort dans `ModuleIso.js`. Reste à tester en jeu.
 4. Planches du nain, de l'elfe et de l'enchanteur, puis des monstres.

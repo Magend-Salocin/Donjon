@@ -19,10 +19,15 @@ Autres champs : "marge" (pixels ajoutés autour de la zone, 2 par défaut), "mir
 "decalage" (dx, dy des meubles, recopiés tels quels).
 
 Dépendance : pip install pillow numpy
-Planches d'animations : grille à gouttières noires, fond vert uni, une case par image, ANIMATIONS images par
-personnage, lues rangée après rangée. "personnages" donne, dans l'ordre de la planche, le préfixe de chaque personnage
-et sa hauteur au repos sur le plateau : toutes ses images sont réduites dans le même rapport. Chaque image est centrée
-sur les pieds, pour que le personnage ne glisse pas d'une image à l'autre.
+Planches d'animations : grille à gouttières noires, fond vert uni, une case par image. Une entrée de "grilles" par
+planche et par personnage :
+  "prefixe"    préfixe des noms (barbare-h)
+  "cases"      nom de l'animation de chaque case, rangée après rangée (null : case ignorée)
+  "reference"  numéro de la case de repos qui donne l'échelle (0 par défaut) et "hauteur" sa hauteur sur le plateau :
+               toutes les images de la planche sont réduites dans le même rapport
+  "face_vers_la_droite"  les images de face sont dessinées vers le bas à droite : le script les retourne, le jeu
+               attend la face vers le bas à gauche (les images "dos-" restent telles quelles)
+Chaque image est centrée sur les pieds, pour que le personnage ne glisse pas d'une image à l'autre.
 
 Usage (depuis donjon-v2/) : python bin/construire-atlas-iso.py [controle.png]
 Les zones de "groupes" n'ont de sens que pour la planche de "planche".
@@ -43,8 +48,6 @@ ESPACE = 2              # pixels vides entre deux images (évite que le lissage 
 FOND = 34               # luminosité (max r, g, b) sous laquelle un pixel relié au bord est du fond
 NOIR_ENFERME = 8        # sous ce seuil, un pixel est du fond même enfermé (entre un bras et le corps)
 MORCEAU = 0.03          # morceau gardé s'il fait au moins cette part du plus grand (sinon : bout d'un voisin)
-ANIMATIONS = ['repos', 'marche0', 'marche1', 'marche2', 'attaque0', 'attaque1', 'attaque2',
-              'touche', 'mort0', 'mort1', 'dos-repos', 'dos-marche0', 'dos-marche1', 'dos-marche2']
 GOUTTIERE = 0.9         # part de pixels sombres d'une colonne (ou rangée) de gouttière
 PIEDS = 0.12            # bas de l'image (en part de sa hauteur) qui sert à centrer sur les pieds
 
@@ -182,18 +185,22 @@ def centrer_sur_les_pieds(image):
 
 
 def animations(grille, echelle):
-    """Images des planches d'animations : (nom, image à la taille de l'atlas, taille sur le plateau)."""
-    personnages = grille['personnages']
+    """Images d'une planche d'animations : (nom, image à la taille de l'atlas, taille sur le plateau)."""
+    noms = grille['cases']
     cases = cases_de_la_grille(Image.open(os.path.join(RACINE, grille['planche'])))
-    if len(cases) != len(personnages) * len(ANIMATIONS):
-        sys.exit(f'{grille["planche"]} : {len(cases)} cases trouvées, {len(personnages) * len(ANIMATIONS)} attendues.')
-    for numero, (prefixe, hauteur) in enumerate(personnages.items()):
-        images_du_personnage = [decoupe_heros.detourer(case) for case in cases[numero * len(ANIMATIONS):(numero + 1) * len(ANIMATIONS)]]
-        rapport = images_du_personnage[0].height / hauteur     # pixels de la planche par pixel du plateau, d'après le repos
-        for animation, image in zip(ANIMATIONS, images_du_personnage):
-            image = centrer_sur_les_pieds(image)
-            taille = [max(1, round(cote / rapport)) for cote in image.size]
-            yield f'{prefixe}-{animation}', reduire(image, (taille[0] * echelle, taille[1] * echelle)), taille
+    if len(cases) != len(noms):
+        sys.exit(f'{grille["planche"]} : {len(cases)} cases trouvées, {len(noms)} attendues.')
+    reference = decoupe_heros.detourer(cases[grille.get('reference', 0)])
+    rapport = reference.height / grille['hauteur']      # pixels de la planche par pixel du plateau, d'après le repos
+    for animation, case in zip(noms, cases):
+        if animation is None:
+            continue
+        image = decoupe_heros.detourer(case)
+        if grille.get('face_vers_la_droite') and not animation.startswith('dos-'):
+            image = image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        image = centrer_sur_les_pieds(image)
+        taille = [max(1, round(cote / rapport)) for cote in image.size]
+        yield f'{grille["prefixe"]}-{animation}', reduire(image, (taille[0] * echelle, taille[1] * echelle)), taille
 
 
 def ranger(liste):
