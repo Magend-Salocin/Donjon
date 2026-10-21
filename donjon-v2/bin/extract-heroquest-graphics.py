@@ -1,8 +1,11 @@
 """
 Extrait les graphismes du HeroQuest PC de Gremlin (1991) pour la vue isométrique du plateau de donjon.
 
-Écrit public/assets/game/iso/atlas.png (toutes les images sur une planche) et atlas.js (position de
-chaque image sur la planche, IsoAtlas, et sol de chaque zone, IsoSols).
+Écrit les graphismes d'origine dans public/assets/game/iso/1991/ : atlas.png (toutes les images sur une planche),
+atlas.js (position de chaque image, IsoAtlas, et sol de chaque zone, IsoSols) et livre.png (fond de la vue classique).
+Le jeu n'utilise pas ces fichiers : son atlas est redessiné (bin/construire-atlas-iso.py) et iso/livre.png retouché.
+Ils servent de référence pour placer les images d'une nouvelle planche (skill atlas-iso,
+.claude/skills/atlas-iso/SKILL.md à la racine du dépôt).
 
 Usage : python bin/extract-heroquest-graphics.py "../_Version/HeroQuest (1991 Gremlin)"
 Prérequis : Python 3.10+ et Pillow.
@@ -22,7 +25,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-OUTPUT = ROOT / 'public' / 'assets' / 'game' / 'iso'
+REFERENCE = ROOT / 'public' / 'assets' / 'game' / 'iso' / '1991'
 DATA_SEGMENT = 0x97c0
 
 PALETTE = 0x5b23
@@ -207,11 +210,11 @@ class Extractor:
         sheet = Image.new('RGBA', (sheet_width, y + row), (0, 0, 0, 0))
         for key, image, _ in self.frames:
             sheet.paste(image, tuple(placed[key][:2]))
-        OUTPUT.mkdir(parents=True, exist_ok=True)
-        sheet.save(OUTPUT / 'atlas.png', optimize=True)
+        REFERENCE.mkdir(parents=True, exist_ok=True)
+        sheet.save(REFERENCE / 'atlas.png', optimize=True)
         book = Image.frombytes('P', (320, 200), self.vga('BOOK')[:64000])
         book.putpalette(self.palette)
-        book.convert('RGB').save(OUTPUT / 'livre.png', optimize=True)   # fond de la vue classique
+        book.convert('RGB').save(REFERENCE / 'livre.png', optimize=True)   # fond de la vue classique
         script = [
             '// Graphismes du HeroQuest PC de Gremlin (1991), extraits par bin/extract-heroquest-graphics.py.',
             '// IsoAtlas : nom -> [x, y, largeur, hauteur(, dx, dy pour les meubles)] sur atlas.png.',
@@ -220,7 +223,7 @@ class Extractor:
             f'var IsoSols = {json.dumps(zone_floors, separators=(",", ":"))};',
             f'var IsoSolsSpeciaux = {json.dumps(special_floors, separators=(",", ":"))};',
         ]
-        (OUTPUT / 'atlas.js').write_text('\n'.join(script) + '\n', encoding='utf-8')
+        (REFERENCE / 'atlas.js').write_text('\n'.join(script) + '\n', encoding='utf-8')
         print(f'{len(self.frames)} images, planche {sheet.width} x {sheet.height}')
 
 

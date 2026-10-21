@@ -44,14 +44,17 @@
 
 	var ISO_LARGEUR = 26, ISO_DEMI_X = 24, ISO_DEMI_Y = 12;
 	var ISO_HAUT = 1, ISO_DROITE = 2, ISO_BAS = 4, ISO_GAUCHE = 8;
-	var ISO_HEROS = { 'barbare': 'barbare', 'nain': 'nain', 'elfe': 'elfe', 'enchanteur': 'magicien' };
-	// Le 5e portrait d'ODDS&SOD (vieil homme) n'est pas un heros : l'humain prend celui du barbare.
-	var ISO_PORTRAITS = { 'humain': 'barbare', 'elfe': 'elfe', 'nain': 'nain', 'ogre': 'barbare' };
 	var ISO_MONSTRES = {
 		'Lutin': 'gobelin', 'Orc': 'orc', 'Femir': 'fimir', 'Gargouille': 'gargouille', 'GuerrierChaos': 'chaos',
 		'ChamanOrc': 'orc', 'Squellette': 'squelette', 'Zombie': 'zombie', 'Momie': 'momie',
-		'MageSquellette': 'squelette', 'Sorcier': 'chaos'
+		'MageSquellette': 'mage', 'Sorcier': 'mage'
 	};
+
+	/* Prefixe des images du heros dans l'atlas : type et sexe (barbare-h, elfe-f...). Images : 0 au repos, 1 et 2 en attaque, -dos de dos. */
+	function IsoNomHeros(Heros){
+		var Nom = Heros[12][23] + '-' + String(Heros[12][31] || 'H').toLowerCase();
+		return IsoAtlas[Nom + '0'] ? Nom : 'barbare-h';
+	}
 
 	function IsoDisponible(){
 		return typeof MesMurs != 'undefined' && typeof MesZones != 'undefined' && typeof IsoAtlas != 'undefined';
@@ -61,7 +64,6 @@
 		if (!IsoDisponible()) { return; }
 		Iso.Canvas = document.getElementById('board-iso');
 		Iso.Contexte = Iso.Canvas.getContext('2d');
-		Iso.Contexte.imageSmoothingEnabled = false;
 		Iso.Planche = new Image();
 		Iso.Planche.src = Chemin.replace('/images', '/iso/atlas.png');
 		Iso.Livre = new Image();
@@ -90,7 +92,7 @@
 		if (Iso.Actif){
 			Iso.Canvas.width = Choix.Largeur;
 			Iso.Canvas.height = Choix.Hauteur;
-			Iso.Contexte.imageSmoothingEnabled = false;
+			Iso.Contexte.imageSmoothingQuality = 'high';	// l'atlas est a IsoEchelle fois la taille du plateau
 		}
 		Iso.Canvas.style.display = Iso.Actif ? '' : 'none';
 		document.getElementById('board').style.display = Iso.Actif ? 'none' : '';
@@ -146,11 +148,11 @@
 			Ctx.save();
 			Ctx.translate(Math.round(x) + Zone[2], Math.round(y));
 			Ctx.scale(-1, 1);
-			Ctx.drawImage(Iso.Planche, Zone[0], Zone[1], Zone[2], Zone[3], 0, 0, Zone[2], Zone[3]);
+			Ctx.drawImage(Iso.Planche, Zone[0], Zone[1], Zone[2] * IsoEchelle, Zone[3] * IsoEchelle, 0, 0, Zone[2], Zone[3]);
 			Ctx.restore();
 			return;
 		}
-		Ctx.drawImage(Iso.Planche, Zone[0], Zone[1], Zone[2], Zone[3], Math.round(x), Math.round(y), Zone[2], Zone[3]);
+		Ctx.drawImage(Iso.Planche, Zone[0], Zone[1], Zone[2] * IsoEchelle, Zone[3] * IsoEchelle, Math.round(x), Math.round(y), Zone[2], Zone[3]);
 	}
 
 	function IsoBoucle(){
@@ -245,8 +247,8 @@
 
 	/* Portrait, caracteristiques et icones d'action, aux positions de l'ecran d'origine (portrait en 0,12). */
 	function IsoPanneau(Heros){
-		var Ctx = Iso.Contexte, Race = String(Heros[12][20] || '').toLowerCase();
-		IsoDessiner('portrait-' + (ISO_PORTRAITS[Race] || 'barbare'), 2, 12);
+		var Ctx = Iso.Contexte;
+		IsoDessiner('portrait-' + IsoNomHeros(Heros), 2, 12);
 		Ctx.strokeStyle = '#c8a040';
 		Ctx.lineWidth = 1;
 		Ctx.strokeRect(1.5, 11.5, 34, 47);
@@ -322,8 +324,7 @@
 
 		var Frappe = Math.floor(Ecoule / 150) % 4;			// animation de l'attaquant pendant la premiere seconde
 		var Anime = Ecoule < 1200;
-		var Race = String(C.Heros[12][20] || '').toLowerCase();
-		var NomHeros = (ISO_HEROS[Race] || 'barbare') + (C.HerosAttaque && Anime ? [0, 1, 2, 1][Frappe] : 0);
+		var NomHeros = IsoNomHeros(C.Heros) + (C.HerosAttaque && Anime ? [0, 1, 2, 1][Frappe] : 0);
 		var NomMonstre = (ISO_MONSTRES[C.Monstre[0]] || 'orc') + (!C.HerosAttaque && Anime ? Frappe : 0);
 		IsoPersonnageZoom(NomHeros, Cx - ISO_DEMI_X * Z, Cy, Z, true);
 		IsoPersonnageZoom(NomMonstre, Cx + ISO_DEMI_X * Z, Cy + ISO_DEMI_Y * Z, Z, false);
@@ -377,7 +378,7 @@
 		Ctx.save();
 		Ctx.translate(Math.round(x) + (Miroir ? Zone[2] * Z : 0), Math.round(y));
 		Ctx.scale(Miroir ? -Z : Z, Z);
-		Ctx.drawImage(Iso.Planche, Zone[0], Zone[1], Zone[2], Zone[3], 0, 0, Zone[2], Zone[3]);
+		Ctx.drawImage(Iso.Planche, Zone[0], Zone[1], Zone[2] * IsoEchelle, Zone[3] * IsoEchelle, 0, 0, Zone[2], Zone[3]);
 		Ctx.restore();
 	}
 
@@ -490,8 +491,7 @@
 	function IsoPersonnage(Case, Qui){
 		var P = IsoPoint(Case), D = IsoDirection(Qui.Cle, Case), Nom;
 		if (Qui.Heros){
-			var Race = String(Qui.Heros[12][20] || '').toLowerCase();
-			Nom = (ISO_HEROS[Race] || 'barbare') + (D.Haut ? 6 : 0);
+			Nom = IsoNomHeros(Qui.Heros) + (D.Haut ? '-dos' : '0');
 		}
 		else {
 			Nom = (ISO_MONSTRES[Qui.Monstre[0]] || 'orc') + '0';

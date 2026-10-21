@@ -6,7 +6,7 @@ Pour chaque case, écrit :
   public/assets/img/personnages/<type>-<sexe>.png               portrait, 480 px de haut (pages du village)
   public/assets/game/images/avatars/<type>-<sexe>-combat.png    180 px de haut (écran de combat)
   public/assets/game/images/avatars/<type>-<sexe>-pion.png      24 x 24, la tête (pion du plateau)
-hero_image() (src/helpers.php) utilise ces fichiers dès qu'ils existent.
+hero_image() (src/helpers.php) lit ces fichiers, sans image de secours.
 
 Dépendance : pip install pillow
 Usage (depuis donjon-v2/) :

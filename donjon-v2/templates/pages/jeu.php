@@ -20,6 +20,7 @@ $leMagend = array_map('strval', [
     $hero['man'], $hero['ppm'], $hero['exp'], $hero['ors'], $hero['codeexp'], $hero['nivsuv'],
     $hero['cexp'], $hero['nbexp'], $hero['libellerace'], $hero['libellerang'], $hero['village'], $hero['image'],
     $hero['Arme'], $hero['Bouclier'], $hero['Casque'], $hero['Plastron'], $hero['AvantBras'], $hero['Botte'], $hero['Jambiere'],
+    $hero['sexe'],
 ]);
 $json = static fn (mixed $value): string => json_encode($value, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
 $questNumber = (int) $adventure['code'];

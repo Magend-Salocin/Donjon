@@ -72,52 +72,28 @@ function limit_text(string $text, int $length): string
     return $match[0] ?? '';
 }
 
-/**
- * Image d'un héros selon son type (colonne image : barbare, nain, elfe, enchanteur) et son sexe :
- * fichier découpé par bin/decouper-heros.py s'il existe ($pattern), sinon l'image de 2009 du type.
- */
-function hero_image(array $hero, string $pattern, array $fallbacks): string
+/** Image d'un héros selon son type (colonne image : barbare, nain, elfe, enchanteur) et son sexe, découpée par bin/decouper-heros.py. */
+function hero_image(array $hero, string $pattern): string
 {
-    $type = (string) $hero['image'];
-    $path = sprintf($pattern, $type . '-' . strtolower((string) $hero['sexe']));
-    if (is_file(ROOT_DIR . '/public/assets/' . $path)) {
-        return asset($path);
-    }
-
-    return asset($fallbacks[$type] ?? reset($fallbacks));
+    return asset(sprintf($pattern, $hero['image'] . '-' . strtolower((string) $hero['sexe'])));
 }
 
 /** Portrait du héros affiché dans les pages du village. */
 function hero_portrait(array $hero): string
 {
-    return hero_image($hero, 'img/personnages/%s.png', [
-        'barbare' => 'img/personnages/NLB_barbare.png',
-        'nain' => 'img/personnages/NLB_nain.png',
-        'elfe' => 'img/personnages/NLB_elfe.png',
-        'enchanteur' => 'img/personnages/NLB_sorcier.png',
-    ]);
+    return hero_image($hero, 'img/personnages/%s.png');
 }
 
 /** Pion du héros sur le plateau du donjon. */
 function hero_token(array $hero): string
 {
-    return hero_image($hero, 'game/images/avatars/%s-pion.png', [
-        'barbare' => 'game/images/avatars/09.bmp',
-        'nain' => 'game/images/avatars/02.jpg',
-        'elfe' => 'game/images/avatars/03.jpg',
-        'enchanteur' => 'game/images/avatars/00.jpg',
-    ]);
+    return hero_image($hero, 'game/images/avatars/%s-pion.png');
 }
 
 /** Grande image du héros affichée pendant les combats du donjon. */
 function hero_fighter(array $hero): string
 {
-    return hero_image($hero, 'game/images/avatars/%s-combat.png', [
-        'barbare' => 'game/images/avatars/W09.png',
-        'nain' => 'game/images/avatars/W02.png',
-        'elfe' => 'game/images/avatars/W03.png',
-        'enchanteur' => 'game/images/avatars/W00.png',
-    ]);
+    return hero_image($hero, 'game/images/avatars/%s-combat.png');
 }
 
 /** Barre de progression. $kind : vie, magie ou exp. */

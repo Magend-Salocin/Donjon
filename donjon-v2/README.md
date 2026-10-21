@@ -88,9 +88,17 @@ Limites :
 
 ### Vue isométrique
 
-Sur les cartes 101 à 124, le plateau s'affiche par défaut en vue isométrique avec les graphismes du jeu de Gremlin : sols de chaque pièce, murs du fond, portes (fermées tant qu'un côté n'est pas dévoilé), meubles, escalier, héros et monstres. Chaque attaque s'affiche en gros plan pendant deux secondes : les deux combattants agrandis sur leurs dalles avec l'animation d'attaque du jeu, les dés lancés, les points de vie et le résultat. Le bouton au-dessus du plateau fait tourner trois vues : 3D, classique et vue de dessus. Le choix est mémorisé dans le navigateur. La vue classique reprend l'écran du jeu d'origine : seule la pièce du héros (ou les cases de couloir à moins de 4 cases) est dessinée, posée sur le livre devant Morcar ; le portrait du héros et ses caractéristiques (or, attaque, déplacement, défense) sont en haut à gauche, et les icônes d'action en bas (lancer les dés, attaquer, chercher un trésor, chercher les pièges, utiliser un objet, fin de tour), cliquables et grisées une fois jouées. Le moteur ne change pas : `ModuleIso.js` redessine en continu l'état du tableau `#board`, qui reste masqué.
+Sur les cartes 101 à 124, le plateau s'affiche par défaut en vue isométrique, avec des graphismes redessinés d'après le jeu de Gremlin : sols de chaque pièce, murs du fond, portes (fermées tant qu'un côté n'est pas dévoilé), meubles, escalier, héros et monstres. Chaque attaque s'affiche en gros plan pendant deux secondes : les deux combattants agrandis sur leurs dalles avec l'animation d'attaque du jeu, les dés lancés, les points de vie et le résultat. Le bouton au-dessus du plateau fait tourner trois vues : 3D, classique et vue de dessus. Le choix est mémorisé dans le navigateur. La vue classique reprend l'écran du jeu d'origine : seule la pièce du héros (ou les cases de couloir à moins de 4 cases) est dessinée, posée sur le livre devant Morcar ; le portrait du héros et ses caractéristiques (or, attaque, déplacement, défense) sont en haut à gauche, et les icônes d'action en bas (lancer les dés, attaquer, chercher un trésor, chercher les pièges, utiliser un objet, fin de tour), cliquables et grisées une fois jouées. Le moteur ne change pas : `ModuleIso.js` redessine en continu l'état du tableau `#board`, qui reste masqué.
 
-Les graphismes viennent de `public/assets/game/iso/atlas.png` et `atlas.js`, générés à partir des fichiers du jeu :
+Les graphismes viennent de `public/assets/game/iso/atlas.png` et `atlas.js`, construits à partir d'une planche redessinée (sols, murs, portes, meubles, héros et héroïnes, monstres, portraits, icônes) :
+
+```powershell
+python bin/construire-atlas-iso.py
+```
+
+La zone de chaque image sur la planche est dans `bin/atlas-iso.json`. L'atlas est à deux fois la taille du plateau, pour les gros plans des combats. Pour une nouvelle planche, suivre le skill `atlas-iso` (`.claude/skills/atlas-iso/SKILL.md` à la racine du dépôt).
+
+Les graphismes d'origine servent de référence (tailles, orientations). Ils sont extraits des fichiers du jeu dans `public/assets/game/iso/1991/` :
 
 ```powershell
 python bin/extract-heroquest-graphics.py "../_Version/HeroQuest (1991 Gremlin)"

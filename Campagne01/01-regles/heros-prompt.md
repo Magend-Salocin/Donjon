@@ -68,7 +68,7 @@ Ranger la planche dans `Campagne01/assets/illustrations/heros.png`, puis depuis 
 python bin/decouper-heros.py ../Campagne01/assets/illustrations/heros.png
 ```
 
-Le script repère les gouttières noires, retire le fond vert de chaque case, recadre sur le personnage et écrit les 3 fichiers par héros (voir le tableau plus haut). Le site les utilise dès qu'ils existent (`hero_image()` dans `src/helpers.php`). Tant qu'un fichier manque, le jeu affiche l'image de 2009 du même type.
+Le script repère les gouttières noires, retire le fond vert de chaque case, recadre sur le personnage et écrit les 3 fichiers par héros (voir le tableau plus haut). Le site les lit avec `hero_image()` (`src/helpers.php`) : les 8 héros doivent avoir leurs 3 fichiers, il n'y a plus d'image de secours.
 
 Vérifier ensuite :
 
