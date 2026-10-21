@@ -26,11 +26,19 @@ SEXES = ['h', 'f']
 HAUTEUR_PORTRAIT, HAUTEUR_COMBAT, COTE_PION = 480, 180, 24
 TETE = 0.28             # côté du pion, en part de la hauteur du personnage (debout, rien au-dessus de la tête)
 TOLERANCE_FOND = 90     # écart de couleur toléré avec le vert du fond
+ECART_VERT_VIF = 100    # g - max(r, b) au-delà duquel un pixel est du fond, même enfermé par le personnage
 
 # Repérage des gouttières : repris de la découpe des illustrations de quêtes.
 _spec = importlib.util.spec_from_file_location('planche', os.path.join(RACINE, 'bin', 'decouper-planche.py'))
 planche_quetes = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(planche_quetes)
+
+
+def vert_vif(rgb):
+    """Masque des pixels proches du vert pur du fond, où qu'ils soient. Les tons olive ou vert-de-gris n'y entrent pas."""
+    r, g, b = rgb.split()
+    ecart = ImageChops.subtract(g, ImageChops.lighter(r, b)).point(lambda v: 255 if v > ECART_VERT_VIF else 0)
+    return ImageChops.multiply(ecart, g.point(lambda v: 255 if v > 150 else 0))
 
 
 def detourer(case):
@@ -46,6 +54,7 @@ def detourer(case):
         if g > 150 and g > r + 60 and g > b + 60:
             ImageDraw.floodfill(marquee, (x, y), repere, thresh=TOLERANCE_FOND)
     fond = ImageChops.difference(marquee, Image.new('RGB', rgb.size, repere)).convert('L').point(lambda v: 255 if v == 0 else 0)
+    fond = ImageChops.lighter(fond, vert_vif(rgb))   # fond enfermé par le personnage (entre la hache et la jambe, dans l'arc)
     alpha = ImageChops.invert(fond).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.6))
 
     bord = fond.filter(ImageFilter.MaxFilter(7))
