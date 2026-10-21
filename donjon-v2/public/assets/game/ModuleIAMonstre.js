@@ -238,6 +238,7 @@ var IsTourMonstreTimer = false;
 	}
 	
 	function ActiveMontrePiece(piece){							//VOID	ACTIVE LES MONTRES DANS LEQUELLE UN JOUEUR ENTRE
+		if (PieceEstCouloir(piece)) { return; }				// couloir : seuls les monstres vus s'activent (DevoilerVueCouloir)
 		for (i=0;i<LesMonstres.length;i++){ 
 			if (LesMonstres[i][9]==GetMyIdPiece(piece) && LesMonstres[i][8]==0){
 				LesMonstres[i][8]=1; 

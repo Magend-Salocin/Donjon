@@ -76,7 +76,7 @@ python bin/import-heroquest.py "../_Version/HeroQuest (1991 Gremlin)"
 
 Le script réécrit les fichiers `.js` et `.jpg` et affiche pour chaque quête le nombre de pièces et de monstres. Il vérifie aussi que le héros peut atteindre tous les monstres. Les aventures correspondantes sont dans `database/seed.sql` (grades 1 à 4, réparties entre les trois villages). Pour les ajouter à une base existante, lancer `bin/reset-db.php`.
 
-Ce qui est repris : pièces, couloirs, murs, portes, éboulis, meubles (cases infranchissables), pièges (fosse, chute de pierre, lance : invisibles, un point de vie perdu), monstres, escalier et départ du héros. Ces cartes définissent `MesMurs`, que le moteur utilise pour bloquer les déplacements et les attaques à travers un mur ou un meuble. Sur ces cartes, les monstres actifs poursuivent le héros par le plus court chemin.
+Ce qui est repris : pièces, couloirs, murs, portes, éboulis, meubles (cases infranchissables), pièges (fosse, chute de pierre, lance : invisibles, un point de vie perdu), monstres, escalier et départ du héros. Ces cartes définissent `MesMurs`, que le moteur utilise pour bloquer les déplacements et les attaques à travers un mur ou un meuble. Sur ces cartes, les couloirs ne sont pas dévoilés d'un coup : le héros voit en ligne droite depuis sa case, jusqu'à un mur, une porte ou un éboulis. Un monstre ne s'active que quand le héros l'a vu (sa pièce dévoilée, ou sa case de couloir en vue) ; il poursuit ensuite le héros par le plus court chemin.
 
 Limites :
 

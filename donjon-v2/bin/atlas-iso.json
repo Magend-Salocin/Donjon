@@ -1,5 +1,5 @@
 {
-  "planche": "public/assets/game/iso/t/f/image.png",
+  "planche": "public/assets/game/iso/t/image.png",
   "echelle": 2,
   "groupes": [
     {"nom": "sols", "cadrage": "losange", "taille": [48, 24], "marge": 0, "images": {

@@ -90,6 +90,7 @@
 
 	function AfficheHeros(id){
 		LesJoueurs[ConstIdJoueur][5] = id;
+		DevoilerVueCouloir(Number(id));
 		MontreElement(id);
 		ImageCase(id).src=LesJoueurs[ConstIdJoueur][6];
 	}

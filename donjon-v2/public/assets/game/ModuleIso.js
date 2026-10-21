@@ -85,7 +85,7 @@
 		Iso.Planche = new Image();
 		Iso.Planche.src = Chemin.replace('/images', '/iso/atlas.png');
 		Iso.Livre = new Image();
-		Iso.Livre.src = Chemin.replace('/images', '/iso/livre.png');
+		Iso.Livre.src = Chemin.replace('/images', '/iso/livre.jpg');
 		IsoPreparerObjets();
 		Iso.Canvas.addEventListener('click', IsoClic);
 		Iso.Canvas.addEventListener('mousemove', IsoSurvol);
@@ -96,9 +96,11 @@
 		window.requestAnimationFrame(IsoBoucle);
 	}
 
+	/* Largeur et Hauteur : taille logique du canvas. Finesse : pixels du canvas par pixel logique (la vue classique est
+	   deux fois plus fine pour afficher iso/livre.jpg, 1280 x 800, sans le reduire). */
 	var ISO_VUES = {
-		'3d': { Suivante: 'classique', Nom: 'Vue 3D', Largeur: 728, Hauteur: 460 },
-		'classique': { Suivante: 'dessus', Nom: 'Vue classique', Largeur: 640, Hauteur: 400 },
+		'3d': { Suivante: 'classique', Nom: 'Vue 3D', Largeur: 728, Hauteur: 460, Finesse: 1 },
+		'classique': { Suivante: 'dessus', Nom: 'Vue classique', Largeur: 640, Hauteur: 400, Finesse: 2 },
 		'dessus': { Suivante: '3d', Nom: 'Vue de dessus' }
 	};
 
@@ -108,15 +110,31 @@
 		Iso.Actif = Vue != 'dessus';
 		Iso.Camera = null;
 		if (Iso.Actif){
-			Iso.Canvas.width = Choix.Largeur;
-			Iso.Canvas.height = Choix.Hauteur;
+			Iso.Finesse = Choix.Finesse;
+			Iso.Canvas.width = Choix.Largeur * Choix.Finesse;
+			Iso.Canvas.height = Choix.Hauteur * Choix.Finesse;
 			Iso.Contexte.imageSmoothingQuality = 'high';	// l'atlas est a IsoEchelle fois la taille du plateau
 		}
 		Iso.Canvas.style.display = Iso.Actif ? '' : 'none';
+		document.querySelector('.quest-grille').classList.toggle('vue-classique', Vue == 'classique');
+		document.getElementById('fiche-heros').style.display = Vue == 'classique' ? '' : 'none';
+		IsoOuvrirFiche(false);
 		document.getElementById('board').style.display = Iso.Actif ? 'none' : '';
 		document.getElementById('board-vue').textContent = Choix.Nom + ' (changer : ' + ISO_VUES[Choix.Suivante].Nom.toLowerCase() + ')';
 		try { localStorage.setItem('donjon-vue', Vue); } catch (e) {}
 		AjusterPlateau();							// ModulePleinEcran.js : taille d'affichage de la nouvelle vue
+	}
+
+	/* Vue classique : la fiche du heros, cachee, s'ouvre par-dessus le plateau (game.css). */
+	function IsoOuvrirFiche(Ouverte){
+		document.querySelector('.quest-grille').classList.toggle('fiche-ouverte', Ouverte);
+		var Bouton = document.getElementById('fiche-heros');
+		Bouton.setAttribute('aria-expanded', Ouverte);
+		Bouton.textContent = Ouverte ? 'Cacher la fiche du héros' : 'Fiche du héros';
+	}
+
+	function IsoBasculerFiche(){
+		IsoOuvrirFiche(!document.querySelector('.quest-grille').classList.contains('fiche-ouverte'));
 	}
 
 	function IsoBasculerVue(){
@@ -234,8 +252,9 @@
 		var Heros = LesJoueurs[ConstIdJoueur];
 		Iso.Montrees = IsoZoneDuHeros(Number(Heros[5]));
 
-		Ctx.setTransform(2, 0, 0, 2, 0, 0);
-		Ctx.drawImage(Iso.Livre, 0, 0);
+		var Echelle = 2 * Iso.Finesse;					// ecran de 320 x 200
+		Ctx.setTransform(Echelle, 0, 0, Echelle, 0, 0);
+		Ctx.drawImage(Iso.Livre, 0, 0, 320, 200);
 
 		var Gauche = Infinity, Droite = -Infinity, Haut = Infinity, Bas = -Infinity;
 		for (var Case in Iso.Montrees){
@@ -246,9 +265,11 @@
 		Ctx.translate(Math.round(ISO_CENTRE_LIVRE.x - (Gauche + Droite) / 2), Math.round(ISO_CENTRE_LIVRE.y - (Haut + Bas) / 2));
 		IsoDessinerCases();
 
-		Ctx.setTransform(2, 0, 0, 2, 0, 0);
+		Ctx.setTransform(Echelle, 0, 0, Echelle, 0, 0);
 		IsoPanneau(Heros);
-		if (Iso.Combat && Date.now() - Iso.Combat.Debut < ISO_DUREE_COMBAT) { IsoGrosPlanCombat(Iso.Canvas.width, Iso.Canvas.height); }
+		if (Iso.Combat && Date.now() - Iso.Combat.Debut < ISO_DUREE_COMBAT){
+			IsoGrosPlanCombat(Iso.Canvas.width / Iso.Finesse, Iso.Canvas.height / Iso.Finesse);
+		}
 	}
 
 	/* Piece du heros, ou cases de son couloir a moins de ISO_RAYON_COULOIR cases (les couloirs forment une seule zone). */
@@ -345,7 +366,7 @@
 	function IsoGrosPlanCombat(Largeur, Hauteur){
 		var Ctx = Iso.Contexte, C = Iso.Combat, Z = ISO_ZOOM_COMBAT;
 		var Ecoule = Date.now() - C.Debut;
-		Ctx.setTransform(1, 0, 0, 1, 0, 0);
+		Ctx.setTransform(Iso.Finesse, 0, 0, Iso.Finesse, 0, 0);		// Largeur, Hauteur : taille logique du canvas
 		Ctx.fillStyle = 'rgba(0, 0, 0, 0.78)';
 		Ctx.fillRect(0, 0, Largeur, Hauteur);
 

@@ -67,46 +67,50 @@ $dice = static fn (string $prefix): string => implode('', array_map(
         </div>
         <div class="quest-cote">
             <p class="plateau-outils"><button type="button" id="board-vue" style="display:none" onclick="IsoBasculerVue()">Vue de dessus</button>
-                <button type="button" id="plein-ecran" style="display:none" onclick="BasculerPleinEcran()">Plein écran</button></p>
-            <div id="CarteJoueurAventure" class="parchemin hero-board">
-                <div id="MenuJoueur">
-                    <div class="actions">
-                        <button type="button" class="ActionJeu" onclick="Lancerdee()" id="Mn_Deplacement">Lancer les dés</button>
-                        <button type="button" class="ActionJeu" onclick="LancerdeeAttaque()" id="Mn_Attaquer">Attaquer</button>
-                        <button type="button" class="ActionJeu" onclick="TirerUneCarteTresor()" id="Mn_Tresor">Chercher un trésor</button>
-                        <button type="button" class="ActionJeu" onclick="DeactiverLesPieges()" id="Mn_Piege">Chercher les pièges</button>
-                        <button type="button" class="ActionJeu" onclick="AfficherElement('myHeroItem')" id="Mn_Objet">Utiliser un objet</button>
-                        <button type="button" class="ActionJeu fin-tour" onclick="FinTour()" id="Mn_FinTour">Fin de tour</button>
+                <button type="button" id="plein-ecran" style="display:none" onclick="BasculerPleinEcran()">Plein écran</button>
+                <button type="button" id="fiche-heros" style="display:none" aria-expanded="false" aria-controls="quest-fiche" onclick="IsoBasculerFiche()">Fiche du héros</button></p>
+            <!-- En vue classique, la fiche est cachée (le livre montre déjà portrait, caractéristiques et actions) et s'ouvre par-dessus le plateau -->
+            <div class="quest-fiche" id="quest-fiche">
+                <div id="CarteJoueurAventure" class="parchemin hero-board">
+                    <div id="MenuJoueur">
+                        <div class="actions">
+                            <button type="button" class="ActionJeu" onclick="Lancerdee()" id="Mn_Deplacement">Lancer les dés</button>
+                            <button type="button" class="ActionJeu" onclick="LancerdeeAttaque()" id="Mn_Attaquer">Attaquer</button>
+                            <button type="button" class="ActionJeu" onclick="TirerUneCarteTresor()" id="Mn_Tresor">Chercher un trésor</button>
+                            <button type="button" class="ActionJeu" onclick="DeactiverLesPieges()" id="Mn_Piege">Chercher les pièges</button>
+                            <button type="button" class="ActionJeu" onclick="AfficherElement('myHeroItem')" id="Mn_Objet">Utiliser un objet</button>
+                            <button type="button" class="ActionJeu fin-tour" onclick="FinTour()" id="Mn_FinTour">Fin de tour</button>
+                        </div>
+                        <div class="hero-infos">
+                            <p class="hero-nom"><strong><?= e($hero['nom']) ?></strong> <?= e($hero['libellerace']) ?> · Niveau <?= (int) $hero['codeexp'] ?> · <span id="MyHeroOrs"><?= (int) $hero['ors'] ?></span> or</p>
+                            <p class="fiche-jauge hero-vie"><span>Vie</span> <span id="MyHeroPv"><?= (int) $hero['pv2'] ?></span> / <?= (int) $hero['pv'] ?>
+                                <?= progress_bar((int) $hero['pv2'], (int) $hero['pv'], 'vie', 'MyHeroBarrePv') ?></p>
+                            <p class="fiche-jauge hero-magie"><span>Magie</span> <?= (int) $hero['pm2'] ?> / <?= (int) $hero['pm'] ?>
+                                <?= progress_bar((int) $hero['pm2'], (int) $hero['pm'], 'magie') ?></p>
+                            <p class="hero-des">Déplacement <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee1" class="die" alt="Dé non lancé"> <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee2" class="die" alt="Dé non lancé"> <span id="DeplacementRestant" aria-live="polite"></span></p>
+                            <p class="hero-monstres">Monstres restants : <strong id="NbMonstre"></strong></p>
+                        </div>
                     </div>
-                    <div class="hero-infos">
-                        <p class="hero-nom"><strong><?= e($hero['nom']) ?></strong> <?= e($hero['libellerace']) ?> · Niveau <?= (int) $hero['codeexp'] ?> · <span id="MyHeroOrs"><?= (int) $hero['ors'] ?></span> or</p>
-                        <p class="fiche-jauge hero-vie"><span>Vie</span> <span id="MyHeroPv"><?= (int) $hero['pv2'] ?></span> / <?= (int) $hero['pv'] ?>
-                            <?= progress_bar((int) $hero['pv2'], (int) $hero['pv'], 'vie', 'MyHeroBarrePv') ?></p>
-                        <p class="fiche-jauge hero-magie"><span>Magie</span> <?= (int) $hero['pm2'] ?> / <?= (int) $hero['pm'] ?>
-                            <?= progress_bar((int) $hero['pm2'], (int) $hero['pm'], 'magie') ?></p>
-                        <p class="hero-des">Déplacement <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee1" class="die" alt="Dé non lancé"> <img src="<?= asset('game/images/dee/neutre.svg') ?>" id="Dee2" class="die" alt="Dé non lancé"> <span id="DeplacementRestant" aria-live="polite"></span></p>
-                        <p class="hero-monstres">Monstres restants : <strong id="NbMonstre"></strong></p>
-                    </div>
-                </div>
 
-                <div id="MenuCombat" style="display:none;">
-                    <table id="FenetreCombat">
-                        <tr>
-                            <td rowspan="2"><img id="Attaquant" style="display:none;" src="" alt=""></td>
-                            <td><span class="dice-label">Attaque</span><?= $dice('DA') ?></td>
-                            <td rowspan="2"><img id="Defenceur" style="display:none;" src="" alt=""></td>
-                        </tr>
-                        <tr>
-                            <td><span class="dice-label">Défense</span><?= $dice('DD') ?></td>
-                        </tr>
-                    </table>
-                    <p id="BilanCombat" class="center" aria-live="polite"></p>
-                    <span id="TourMonstre" style="display:none;"></span>
+                    <div id="MenuCombat" style="display:none;">
+                        <table id="FenetreCombat">
+                            <tr>
+                                <td rowspan="2"><img id="Attaquant" style="display:none;" src="" alt=""></td>
+                                <td><span class="dice-label">Attaque</span><?= $dice('DA') ?></td>
+                                <td rowspan="2"><img id="Defenceur" style="display:none;" src="" alt=""></td>
+                            </tr>
+                            <tr>
+                                <td><span class="dice-label">Défense</span><?= $dice('DD') ?></td>
+                            </tr>
+                        </table>
+                        <p id="BilanCombat" class="center" aria-live="polite"></p>
+                        <span id="TourMonstre" style="display:none;"></span>
+                    </div>
                 </div>
-            </div>
-            <p id="TourJoueur" class="center" aria-live="polite"></p>
-            <div class="center abandon">
-                <?= action_button('abandon-adventure', 'Abandonner l\'aventure', 'aventures') ?>
+                <p id="TourJoueur" class="center" aria-live="polite"></p>
+                <div class="center abandon">
+                    <?= action_button('abandon-adventure', 'Abandonner l\'aventure', 'aventures') ?>
+                </div>
             </div>
         </div>
     </div>

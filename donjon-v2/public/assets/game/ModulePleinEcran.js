@@ -1,7 +1,7 @@
 /*
  * Taille d'affichage du plateau (canvas des vues iso ou tableau #board de la vue de dessus).
- * Le plateau occupe toute la largeur de sa colonne. Quand la fiche du heros est a cote (grand ecran), il tient
- * en entier dans la hauteur de la fenetre ; quand elle est dessous, il en prend au plus 70 %.
+ * Le plateau occupe toute la largeur de sa colonne. Quand la fiche du heros est a cote (grand ecran) ou par-dessus
+ * (vue classique), il tient en entier dans la hauteur de la fenetre ; quand elle est dessous, il en prend au plus 70 %.
  * En plein ecran (toute la zone de jeu, cartes tresor et inventaire compris), il est agrandi au maximum
  * en laissant la fiche du heros visible.
  * La resolution interne du canvas ne change pas : seul l'affichage est mis a l'echelle.
@@ -30,6 +30,10 @@
 		return document.getElementById('CarteJoueurAventure').getBoundingClientRect().left >= Colonne.getBoundingClientRect().right;
 	}
 
+	function FicheParDessus(){						// vue classique : fiche cachee ou ouverte par-dessus le plateau
+		return document.querySelector('.quest-grille').classList.contains('vue-classique');
+	}
+
 	function AjusterPlateau(){
 		var Plateau = PlateauVisible(), Canvas = Plateau.tagName == 'CANVAS';
 		Plateau.style.width = Plateau.style.height = Plateau.style.zoom = '';	// mesures a la taille d'origine
@@ -37,7 +41,7 @@
 		var Hauteur = Canvas ? Plateau.height : Plateau.offsetHeight;
 		var Zone = ZoneDeJeu(), Colonne = Plateau.parentElement, Bordure = Plateau.offsetWidth - Plateau.clientWidth;
 		var HauteurDispo;
-		if (FicheACote(Colonne)){
+		if (FicheACote(Colonne) || FicheParDessus()){
 			// en plein ecran, sous le titre ; dans la page, le plateau doit tenir dans la fenetre
 			HauteurDispo = EstPleinEcran() ? window.innerHeight - Colonne.getBoundingClientRect().top : window.innerHeight;
 			HauteurDispo -= PLATEAU_MARGE;
