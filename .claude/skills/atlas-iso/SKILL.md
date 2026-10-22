@@ -10,7 +10,7 @@ La vue iso (`public/assets/game/ModuleIso.js`) dessine tout depuis une seule ima
 | Planche | Clé du JSON | Fond | Découpage | Procédure |
 | --- | --- | --- | --- | --- |
 | Décor et sprites fixes (sols, murs, portes, meubles, portraits, icônes, héros et monstres sans animations) | `planche`, `groupes` | noir | une zone relevée à la main par sprite | [kb/planche-decor.md](../../kb/planche-decor.md) |
-| Animations d'un ou deux personnages (`iso/planches/*.png`) | `grilles` | vert `#00FF00`, gouttières noires | automatique, case par case | [kb/planche-animations.md](../../kb/planche-animations.md) |
+| Animations d'un ou deux personnages (`iso/remake/planches/*.png`) | `grilles` | vert `#00FF00`, gouttières noires | automatique, case par case | [kb/planche-animations.md](../../kb/planche-animations.md) |
 
 Les animations, leurs noms et les étapes sont décrits dans [kb/animations-iso/concept-animations-iso.md](../../kb/animations-iso/concept-animations-iso.md). Le prompt modèle d'une planche d'animations est [kb/animations-iso/prompt-barbare.md](../../kb/animations-iso/prompt-barbare.md).
 
@@ -20,7 +20,7 @@ Toutes les commandes se lancent depuis `donjon-v2/`.
 | --- | --- |
 | `bin/atlas-iso.json` | planche du décor et zones, planches d'animations, échelle, sols des zones |
 | `bin/construire-atlas-iso.py` | découpe, détoure, met à l'échelle, écrit `atlas.png` et `atlas.js` |
-| `public/assets/game/iso/planches/` | planches d'animations |
+| `public/assets/game/iso/remake/planches/` | planches d'animations |
 | `public/assets/game/iso/1991/` | atlas d'origine (`bin/extract-heroquest-graphics.py`) : référence des tailles et orientations |
 | `.claude/skills/atlas-iso/outils.py` | repérage des sprites, planche nommée de 1991, scène de test |
 

@@ -1,5 +1,5 @@
 {
-  "planche": "public/assets/game/iso/t/image.png",
+  "planche": "public/assets/game/iso/remake/atlas.png",
   "echelle": 2,
   "groupes": [
     {"nom": "sols", "cadrage": "losange", "taille": [48, 24], "marge": 0, "images": {
@@ -167,23 +167,23 @@
     }}
   ],
   "grilles": [
-    {"planche": "public/assets/game/iso/planches/barbare-h-deplacements.png", "prefixe": "barbare-h", "hauteur": 40,
+    {"planche": "public/assets/game/iso/remake/planches/barbare-h-deplacements.png", "prefixe": "barbare-h", "hauteur": 40,
      "face_vers_la_droite": true, "cases": [
        "repos", "marche0", "marche1", "marche2",
        null, null, null, null,
        "dos-repos", "dos-marche0", "dos-marche1", "dos-marche2",
        null, null, null, null]},
-    {"planche": "public/assets/game/iso/planches/barbare-h-combat.png", "prefixe": "barbare-h", "hauteur": 40,
+    {"planche": "public/assets/game/iso/remake/planches/barbare-h-combat.png", "prefixe": "barbare-h", "hauteur": 40,
      "face_vers_la_droite": true, "cases": [
        null, "attaque0", "attaque1", "attaque2",
        "touche", "mort0", "mort1", "mort2"]},
-    {"planche": "public/assets/game/iso/planches/barbare-f-deplacements.png", "prefixe": "barbare-f", "hauteur": 38,
+    {"planche": "public/assets/game/iso/remake/planches/barbare-f-deplacements.png", "prefixe": "barbare-f", "hauteur": 38,
      "face_vers_la_droite": true, "cases": [
        "repos", "marche0", "marche1", "marche2",
        null, null, null, null,
        "dos-repos", "dos-marche0", "dos-marche1", "dos-marche2",
        null, null, null, null]},
-    {"planche": "public/assets/game/iso/planches/barbare-f-combat.png", "prefixe": "barbare-f", "hauteur": 38,
+    {"planche": "public/assets/game/iso/remake/planches/barbare-f-combat.png", "prefixe": "barbare-f", "hauteur": 38,
      "face_vers_la_droite": true, "cases": [
        null, "attaque0", "attaque1", "attaque2",
        "touche", "mort0", "mort1", "mort2"]}

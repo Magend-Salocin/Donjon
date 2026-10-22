@@ -2,7 +2,7 @@
 
 Deuxième version du [concept des animations iso](concept-animations-iso.md). La première planche donnait des sprites presque de face : retournés en miroir, ils semblaient se replacer au lieu d'avancer. Ici, chaque direction est un vrai trois-quarts sur sa diagonale.
 
-Résultat pour le barbare homme (`iso/planches/barbare-h-deplacements.png`, `barbare-h-combat.png`) : le générateur a dessiné les rangées 1 et 2 toutes deux vers le bas à droite. On garde la rangée 1 (bas-droite) et la rangée 3 (haut-gauche), le miroir donne les deux autres : sur un vrai trois-quarts, il ne se voit pas. Demander les 4 rangées reste utile, le générateur dessine mieux une direction quand il voit les autres.
+Résultat pour le barbare homme (`iso/remake/planches/barbare-h-deplacements.png`, `barbare-h-combat.png`) : le générateur a dessiné les rangées 1 et 2 toutes deux vers le bas à droite. On garde la rangée 1 (bas-droite) et la rangée 3 (haut-gauche), le miroir donne les deux autres : sur un vrai trois-quarts, il ne se voit pas. Demander les 4 rangées reste utile, le générateur dessine mieux une direction quand il voit les autres.
 
 ## Directions
 

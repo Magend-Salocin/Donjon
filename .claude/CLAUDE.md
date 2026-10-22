@@ -14,6 +14,7 @@ Ces fichiers ne sont pas chargés automatiquement (sauf l'agent) : lire celui qu
 
 | Chemin (dans `.claude/`) | Contenu |
 | --- | --- |
+| `kb/roadmap.md` | état du jeu, dette, jalons, décisions à prendre, skills et agents à créer |
 | `skills/atlas-iso/SKILL.md` | skill de construction de l'atlas iso (`donjon-v2/public/assets/game/iso/atlas.png` et `atlas.js`) : déroulé et fichiers à lire |
 | `skills/atlas-iso/outils.py` | repérage des sprites, planche nommée de 1991, scène de test |
 | `agents/juge-planche.md` | agent qui juge une planche d'animations avant intégration |

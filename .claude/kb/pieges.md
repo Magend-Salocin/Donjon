@@ -6,5 +6,5 @@
 - **L'orientation.** Une paire de 1991 (`meuble4f` / `meuble50`…) est un miroir. Vérifier quel dessin de la planche correspond à chaque nom ; s'il n'y en a qu'un, `"miroir": true` donne l'autre.
 - **Les icônes grisées absentes.** `"gris": true` les fabrique à partir de l'icône en couleur.
 - **Le vert vif sur un personnage** (elfe, orc) est effacé avec le fond. Dans le prompt, demander des verts olive ou vert-de-gris.
-- **`bin/extract-heroquest-graphics.py` n'écrit que dans `iso/1991/`.** `iso/livre.jpg` (fond de la vue classique, 1280 × 800) est recadré de `iso/t/livre.png` (zone 88, 32, 1400 × 875).
+- **`bin/extract-heroquest-graphics.py` n'écrit que dans `iso/1991/`.** `iso/livre.jpg` (fond de la vue classique, 1280 × 800) est recadré de `iso/remake/livre.png` (zone 88, 32, 1400 × 875).
 - **Nouveau personnage dans le code.** Ajouter ses images, puis l'utiliser dans `ModuleIso.js` (`ISO_MONSTRES`, `IsoNomHeros`). `IsoNomHeros` retombe sur `barbare-h` si un héros n'a pas d'image de repos.
