@@ -59,7 +59,7 @@ public/               Racine web
 
 Le plateau (`public/assets/game/`) est le code JavaScript de 2009, nettoyé :
 
-- mootools est remplacé par `compat.js` (fonction `$`) ;
+- mootools est remplacé par la fonction `$` de `public/assets/game/init.js` ;
 - chaque aventure `N` charge la carte `quests/questN.js` et son image `quests/questN.jpg` (cartes 1 à 8 de 2009, aventures 1 à 6 en base) ;
 - la sauvegarde passe par `api.php` : vie et or du héros, objets trouvés ou utilisés, fin de partie.
 

@@ -122,7 +122,6 @@ $dice = static fn (string $prefix): string => implode('', array_map(
     var MyHeroNum = <?= $json((string) $hero['num']) ?>;
     var LeMagend = <?= $json($leMagend) ?>;
 </script>
-<script src="<?= asset('game/compat.js') ?>"></script>
 <script src="<?= asset('game/init.js') ?>"></script>
 <script src="<?= asset('game/config/tresors.js') ?>"></script>
 <script src="<?= asset('game/config/monstres.js') ?>"></script>
