@@ -71,7 +71,7 @@ INSERT INTO aventure (code, libelle, resumer, nbor, nbexp, rang, image, village)
 (123, 'La dernière porte', 'Dernière porte avant la cour du Sorcier-Roi. Les guerriers du chaos de la garde du destin qui la défendent sont plus puissants que tous ceux que vous avez combattus.', 90, 90, 4, '', '03'),
 (124, 'La cour du Sorcier-Roi', 'Le Sorcier-Roi s''est réfugié dans sa salle du trône. Cette fois, il ne doit pas s''échapper.', 100, 100, 4, '', '01');
 
--- Objets 1 à 30 : dump de 2007. Objets 995 à 999 : potions des cartes trésor du donjon (MesItem.js).
+-- Objets 1 à 30 : dump de 2007. Objets 995 à 999 : potions des cartes trésor du donjon (public/assets/game/config/tresors.js).
 INSERT INTO objet (num, libelle, resumer, effet, valeur, image, catheg, autre) VALUES
 (995, 'Breuvage héroïque', 'Un sac de cuir accroché au mur contient une potion. Il s''agit d''un breuvage héroïque. Celui-ci peut être pris juste avant de lever un combat. Le joueur qui absorbe cette potion pourra, le temps d''un tour seulement, attaquer deux fois au lieu d''une.', 'att', 1, 'biere03.png', 'quete', ''),
 (996, 'Potion de vitesse', 'Vous repérez un flacon poussiéreux sur une étagère. En le nettoyant, vous vous rendez compte qu''il s''agit d''une potion de vitesse. Elle vous permettra de relancer les dés de déplacement.', 'dee', 2, 'biere02.png', 'quete', ''),

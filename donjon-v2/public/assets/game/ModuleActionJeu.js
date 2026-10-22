@@ -2,8 +2,6 @@
 	//  Nom - Attaque -  Defence - Corp - Esprit - Position - Image - Piece - Attaquer	-ChercherTresor	 - Or	- deplacement	JOUEUR - ImageCombat
 	//   0  -      1     -               2     -       3  -    4   -            5     -   6   -          7    -  8 -                        9-                    10 -           11  - 12 - 13
 
-	var PartieTerminee = false;
-
 	function initialiserJeux(){						//LANCE LA PARTIE
 		for (var jj=0;jj<PieceActiver.length;jj++){
 			if(PieceActiver[jj] && PieceActiver[jj].length >0){

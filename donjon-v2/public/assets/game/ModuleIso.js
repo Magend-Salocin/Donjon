@@ -46,11 +46,6 @@
 
 	var ISO_LARGEUR = 26, ISO_DEMI_X = 24, ISO_DEMI_Y = 12;
 	var ISO_HAUT = 1, ISO_DROITE = 2, ISO_BAS = 4, ISO_GAUCHE = 8;
-	var ISO_MONSTRES = {
-		'Lutin': 'gobelin', 'Orc': 'orc', 'Femir': 'fimir', 'Gargouille': 'gargouille', 'GuerrierChaos': 'chaos',
-		'ChamanOrc': 'orc', 'Squellette': 'squelette', 'Zombie': 'zombie', 'Momie': 'momie',
-		'MageSquellette': 'mage', 'Sorcier': 'mage'
-	};
 
 	var ISO_DUREE_PAS = 240;					// glissement d'une case a la voisine, avec les 3 images de marche
 	var ISO_FIN_FRAPPE = [150, 300, 600];		// gros plan : fin des images attaque0, attaque1, attaque2 (ms)
@@ -380,7 +375,7 @@
 		var Mort = C.HerosAttaque ? C.Monstre[8] == -1 : C.Heros[3] < 1;
 		var Attaquant = IsoAnimationAttaquant(Ecoule), Defenseur = IsoAnimationDefenseur(Ecoule, C.Perte, Mort);
 		var NomHeros = IsoImage(IsoNomHeros(C.Heros), C.HerosAttaque ? Attaquant : Defenseur);
-		var NomMonstre = IsoImage(ISO_MONSTRES[C.Monstre[0]] || 'orc', C.HerosAttaque ? Defenseur : Attaquant);
+		var NomMonstre = IsoImage(SpriteMonstre(C.Monstre), C.HerosAttaque ? Defenseur : Attaquant);
 		IsoPersonnageZoom(NomHeros, Cx - ISO_DEMI_X * Z, Cy, Z, true);
 		IsoPersonnageZoom(NomMonstre, Cx + ISO_DEMI_X * Z, Cy + ISO_DEMI_Y * Z, Z, false);
 
@@ -581,7 +576,7 @@
 			var Image = Math.min(2, Math.floor(IsoAvance(D) * 3));
 			Animation = 'marche' + (D.Pas % 2 ? 2 - Image : Image);
 		}
-		var Base = Qui.Heros ? IsoNomHeros(Qui.Heros) : (ISO_MONSTRES[Qui.Monstre[0]] || 'orc');
+		var Base = Qui.Heros ? IsoNomHeros(Qui.Heros) : SpriteMonstre(Qui.Monstre);
 		var Nom = IsoImage(Base, (D.Haut ? 'dos-' : '') + Animation), Zone = IsoAtlas[Nom];
 		IsoDessiner(Nom, P.x - Zone[2] / 2, P.y + ISO_DEMI_Y + 4 - Zone[3], D.Miroir);
 	}

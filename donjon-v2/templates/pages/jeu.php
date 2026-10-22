@@ -123,7 +123,9 @@ $dice = static fn (string $prefix): string => implode('', array_map(
     var LeMagend = <?= $json($leMagend) ?>;
 </script>
 <script src="<?= asset('game/compat.js') ?>"></script>
-<script src="<?= asset('game/MesItem.js') ?>"></script>
+<script src="<?= asset('game/init.js') ?>"></script>
+<script src="<?= asset('game/config/tresors.js') ?>"></script>
+<script src="<?= asset('game/config/monstres.js') ?>"></script>
 <script src="<?= asset('game/quests/quest' . $questNumber . '.js') ?>"></script>
 <script>
     //  Nom - Attaque - Defence - Corp - Esprit - Position - Image - Piece - Attaquer - ChercherTresor - Or - deplacement - JOUEUR - ImageCombat

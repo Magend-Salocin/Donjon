@@ -132,7 +132,7 @@ Une case qui touche deux portes ne peut en porter qu'une seule, la première ren
 
 `'X'` marque une case piégée, `'0'` une case normale. Un piège est invisible. Marcher dessus coûte 1 point de Corps, puis le piège disparaît. L'action « Piège » désamorce tous les pièges de la pièce où se trouve le héros.
 
-Les trésors ne se configurent pas par quête. Fouiller une pièce tire une carte au hasard ([MesItem.js](../MesItem.js), `TabObjet`), une seule fois par pièce et seulement quand plus aucun monstre actif n'y reste.
+Les trésors ne se configurent pas par quête. Fouiller une pièce tire une carte au hasard ([config/tresors.js](../config/tresors.js)), une seule fois par pièce et seulement quand plus aucun monstre actif n'y reste.
 
 ## 7. `LesMonstres`
 
@@ -146,7 +146,7 @@ TabMonstre(type, case, piece)
 - `NbMonstre` : nombre d'entrées de `LesMonstres`, à titre informatif.
 - Un type inconnu reprend le type du monstre précédent.
 
-Les types sont définis dans `TabMonstre` ([MesItem.js](../MesItem.js)) :
+Les types sont définis dans [config/monstres.js](../config/monstres.js) :
 
 | Type | Nom | Dépl. | Att. | Déf. | Corps |
 |---|---|---|---|---|---|

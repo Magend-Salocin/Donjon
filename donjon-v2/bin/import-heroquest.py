@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 TILES = Path(__file__).resolve().parent / 'heroquest-tiles'
 OUTPUT = ROOT / 'public' / 'assets' / 'game' / 'quests'
 
-# Monstres Gremlin (octet "type") -> numéro de TabMonstre dans MesItem.js.
+# Monstres Gremlin (octet "type") -> numéro de type dans public/assets/game/config/monstres.js.
 MONSTERS = {
     0: 1,    # gobelin -> Lutin
     1: 2,    # orc
