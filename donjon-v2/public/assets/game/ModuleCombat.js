@@ -14,7 +14,7 @@
 
 	function LancerdeeAtt(NbLancer,Mode){ 					// MODULE DE LANCER DE DEE DE COMBAT RETOUR UN NOMBRE
 		var Prefixe = Mode==0 ? 'DA' : 'DD';
-		var FaceUtile = Mode==0 ? 'crane' : 'bouclier-blanc';	// attaque : un crane touche ; defense : un bouclier blanc pare
+		var FaceUtile = ['crane', 'bouclier-blanc', 'bouclier-noir'][Mode];	// 0 attaque : un crane touche ; 1 heros : un bouclier blanc pare ; 2 monstre : un bouclier noir pare
 		var dee =0;
 		var NbDes = Math.max(1, Math.min(8, parseInt(NbLancer)));
 		for (var i=0;i<8;i++){
@@ -66,7 +66,7 @@
 		}
 		if(mode=="JOUEUR"){
 			Touches = LancerdeeAtt(LesJoueurs[IdJoueurs][1],0);
-			Parades = LancerdeeAtt(LesMonstres[IdMonstre][3],1);
+			Parades = LancerdeeAtt(LesMonstres[IdMonstre][3],2);
 			if (Touches > Parades) { PerteVieMonstre(LesMonstres,IdMonstre,Touches - Parades) }
 			LesJoueurs[IdJoueurs][8]=1;
 		}
