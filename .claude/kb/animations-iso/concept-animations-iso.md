@@ -4,7 +4,7 @@ Statut : en cours. Le barbare (homme et femme) a sa planche d'animations ; le d�
 
 ## Objectif
 
-Donner plus de vie à la vue iso ([ModuleIso.js](../public/assets/game/ModuleIso.js)) : des personnages qui marchent d'une case à l'autre, des coups de hache visibles, une réaction quand ils sont touchés, une chute à leur mort. Et rendre les graphismes faciles à refaire, famille par famille, sans reprendre tout l'atlas.
+Donner plus de vie à la vue iso ([ModuleIso.js](../../../donjon-v2/public/assets/game/ModuleIso.js)) : des personnages qui marchent d'une case à l'autre, des coups de hache visibles, une réaction quand ils sont touchés, une chute à leur mort. Et rendre les graphismes faciles à refaire, famille par famille, sans reprendre tout l'atlas.
 
 ## Ce qui existe
 
@@ -30,7 +30,7 @@ Pourquoi pas 4 atlas chargés séparément : le seul gain serait un cache par fa
 
 ### Grille stricte pour les personnages
 
-Chaque planche de personnages est une grille fixe : une case par image, des gouttières noires, un fond vert uni (`#00FF00`) et les pieds sur la même ligne dans toutes les cases. C'est la méthode qui a bien marché pour les portraits ([heros-prompt.md](../../Campagne01/01-regles/heros-prompt.md)) :
+Chaque planche de personnages est une grille fixe : une case par image, des gouttières noires, un fond vert uni (`#00FF00`) et les pieds sur la même ligne dans toutes les cases. C'est la méthode qui a bien marché pour les portraits ([heros-prompt.md](../../../../../HeroQuest/HeroQuest/Campagne01/01-regles/heros-prompt.md)) :
 
 - le script repère les gouttières, retire le vert et pose chaque image sur la même ligne de pieds ;
 - aucune zone à relever à la main ;
@@ -66,7 +66,7 @@ Noms dans l'atlas : `<type>-<sexe>-repos`, `-marche0` à `-marche2`, `-attaque0`
 
 ## Étapes
 
-1. Fait : barbare homme et femme en trois-quarts, une planche de déplacements et une de combat chacun ([animations-iso/prompt-barbare.md](animations-iso/prompt-barbare.md)).
+1. Fait : barbare homme et femme en trois-quarts, une planche de déplacements et une de combat chacun ([prompt-barbare.md](prompt-barbare.md)).
 2. Fait : découpage des planches en grille dans `construire-atlas-iso.py` (section `grilles` de `bin/atlas-iso.json`, procédure dans le skill `atlas-iso`).
 3. Fait : marche animée, touché et mort dans `ModuleIso.js`. Reste à tester en jeu.
 4. Planches du nain, de l'elfe et de l'enchanteur, puis des monstres.

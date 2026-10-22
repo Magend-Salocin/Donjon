@@ -4,7 +4,7 @@ Statut : proposition, à valider avant développement.
 
 ## Objectif
 
-Aujourd'hui, la taverne ([taverne.php](../templates/pages/taverne.php)) ne contient qu'un forum de village et un lien vers Tetris. L'idée est d'en faire le lieu où la campagne (`../Campagne01`) entre dans le jeu :
+Aujourd'hui, la taverne ([taverne.php](../../../donjon-v2/templates/pages/taverne.php)) ne contient qu'un forum de village et un lien vers Tetris. L'idée est d'en faire le lieu où la campagne (`Campagne01` du dépôt HeroQuest) entre dans le jeu :
 
 - parler aux PNJ par des dialogues à choix fermés ;
 - ouvrir des aventures : celles de la campagne, et les quêtes de 2009 ;
@@ -19,12 +19,12 @@ Le jeu en ligne n'a pas de maître du jeu. Les dialogues remplissent ce rôle : 
 
 | Document | Contenu |
 | --- | --- |
-| [taverne/mecaniques.md](taverne/mecaniques.md) | Notation des dialogues, conditions, effets, déblocage des aventures, débriefings, bonus, réputation et corruption, tables |
-| [taverne/pnj.md](taverne/pnj.md) | PNJ de chaque taverne, conditions de présence, ton |
-| [taverne/dialogues-taverniers.md](taverne/dialogues-taverniers.md) | Taverniers (rumeurs, repos, recrutement) et habitués qui ouvrent les quêtes de 2009 |
-| [taverne/dialogues-campagne.md](taverne/dialogues-campagne.md) | Mentor et les débriefings des aventures 101 à 114 |
-| [taverne/compagnons.md](taverne/compagnons.md) | Mercenaires, Sir Ragnar, Balur, le Guide traître, fidélité |
-| [taverne/recompenses.md](taverne/recompenses.md) | Reliques, bonus de rumeur, registre des drapeaux |
+| [mecaniques.md](mecaniques.md) | Notation des dialogues, conditions, effets, déblocage des aventures, débriefings, bonus, réputation et corruption, tables |
+| [pnj.md](pnj.md) | PNJ de chaque taverne, conditions de présence, ton |
+| [dialogues-taverniers.md](dialogues-taverniers.md) | Taverniers (rumeurs, repos, recrutement) et habitués qui ouvrent les quêtes de 2009 |
+| [dialogues-campagne.md](dialogues-campagne.md) | Mentor et les débriefings des aventures 101 à 114 |
+| [compagnons.md](compagnons.md) | Mercenaires, Sir Ragnar, Balur, le Guide traître, fidélité |
+| [recompenses.md](recompenses.md) | Reliques, bonus de rumeur, registre des drapeaux |
 
 ## Ce qui existe et ce qui manque
 
@@ -49,7 +49,7 @@ Les aventures 105 (Melar) et 110 (Château des mystères) ne sont pas en base. L
 - **Condition** : un test sur l'état du héros (aventure réussie, drapeau, or, grade, réputation, type…).
 - **Effet** : une modification de cet état (or, objet, drapeau, aventure débloquée, bonus, recrutement…).
 
-La liste complète des conditions et des effets est dans [mecaniques.md](taverne/mecaniques.md).
+La liste complète des conditions et des effets est dans [mecaniques.md](mecaniques.md).
 
 ### Règles d'interface
 
@@ -61,7 +61,7 @@ La liste complète des conditions et des effets est dans [mecaniques.md](taverne
 
 ### Format des données
 
-Les dialogues s'écrivent en Markdown dans `taverne/` (notation lisible, facile à relire), puis se convertissent en un fichier PHP par PNJ, `data/dialogues/<pnj>.php`. Ce format ne demande ni dépendance ni parseur, autorise les commentaires et suit le style de `config/config.php`.
+Les dialogues s'écrivent en Markdown dans `.claude/kb/taverne/` (notation lisible, facile à relire), puis se convertissent en un fichier PHP par PNJ, `data/dialogues/<pnj>.php`. Ce format ne demande ni dépendance ni parseur, autorise les commentaires et suit le style de `config/config.php`.
 
 Le premier nœud d'Hergard, tavernier de Valtordu, une fois converti :
 
@@ -86,7 +86,7 @@ return [
                 ['texte' => 'Rien, merci.'],
             ],
         ],
-        // nouvelles, repos, tournee : voir taverne/dialogues-taverniers.md
+        // nouvelles, repos, tournee : voir .claude/kb/taverne/dialogues-taverniers.md
     ],
 ];
 ```
@@ -136,7 +136,7 @@ Chaque étape est jouable seule. La 1 donne déjà une raison d'aller à la tave
 - **Noms des villages.** Les villages du jeu (Valtordu, Waldorg, Gzor) viennent de l'univers Naheulbeuk de 2009. La campagne se déroule dans l'Empire (Ubersreik, Altdorf). Les documents gardent les villages du jeu, et les PNJ citent Altdorf comme la capitale lointaine. À confirmer.
 - **Karlen ou Wardoz.** L'aventure 107 parle de Karlen (nom du HeroQuest PC), la campagne de Wardoz. Les dialogues utilisent Wardoz : faut-il corriger le résumé en base ?
 - **Quêtes de 2009 verrouillées.** Les aventures 1 à 6 seraient cachées jusqu'à la rencontre de l'habitué. C'est un changement pour les joueurs actuels, sauf si leurs drapeaux sont posés à la migration.
-- **Plafond de dés.** L'équipement ajoute 5 à 50 à l'attaque et à la défense, alors que le donjon plafonne à 8 dés. Un héros équipé est donc vite au plafond. Les bonus de la taverne s'appliquent après le plafond ([mecaniques.md](taverne/mecaniques.md)), mais l'équilibre de l'équipement mériterait d'être revu à part.
-- **Réputation globale ou par village.** La campagne ne tranche pas ([regles-campagne.md](../../Campagne01/01-regles/regles-campagne.md)). Les documents utilisent une réputation globale.
+- **Plafond de dés.** L'équipement ajoute 5 à 50 à l'attaque et à la défense, alors que le donjon plafonne à 8 dés. Un héros équipé est donc vite au plafond. Les bonus de la taverne s'appliquent après le plafond ([mecaniques.md](mecaniques.md)), mais l'équilibre de l'équipement mériterait d'être revu à part.
+- **Réputation globale ou par village.** La campagne ne tranche pas ([regles-campagne.md](../../../../../HeroQuest/HeroQuest/Campagne01/01-regles/regles-campagne.md)). Les documents utilisent une réputation globale.
 - **Seuils de réputation et de corruption.** Les documents reprennent ceux de `regles-campagne.md`, encore à arbitrer dans la campagne.
 - **Mort d'un mercenaire.** Si le héros perd l'aventure, le mercenaire part avec son or. Faut-il aller plus loin, avec des blessures ou un prix qui augmente ?

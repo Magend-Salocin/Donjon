@@ -2,7 +2,7 @@
 
 Une planche par personnage et par usage : déplacements (4 × 4) et combat (4 × 2). Fond vert `#00FF00`, gouttières noires. Découpage automatique.
 
-1. **Prompt.** Partir de `docs/animations-iso/prompt-barbare.md`. Décrire le personnage à partir de son portrait (`public/assets/img/personnages/<type>-<sexe>.png`) et joindre ses sprites actuels en référence.
+1. **Prompt.** Partir de [animations-iso/prompt-barbare.md](animations-iso/prompt-barbare.md). Décrire le personnage à partir de son portrait (`public/assets/img/personnages/<type>-<sexe>.png`) et joindre ses sprites actuels en référence.
 2. **Juger la planche** avant de l'intégrer, avec l'agent [juge-planche](../agents/juge-planche.md). Une rangée ratée se régénère seule (voir la fin du prompt modèle).
 3. **Déclarer** dans `grilles`, une entrée par planche (exemples du barbare dans `bin/atlas-iso.json`) :
    - `"prefixe"` : `<base>` du personnage ;

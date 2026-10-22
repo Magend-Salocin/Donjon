@@ -10,7 +10,7 @@ Ce sont des objets de lore, jamais vendus. Leur effet dure tant qu'ils sont dans
 | ---: | --- | --- | --- |
 | 40 | Lettre de recommandation impériale | 101, victoire | Le Garde impérial signe à moitié prix. Réplique spéciale des PNJ impériaux. |
 | 41 | Bague de la famille Ragnar (Bijou) | 102, accepter la dette de Ragnar | `def+1` |
-| 42 | Carte des tunnels orques | 103, victoire | Voyages 25 % plus courts ([Travel](../../src/Game/Travel.php)) |
+| 42 | Carte des tunnels orques | 103, victoire | Voyages 25 % plus courts ([Travel](../../../donjon-v2/src/Game/Travel.php)) |
 | 43 | Médaille impériale | 104, rendre l'or | Réputation +2 au moment de la remise. Le Garde impérial signe gratuitement. |
 | 44 | Cape en peau d'orc | 106, alliance avec Grak | `def+1`. Ragnar refuse de la voir (fidélité −2 à la remise). |
 | 45 | Pierre de protection | 107, purifier Wardoz | `corps+2` |

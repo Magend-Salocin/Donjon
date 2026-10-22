@@ -1,6 +1,6 @@
 # Mécaniques de la taverne
 
-Spécification technique des dialogues : comment les écrire, ce qu'ils peuvent tester et modifier, et ce qu'il faut ajouter au jeu pour que leurs effets existent. Vue d'ensemble : [concept-taverne.md](../concept-taverne.md).
+Spécification technique des dialogues : comment les écrire, ce qu'ils peuvent tester et modifier, et ce qu'il faut ajouter au jeu pour que leurs effets existent. Vue d'ensemble : [concept-taverne.md](concept-taverne.md).
 
 ## 1. Écrire un dialogue
 
@@ -56,7 +56,7 @@ Présence : condition pour que le PNJ soit à la taverne.
 
 ## 4. Débloquer des aventures
 
-Aujourd'hui, toutes les aventures du grade et du village s'affichent ([World::adventures](../../src/Repository/World.php)).
+Aujourd'hui, toutes les aventures du grade et du village s'affichent ([World::adventures](../../../donjon-v2/src/Repository/World.php)).
 
 À ajouter : une colonne `aventure.cle TEXT NULL`. Une aventure dont la clé est renseignée n'apparaît que si le héros a le drapeau du même nom. L'effet `debloquer 102` pose donc le drapeau `aventure_102`.
 
@@ -85,7 +85,7 @@ Le dernier nœud du débriefing efface ce drapeau. Seules les aventures 101 à 1
 
 Table `bonus (jou_num, code, aventures, aventure NULL)` : bonus actif pendant `aventures` aventures, puis supprimé (1 par défaut). Si `aventure` est renseigné (notation `bonus def+1@102`), le bonus ne vaut que pour cette aventure et attend qu'elle soit jouée.
 
-Les bonus s'appliquent dans [jeu.php](../../templates/pages/jeu.php) au moment de construire le héros du plateau, après le plafond :
+Les bonus s'appliquent dans [jeu.php](../../../donjon-v2/templates/pages/jeu.php) au moment de construire le héros du plateau, après le plafond :
 
 ```js
 Math.min(8, forc) + bonusAttaque
@@ -110,7 +110,7 @@ Les mercenaires et les compagnons utilisent les mêmes codes ([compagnons.md](co
 
 ## 7. Réputation et corruption dans le jeu
 
-Ce sont deux drapeaux numériques, `reputation` (départ 3) et `corruption` (départ 0). Les seuils viennent de [regles-campagne.md](../../../Campagne01/01-regles/regles-campagne.md).
+Ce sont deux drapeaux numériques, `reputation` (départ 3) et `corruption` (départ 0). Les seuils viennent de [regles-campagne.md](../../../../../HeroQuest/HeroQuest/Campagne01/01-regles/regles-campagne.md).
 
 | Réputation | Effet dans le jeu |
 | --- | --- |
@@ -125,7 +125,7 @@ Ce sont deux drapeaux numériques, `reputation` (départ 3) et `corruption` (dé
 | 4-6 | `monstre+1` dans chaque aventure. Les PNJ le remarquent. |
 | 7+ | La taverne ne permet plus le repos. Balur trahit. Un cultiste remplace l'un des taverniers. |
 
-Les deux jauges s'affichent sur la fiche du héros ([personnage.php](../../templates/pages/personnage.php)), sous les jauges de vie et de magie.
+Les deux jauges s'affichent sur la fiche du héros ([personnage.php](../../../donjon-v2/templates/pages/personnage.php)), sous les jauges de vie et de magie.
 
 ## 8. Nouveaux objets
 

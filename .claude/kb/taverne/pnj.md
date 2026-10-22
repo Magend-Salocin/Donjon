@@ -8,7 +8,7 @@ Qui se trouve dans quelle taverne, et à quel moment. Les dialogues sont dans [d
 - Le débriefing d'une aventure a lieu dans la taverne du village où elle se joue (colonne `aventure.village`).
 - Un PNJ de débriefing passe avant tous les autres. Tant qu'il attend, les autres ont une réplique courte du type « Va d'abord voir celui qui t'attend dans le coin ».
 - Un PNJ dont le dialogue est épuisé (drapeau `fini_<pnj>`) ne s'affiche plus, sauf s'il a une réplique d'ambiance.
-- Chaque PNJ a un portrait (`img/pnj/<pnj>.png`), à générer comme les héros ([heros-prompt.md](../../../Campagne01/01-regles/heros-prompt.md)).
+- Chaque PNJ a un portrait (`img/pnj/<pnj>.png`), à générer comme les héros ([heros-prompt.md](../../../../../HeroQuest/HeroQuest/Campagne01/01-regles/heros-prompt.md)).
 
 ## Valtordu, Au rat fumant (village 01)
 

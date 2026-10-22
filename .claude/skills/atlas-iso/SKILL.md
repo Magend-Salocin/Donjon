@@ -9,10 +9,10 @@ La vue iso (`public/assets/game/ModuleIso.js`) dessine tout depuis une seule ima
 
 | Planche | Clé du JSON | Fond | Découpage | Procédure |
 | --- | --- | --- | --- | --- |
-| Décor et sprites fixes (sols, murs, portes, meubles, portraits, icônes, héros et monstres sans animations) | `planche`, `groupes` | noir | une zone relevée à la main par sprite | [kb/planche-decor.md](kb/planche-decor.md) |
-| Animations d'un ou deux personnages (`iso/planches/*.png`) | `grilles` | vert `#00FF00`, gouttières noires | automatique, case par case | [kb/planche-animations.md](kb/planche-animations.md) |
+| Décor et sprites fixes (sols, murs, portes, meubles, portraits, icônes, héros et monstres sans animations) | `planche`, `groupes` | noir | une zone relevée à la main par sprite | [kb/planche-decor.md](../../kb/planche-decor.md) |
+| Animations d'un ou deux personnages (`iso/planches/*.png`) | `grilles` | vert `#00FF00`, gouttières noires | automatique, case par case | [kb/planche-animations.md](../../kb/planche-animations.md) |
 
-Les animations, leurs noms et les étapes sont décrits dans `docs/concept-animations-iso.md`. Le prompt modèle d'une planche d'animations est `docs/animations-iso/prompt-barbare.md`.
+Les animations, leurs noms et les étapes sont décrits dans [kb/animations-iso/concept-animations-iso.md](../../kb/animations-iso/concept-animations-iso.md). Le prompt modèle d'une planche d'animations est [kb/animations-iso/prompt-barbare.md](../../kb/animations-iso/prompt-barbare.md).
 
 Toutes les commandes se lancent depuis `donjon-v2/`.
 
@@ -26,9 +26,9 @@ Toutes les commandes se lancent depuis `donjon-v2/`.
 
 ## Déroulé
 
-1. Lire [rules/regles.md](rules/regles.md) et [kb/contrat-atlas.md](kb/contrat-atlas.md).
-2. Suivre la procédure de la planche concernée (tableau ci-dessus). Pour une planche d'animations, la faire juger d'abord par un sous-agent avec le prompt de [agents/juge-planche.md](agents/juge-planche.md).
-3. En cas de rendu inattendu, consulter [kb/pieges.md](kb/pieges.md).
-4. Construire et vérifier : [rules/verification.md](rules/verification.md).
+1. Lire [rules/regles.md](../../rules/regles.md) et [kb/contrat-atlas.md](../../kb/contrat-atlas.md).
+2. Suivre la procédure de la planche concernée (tableau ci-dessus). Pour une planche d'animations, la faire juger d'abord par l'agent `juge-planche` ([agents/juge-planche.md](../../agents/juge-planche.md)).
+3. En cas de rendu inattendu, consulter [kb/pieges.md](../../kb/pieges.md).
+4. Construire et vérifier : [rules/verification.md](../../rules/verification.md).
 
-L'organisation des fichiers du skill est décrite dans [CLAUDE.md](CLAUDE.md).
+L'organisation des fichiers du skill est décrite dans [.claude/CLAUDE.md](../../CLAUDE.md).

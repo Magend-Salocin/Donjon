@@ -1,6 +1,6 @@
 # Dialogues de la campagne
 
-Notation : voir [mecaniques.md](mecaniques.md). Sources : les fiches de quête de [Campagne01/02-quetes](../../../Campagne01/02-quetes) et leurs conséquences ([consequences.md](../../../Campagne01/02-quetes/consequences.md)).
+Notation : voir [mecaniques.md](mecaniques.md). Sources : les fiches de quête de [Campagne01/02-quetes](../../../../../HeroQuest/HeroQuest/Campagne01/02-quetes) et leurs conséquences ([consequences.md](../../../../../HeroQuest/HeroQuest/Campagne01/02-quetes/consequences.md)).
 
 ## Principes
 
