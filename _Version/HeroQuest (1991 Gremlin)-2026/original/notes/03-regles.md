@@ -2,7 +2,7 @@
 
 Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes, événements de quête, monstres. Les dés, le déplacement, l'attaque du héros et la pioche des trésors sont décrits dans [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#code-du-jeu-règles) ; la boucle des tours dans [02-ecrans.md](02-ecrans.md#une-partie).
 
-État : structure du tour, panneau, événements, fouilles scriptées, sorts et monstres lus ; plusieurs champs et résultats restent à confirmer au débogueur (marqués « ? »).
+État : structure du tour, panneau, événements, fouilles scriptées, sorts, objets et monstres lus ; plusieurs champs et résultats restent à confirmer au débogueur (marqués « ? »).
 
 ## Fiche d'un personnage (26 octets, DS:4663 + 26 × n)
 
@@ -16,8 +16,13 @@ Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes,
 | +8 | rôle à trouver |
 | +9, +0x0A | or, sur 16 bits |
 | +0x0B, +0x0C | sorts connus, un bit par sort : sorts 1 à 6 dans +0x0B, 7 à 12 dans +0x0C |
-| +0x0D | bit 2 : rôle à trouver (lu au début du tour) |
+| +0x0D | artefacts possédés : 1 armure de Borin, 2 baguette de rappel (lue au début du tour), 4 talisman du savoir, 8 poison d'orc, 0x10 lame de l'esprit |
 | +0x0E, +0x0F | équipement acheté, un bit par objet (voir l'armurerie dans [02-ecrans.md](02-ecrans.md#armurerie)) ; le bit 0x2000 (+0x0F bit 0x20) empêche l'attaque (?) |
+| +0x10 | potions possédées : 1 force, 2 ténacité, 4 et 8 curatives, 0x10 eau bénite, 0x20 rapidité, 0x40 héroïque |
+| +0x11 | arme en main (un seul bit, dans l'ordre de +0x0E) |
+| +0x12 | artefacts en service (bits de +0x0D) |
+| +0x13 | armures portées : 1 bouclier, 2 casque, 4 cotte de mailles, 8 armure de plates |
+| +0x17 | potions bues dont l'effet dure (bits de +0x10) |
 | +0x14, +0x15 | dés d'attaque et de défense (barbare 3 et 2, nain et elfe 2 et 2, enchanteur 1 et 2) |
 | +0x16 | sort choisi (1 à 12, 0 = aucun) |
 | +0x18 | effets de sorts : 1 voile de brume (ignoré par les monstres), 2 endormi, 4 passe son tour (tempête), 8 déplacement doublé (vent rapide), 0x10 deux dés d'attaque de plus (courage), 0x20 ou 0x80 passe à travers un mur (traversée de la roche), 0x40 deux dés de défense de plus (peau de pierre) |
@@ -96,6 +101,43 @@ Les sorts sont sans effet sur le Sorcier-Roi : avant l'effet, le jeu teste le ty
 3. Attend un clic sur la cible ; la zone (224, 180)-(240, 196) annule.
 4. Range la routine d'effet du sort (table `effets_sorts`, DS:5A6F, 13 entrées : les 12 sorts, puis le génie qui révèle la pièce ; le menu du génie, dans l'inventaire, remplace le sort 6 par 13) dans DS:4097, puis l'appelle (`jmp [0x4097]`, en 0x0F01) ; l'effet affiche son message par `sort_message`. Sans cible valide : « CE SORT N'A AUCUN EFFET SUR UN ENNEMI. IL A ETE GASPILLE ».
 5. `retire_sort` efface le bit du sort dans la fiche : chaque sort ne sert qu'une fois par quête, comme dans le jeu de plateau.
+
+## Objets
+
+L'inventaire ([écran](02-ecrans.md#inventaire)) liste 36 objets. Pour chacun, la table `objets_champs` (DS:AE0E) donne le champ de la fiche à modifier au clic et la valeur à y mettre :
+
+| Objets | Champ | Règle au clic |
+| --- | --- | --- |
+| Potions (0 à 6) | +0x17 | voir ci-dessous ; la potion est retirée de +0x10 |
+| Artefacts (7 à 11) | +0x12 | baguette de rappel et talisman : sans effet (passifs). Les autres se prennent ou se posent. L'armure de Borin retire la cotte et l'armure de plates. Le poison d'orc et la lame de l'esprit lâchent l'arme en main |
+| Armes (12 à 19) | +0x11 | une seule en main ; recliquer la lâche (et remet aussi +0x12 à zéro). La hache d'armes retire le bouclier. La trousse à outils désarme un piège |
+| Armures (20 à 23) | +0x13 | se portent ou s'enlèvent. Cotte et plates : une seule des deux, et elles retirent l'armure de Borin. Bouclier refusé avec la hache d'armes en main |
+| Sorts (24 à 35) | +0x16 | le sort choisi ; le génie ouvre son menu ([sorts](#sorts)) |
+
+Le personnage 4 a des restrictions dans ce code (pas d'armure, seulement le bâton et la trousse à outils, table DS:AE56), mais l'inventaire ne s'ouvre pas pour lui : elles ne servent pas. L'enchanteur n'a ici aucune restriction.
+
+Potions :
+
+| Potion | Effet |
+| --- | --- |
+| Curatives (deux emplacements) | +4 points de corps, sans dépasser le départ ; « LE FLUIDE VOUS RANIME ». Le code efface aussi les autres potions en cours (+0x17) |
+| Eau bénite | tue les squelettes, zombis et momies de la pièce (types 4 à 6) ; « VOTRE EAU BENITE A TUE n », sinon « VOUS AVEZ GASPILLE VOTRE EAU BENITE » |
+| Force | deux dés d'attaque de plus |
+| Ténacité | deux dés de défense de plus |
+| Rapidité | déplacement doublé |
+| Héroïque | rallume l'icône d'attaque : le héros attaque deux fois |
+
+Boire une potion dont l'effet dure encore : « VOUS AVEZ TOUJOURS CETTE POTION DANS LE SANG ».
+
+Trousse à outils (`trousse_outils`) : le jeu cherche un piège (codes 0x31 à 0x36) sur la case du héros puis sur les 4 cases voisines de la même zone (table DS:4399), et l'efface. Le nain réussit toujours ; les autres lancent un dé de combat. Sur un échec, le héros perd 1 point de corps :
+
+| Piège | Réussite | Échec |
+| --- | --- | --- |
+| Fosse | « VOUS POSEZ UNE TRAPPE » | « LA PIERRE ... S'EFFONDRE ... ET PERDEZ 1 POINT DE CORPS » |
+| Chute de pierre (0x34, 0x35) | « VOUS DEGAGEZ LE ROCHER » | « UN ROCHER TOMBE DU TOIT SUR LA TETE DU (héros) » |
+| Lance (0x36) | « ... IL VOUS A MANQUE » | « ... PIEGE A LANCES ... PERDEZ 1 POINT DE CORPS » |
+
+Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTILISER VOS OUTILS ». La réussite sur un dé de combat (valeur non nulle renvoyée par `de_combat`) reste à confirmer.
 
 ## Monstres
 

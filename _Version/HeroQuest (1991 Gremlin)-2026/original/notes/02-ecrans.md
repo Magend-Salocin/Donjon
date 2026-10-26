@@ -2,7 +2,7 @@
 
 Comment le jeu enchaîne ses écrans, affiche, dialogue avec le joueur et fait tourner une quête. Adresses et noms : `original/asm/quest.asm` et `original/symboles.txt`.
 
-État : boucle principale, menu titre, écran des héros, armurerie, choix de la quête, affichage et boucle des tours lus. Le tour lui-même est décrit dans [03-regles.md](03-regles.md). Reste : le briefing (texte de QUESTn.BIN sur le parchemin) et l'écran d'inventaire.
+État : boucle principale, menu titre, écran des héros, armurerie, choix de la quête, affichage et boucle des tours lus. Le tour lui-même est décrit dans [03-regles.md](03-regles.md). L'inventaire aussi. Reste : le briefing (texte de QUESTn.BIN sur le parchemin) et le menu de sauvegarde.
 
 ## Boucle principale
 
@@ -133,8 +133,23 @@ Quelques entrées sont de simples chaînes (par exemple « JE COMPRENDS MENTOR �
 
 Pendant un tour, les actions identifiées par leurs messages : `fouille_tresor`, `fouille_portes`, `fouille_pieges`, coffres (`coffre_potion`, `coffre_fleche`, `coffre_gargouille`...), objets de quête (`prend_lame_esprit`, `cles_agrain`), `boit_potion`, sorts (voir [03-regles.md](03-regles.md#sorts)), `attaque_heros`, `attaque_contre_heros`, et en fin de quête `fin_quete`, `mort_heros`, `tous_elimines`, primes (`prime_ulag`, `prime_balur`...).
 
+## Inventaire
+
+`inventaire_sorts` (0x8C20) charge WIZBACK (fond) et INVENT (images), plus SPELLIT pour les sorts. Le personnage 4 (Sir Ragnar) n'a pas d'inventaire. `mode_inventaire` (DS:AD67) choisit la page :
+
+| Mode | Page | Objets listés (fiche) | En service (fiche) |
+| --- | --- | --- | --- |
+| 0 | trois cartes de catégorie, 64 × 94, en (64, 64), (136, 64), (208, 64) | | |
+| 1 | armes et armures | +0x0E (8 armes ; +0x0F bit 0x80 donne aussi la trousse à outils), +0x0F bits 1 à 8 (4 armures) | +0x11, +0x13 |
+| 2 | potions | +0x10 (7 bits) | +0x17 |
+| 3 | artefacts | +0x0D (5 bits) | +0x12 |
+| 5 | sorts, ouvert par `action_sort` | +0x0B, +0x0C | +0x16 |
+
+Une page d'objets montre jusqu'à 12 cases de 32 × 32, en deux rangées de 6 : x = 44 + 40c, y = 88 et 128 (zones DS:ADA4). Un objet en service porte le cadre INVENT 0xA280. Sous le curseur, le nom de l'objet s'affiche dans le bandeau en (32, 169). La flèche en (296, 180) ramène aux catégories (au jeu pour les sorts) ; le bouton droit ferme l'inventaire et redessine le plateau (BOOK, MAPS).
+
+Les 36 objets (table `objets`, DS:44FE : nom et image) et ce qu'un clic fait sur chacun sont décrits dans [03-regles.md](03-regles.md#objets).
+
 ## À lire ensuite
 
 - Le briefing : affichage du texte de QUESTn.BIN sur le parchemin, après `lance_quete`.
-- `inventaire_sorts` (0x8C20) : écran d'inventaire sur le fond WIZBACK (cartes de catégorie INVENT en (64, 64), (136, 64), (208, 64)), et ses modes (DS:AD67, 5 = choix d'un sort).
 - `sauvegarde_menu` : le déroulé du menu (le format de QUEST.SAV est dans [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#questsav)).

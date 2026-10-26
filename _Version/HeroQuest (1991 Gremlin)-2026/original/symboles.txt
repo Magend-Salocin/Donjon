@@ -147,7 +147,7 @@
 0x8070  code  armurerie              icône armurerie : achats (« VOUS NE POUVEZ PAS VOUS PERMETTRE CELA »)
 0x8443  code  sauve_quest_sav        écrit QUEST.SAV
 0x0246  code  partie                 une quête : préparation des 4 joueurs (DS:3195-3198), puis le jeu
-0x8c20  code  inventaire_sorts       WIZBACK, INVENT, SPELLIT : équipement et sorts pendant la quête (?)
+0x8c20  code  inventaire_sorts       inventaire pendant la quête (WIZBACK, INVENT, SPELLIT) : armes et armures, potions, artefacts, sorts ; rien pour le personnage 4
 
 # ---- Actions et événements pendant une quête
 0x6be0  code  fouille_tresor         « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN », « CETTE PIECE A DEJA ETE FOUILLEE »
@@ -160,7 +160,6 @@
 0x71f7  code  coffre_gargouille      « LA GARGOUILLE S'ANIME SUBITEMENT »
 0x70d2  code  prend_lame_esprit      « VOUS PRENEZ LA LAME DE L'ESPRIT »
 0x7187  code  cles_agrain            « LES CLES D'AGRAIN SONT SUR LA TABLE »
-0x93b1  code  boit_potion            « LE FLUIDE VOUS RANIME »
 0x2c36  code  brume_de_mort          « L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL »
 0x10d8  code  mort_heros             « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES », « LES JOUEURS SONT TOUS ELIMINES »
 0x1a3a  code  tous_elimines
@@ -240,7 +239,7 @@
 0x2c74  code  action_sort            icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
 0x2d84  code  retire_sort            efface le bit du sort lancé (+0x0B / +0x0C de la fiche) et le sort choisi (+0x16)
 0x4387  table proprietes_sorts       un octet par sort (1 à 12) : bit 1 cible un personnage, bit 2 un ennemi (?)
-0xad67  var   mode_inventaire        5 = choix d'un sort
+0xad67  var   mode_inventaire        0 catégories, 1 armes et armures, 2 potions, 3 artefacts, 5 sorts
 0x3faf  var   objet_choisi
 
 # ---- Effets des sorts (table effets_sorts, indexée par le numéro du sort - 1 ; voir original/notes/03-regles.md)
@@ -256,8 +255,33 @@
 0x10b3  code  sort_traverse_roche    10 : +0x18 bit 0x20 (ou 0x80), passer à travers un mur au prochain déplacement
 0x0f3b  code  sort_peau_pierre       11 : +0x18 bit 0x40, deux dés de défense de plus
 0x0f6d  etiq  sort_message           affiche le message BX du sort, puis fin de l'action
-0x5a6f  table effets_sorts           12 routines d'effet
+0x5a6f  table effets_sorts           13 routines d'effet (le 13e : génie qui révèle la pièce)
 0x4097  var   effet_sort_choisi      routine d'effet du sort en cours, appelée par jmp [0x4097]
 0x45e5  table noms_defaut            SIGMAR, GRUNGI, LADRIL, ZOLTAR, RAGNAR (16 octets chacun)
 0x102d  etiq  sort_genie_revele      13 : révèle le contenu de la pièce (choix 0 du menu du génie)
 0x9696  etiq  menu_genie             « ORDONNEZ AU GENIE DE » : 0 révéler la pièce (sort 13), 1 attaquer (sort 6)
+
+# ---- Inventaire (voir original/notes/02-ecrans.md#inventaire et 03-regles.md#objets)
+0x3fa7  var   personnage_courant     numéro du personnage qui joue (0 à 4), posé par tour_personnage
+0x44fe  table objets                 36 objets, 4 octets : offset du nom dans le fichier de textes, image dans INVENT
+0xae0e  table objets_champs          36 objets, 2 octets : champ de la fiche qui marque l'objet utilisé, et sa valeur
+0xad6a  table liste_objets           les 12 objets affichés (numéro × 2, bit 0x80 = en service), FFFF = case vide
+0xad82  table zones_categories       3 cartes : armes et armures, potions, artefacts
+0xad9a  table zones_sortie_inventaire
+0xada4  table zones_objets           12 cases de 32 × 32 (2 rangées de 6), puis la sortie
+0xae56  table armes_personnage4      armes permises au personnage 4, par numéro de bit (bâton, trousse à outils)
+0xae62  table messages_potions       message de chaque potion (bit 0 à 6)
+0x9652  code  liste_bits             range dans la liste un numéro d'objet par bit posé dans AL
+0x9661  code  marque_en_service      pour chaque bit de AL, marque l'objet correspondant (sub_9670)
+0x9670  code  marque_objet           pose le bit 0x80 de l'entrée SI dans liste_objets
+0x9527  code  dessine_objets         dessine les 12 cases, et le cadre 0xA280 sur les objets en service
+0x95d6  code  barre_texte            bandeau de texte en (32, 169)
+0x9313  etiq  choix_armure           +0x13 ; bouclier refusé avec la hache d'armes
+0x936a  etiq  choix_arme             +0x11 : une seule arme ; la trousse à outils désarme un piège
+0x93bb  etiq  choix_artefact         +0x12
+0x93f7  etiq  boit_potion            +0x17 (en cours), retire la potion de +0x10
+0x9453  etiq  potion_curative        « LE FLUIDE VOUS RANIME » : +4 points de corps, sans dépasser le départ
+0x948b  etiq  eau_benite             tue les morts-vivants de la pièce (squelette, zombi, momie)
+0x96cb  etiq  trousse_outils         désarme un piège sur la case ou à côté ; le nain réussit toujours
+0x979a  code  piege_case             AL = 0x31 à 0x36 si la case (CL, CH) de la zone DL porte un piège, qu'il efface
+0x45ab  code  numero_bit             numéro du premier bit posé de AL (0 à 7)

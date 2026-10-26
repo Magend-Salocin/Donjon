@@ -335,7 +335,7 @@ loc_033f:
 0036a  74 05                je loc_0371
 0036c  c6 06 2c 40 01       mov byte ptr [0x402c], 1
 loc_0371:
-00371  a2 a7 3f             mov byte ptr [0x3fa7], al
+00371  a2 a7 3f             mov byte ptr [0x3fa7], al    ; personnage_courant
 00374  80 3f 00             cmp byte ptr [bx], 0
 00377  75 01                jne loc_037a
 00379  c3                   ret
@@ -717,7 +717,7 @@ loc_0702:
 loc_070a:
 0070a  c6 06 c0 3f 00       mov byte ptr [0x3fc0], 0    ; evenement_b
 0070f  b2 01                mov dl, 1
-00711  a0 a7 3f             mov al, byte ptr [0x3fa7]
+00711  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 loc_0714:
 00714  0a c0                or al, al
 00716  74 06                je loc_071e
@@ -731,7 +731,7 @@ loc_071e:
 00725  c3                   ret
 loc_0726:
 00726  08 16 c1 3f          or byte ptr [0x3fc1], dl
-0072a  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
+0072a  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 0072e  32 ff                xor bh, bh
 00730  d1 e3                shl bx, 1
 00732  8b bf 8f 4a          mov di, word ptr [bx + 0x4a8f]
@@ -858,7 +858,7 @@ loc_082a:
 
 ; ======== mode_attaque
 ; actif quand l'icône attaque est enfoncée (état 0x1C) ; clic sur une cible, zone DS:4337 pour annuler
-00833  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+00833  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 00838  75 01                jne loc_083b
 0083a  c3                   ret
 loc_083b:
@@ -1337,7 +1337,7 @@ loc_0c11:
 00c29  e9 da 5c             jmp sub_6906
 
 ; ======== sub_0c2c   (routine probable : non appelée directement)
-00c2c  a0 a7 3f             mov al, byte ptr [0x3fa7]
+00c2c  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 00c2f  a2 c0 3f             mov byte ptr [0x3fc0], al    ; evenement_b
 00c32  32 c0                xor al, al
 loc_0c34:
@@ -1892,7 +1892,7 @@ loc_10aa:
 ; ======== sort_traverse_roche
 ; 10 : +0x18 bit 0x20 (ou 0x80), passer à travers un mur au prochain déplacement
 010b3  bb 5a 00             mov bx, 0x5a
-010b6  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3
+010b6  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3    ; personnage_courant
 010bb  75 0e                jne loc_10cb
 010bd  a0 9b 3f             mov al, byte ptr [0x3f9b]
 010c0  a8 01                test al, 1
@@ -1921,7 +1921,7 @@ loc_10d2:
 010ff  bb 20 00             mov bx, 0x20    ; message « VOUS AVEZ ESSUYE / DES BLESSURES MORTELLES. / VOUS AVEZ ECHOUE / DANS CETTE QUETE »
 01102  e8 e8 77             call affiche_message
 01105  e8 1d 07             call sub_1825
-01108  a0 a7 3f             mov al, byte ptr [0x3fa7]
+01108  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 0110b  3a 06 ca 3f          cmp al, byte ptr [0x3fca]    ; heros_courant
 0110f  75 05                jne loc_1116
 01111  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
@@ -2224,7 +2224,7 @@ loc_1392:
 013a3  32 ff                xor bh, bh
 013a5  d1 e3                shl bx, 1
 013a7  8b 9f cd 40          mov bx, word ptr [bx + 0x40cd]
-013ab  a0 a7 3f             mov al, byte ptr [0x3fa7]
+013ab  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 013ae  32 e4                xor ah, ah
 013b0  03 d8                add bx, ax
 013b2  8a 07                mov al, byte ptr [bx]
@@ -2469,7 +2469,7 @@ loc_158c:
 0158f  75 66                jne loc_15f7
 01591  80 3e c0 3f ff       cmp byte ptr [0x3fc0], 0xff    ; evenement_b
 01596  75 5f                jne loc_15f7
-01598  a0 a7 3f             mov al, byte ptr [0x3fa7]
+01598  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 0159b  a2 c0 3f             mov byte ptr [0x3fc0], al    ; evenement_b
 0159e  80 0e c0 3f 80       or byte ptr [0x3fc0], 0x80    ; evenement_b
 015a3  eb 56                jmp loc_15fb
@@ -2491,7 +2491,7 @@ loc_15c5:
 015c5  80 fa 16             cmp dl, 0x16
 015c8  75 2d                jne loc_15f7
 015ca  c6 06 cb 46 01       mov byte ptr [0x46cb], 1
-015cf  a0 a7 3f             mov al, byte ptr [0x3fa7]
+015cf  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 015d2  a2 bf 3f             mov byte ptr [0x3fbf], al    ; evenement_a
 015d5  80 0e bf 3f 80       or byte ptr [0x3fbf], 0x80    ; evenement_a
 015da  53                   push bx
@@ -2812,10 +2812,10 @@ loc_186f:
 01872  c6 06 c8 3f 00       mov byte ptr [0x3fc8], 0
 01877  80 3e 92 3f 03       cmp byte ptr [0x3f92], 3    ; numero_quete
 0187c  74 1b                je loc_1899
-0187e  a0 a7 3f             mov al, byte ptr [0x3fa7]
+0187e  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 01881  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 01884  e8 5b 0e             call sub_26e2
-01887  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
+01887  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 0188b  32 ff                xor bh, bh
 0188d  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 01892  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -2858,7 +2858,7 @@ loc_18e9:
 018ec  be c6 00             mov si, 0xc6
 018ef  eb e1                jmp loc_18d2
 loc_18f1:
-018f1  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+018f1  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 018f6  74 03                je loc_18fb
 018f8  e9 3f 01             jmp tous_elimines
 loc_18fb:
@@ -2908,7 +2908,7 @@ loc_1964:
 01971  e8 b1 fe             call sub_1825
 01974  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0    ; choix_menu
 01979  74 66                je loc_19e1
-0197b  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
+0197b  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 0197f  b7 00                mov bh, 0
 01981  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01985  c6 87 a0 44 00       mov byte ptr [bx + 0x44a0], 0    ; heros_en_jeu
@@ -2955,10 +2955,10 @@ loc_19df:
 019df  58                   pop ax
 019e0  c3                   ret
 loc_19e1:
-019e1  a0 a7 3f             mov al, byte ptr [0x3fa7]
+019e1  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 019e4  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 019e7  e8 f8 0c             call sub_26e2
-019ea  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
+019ea  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 019ee  32 ff                xor bh, bh
 019f0  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 019f5  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -2974,7 +2974,7 @@ loc_1a0f:
 01a0f  be ce 00             mov si, 0xce
 01a12  80 3e c0 3f ff       cmp byte ptr [0x3fc0], 0xff    ; evenement_b
 01a17  74 1c                je sub_1a35
-01a19  a0 a7 3f             mov al, byte ptr [0x3fa7]
+01a19  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 01a1c  3a 06 c0 3f          cmp al, byte ptr [0x3fc0]    ; evenement_b
 01a20  75 18                jne tous_elimines
 01a22  bb cc 00             mov bx, 0xcc    ; message « L'EMPEREUR OFFRE AUX / ASSASSINS DE BALUR UNE / RECOMPENSE DE 150 PIECES D'OR »
@@ -3118,7 +3118,7 @@ loc_1b64:
 01b65  56                   push si
 01b66  80 3e b0 3f 00       cmp byte ptr [0x3fb0], 0
 01b6b  74 08                je loc_1b75
-01b6d  a0 a7 3f             mov al, byte ptr [0x3fa7]
+01b6d  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 01b70  3a 44 19             cmp al, byte ptr [si + 0x19]
 01b73  74 37                je loc_1bac
 loc_1b75:
@@ -3403,9 +3403,9 @@ loc_1d84:
 ; MAPS.VGA : carte de la quête (?)
 01d8f  c6 06 b6 3f 01       mov byte ptr [0x3fb6], 1
 01d94  ff 36 37 46          push word ptr [0x4637]    ; fiche_heros_courant
-01d98  ff 36 a7 3f          push word ptr [0x3fa7]
+01d98  ff 36 a7 3f          push word ptr [0x3fa7]    ; personnage_courant
 01d9c  a0 bc 3f             mov al, byte ptr [0x3fbc]
-01d9f  a2 a7 3f             mov byte ptr [0x3fa7], al
+01d9f  a2 a7 3f             mov byte ptr [0x3fa7], al    ; personnage_courant
 01da2  8b 1e d6 3f          mov bx, word ptr [0x3fd6]    ; attaquant
 01da6  89 1e 37 46          mov word ptr [0x4637], bx    ; fiche_heros_courant
 01daa  e8 d3 3e             call charge_men
@@ -3413,7 +3413,7 @@ loc_1d84:
 01db0  e8 75 ed             call sub_0b28
 01db3  e8 da 00             call attaque_contre_heros
 01db6  c6 06 b6 3f 00       mov byte ptr [0x3fb6], 0
-01dbb  8f 06 a7 3f          pop word ptr [0x3fa7]
+01dbb  8f 06 a7 3f          pop word ptr [0x3fa7]    ; personnage_courant
 01dbf  8f 06 37 46          pop word ptr [0x4637]    ; fiche_heros_courant
 01dc3  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 01dc8  75 63                jne loc_1e2d
@@ -4310,7 +4310,7 @@ loc_2593:
 025a2  e8 80 f2             call sub_1825
 025a5  e8 b6 40             call sub_665e
 025a8  e8 2c 01             call sub_26d7
-025ab  a0 a7 3f             mov al, byte ptr [0x3fa7]
+025ab  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 025ae  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 025b1  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 025b5  80 7c 06 00          cmp byte ptr [si + 6], 0
@@ -4353,7 +4353,7 @@ loc_25ec:
 02608  e8 a5 48             call sub_6eb0
 0260b  c6 06 24 59 00       mov byte ptr [0x5924], 0
 02610  ba 19 07             mov dx, 0x719
-02613  a0 a7 3f             mov al, byte ptr [0x3fa7]
+02613  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 02616  a2 bc 3f             mov byte ptr [0x3fbc], al
 02619  e8 6f fe             call sub_248b
 0261c  bb 3e 59             mov bx, 0x593e
@@ -4364,7 +4364,7 @@ loc_2626:
 02626  c6 06 3e 59 31       mov byte ptr [0x593e], 0x31
 0262b  c3                   ret
 loc_262c:
-0262c  a0 a7 3f             mov al, byte ptr [0x3fa7]
+0262c  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 0262f  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 02632  e8 b3 00             call sub_26e8
 02635  3c 0f                cmp al, 0xf
@@ -4377,7 +4377,7 @@ loc_263a:
 02643  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
 02648  c6 06 70 58 00       mov byte ptr [0x5870], 0
 0264d  ba 00 00             mov dx, 0
-02650  a0 a7 3f             mov al, byte ptr [0x3fa7]
+02650  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 02653  a2 bc 3f             mov byte ptr [0x3fbc], al
 02656  e8 32 fe             call sub_248b
 02659  bb 6f 58             mov bx, 0x586f    ; grille_occupants
@@ -5264,11 +5264,11 @@ loc_2c6c:
 
 ; ======== action_sort
 ; icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
-02c74  80 3e a7 3f 02       cmp byte ptr [0x3fa7], 2
+02c74  80 3e a7 3f 02       cmp byte ptr [0x3fa7], 2    ; personnage_courant
 02c79  73 01                jae loc_2c7c
 02c7b  c3                   ret
 loc_2c7c:
-02c7c  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3
+02c7c  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3    ; personnage_courant
 02c81  76 01                jbe loc_2c84
 02c83  c3                   ret
 loc_2c84:
@@ -8420,7 +8420,8 @@ loc_44a4:
 045a7  e8 e1 eb             call sub_318b
 045aa  c3                   ret
 
-; ======== sub_45ab   (appelée depuis 9373, 943e)
+; ======== numero_bit   (appelée depuis 9373, 943e)
+; numéro du premier bit posé de AL (0 à 7)
 045ab  51                   push cx
 045ac  b4 00                mov ah, 0
 045ae  b9 08 00             mov cx, 8
@@ -9365,7 +9366,7 @@ loc_4d73:
 04d76  e9 37 21             jmp sub_6eb0
 loc_4d79:
 04d79  8a 2e 9b 40          mov ch, byte ptr [0x409b]
-04d7d  a0 a7 3f             mov al, byte ptr [0x3fa7]
+04d7d  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 04d80  02 c0                add al, al
 04d82  02 c0                add al, al
 04d84  02 c5                add al, ch
@@ -10401,7 +10402,7 @@ loc_570b:
 
 ; ======== sub_5737   (routine probable : non appelée directement)
 05737  8b 0e 25 5e          mov cx, word ptr [0x5e25]    ; seg_shopsp
-0573b  a0 a7 3f             mov al, byte ptr [0x3fa7]
+0573b  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 0573e  32 e4                xor ah, ah
 05740  a3 e9 37             mov word ptr [0x37e9], ax    ; erreur_fichier
 05743  a3 ed 37             mov word ptr [0x37ed], ax
@@ -10922,7 +10923,7 @@ loc_5b62:
 05b62  83 c3 0a             add bx, 0xa
 05b65  e2 e6                loop loc_5b4d
 loc_5b67:
-05b67  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+05b67  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 05b6c  75 1e                jne loc_5b8c
 05b6e  c6 06 89 42 ff       mov byte ptr [0x4289], 0xff
 05b73  c6 06 95 42 ff       mov byte ptr [0x4295], 0xff
@@ -12316,7 +12317,7 @@ loc_65fc:
 ; ======== sub_661c   (appelée depuis 039f, 0545, 12c5, 1836, 5d78, 6f9e)
 0661c  be e1 45             mov si, 0x45e1
 0661f  e8 82 fa             call sub_60a4
-06622  a0 a7 3f             mov al, byte ptr [0x3fa7]
+06622  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06625  50                   push ax
 06626  bb d7 45             mov bx, 0x45d7    ; noms_heros
 06629  e8 af fa             call sub_60db
@@ -12624,7 +12625,7 @@ loc_68a6:
 068c7  f6 45 0f 40          test byte ptr [di + 0xf], 0x40
 068cb  74 0b                je loc_68d8
 loc_68cd:
-068cd  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+068cd  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 068d2  74 04                je loc_68d8
 068d4  fe 0e c4 3f          dec byte ptr [0x3fc4]    ; des_deplacement
 loc_68d8:
@@ -12982,7 +12983,7 @@ loc_6bd8:
 
 ; ======== fouille_tresor
 ; « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN », « CETTE PIECE A DEJA ETE FOUILLEE »
-06be0  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+06be0  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 06be5  75 01                jne loc_6be8
 06be7  c3                   ret
 loc_6be8:
@@ -13035,7 +13036,7 @@ loc_6c41:
 loc_6c48:
 06c48  e8 40 01             call sub_6d8b
 06c4b  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
-06c4f  a0 a7 3f             mov al, byte ptr [0x3fa7]
+06c4f  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06c52  a2 bc 3f             mov byte ptr [0x3fbc], al
 06c55  bf 4a 4d             mov di, 0x4d4a    ; monstres
 06c58  8a 44 03             mov al, byte ptr [si + 3]
@@ -13097,7 +13098,7 @@ loc_6cb6:
 06cc9  74 01                je loc_6ccc
 06ccb  c3                   ret
 loc_6ccc:
-06ccc  a0 a7 3f             mov al, byte ptr [0x3fa7]
+06ccc  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06ccf  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 06cd2  e9 03 a4             jmp mort_heros
 loc_6cd5:
@@ -13249,7 +13250,7 @@ loc_6df4:
 
 ; ======== fouille_portes
 ; « UNE PORTE SECRETE S'OUVRE »
-06dfa  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+06dfa  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 06dff  75 01                jne loc_6e02
 06e01  c3                   ret
 loc_6e02:
@@ -13347,7 +13348,7 @@ loc_6eef:
 06eef  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
 06ef4  8b 1e 37 46          mov bx, word ptr [0x4637]    ; fiche_heros_courant
 06ef8  89 1e d6 3f          mov word ptr [0x3fd6], bx    ; attaquant
-06efc  a0 a7 3f             mov al, byte ptr [0x3fa7]
+06efc  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06eff  a2 bc 3f             mov byte ptr [0x3fbc], al
 06f02  89 3e d4 3f          mov word ptr [0x3fd4], di    ; cible
 06f06  e8 86 ae             call carte_quete
@@ -13412,7 +13413,7 @@ loc_6f85:
 06f85  be a4 00             mov si, 0xa4
 06f88  e9 aa aa             jmp sub_1a35
 loc_6f8b:
-06f8b  a0 a7 3f             mov al, byte ptr [0x3fa7]
+06f8b  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06f8e  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 06f91  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 06f95  e8 40 a1             call mort_heros
@@ -13422,7 +13423,7 @@ loc_6f8b:
 06fa1  e9 1d f6             jmp sub_65c1
 
 ; ======== sub_6fa4   (routine probable : non appelée directement)
-06fa4  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3
+06fa4  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3    ; personnage_courant
 06fa9  75 01                jne loc_6fac
 06fab  c3                   ret
 loc_6fac:
@@ -13669,7 +13670,7 @@ loc_71b8:
 071ce  e9 87 fd             jmp loc_6f58
 
 ; ======== sub_71d1   (routine probable : non appelée directement)
-071d1  a0 a7 3f             mov al, byte ptr [0x3fa7]
+071d1  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 071d4  3c 03                cmp al, 3
 071d6  75 0b                jne loc_71e3
 071d8  c6 06 99 4b 0e       mov byte ptr [0x4b99], 0xe
@@ -16401,8 +16402,8 @@ loc_8bc7:
 ; ---- 12 octets non atteints (8c14-8c1f)
 
 ; ======== inventaire_sorts   (appelée depuis 2cbb)
-; WIZBACK, INVENT, SPELLIT : équipement et sorts pendant la quête (?)
-08c20  a0 a7 3f             mov al, byte ptr [0x3fa7]
+; inventaire pendant la quête (WIZBACK, INVENT, SPELLIT) : armes et armures, potions, artefacts, sorts ; rien pour le personnage 4
+08c20  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 08c23  3c 04                cmp al, 4
 08c25  75 01                jne loc_8c28
 08c27  c3                   ret
@@ -16666,7 +16667,7 @@ loc_8e74:
 08ece  e8 9e d6             call sauve_tampon
 loc_8ed1:
 08ed1  e8 28 d5             call curseur_memorise
-08ed4  be 9a ad             mov si, 0xad9a
+08ed4  be 9a ad             mov si, 0xad9a    ; zones_sortie_inventaire
 08ed7  e8 40 c0             call zone_sous_curseur
 08eda  83 fb 02             cmp bx, 2
 08edd  75 20                jne loc_8eff
@@ -16705,7 +16706,7 @@ loc_8f1d:
 08f26  e8 29 a8             call lit_commandes
 08f29  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 08f2e  75 2d                jne loc_8f5d
-08f30  be 82 ad             mov si, 0xad82
+08f30  be 82 ad             mov si, 0xad82    ; zones_categories
 08f33  e8 cf bf             call zone_cliquee
 08f36  83 fb 08             cmp bx, 8
 08f39  77 96                ja loc_8ed1
@@ -16871,11 +16872,11 @@ loc_90e7:
 090eb  8e c0                mov es, ax
 090ed  58                   pop ax
 090ee  b8 ff ff             mov ax, 0xffff
-090f1  bf 6a ad             mov di, 0xad6a
+090f1  bf 6a ad             mov di, 0xad6a    ; liste_objets
 090f4  b9 0c 00             mov cx, 0xc
 090f7  f3 ab                rep stosw word ptr es:[di], ax
 090f9  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
-090fd  be 6a ad             mov si, 0xad6a
+090fd  be 6a ad             mov si, 0xad6a    ; liste_objets
 09100  80 3e 67 ad 01       cmp byte ptr [0xad67], 1    ; mode_inventaire
 09105  75 4f                jne loc_9156
 09107  b9 08 00             mov cx, 8
@@ -16885,27 +16886,27 @@ loc_90e7:
 09113  0c 80                or al, 0x80
 loc_9115:
 09115  bb 18 00             mov bx, 0x18
-09118  e8 37 05             call sub_9652
+09118  e8 37 05             call liste_bits
 0911b  89 36 68 ad          mov word ptr [0xad68], si
 0911f  be 18 00             mov si, 0x18
 09122  b9 08 00             mov cx, 8
 09125  8a 45 11             mov al, byte ptr [di + 0x11]
 09128  0a c0                or al, al
 0912a  74 03                je loc_912f
-0912c  e8 32 05             call sub_9661
+0912c  e8 32 05             call marque_en_service
 loc_912f:
 0912f  8b 36 68 ad          mov si, word ptr [0xad68]
 09133  b9 04 00             mov cx, 4
 09136  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0913a  8a 45 0f             mov al, byte ptr [di + 0xf]
 0913d  bb 28 00             mov bx, 0x28
-09140  e8 0f 05             call sub_9652
+09140  e8 0f 05             call liste_bits
 09143  be 28 00             mov si, 0x28
 09146  b9 04 00             mov cx, 4
 09149  8a 45 13             mov al, byte ptr [di + 0x13]
 0914c  0a c0                or al, al
 0914e  74 03                je loc_9153
-09150  e8 0e 05             call sub_9661
+09150  e8 0e 05             call marque_en_service
 loc_9153:
 09153  e9 86 00             jmp loc_91dc
 loc_9156:
@@ -16914,14 +16915,14 @@ loc_9156:
 0915d  b9 07 00             mov cx, 7
 09160  8a 45 10             mov al, byte ptr [di + 0x10]
 09163  bb 00 00             mov bx, 0
-09166  e8 e9 04             call sub_9652
+09166  e8 e9 04             call liste_bits
 09169  89 36 68 ad          mov word ptr [0xad68], si
 0916d  be 00 00             mov si, 0
 09170  b9 07 00             mov cx, 7
 09173  8a 45 17             mov al, byte ptr [di + 0x17]
 09176  0a c0                or al, al
 09178  74 03                je loc_917d
-0917a  e8 e4 04             call sub_9661
+0917a  e8 e4 04             call marque_en_service
 loc_917d:
 0917d  eb 5d                jmp loc_91dc
 ; ---- 1 octets non atteints (917f-917f)
@@ -16931,14 +16932,14 @@ loc_9180:
 09187  b9 05 00             mov cx, 5
 0918a  8a 45 0d             mov al, byte ptr [di + 0xd]
 0918d  bb 0e 00             mov bx, 0xe
-09190  e8 bf 04             call sub_9652
+09190  e8 bf 04             call liste_bits
 09193  89 36 68 ad          mov word ptr [0xad68], si
 09197  be 0e 00             mov si, 0xe
 0919a  b9 05 00             mov cx, 5
 0919d  8a 45 12             mov al, byte ptr [di + 0x12]
 091a0  0a c0                or al, al
 091a2  74 03                je loc_91a7
-091a4  e8 ba 04             call sub_9661
+091a4  e8 ba 04             call marque_en_service
 loc_91a7:
 091a7  eb 33                jmp loc_91dc
 ; ---- 1 octets non atteints (91a9-91a9)
@@ -16948,21 +16949,21 @@ loc_91aa:
 091ae  8e c0                mov es, ax
 091b0  58                   pop ax
 091b1  b8 ff ff             mov ax, 0xffff
-091b4  bf 6a ad             mov di, 0xad6a
+091b4  bf 6a ad             mov di, 0xad6a    ; liste_objets
 091b7  b9 0c 00             mov cx, 0xc
 091ba  f3 ab                rep stosw word ptr es:[di], ax
 091bc  b9 06 00             mov cx, 6
 091bf  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 091c3  8a 45 0b             mov al, byte ptr [di + 0xb]
-091c6  be 6a ad             mov si, 0xad6a
+091c6  be 6a ad             mov si, 0xad6a    ; liste_objets
 091c9  bb 30 00             mov bx, 0x30
-091cc  e8 83 04             call sub_9652
+091cc  e8 83 04             call liste_bits
 091cf  b9 06 00             mov cx, 6
 091d2  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 091d6  8a 45 0c             mov al, byte ptr [di + 0xc]
-091d9  e8 76 04             call sub_9652
+091d9  e8 76 04             call liste_bits
 loc_91dc:
-091dc  e8 48 03             call sub_9527
+091dc  e8 48 03             call dessine_objets
 091df  e8 8d d3             call sauve_tampon
 loc_91e2:
 091e2  e8 17 d2             call curseur_memorise
@@ -17015,9 +17016,9 @@ loc_924b:
 09257  90                   nop
 loc_9258:
 09258  e8 21 9f             call affiche_texte
-0925b  83 3e 6a ad ff       cmp word ptr [0xad6a], -1
+0925b  83 3e 6a ad ff       cmp word ptr [0xad6a], -1    ; liste_objets
 09260  74 25                je loc_9287
-09262  be a4 ad             mov si, 0xada4
+09262  be a4 ad             mov si, 0xada4    ; zones_objets
 09265  e8 b2 bc             call zone_sous_curseur
 09268  83 fb 02             cmp bx, 2
 0926b  72 1a                jb loc_9287
@@ -17028,7 +17029,7 @@ loc_9258:
 09279  74 0c                je loc_9287
 0927b  83 e6 7f             and si, 0x7f
 0927e  d1 e6                shl si, 1
-09280  8b b4 fe 44          mov si, word ptr [si + 0x44fe]
+09280  8b b4 fe 44          mov si, word ptr [si + 0x44fe]    ; objets
 09284  e8 6a d1             call sub_63f1
 loc_9287:
 09287  e8 8a cb             call curseur_sauve_fond
@@ -17039,7 +17040,7 @@ loc_9287:
 09298  74 03                je loc_929d
 0929a  e9 c0 fc             jmp loc_8f5d
 loc_929d:
-0929d  be a4 ad             mov si, 0xada4
+0929d  be a4 ad             mov si, 0xada4    ; zones_objets
 092a0  e8 62 bc             call zone_cliquee
 092a3  83 fb 1a             cmp bx, 0x1a
 092a6  76 03                jbe loc_92ab
@@ -17064,7 +17065,7 @@ loc_92c8:
 092d1  e9 0e ff             jmp loc_91e2
 loc_92d4:
 092d4  25 7f 00             and ax, 0x7f
-092d7  be 0e ae             mov si, 0xae0e
+092d7  be 0e ae             mov si, 0xae0e    ; objets_champs
 092da  03 f0                add si, ax
 092dc  8a 1c                mov bl, byte ptr [si]
 092de  8a 44 01             mov al, byte ptr [si + 1]
@@ -17074,15 +17075,15 @@ loc_92d4:
 092ea  8a 21                mov ah, byte ptr [bx + di]
 092ec  83 fb 17             cmp bx, 0x17
 092ef  75 03                jne loc_92f4
-092f1  e9 03 01             jmp loc_93f7
+092f1  e9 03 01             jmp boit_potion
 loc_92f4:
 092f4  83 fb 11             cmp bx, 0x11
-092f7  74 71                je loc_936a
+092f7  74 71                je choix_arme
 092f9  83 fb 13             cmp bx, 0x13
-092fc  74 15                je loc_9313
+092fc  74 15                je choix_armure
 092fe  83 fb 12             cmp bx, 0x12
 09301  75 03                jne loc_9306
-09303  e9 b5 00             jmp loc_93bb
+09303  e9 b5 00             jmp choix_artefact
 loc_9306:
 09306  83 fb 16             cmp bx, 0x16
 09309  75 03                jne loc_930e
@@ -17090,12 +17091,12 @@ loc_9306:
 loc_930e:
 0930e  88 11                mov byte ptr [bx + di], dl
 09310  e9 d4 fd             jmp loc_90e7
-loc_9313:
+choix_armure:    ; +0x13 ; bouclier refusé avec la hache d'armes
 09313  0a d2                or dl, dl
 09315  75 01                jne loc_9318
 09317  c3                   ret
 loc_9318:
-09318  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+09318  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 0931d  74 3c                je loc_935b
 0931f  8a c2                mov al, dl
 09321  22 45 13             and al, byte ptr [di + 0x13]
@@ -17130,12 +17131,12 @@ loc_935b:
 loc_9364:
 09364  30 55 13             xor byte ptr [di + 0x13], dl
 09367  e9 7d fd             jmp loc_90e7
-loc_936a:
-0936a  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
+choix_arme:    ; +0x11 : une seule arme ; la trousse à outils désarme un piège
+0936a  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 0936f  75 0d                jne loc_937e
 09371  8a c2                mov al, dl
-09373  e8 35 b2             call sub_45ab
-09376  bb 56 ae             mov bx, 0xae56
+09373  e8 35 b2             call numero_bit
+09376  bb 56 ae             mov bx, 0xae56    ; armes_personnage4
 09379  d7                   xlatb
 0937a  0a c0                or al, al
 0937c  74 dd                je loc_935b
@@ -17146,7 +17147,7 @@ loc_937e:
 09386  80 65 12 07          and byte ptr [di + 0x12], 7
 0938a  f6 c2 80             test dl, 0x80
 0938d  74 03                je loc_9392
-0938f  e9 39 03             jmp loc_96cb
+0938f  e9 39 03             jmp trousse_outils
 loc_9392:
 09392  f6 c2 08             test dl, 8
 09395  75 03                jne loc_939a
@@ -17162,12 +17163,11 @@ loc_93a9:
 093a9  c7 45 11 00 00       mov word ptr [di + 0x11], 0
 093ae  e9 36 fd             jmp loc_90e7
 
-; ======== boit_potion
-; « LE FLUIDE VOUS RANIME »
+; ======== sub_93b1   (routine probable : non appelée directement)
 093b1  88 55 11             mov byte ptr [di + 0x11], dl
 093b4  80 65 14 07          and byte ptr [di + 0x14], 7
 093b8  e9 2c fd             jmp loc_90e7
-loc_93bb:
+choix_artefact:    ; +0x12
 093bb  8a c2                mov al, dl
 093bd  24 06                and al, 6
 093bf  74 03                je loc_93c4
@@ -17193,15 +17193,15 @@ loc_93e1:
 loc_93f1:
 093f1  30 55 12             xor byte ptr [di + 0x12], dl
 093f4  e9 f0 fc             jmp loc_90e7
-loc_93f7:
+boit_potion:    ; +0x17 (en cours), retire la potion de +0x10
 093f7  f6 c2 ef             test dl, 0xef
 093fa  75 03                jne loc_93ff
-093fc  e9 8c 00             jmp loc_948b
+093fc  e9 8c 00             jmp eau_benite
 loc_93ff:
 093ff  f6 c2 fb             test dl, 0xfb
-09402  74 4f                je loc_9453
+09402  74 4f                je potion_curative
 09404  f6 c2 f7             test dl, 0xf7
-09407  74 4a                je loc_9453
+09407  74 4a                je potion_curative
 09409  84 55 17             test byte ptr [di + 0x17], dl
 0940c  74 09                je loc_9417
 0940e  bb 90 00             mov bx, 0x90    ; message « VOUS AVEZ TOUJOURS CETTE / POTION DANS LE SANG »
@@ -17220,7 +17220,7 @@ loc_9417:
 09438  80 75 17 40          xor byte ptr [di + 0x17], 0x40
 loc_943c:
 0943c  8a c2                mov al, dl
-0943e  e8 6a b1             call sub_45ab
+0943e  e8 6a b1             call numero_bit
 09441  8a d8                mov bl, al
 09443  32 ff                xor bh, bh
 09445  d1 e3                shl bx, 1
@@ -17228,8 +17228,8 @@ loc_943c:
 0944b  8b de                mov bx, si
 0944d  e8 9d f4             call affiche_message
 09450  e9 94 fc             jmp loc_90e7
-loc_9453:
-09453  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
+potion_curative:    ; « LE FLUIDE VOUS RANIME » : +4 points de corps, sans dépasser le départ
+09453  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 09457  b7 00                mov bh, 0
 09459  8a 45 06             mov al, byte ptr [di + 6]
 0945c  04 04                add al, 4
@@ -17250,7 +17250,7 @@ loc_9482:
 09482  bb 82 00             mov bx, 0x82    ; message « LE FLUIDE VOUS RANIME »
 09485  e8 65 f4             call affiche_message
 09488  e9 5c fc             jmp loc_90e7
-loc_948b:
+eau_benite:    ; tue les morts-vivants de la pièce (squelette, zombi, momie)
 0948b  8b 0e e0 3f          mov cx, word ptr [0x3fe0]
 0948f  e8 70 81             call sub_1602
 09492  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
@@ -17323,7 +17323,8 @@ loc_951e:
 09522  8b f3                mov si, bx
 09524  e9 f9 8b             jmp sub_2120
 
-; ======== sub_9527   (appelée depuis 91dc)
+; ======== dessine_objets   (appelée depuis 91dc)
+; dessine les 12 cases, et le cadre 0xA280 sur les objets en service
 09527  e8 f9 d4             call fond_vers_tampon
 0952a  be 20 34             mov si, 0x3420
 0952d  bf 28 e2             mov di, 0xe228
@@ -17338,9 +17339,9 @@ loc_951e:
 09543  1e                   push ds
 09544  e8 0c a6             call copie_image
 09547  1f                   pop ds
-09548  e8 8b 00             call sub_95d6
-0954b  be 6a ad             mov si, 0xad6a
-0954e  bf a4 ad             mov di, 0xada4
+09548  e8 8b 00             call barre_texte
+0954b  be 6a ad             mov si, 0xad6a    ; liste_objets
+0954e  bf a4 ad             mov di, 0xada4    ; zones_objets
 09551  b9 0c 00             mov cx, 0xc
 loc_9554:
 09554  ad                   lodsw ax, word ptr [si]
@@ -17405,7 +17406,8 @@ loc_95ce:
 095ce  c6 06 67 ad 03       mov byte ptr [0xad67], 3    ; mode_inventaire
 095d3  e9 11 fb             jmp loc_90e7
 
-; ======== sub_95d6   (appelée depuis 9548)
+; ======== barre_texte   (appelée depuis 9548)
+; bandeau de texte en (32, 169)
 095d6  b8 a9 00             mov ax, 0xa9
 095d9  bb 20 00             mov bx, 0x20
 095dc  e8 95 9b             call ligne_ecran
@@ -17458,29 +17460,32 @@ loc_9605:
 09650  1f                   pop ds
 09651  c3                   ret
 
-; ======== sub_9652   (appelée depuis 9118, 9140, 9166, 9190, 91cc, 91d9)
+; ======== liste_bits   (appelée depuis 9118, 9140, 9166, 9190, 91cc, 91d9)
+; range dans la liste un numéro d'objet par bit posé dans AL
 09652  d0 e8                shr al, 1
 09654  73 05                jae loc_965b
 09656  89 1c                mov word ptr [si], bx
 09658  83 c6 02             add si, 2
 loc_965b:
 0965b  83 c3 02             add bx, 2
-0965e  e2 f2                loop sub_9652
+0965e  e2 f2                loop liste_bits
 09660  c3                   ret
 
-; ======== sub_9661   (appelée depuis 912c, 9150, 917a, 91a4)
+; ======== marque_en_service   (appelée depuis 912c, 9150, 917a, 91a4)
+; pour chaque bit de AL, marque l'objet correspondant (sub_9670)
 09661  d0 e8                shr al, 1
 09663  50                   push ax
 09664  73 03                jae loc_9669
-09666  e8 07 00             call sub_9670
+09666  e8 07 00             call marque_objet
 loc_9669:
 09669  58                   pop ax
 0966a  83 c6 02             add si, 2
-0966d  e2 f2                loop sub_9661
+0966d  e2 f2                loop marque_en_service
 0966f  c3                   ret
 
-; ======== sub_9670   (appelée depuis 9666)
-09670  bf 6a ad             mov di, 0xad6a
+; ======== marque_objet   (appelée depuis 9666)
+; pose le bit 0x80 de l'entrée SI dans liste_objets
+09670  bf 6a ad             mov di, 0xad6a    ; liste_objets
 09673  b9 0c 00             mov cx, 0xc
 loc_9676:
 09676  39 35                cmp word ptr [di], si
@@ -17515,7 +17520,7 @@ loc_96c0:
 096c0  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 096c4  c6 45 16 0d          mov byte ptr [di + 0x16], 0xd
 096c8  e9 92 f8             jmp loc_8f5d
-loc_96cb:
+trousse_outils:    ; désarme un piège sur la case ou à côté ; le nain réussit toujours
 096cb  e8 4d 7f             call sub_161b
 096ce  8a 55 03             mov dl, byte ptr [di + 3]
 096d1  be 99 43             mov si, 0x4399
@@ -17533,7 +17538,7 @@ loc_96e7:
 096f0  72 03                jb loc_96f5
 096f2  e9 8e 00             jmp loc_9783
 loc_96f5:
-096f5  e8 a2 00             call sub_979a
+096f5  e8 a2 00             call piege_case
 096f8  0a c0                or al, al
 096fa  75 03                jne loc_96ff
 096fc  e9 84 00             jmp loc_9783
@@ -17543,7 +17548,7 @@ loc_96ff:
 loc_9700:
 09700  d8 80 3e a7          fadd dword ptr [bx + si - 0x58c2]
 ; ---- -3 octets non atteints (9704-9700)
-09701  80 3e a7 3f 01       cmp byte ptr [0x3fa7], 1
+09701  80 3e a7 3f 01       cmp byte ptr [0x3fa7], 1    ; personnage_courant
 ; ---- -2 octets non atteints (9706-9703)
 09704  3f                   aas
 09705  01 74 55             add word ptr [si + 0x55], si
@@ -17577,12 +17582,12 @@ loc_9730:
 0973e  74 03                je loc_9743
 09740  e9 a4 f9             jmp loc_90e7
 loc_9743:
-09743  a0 a7 3f             mov al, byte ptr [0x3fa7]
+09743  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 09746  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 09749  e8 8c 79             call mort_heros
 0974c  e9 0e f8             jmp loc_8f5d
 loc_974f:
-0974f  a0 a7 3f             mov al, byte ptr [0x3fa7]
+0974f  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 09752  32 e4                xor ah, ah
 09754  d0 e0                shl al, 1
 09756  be 36 00             mov si, 0x36
@@ -17620,7 +17625,8 @@ loc_9792:
 09794  e8 56 f1             call affiche_message
 09797  e9 4d f9             jmp loc_90e7
 
-; ======== sub_979a   (appelée depuis 96f5)
+; ======== piege_case   (appelée depuis 96f5)
+; AL = 0x31 à 0x36 si la case (CL, CH) de la zone DL porte un piège, qu'il efface
 0979a  52                   push dx
 0979b  e8 64 7e             call sub_1602
 0979e  5a                   pop dx
