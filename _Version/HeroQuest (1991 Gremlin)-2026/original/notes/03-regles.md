@@ -2,7 +2,7 @@
 
 Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes, événements de quête, monstres. Les dés, le déplacement, l'attaque du héros et la pioche des trésors sont décrits dans [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#code-du-jeu-règles) ; la boucle des tours dans [02-ecrans.md](02-ecrans.md#une-partie).
 
-État : structure du tour, panneau, événements, fouilles scriptées, sorts, objets et monstres lus ; plusieurs champs et résultats restent à confirmer au débogueur (marqués « ? »).
+État : tour, panneau, déplacement, combat, sorts, objets, fouilles, pièges, événements, monstres et fin de quête lus. Les points incertains sont marqués « ? » et sont à vérifier au débogueur.
 
 ## Fiche d'un personnage (26 octets, DS:4663 + 26 × n)
 
@@ -49,7 +49,47 @@ Noms par défaut (DS:45E5, 16 octets chacun) : SIGMAR, GRUNGI, LADRIL, ZOLTAR, R
 | 6 à 9 (DS:42BF) | 4 directions de déplacement | grisée si un mur ou un objet bloque ce côté |
 | 11 (DS:42FB) | sorts | cachée pour le barbare, le nain et le 5e personnage |
 
-Les positions à l'écran ne sont pas dans le fichier : la table est remplie à l'exécution. À relever au débogueur (`D` sur DS:4277 pendant un tour).
+Les clics sont lus dans une autre table, `zones_panneau` (DS:48A4, pointée par DS:4635) : x1, x2, y1, y2 puis la routine appelée, 10 octets par zone, terminée par FFFFh. Elle donne la position des 12 icônes à l'écran :
+
+| Zone (x, y) | Action | Routine |
+| --- | --- | --- |
+| (24-41, 148-165) | fin du tour | `fin_tour` (0x0756) |
+| (259-275, 162-178) | pas vers la gauche (x − 1) | 0x48A0 |
+| (275-291, 162-178) | pas vers le haut (y − 1) | 0x4A2F |
+| (259-275, 178-194) | pas vers le bas (y + 1) | 0x4AF7 |
+| (275-291, 178-194) | pas vers la droite (x + 1) | 0x4968 |
+| (48-64, 162-178) | fouille des portes secrètes et des pièges | `fouille_portes` |
+| (48-64, 178-194) | fouille du trésor | `fouille_tresor` |
+| (20-36, 165-181) | attaque | `mode_attaque` |
+| (299-315, 156-172) | sorts | `action_sort` |
+| (80-96, 180-196) | inventaire | `inventaire_sorts` |
+| (4-20, 172-188) | ouvrir les portes de la case | `ouvre_portes` (0x0785) |
+| (224-240, 180-196) | regarder : informations sous le curseur, jusqu'à un clic sur la même zone (?) | `mode_regarder` (0x0CB3) |
+
+`fin_tour` arrête le tour (DS:3F9A = 1) ; une traversée de la roche lancée ce tour (+0x18 bit 0x80) devient active pour le tour suivant (bit 0x20).
+
+## Déplacement
+
+Au début du tour, les dés de déplacement tournent jusqu'à un clic : `lancer_deplacement` (0x672A) tire DS:3FC4 dés et la somme va dans `deplacement_restant` (DS:3F9C) ; au-delà de 24, elle est ramenée à 5. Le nombre de dés (`des_deplacement_tour`, 0x68AE) : 2 ; 1 avec l'armure de plates ou un objet de quête porté (+0x0F bit 0x40), sauf pour Sir Ragnar ; doublé par la potion de rapidité, puis par le vent rapide (effets consommés), 6 au plus.
+
+Un pas (routines des 4 flèches) est refusé :
+
+- si un personnage occupe la case d'arrivée (`personnage_en_dx`) : les héros ne se traversent pas ;
+- s'il ne reste plus de déplacement, ou si le héros a déjà agi après avoir bougé (DS:3F9B bit 4) ;
+- au bord du plateau ;
+- s'il y a un mur de ce côté (octet de murs : 0x40 à gauche, 0x80 en haut, de la case ou de sa voisine), sauf avec la traversée de la roche (+0x18 bit 0x20) vers une case de la quête ;
+- devant une porte secrète non révélée (bits 0x08 sans 0x04) ;
+- si la case d'arrivée contient un monstre (1 à 32), un éboulis (0x30, 0x31) ou un meuble (0x40 et plus).
+
+Une porte fermée (bit 0x10 ou 0x20 sans 0x04) s'ouvre au passage (bit 0x04, son) et révèle la zone de l'autre côté. Une case de piège ou d'escalier (0x32 à 0x3F) se traverse ; les pièges se déclenchent ([pièges](#pièges)). Chaque pas retire 1 à `deplacement_restant` et pose DS:3F9B bit 1 (le héros a bougé).
+
+Agir (fouille, attaque, sort : `fin_deplacement`, 0x6049) après avoir bougé met le déplacement restant à 0 ; la potion héroïque l'évite. Agir avant de bouger laisse le déplacement.
+
+Déplacements propres à certaines quêtes :
+
+- 5e LABYRINTHE DE MELAR et 16e LES SALLES FROIDES : passer la porte en (5, 3) ou (5, 4) réveille le monstre 1.
+- 10e CHATEAU DES MYSTERES : un pas sur une case hors zone (0) téléporte le héros au hasard (table DS:43B2 : zone, x, y, porte) dans une autre zone ; il perd l'or de la mine (+0x0F bit 0x10). Un monstre sur la case d'arrivée est tué : « VOUS AVEZ TUE UN ENNEMI EN VOUS TELEPORTANT SUR LUI ».
+- 16e LES SALLES FROIDES : entrer dans la zone 31 (la pièce tournante) envoie le héros sur une des 6 positions de la table DS:43DE, tirée au dé, libre de tout personnage.
 
 ## Événements de quête
 

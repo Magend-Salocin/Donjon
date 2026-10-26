@@ -395,3 +395,24 @@
 0x2bb8  code  mort_ouvre_escalier    type 22 : pose l'escalier (codes 0x38 à 0x3B)
 0x2bdc  code  mort_sorcier_final     type 26 : fin_du_jeu = 1
 0x3fe6  var   pas_brume              direction de la brume de la mort (table DS:4657)
+
+# ---- Panneau et déplacement (voir original/notes/03-regles.md#panneau-dicônes et #déplacement)
+0x48a4  table zones_panneau          12 zones cliquables : x1, x2, y1, y2, routine (10 octets), FFFFh
+0x4635  var   zones_actives          table de zones cliquables en cours (zones_panneau pendant un tour)
+0x64a7  code  zone_panneau           SI = zone sous le curseur dans la table DS:4635, CF posé si trouvée
+0x0756  code  fin_tour               icône fin du tour : DS:3F9A = 1 ; traversée de la roche activée
+0x0785  etiq  ouvre_portes           icône : ouvre les portes de la case du héros (sub_07c0)
+0x07c0  code  ouvre_portes_case      pose le bit 0x04 des portes non secrètes autour de la case et révèle l'autre côté
+0x0790  code  porte_reveille         quêtes 5 et 16 : la porte en (5, 3-4) réveille le monstre 1
+0x0cb3  code  mode_regarder          informations sous le curseur, jusqu'à un clic sur la zone d'annulation (?)
+0x48a0  etiq  pas_gauche
+0x4968  code  pas_droite
+0x4a2f  code  pas_haut
+0x4af7  code  pas_bas
+0x4bbf  etiq  pas_fait               commun aux 4 pas : déplacement - 1, zone, téléports des quêtes 10 et 16
+0x6049  code  fin_deplacement        une action après un déplacement arrête le déplacement (sauf potion héroïque)
+0x3f9a  var   fin_du_tour
+0x3f9b  var   etat_action            bit 1 a bougé, 2 a agi, 4 ne peut plus bouger, 8 action faite
+0x43b2  table teleports_chateau      quête 10 : zone, x, y, porte (4 octets)
+0x43de  table teleports_salles_froides quête 16 : 6 positions (5 octets)
+0x68ae  code  des_deplacement_tour   nombre de dés de déplacement du tour (plates, objet porté, rapidité, vent rapide)

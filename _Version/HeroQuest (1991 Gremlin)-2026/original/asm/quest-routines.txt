@@ -1,10 +1,10 @@
-; Routines de QUEST.EXE : 378, dont 186 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 378, dont 196 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom fichier_offset  "questb.ega"
-00246  partie                     173    1  | 10h/? 21h/4c    3196 3197 3198 3fe9 4635 commandes commandes_joueurs numero_quete
+00246  partie                     173    1  | 10h/? 21h/4c    3196 3197 3198 3fe9 commandes commandes_joueurs numero_quete zones_actives
 002f3  prepare_heros               86    1  |     fiche_heros_courant
-00349  tour_personnage            313    5  |     0e0e 0e0f 0e11 3f97 3f9a 3fc8 3fce 402c 40cc 4639 attaque_repetee commande_type
+00349  tour_personnage            313    5  |     0e0e 0e0f 0e11 3f97 3fc8 3fce 402c 40cc 4639 attaque_repetee commande_type commandes
 00480  evenements_quete           166    1  |     evenement_a evenement_b message_en_attente numero_quete
 00526  sub_0526                    47    2  |     0e58 0e5a 3f97 3f99
 00555  sub_0555                   118    3  |     37f5 37f7 3f9e 3fe4 fiche_heros_courant index_case_courante zone_heros
@@ -15,10 +15,10 @@
 006b4  quete_continue              28    5  |     46cb etat_quete numero_quete
 006d0  sub_06d0                     6    1  |     
 006d6  evenements_tour            126    1  |     3fc3 equipement_repris evenement_b numero_quete personnage_courant
-00756  sub_0756                    47    1  |     3f9a 3fc8 fiche_heros_courant piege_en_cours
+00756  fin_tour                    50    1  |     3fc8 fiche_heros_courant fin_du_tour piege_en_cours
 00788  sub_0788                     8    4  |     
-00790  sub_0790                    48    1  |     fiche_heros_courant numero_quete
-007c0  sub_07c0                   115    0  |     3f97
+00790  porte_reveille              48    1  |     fiche_heros_courant numero_quete
+007c0  ouvre_portes_case          115    1  |     3f97
 00833  mode_attaque               259    0  |     3f91 3f9d 3fac 3fb1 3fe9 4289 cible commandes fiche_heros_courant numero_quete personnage_courant resultat_vise
 00936  attaque_heros              264    0  |     0e0e attaquant attaque_repetee boucliers choix_menu cible cranes des_attaque_heros des_defense_monstre fiche_heros_courant
 00a3e  portee_attaque             197    1  |     3fb0 3fb2 attaque_a_distance cible resultat_vise
@@ -38,7 +38,7 @@
 00c82  etoile_ouest                16    0  |     
 00c92  sub_0c92                     6    0  |     
 00c98  sub_0c98                    26    1  |     3f9d 3fac commandes
-00cb3  sub_0cb3                    54    0  |     3f91 commandes
+00cb3  mode_regarder               54    0  |     3f91 commandes
 00ce9  sub_0ce9                   343    2  |     3f9d 3fac 3fad 3fae 3fb5 3fd0 4095 4096 47e9 cible commandes curseur_x  "UC_CiCsC}CBARBARIAN"
 00e40  sub_0e40                   197    6  |     3fae 3fd0 cible effet_sort_choisi fiche_heros_courant heros_courant numero_quete resultat_vise
 00f06  sort_guerison               32    0  |     heros_courant
@@ -51,8 +51,8 @@
 00fe1  sort_sommeil                58    0  |     cible heros_courant
 0101c  sort_brume                  10    0  |     
 01026  sort_genie                 139    0  |     3fd0 heros_courant seg_odds segment_source
-010b3  sort_traverse_roche         37    0  |     3f9b personnage_courant
-010d8  mort_heros                  76    4  |     3f9a heros_courant personnage_courant
+010b3  sort_traverse_roche         37    0  |     etat_action personnage_courant
+010d8  mort_heros                  76    4  |     fin_du_tour heros_courant personnage_courant
 01124  sub_1124                     6    1  |     
 0112a  sub_112a                    20    0  |     numero_quete
 0113e  sub_113e                    10    2  |     cible
@@ -79,8 +79,8 @@
 017b9  sub_17b9                    49    1  |     3fde 586f zone_heros
 017ea  sub_17ea                    59    2  |     3fe2 index_case_courante seg_graphics segment_source
 01825  sub_1825                    41   16  |     3f99
-0184e  fin_quete                  371    1  |     3f9a 3fc8 4639 choix_menu coffres_rapportes deplacement_restant evenement_a evenement_b fiche_heros_courant heros_courant heros_sortis numero_quete
-019c2  case_prise_heros           112    3  |     3f9a evenement_b fiche_heros_courant heros_courant personnage_courant
+0184e  fin_quete                  371    1  |     3fc8 4639 choix_menu coffres_rapportes deplacement_restant evenement_a evenement_b fiche_heros_courant fin_du_tour heros_courant heros_sortis numero_quete
+019c2  case_prise_heros           112    3  |     evenement_b fiche_heros_courant fin_du_tour heros_courant personnage_courant
 01a35  message_puis_sortie          5    3  |     
 01a3a  apres_sortie                22    4  |     
 01a50  sub_1a50                   357    7  |     37eb 37ed 37ef 3fb0 erreur_fichier personnage_courant seg_annexe segment_source  "AND TRY AGAIN"
@@ -109,7 +109,7 @@
 0253f  marque_case                128    3  |     4639 fiche_heros_courant heros_courant personnage_courant piege_en_cours seg_odds segment_source  "AND TRY AGAIN"
 025bf  piege_des                  239    0  |     3f97 3fbc 586f 5870 5924 593e case_piege fiche_heros_courant heros_courant numero_quete personnage_courant piege_en_cours
 026af  trois_des_un_point          40    0  |     26c9 heros_courant
-026d7  sub_26d7                    11    3  |     3f9b deplacement_restant
+026d7  sub_26d7                    11    3  |     deplacement_restant etat_action
 026e2  heros_hors_quete             6    3  |     
 026e8  sub_26e8                     3    1  |     
 026eb  sub_26eb                    23    1  |     heros_courant
@@ -139,7 +139,7 @@
 02c16  sub_2c16                    16    1  |     pas_brume
 02c26  sub_2c26                    16    1  |     pas_brume
 02c36  brume_de_mort               62    1  |     heros_courant
-02c74  action_sort                272    0  |     3f91 3f9b 3f9d 3fac 3fad 3fae 3fb5 3fc9 3fe9 402c 4301 attaque_repetee
+02c74  action_sort                272    0  |     3f91 3f9d 3fac 3fad 3fae 3fb5 3fc9 3fe9 402c 4301 attaque_repetee etat_action
 02d84  retire_sort                 40    2  |     
 02dac  sub_2dac                    82    1  |     3fc8 3fcc 3fee 3fef 3ff0 3ff1 3ff3 3ff9 deplacement_restant erreur_fichier fiche_heros_courant resultat_vise
 02dff  sub_2dff                   184    4  |     3fc8 3ff0 3ff1 3ff2 3ff3 3ff5 3ff6 3ff9
@@ -203,10 +203,10 @@
 0476e  son_arret                   56    1  | 60h  0x61  319c 319e son_actif son_pilote
 047a6  son_charge_pilote          127    1  | 21h/48 60h    319a 3206 3208 37f9 erreur_fichier fichier_nom fichier_offset fichier_segment son_actif son_pilote
 04825  son_prepare                 43    1  | 60h    319a 319c son_pilote
-04850  son_musique                280    1  | 10h/? 21h/4c 60h  0x61  0e0f 319c 3956 3eb4 3f9b 3fce 40cc deplacement_restant numero_quete son_actif son_pilote
-04968  sub_4968                   199    0  |     0e0f 3eb4 3f9b 3fce 40cc deplacement_restant numero_quete
-04a2f  sub_4a2f                   200    0  |     0e0f 3eb4 3f9b 3fce 40cc deplacement_restant numero_quete
-04af7  sub_4af7                   689    0  |     0e0f 0e11 0e57 3eb4 3f98 3f9b 3fc8 3fce 409b 40cc deplacement_restant message_en_attente
+04850  son_musique                283    1  | 10h/? 21h/4c 60h  0x61  0e0f 319c 3956 3eb4 3fce 40cc deplacement_restant etat_action numero_quete son_actif son_pilote
+04968  pas_droite                 199    0  |     0e0f 3eb4 3fce 40cc deplacement_restant etat_action numero_quete
+04a2f  pas_haut                   200    0  |     0e0f 3eb4 3fce 40cc deplacement_restant etat_action numero_quete
+04af7  pas_bas                    689    0  |     0e0f 0e11 0e57 3eb4 3f98 3fc8 3fce 409b 40cc deplacement_restant etat_action message_en_attente
 04daa  sub_4daa                    29    2  |     
 04dc7  entre_piege                 72    4  |     3fc8 3fcc case_piege piege_en_cours
 04e10  alloue_memoire             245    1  | 21h/48    5e31 mode_video seg_annexe seg_ecran seg_furn seg_furn_brut seg_graphics seg_monsters seg_odds seg_shopsp  "AND TRY AGAIN"
@@ -232,12 +232,12 @@
 05838  sub_5838                   124    2  |     
 058b5  sub_58b5                    42    2  |     mode_video seg_furn
 058df  sub_58df                    21    4  |     
-058f4  sub_58f4                   358    2  |     3f9b deplacement_restant fiche_heros_courant
+058f4  sub_58f4                   358    2  |     deplacement_restant etat_action fiche_heros_courant
 05a72  sub_5a72                    10    0  |     
 05a7d  icones_actives              52    2  |     4301 fiche_heros_courant
 05ab1  sub_5ab1                    13    1  |     
 05abe  icones_init                 38    2  |     fiche_heros_courant
-05ae4  icones_selon_situation     168    1  |     3f9b 402c 4289 428a 4295 42ad 42ae 42b9 42ba 42f5 42f6 4301
+05ae4  icones_selon_situation     168    1  |     402c 4289 428a 4295 42ad 42ae 42b9 42ba 42f5 42f6 4301 4302
 05b8d  sub_5b8d                   243    1  |     37eb 3fde erreur_fichier index_case_courante seg_odds segment_source zone_heros
 05c80  charge_men                 252    2  |     47f1 erreur_fichier fiche_heros_courant fichier_nom fichier_offset fichier_segment fichier_taille index_case_courante mode_video seg_annexe  "men.ega"
 05d7f  sub_5d7f                    13   11  |     
@@ -253,7 +253,7 @@
 05fe3  mode_vga                    74    2  | 10h/09 10h/10    
 0602d  sub_602d                     6    1  |     
 06033  de6_moins_un                22    7  |     
-06049  sub_6049                    53    4  |     3f9b 409f deplacement_restant fiche_heros_courant
+06049  fin_deplacement             53    4  |     409f deplacement_restant etat_action fiche_heros_courant
 0607e  index_case                  19    9  |     
 06091  sub_6091                    19    0  |     
 060a4  sub_60a4                     5    3  |     
@@ -273,7 +273,7 @@
 06441  sub_6441                    35    1  |     4639 commandes fiche_heros_courant
 06464  sub_6464                    40    1  |     
 0648c  sub_648c                    27    1  |     
-064a7  sub_64a7                    47    2  |     4635 47e7 47e9
+064a7  zone_panneau                47    2  |     47e7 47e9 zones_actives
 064d6  sub_64d6                     7    2  |     fiche_heros_courant
 064dd  sub_64dd                    43    1  |     
 06509  sub_6509                    15    3  |     
@@ -288,19 +288,19 @@
 06680  sub_6680                   121    5  |     seg_odds segment_source
 066f9  sub_66f9                   139    2  |     3f90 4639 4b6f commandes deplacement_restant des_deplacement
 06784  sub_6784                   297    1  |     0e11 3fc8 3fcc 3fe4 3fee 3fef 3ff0 3ff1 3ff5 3ff6 4639 47e7
-068ae  sub_68ae                    88    1  |     3f9a 3f9b des_deplacement fiche_heros_courant personnage_courant
+068ae  des_deplacement_tour        88    1  |     des_deplacement etat_action fiche_heros_courant fin_du_tour personnage_courant
 06906  ajoute_or                    4    8  |     fiche_heros_courant
 0690a  ajoute_or_di                12    2  |     
 06916  sub_6916                    30    2  |     4639 fiche_heros_courant
 06934  sub_6934                    34    2  |     3fe0 index_case_courante
 06956  sub_6956                   203    1  |     erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille mode_video seg_annexe  "maps.ega"
 06a23  fond_vers_tampon           443   19  |     6a58 6a59 mode_video seg_ecran seg_furn
-06be0  fouille_tresor             385    0  |     3f9b 3fbc 3fc7 42f5 fiche_heros_courant heros_courant personnage_courant zone_heros
+06be0  fouille_tresor             385    0  |     3fbc 3fc7 42f5 etat_action fiche_heros_courant heros_courant personnage_courant zone_heros
 06d66  tire_carte                  37    1  |     463b carte_tresor
 06d8b  remet_carte                 15    3  |     carte_tresor
 06d9a  monstre_dans_zone           61    1  |     3fc7 3fe4 fiche_heros_courant zone_heros
 06dd7  sub_6dd7                    35    1  |     3fc7
-06dfa  fouille_portes             178    0  |     37eb 37ed 3f9b 42ad 4635 fiche_heros_courant personnage_courant zone_heros
+06dfa  fouille_portes             178    0  |     37eb 37ed 42ad etat_action fiche_heros_courant personnage_courant zone_heros zones_actives
 06eb0  sub_6eb0                    92    3  |     3f97 3fbc attaquant cible fiche_heros_courant personnage_courant
 06f0c  evt_coffre_desarme_2         6    0  |     
 06f12  fouille_vide                38    0  |     4bc2 fiche_heros_courant
@@ -349,7 +349,7 @@
 07954  sauvegarde_menu            547    0  | 21h/3d 21h/3e 21h/3f    37eb choix_menu erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille heros_selectionne mode_video seg_annexe  "quest.sav"
 07b7a  liste_emplacements         128    2  |     choix_menu heros_selectionne seg_annexe
 07bfa  dessine_cadre              396    1  |     37eb 37ed 37ef erreur_fichier seg_annexe segment_source
-07d86  saisie_texte               456    1  |     4635 47e7 47e9 ab64 ab68 ab79 choix_menu commandes mode_video  "________________"
+07d86  saisie_texte               456    1  |     47e7 47e9 ab64 ab68 ab79 choix_menu commandes mode_video zones_actives  "________________"
 07f4f  sub_7f4f                    37    0  |     ab79 choix_menu  "________________"
 07f74  sub_7f74                    93    1  |     44a2 44a3 46a2 46a3 46bc 46bd
 07fd1  sub_7fd1                    89    1  |     3197 3198 44a2 44a3 ac13 ac15 choix_menu commande_type
@@ -365,13 +365,13 @@
 08827  attente_briefing            65    1  |     3750 choix_menu commandes mode_video
 08870  sub_8870                    40    2  |     ad37 erreur_fichier
 08898  sub_8898                    84    1  |     3750 ad3b choix_menu commandes erreur_fichier mode_video
-088ed  affiche_message            387  111  |     3750 3759 3f97 3fe9 4635 ad20 ad22 ad24 ad26 ad28 ad2a ad2c
+088ed  affiche_message            387  111  |     3750 3759 3f97 3fe9 ad20 ad22 ad24 ad26 ad28 ad2a ad2c ad2d
 08a70  sub_8a70                   269    4  |     3750 37eb ad20 ad22 ad24 ad2f ad31 ad33 ad35 ad36 ad39 ad3b  "AND TRY AGAIN"
 08b7d  sub_8b7d                     8    2  |     ad2a ad2d
 08b85  sub_8b85                    16    2  |     ad28 seg_furn
 08b95  sub_8b95                   127    2  |     37f3 ad24 ad36 seg_odds segment_source
 08c20  inventaire_sorts          1923    1  |     3759 3fe9 42e9 ad44 ad45 ad68 ad6a commandes erreur_fichier fiche_heros_courant fichier_nom fichier_offset  "book.ega"
-093b1  sub_93b1                   326    0  |     3f9b 3fe0 4289 428a choix_menu fiche_heros_courant personnage_courant
+093b1  sub_93b1                   326    0  |     3fe0 4289 428a choix_menu etat_action fiche_heros_courant personnage_courant
 094f7  sub_94f7                    47    1  |     choix_menu
 09527  dessine_objets             175    1  |     erreur_fichier mode_inventaire seg_annexe seg_odds segment_source
 095d6  barre_texte                124    1  |     37f3 seg_annexe segment_source

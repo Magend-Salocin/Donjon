@@ -218,7 +218,7 @@ loc_021b:
 
 ; ======== partie   (appelée depuis 016a)
 ; une quête : préparation des 4 joueurs (DS:3195-3198), puis le jeu
-00246  c7 06 35 46 a4 48    mov word ptr [0x4635], 0x48a4
+00246  c7 06 35 46 a4 48    mov word ptr [0x4635], 0x48a4    ; zones_actives, zones_panneau
 0024c  c6 06 e9 3f 00       mov byte ptr [0x3fe9], 0
 00251  e8 cf 67             call fond_vers_tampon
 00254  e8 6a 63             call sub_65c1
@@ -350,7 +350,7 @@ loc_037a:
 0039c  e8 84 66             call fond_vers_tampon
 0039f  e8 7a 62             call sub_661c
 003a2  e8 81 01             call sub_0526
-003a5  e8 06 65             call sub_68ae
+003a5  e8 06 65             call des_deplacement_tour
 003a8  e8 d2 56             call icones_actives
 003ab  e8 86 4e             call dessine_icones
 003ae  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -398,7 +398,7 @@ loc_0413:
 00419  c6 06 cc 40 ff       mov byte ptr [0x40cc], 0xff
 0041e  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 00423  74 03                je loc_0428
-00425  e8 2e 03             call sub_0756
+00425  e8 2e 03             call fin_tour
 loc_0428:
 00428  e8 59 63             call sub_6784
 0042b  e8 a2 02             call sub_06d0
@@ -412,7 +412,7 @@ loc_0428:
 00443  e8 1e 60             call sub_6464
 00446  e8 cf 60             call sub_6518
 00449  e8 c8 59             call curseur_sauve_fond
-0044c  80 3e 9a 3f 00       cmp byte ptr [0x3f9a], 0
+0044c  80 3e 9a 3f 00       cmp byte ptr [0x3f9a], 0    ; fin_du_tour
 00451  75 03                jne loc_0456
 00453  e8 8e 5c             call affiche_tampon
 loc_0456:
@@ -424,7 +424,7 @@ loc_0456:
 00467  74 03                je loc_046c
 00469  e8 ba 00             call sub_0526
 loc_046c:
-0046c  80 3e 9a 3f 00       cmp byte ptr [0x3f9a], 0
+0046c  80 3e 9a 3f 00       cmp byte ptr [0x3f9a], 0    ; fin_du_tour
 00471  74 01                je loc_0474
 00473  c3                   ret
 loc_0474:
@@ -750,7 +750,8 @@ loc_0726:
 00752  e9 f5 12             jmp loc_1a4a
 ; ---- 1 octets non atteints (0755-0755)
 
-; ======== sub_0756   (appelée depuis 0425)
+; ======== fin_tour   (appelée depuis 0425)
+; icône fin du tour : DS:3F9A = 1 ; traversée de la roche activée
 00756  80 3e c8 3f 00       cmp byte ptr [0x3fc8], 0
 0075b  74 01                je loc_075e
 0075d  c3                   ret
@@ -767,19 +768,21 @@ loc_0766:
 00778  80 65 18 7f          and byte ptr [di + 0x18], 0x7f
 loc_077c:
 0077c  e8 c9 22             call son_effet_2
-0077f  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
+0077f  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1    ; fin_du_tour
 00784  c3                   ret
-; ---- 3 octets non atteints (0785-0787)
+ouvre_portes:    ; icône : ouvre les portes de la case du héros (sub_07c0)
+00785  e8 38 00             call ouvre_portes_case
 
 ; ======== sub_0788   (appelée depuis 4927, 49ee, 4ab4, 4b7f)
 00788  50                   push ax
 00789  57                   push di
-0078a  e8 03 00             call sub_0790
+0078a  e8 03 00             call porte_reveille
 0078d  5f                   pop di
 0078e  58                   pop ax
 0078f  c3                   ret
 
-; ======== sub_0790   (appelée depuis 078a)
+; ======== porte_reveille   (appelée depuis 078a)
+; quêtes 5 et 16 : la porte en (5, 3-4) réveille le monstre 1
 00790  80 3e 92 3f 04       cmp byte ptr [0x3f92], 4    ; numero_quete
 00795  74 07                je loc_079e
 00797  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
@@ -800,7 +803,8 @@ loc_07bd:
 007bd  32 c0                xor al, al
 007bf  c3                   ret
 
-; ======== sub_07c0   (routine probable : non appelée directement)
+; ======== ouvre_portes_case   (appelée depuis 0785)
+; pose le bit 0x04 des portes non secrètes autour de la case et révèle l'autre côté
 007c0  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
 007c5  e8 53 0e             call sub_161b
 007c8  80 c7 02             add bh, 2
@@ -968,7 +972,7 @@ loc_0924:
 
 ; ======== attaque_heros
 ; le héros attaque : crânes (DS:3FB8 dés) contre boucliers noirs du monstre (DS:3FBB dés)
-00936  e8 10 57             call sub_6049
+00936  e8 10 57             call fin_deplacement
 00939  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 0093d  89 36 d6 3f          mov word ptr [0x3fd6], si    ; attaquant
 loc_0941:
@@ -1423,7 +1427,8 @@ loc_0caa:
 00cad  c6 06 9d 3f 01       mov byte ptr [0x3f9d], 1
 00cb2  c3                   ret
 
-; ======== sub_0cb3   (routine probable : non appelée directement)
+; ======== mode_regarder
+; informations sous le curseur, jusqu'à un clic sur la zone d'annulation (?)
 00cb3  c6 06 91 3f 01       mov byte ptr [0x3f91], 1
 00cb8  e8 15 4a             call sub_56d0
 loc_0cbb:
@@ -1902,7 +1907,7 @@ loc_10aa:
 010b3  bb 5a 00             mov bx, 0x5a
 010b6  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3    ; personnage_courant
 010bb  75 0e                jne loc_10cb
-010bd  a0 9b 3f             mov al, byte ptr [0x3f9b]
+010bd  a0 9b 3f             mov al, byte ptr [0x3f9b]    ; etat_action
 010c0  a8 01                test al, 1
 010c2  74 07                je loc_10cb
 010c4  80 4c 18 80          or byte ptr [si + 0x18], 0x80
@@ -1932,7 +1937,7 @@ loc_10d2:
 01108  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 0110b  3a 06 ca 3f          cmp al, byte ptr [0x3fca]    ; heros_courant
 0110f  75 05                jne loc_1116
-01111  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
+01111  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1    ; fin_du_tour
 loc_1116:
 01116  e8 9b f5             call quete_continue
 01119  75 09                jne sub_1124
@@ -2831,7 +2836,7 @@ loc_186f:
 01892  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01896  c6 05 00             mov byte ptr [di], 0
 loc_1899:
-01899  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
+01899  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1    ; fin_du_tour
 0189e  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 018a3  73 12                jae loc_18b7
 018a5  bb 1c 00             mov bx, 0x1c    ; message « VOUS AVEZ ECHAPPE INDEMNE / A LA QUETE »
@@ -2940,7 +2945,7 @@ loc_19a8:
 019ab  88 65 02             mov byte ptr [di + 2], ah
 019ae  80 65 0f bf          and byte ptr [di + 0xf], 0xbf
 019b2  c6 06 9c 3f 00       mov byte ptr [0x3f9c], 0    ; deplacement_restant
-019b7  c6 06 9a 3f 00       mov byte ptr [0x3f9a], 0
+019b7  c6 06 9a 3f 00       mov byte ptr [0x3f9a], 0    ; fin_du_tour
 019bc  e8 f1 54             call sub_6eb0
 019bf  e9 e8 54             jmp loc_6eaa
 
@@ -2974,7 +2979,7 @@ loc_19e1:
 019f0  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 019f5  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 019f9  c6 05 00             mov byte ptr [di], 0
-019fc  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
+019fc  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1    ; fin_du_tour
 01a01  e9 a6 54             jmp loc_6eaa
 fin_course:    ; quête 9 : retire l'objet de quête (+0x0F bit 0x40)
 01a04  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -4457,7 +4462,7 @@ loc_26ce:
 026d4  e9 fb e9             jmp loc_10d2
 
 ; ======== sub_26d7   (appelée depuis 25a8, 263a, 269b)
-026d7  80 0e 9b 3f 02       or byte ptr [0x3f9b], 2
+026d7  80 0e 9b 3f 02       or byte ptr [0x3f9b], 2    ; etat_action
 026dc  c6 06 9c 3f 00       mov byte ptr [0x3f9c], 0    ; deplacement_restant
 026e1  c3                   ret
 
@@ -5301,7 +5306,7 @@ loc_2c84:
 loc_2c8c:
 02c8c  80 3e 2c 40 01       cmp byte ptr [0x402c], 1
 02c91  74 16                je loc_2ca9
-02c93  f6 06 9b 3f 00       test byte ptr [0x3f9b], 0
+02c93  f6 06 9b 3f 00       test byte ptr [0x3f9b], 0    ; etat_action
 02c98  74 1c                je loc_2cb6
 02c9a  f6 06 b3 3f 02       test byte ptr [0x3fb3], 2    ; attaque_repetee
 02c9f  74 01                je loc_2ca2
@@ -5349,11 +5354,11 @@ loc_2cf9:
 loc_2d16:
 02d16  80 3e 9d 3f 00       cmp byte ptr [0x3f9d], 0
 02d1b  74 dc                je loc_2cf9
-02d1d  f6 06 9b 3f 02       test byte ptr [0x3f9b], 2
+02d1d  f6 06 9b 3f 02       test byte ptr [0x3f9b], 2    ; etat_action
 02d22  74 05                je loc_2d29
 02d24  c6 06 2c 40 00       mov byte ptr [0x402c], 0
 loc_2d29:
-02d29  e8 1d 33             call sub_6049
+02d29  e8 1d 33             call fin_deplacement
 02d2c  c6 06 af 3f 00       mov byte ptr [0x3faf], 0    ; objet_choisi
 02d31  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 02d35  8a 0e c9 3f          mov cl, byte ptr [0x3fc9]
@@ -8855,6 +8860,9 @@ loc_4891:
 0489a  b8 00 4c             mov ax, 0x4c00
 0489d  cd 21                int 0x21
 0489f  00 8a 55 01          add byte ptr [bp + si + 0x155], cl
+; ---- -3 octets non atteints (48a3-489f)
+pas_gauche:
+048a0  8a 55 01             mov dl, byte ptr [di + 1]
 048a3  80 fa 00             cmp dl, 0
 048a6  75 03                jne loc_48ab
 048a8  e9 f4 04             jmp loc_4d9f
@@ -8866,7 +8874,7 @@ loc_48ab:
 048b5  74 03                je loc_48ba
 048b7  e9 e5 04             jmp loc_4d9f
 loc_48ba:
-048ba  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4
+048ba  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4    ; etat_action
 048bf  74 03                je loc_48c4
 048c1  e9 db 04             jmp loc_4d9f
 loc_48c4:
@@ -8940,9 +8948,9 @@ loc_495a:
 0495f  4b                   dec bx
 04960  fe 4d 01             dec byte ptr [di + 1]
 04963  b0 02                mov al, 2
-04965  e9 57 02             jmp loc_4bbf
+04965  e9 57 02             jmp pas_fait
 
-; ======== sub_4968   (routine probable : non appelée directement)
+; ======== pas_droite
 04968  8a 55 01             mov dl, byte ptr [di + 1]
 0496b  80 fa 19             cmp dl, 0x19
 0496e  75 03                jne loc_4973
@@ -8955,7 +8963,7 @@ loc_4973:
 0497d  74 03                je loc_4982
 0497f  e9 1d 04             jmp loc_4d9f
 loc_4982:
-04982  a0 9b 3f             mov al, byte ptr [0x3f9b]
+04982  a0 9b 3f             mov al, byte ptr [0x3f9b]    ; etat_action
 04985  a8 04                test al, 4
 04987  74 03                je loc_498c
 04989  e9 13 04             jmp loc_4d9f
@@ -9030,9 +9038,9 @@ loc_4a21:
 04a25  08 2f                or byte ptr [bx], ch
 04a27  fe 45 01             inc byte ptr [di + 1]
 04a2a  b0 01                mov al, 1
-04a2c  e9 90 01             jmp loc_4bbf
+04a2c  e9 90 01             jmp pas_fait
 
-; ======== sub_4a2f   (routine probable : non appelée directement)
+; ======== pas_haut
 04a2f  8a 55 01             mov dl, byte ptr [di + 1]
 04a32  8a 75 02             mov dh, byte ptr [di + 2]
 04a35  80 fe 00             cmp dh, 0
@@ -9045,7 +9053,7 @@ loc_4a3d:
 04a44  74 03                je loc_4a49
 04a46  e9 56 03             jmp loc_4d9f
 loc_4a49:
-04a49  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4
+04a49  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4    ; etat_action
 04a4e  74 03                je loc_4a53
 04a50  e9 4c 03             jmp loc_4d9f
 loc_4a53:
@@ -9118,9 +9126,9 @@ loc_4ae7:
 04aec  83 eb 1a             sub bx, 0x1a
 04aef  fe 4d 02             dec byte ptr [di + 2]
 04af2  b0 03                mov al, 3
-04af4  e9 c8 00             jmp loc_4bbf
+04af4  e9 c8 00             jmp pas_fait
 
-; ======== sub_4af7   (routine probable : non appelée directement)
+; ======== pas_bas
 04af7  8a 55 01             mov dl, byte ptr [di + 1]
 04afa  8a 75 02             mov dh, byte ptr [di + 2]
 04afd  80 fe 13             cmp dh, 0x13
@@ -9133,7 +9141,7 @@ loc_4b05:
 04b0c  74 03                je loc_4b11
 04b0e  e9 8e 02             jmp loc_4d9f
 loc_4b11:
-04b11  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4
+04b11  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4    ; etat_action
 04b16  74 03                je loc_4b1b
 04b18  e9 84 02             jmp loc_4d9f
 loc_4b1b:
@@ -9207,7 +9215,7 @@ loc_4bb2:
 04bb8  08 2f                or byte ptr [bx], ch
 04bba  fe 45 02             inc byte ptr [di + 2]
 04bbd  32 c0                xor al, al
-loc_4bbf:
+pas_fait:    ; commun aux 4 pas : déplacement - 1, zone, téléports des quêtes 10 et 16
 04bbf  80 3e b4 3e 01       cmp byte ptr [0x3eb4], 1
 04bc4  75 13                jne loc_4bd9
 04bc6  56                   push si
@@ -9220,7 +9228,7 @@ loc_4bbf:
 loc_4bd9:
 04bd9  89 5d 04             mov word ptr [di + 4], bx
 04bdc  a2 9b 40             mov byte ptr [0x409b], al
-04bdf  80 0e 9b 3f 01       or byte ptr [0x3f9b], 1
+04bdf  80 0e 9b 3f 01       or byte ptr [0x3f9b], 1    ; etat_action
 04be4  fe 0e 9c 3f          dec byte ptr [0x3f9c]    ; deplacement_restant
 04be8  e8 30 ca             call sub_161b
 04beb  3a 45 03             cmp al, byte ptr [di + 3]
@@ -9251,7 +9259,7 @@ loc_4c12:
 04c27  5b                   pop bx
 04c28  3c 01                cmp al, 1
 04c2a  74 e6                je loc_4c12
-04c2c  8a 87 de 43          mov al, byte ptr [bx + 0x43de]
+04c2c  8a 87 de 43          mov al, byte ptr [bx + 0x43de]    ; teleports_salles_froides
 04c30  88 45 03             mov byte ptr [di + 3], al
 04c33  8b 8f df 43          mov cx, word ptr [bx + 0x43df]
 04c37  89 4d 01             mov word ptr [di + 1], cx
@@ -9413,7 +9421,7 @@ loc_4d9f:
 04db4  02 d2                add dl, dl
 04db6  02 d2                add dl, dl
 04db8  b6 00                mov dh, 0
-04dba  bb b2 43             mov bx, 0x43b2
+04dba  bb b2 43             mov bx, 0x43b2    ; teleports_chateau
 04dbd  03 da                add bx, dx
 04dbf  8a 07                mov al, byte ptr [bx]
 04dc1  3a 45 03             cmp al, byte ptr [di + 3]
@@ -10660,7 +10668,7 @@ loc_58ed:
 05900  75 03                jne loc_5905
 05902  e9 51 01             jmp loc_5a56
 loc_5905:
-05905  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4
+05905  f6 06 9b 3f 04       test byte ptr [0x3f9b], 4    ; etat_action
 0590a  74 03                je loc_590f
 0590c  e9 47 01             jmp loc_5a56
 loc_590f:
@@ -10910,7 +10918,7 @@ loc_5adf:
 05aee  c6 06 02 43 01       mov byte ptr [0x4302], 1
 05af3  c6 06 ba 42 01       mov byte ptr [0x42ba], 1
 05af8  c6 06 8a 42 01       mov byte ptr [0x428a], 1
-05afd  f6 06 9b 3f 02       test byte ptr [0x3f9b], 2
+05afd  f6 06 9b 3f 02       test byte ptr [0x3f9b], 2    ; etat_action
 05b02  74 35                je loc_5b39
 05b04  c6 06 ad 42 01       mov byte ptr [0x42ad], 1
 05b09  c6 06 f5 42 01       mov byte ptr [0x42f5], 1
@@ -10923,7 +10931,7 @@ loc_5b21:
 05b21  c6 06 89 42 01       mov byte ptr [0x4289], 1
 loc_5b26:
 05b26  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
-05b2a  f6 06 9b 3f 08       test byte ptr [0x3f9b], 8
+05b2a  f6 06 9b 3f 08       test byte ptr [0x3f9b], 8    ; etat_action
 05b2f  75 05                jne loc_5b36
 05b31  c6 06 89 42 0b       mov byte ptr [0x4289], 0xb
 loc_5b36:
@@ -11560,25 +11568,26 @@ loc_6016:
 06047  58                   pop ax
 06048  c3                   ret
 
-; ======== sub_6049   (appelée depuis 0936, 2d29, 6bf3, 6e0d)
+; ======== fin_deplacement   (appelée depuis 0936, 2d29, 6bf3, 6e0d)
+; une action après un déplacement arrête le déplacement (sauf potion héroïque)
 06049  80 3e 9f 40 00       cmp byte ptr [0x409f], 0
 0604e  74 01                je loc_6051
 06050  c3                   ret
 loc_6051:
-06051  f6 06 9b 3f 01       test byte ptr [0x3f9b], 1
+06051  f6 06 9b 3f 01       test byte ptr [0x3f9b], 1    ; etat_action
 06056  74 14                je loc_606c
 06058  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0605c  f6 45 17 40          test byte ptr [di + 0x17], 0x40
 06060  75 0a                jne loc_606c
-06062  80 0e 9b 3f 04       or byte ptr [0x3f9b], 4
+06062  80 0e 9b 3f 04       or byte ptr [0x3f9b], 4    ; etat_action
 06067  c6 06 9c 3f 00       mov byte ptr [0x3f9c], 0    ; deplacement_restant
 loc_606c:
-0606c  80 0e 9b 3f 02       or byte ptr [0x3f9b], 2
+0606c  80 0e 9b 3f 02       or byte ptr [0x3f9b], 2    ; etat_action
 06071  f6 45 17 40          test byte ptr [di + 0x17], 0x40
 06075  74 01                je loc_6078
 06077  c3                   ret
 loc_6078:
-06078  80 0e 9b 3f 08       or byte ptr [0x3f9b], 8
+06078  80 0e 9b 3f 08       or byte ptr [0x3f9b], 8    ; etat_action
 0607d  c3                   ret
 
 ; ======== index_case   (appelée depuis 121e, 230b, 24ad, 24eb, 250b, 6ec2, 6ee0, 86a4)
@@ -12111,7 +12120,7 @@ loc_643c:
 06448  c3                   ret
 loc_6449:
 06449  e8 e2 d4             call attend_relache_clic
-0644c  e8 58 00             call sub_64a7
+0644c  e8 58 00             call zone_panneau
 0644f  83 3c ff             cmp word ptr [si], -1
 06452  75 03                jne loc_6457
 06454  e9 5f 03             jmp loc_67b6
@@ -12122,7 +12131,7 @@ loc_6457:
 06462  ff 27                jmp word ptr [bx]
 
 ; ======== sub_6464   (appelée depuis 0443)
-06464  e8 40 00             call sub_64a7
+06464  e8 40 00             call zone_panneau
 06467  83 3c ff             cmp word ptr [si], -1
 0646a  74 20                je sub_648c
 0646c  e8 1d 00             call sub_648c
@@ -12154,11 +12163,12 @@ loc_649e:
 064a2  c6 44 07 01          mov byte ptr [si + 7], 1
 064a6  c3                   ret
 
-; ======== sub_64a7   (appelée depuis 644c, 6464)
+; ======== zone_panneau   (appelée depuis 644c, 6464)
+; SI = zone sous le curseur dans la table DS:4635, CF posé si trouvée
 064a7  33 c0                xor ax, ax
 064a9  8b 16 e7 47          mov dx, word ptr [0x47e7]
 064ad  8b 2e e9 47          mov bp, word ptr [0x47e9]
-064b1  8b 36 35 46          mov si, word ptr [0x4635]
+064b1  8b 36 35 46          mov si, word ptr [0x4635]    ; zones_actives
 loc_64b5:
 064b5  83 3c ff             cmp word ptr [si], -1
 064b8  75 01                jne loc_64bb
@@ -12639,10 +12649,11 @@ loc_68a6:
 068a9  89 1e cc 3f          mov word ptr [0x3fcc], bx
 068ad  c3                   ret
 
-; ======== sub_68ae   (appelée depuis 03a5)
+; ======== des_deplacement_tour   (appelée depuis 03a5)
+; nombre de dés de déplacement du tour (plates, objet porté, rapidité, vent rapide)
 068ae  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
-068b2  c6 06 9a 3f 00       mov byte ptr [0x3f9a], 0
-068b7  c6 06 9b 3f 00       mov byte ptr [0x3f9b], 0
+068b2  c6 06 9a 3f 00       mov byte ptr [0x3f9a], 0    ; fin_du_tour
+068b7  c6 06 9b 3f 00       mov byte ptr [0x3f9b], 0    ; etat_action
 068bc  c6 06 c4 3f 02       mov byte ptr [0x3fc4], 2    ; des_deplacement
 068c1  f6 45 13 08          test byte ptr [di + 0x13], 8
 068c5  75 06                jne loc_68cd
@@ -13017,8 +13028,8 @@ loc_6be8:
 06bed  74 01                je loc_6bf0
 06bef  c3                   ret
 loc_6bf0:
-06bf0  a0 9b 3f             mov al, byte ptr [0x3f9b]
-06bf3  e8 53 f4             call sub_6049
+06bf0  a0 9b 3f             mov al, byte ptr [0x3f9b]    ; etat_action
+06bf3  e8 53 f4             call fin_deplacement
 loc_6bf6:
 06bf6  e8 a1 01             call monstre_dans_zone
 06bf9  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -13287,8 +13298,8 @@ loc_6e02:
 06e07  74 01                je loc_6e0a
 06e09  c3                   ret
 loc_6e0a:
-06e0a  a0 9b 3f             mov al, byte ptr [0x3f9b]
-06e0d  e8 39 f2             call sub_6049
+06e0a  a0 9b 3f             mov al, byte ptr [0x3f9b]    ; etat_action
+06e0d  e8 39 f2             call fin_deplacement
 06e10  8a 1e 94 3f          mov bl, byte ptr [0x3f94]    ; zone_heros
 06e14  b7 00                mov bh, 0
 06e16  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
@@ -13348,7 +13359,7 @@ loc_6e94:
 06ea4  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06ea8  ff 17                call word ptr [bx]
 loc_6eaa:
-06eaa  c7 06 35 46 a4 48    mov word ptr [0x4635], 0x48a4
+06eaa  c7 06 35 46 a4 48    mov word ptr [0x4635], 0x48a4    ; zones_actives, zones_panneau
 
 ; ======== sub_6eb0   (appelée depuis 074f, 19bc, 2608)
 06eb0  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
@@ -14947,7 +14958,7 @@ loc_7d39:
 07d8b  c6 06 79 ab 00       mov byte ptr [0xab79], 0
 07d90  90                   nop
 07d91  bb 6d ab             mov bx, 0xab6d
-07d94  89 1e 35 46          mov word ptr [0x4635], bx
+07d94  89 1e 35 46          mov word ptr [0x4635], bx    ; zones_actives
 07d98  50                   push ax
 07d99  b8 7c 09             mov ax, 0x97c
 07d9c  8e c0                mov es, ax
@@ -16138,7 +16149,7 @@ loc_88ea:
 ; ======== affiche_message   (appelée depuis 01ba, 0203, 03f2, 049f, 04de, 074c, 092b, 09cf)
 ; boîte de message BX (offset dans la table des textes chargée en DS:5FC1)
 088ed  ff 36 50 37          push word ptr [0x3750]
-088f1  ff 36 35 46          push word ptr [0x4635]
+088f1  ff 36 35 46          push word ptr [0x4635]    ; zones_actives
 088f5  c6 06 59 37 01       mov byte ptr [0x3759], 1
 088fa  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff    ; choix_menu
 088ff  c6 06 3b ad 00       mov byte ptr [0xad3b], 0
@@ -16272,7 +16283,7 @@ loc_8a47:
 08a53  83 2e 22 ad 04       sub word ptr [0xad22], 4
 08a58  59                   pop cx
 08a59  e2 ec                loop loc_8a47
-08a5b  8f 06 35 46          pop word ptr [0x4635]
+08a5b  8f 06 35 46          pop word ptr [0x4635]    ; zones_actives
 08a5f  8f 06 50 37          pop word ptr [0x3750]
 08a63  c6 06 59 37 00       mov byte ptr [0x3759], 0
 08a68  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
@@ -17273,7 +17284,7 @@ loc_9417:
 09427  74 13                je loc_943c
 09429  c6 06 89 42 0b       mov byte ptr [0x4289], 0xb
 0942e  c6 06 8a 42 01       mov byte ptr [0x428a], 1
-09433  80 36 9b 3f 08       xor byte ptr [0x3f9b], 8
+09433  80 36 9b 3f 08       xor byte ptr [0x3f9b], 8    ; etat_action
 09438  80 75 17 40          xor byte ptr [di + 0x17], 0x40
 loc_943c:
 0943c  8a c2                mov al, dl
