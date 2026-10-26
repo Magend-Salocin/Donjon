@@ -192,6 +192,31 @@ Les types 14 à 26 (extension) sont dans la même table. Une routine de mort est
 
 Les bits hauts de la table (0x80 pour le bâton, l'épée courte, la lance et l'arbalète ; 0x40, 0x20, 0x10) sont sans doute les portées (diagonale, lancer, tir) : à lire. Le poison d'orc donne 2 dés, la lame de l'esprit 3 (4 contre squelettes, zombis et momies). Puis (0x0B44) : contre le Sorcier-Roi, aucun dé sans la lame de l'esprit ; +2 avec la potion de force ou le courage, consommés par cette attaque.
 
+## Fin de quête
+
+Un héros sort de la quête quand il est sur l'escalier (codes 0x38 à 0x3B de `grille_occupants`) et que le premier octet de son état de tour (DS:4639) vaut 1 (à préciser). C'est `fin_quete` (0x184E), appelée à chaque passage de la boucle du tour :
+
+1. Son bit est posé dans `etat_quete`, il quitte `heros_en_jeu` (FFh) et sa fiche est désactivée (+0 = 0). Exception : dans la 4e quête, ces trois points sont faits par la routine de la quête.
+2. « VOUS AVEZ ECHAPPE INDEMNE A LA QUETE », puis la routine de la quête (`fins_quetes`, DS:44A9, quêtes du code 0 à 14 ; les quêtes de l'extension n'en ont pas).
+
+| Quête du jeu | Routine | Effet |
+| --- | --- | --- |
+| 1 Le labyrinthe | `fin_labyrinthe` | le premier sorti reçoit 100 pièces d'or |
+| 2 Le sauvetage de Sir Ragnar | `fin_ragnar` | quand Sir Ragnar sort : « L'EMPEREUR OFFRE 100 PIECES D'OR AU SAUVEUR », mais le héros qui l'a trouvé (`evenement_a`) reçoit 200 pièces |
+| 4 L'or du prince Magnus | `fin_or_prince` | avec le coffre (+0x0F bit 0x40) : « GARDER LE COFFRE » ou « RENDEZ-LE AU PRINCE » (récompense de 200 annoncée, 50 pièces retirées de l'or). Puis, s'il reste des coffres : « ABANDONNEZ LA QUETE » ou « ALLEZ CHERCHER PLUS D'OR » (le héros revient en (3, 11) ou sur une case voisine libre) |
+| 7 Le chasseur de pierres | `fin_karlen` | 100 pièces si Karlen a été trouvé (`evenement_b` posé) |
+| 8 Le mage du feu | `fin_balur` | 150 pièces au héros qui a tué Balur ; sinon « BALUR EST TOUJOURS VIVANT » |
+| 9 Course contre la montre | `fin_course` | retire l'objet de quête (+0x0F bit 0x40) |
+| 10 Le château des mystères | `fin_or_faux` | si le héros a l'or de la mine (+0x0F bit 0x20) : 5000 pièces retirées, « L'OR TROUVE DANS LA MINE ETAIT FAUX » |
+
+`ajoute_or` (0x6906) n'ajoute rien si le héros a déjà 9999 pièces ou plus.
+
+Mort d'un héros (`mort_heros`, 0x10D8) : points de corps, or, équipement (+0x0E, +0x0F), artefacts (+0x0D) et objets en service remis à zéro ; la fiche est désactivée et le bit du héros posé dans `etat_quete`. Le héros reste « en jeu » à l'écran des héros, mais `choix_quete` ne compte pas un héros sans points de corps.
+
+La quête s'arrête (`quete_continue`) quand `etat_quete` vaut 0Fh : les 4 héros sont sortis, morts ou absents. Dans la 2e quête, elle continue tant que Sir Ragnar est sur le plateau. Le jeu affiche alors « LES JOUEURS SONT TOUS ELIMINES », même si tous sont sortis vivants, et revient au menu titre. Après la 15e quête (`numero_quete` ≥ 15) et si DS:3FE7 est posé, l'écran final s'affiche ([02-ecrans.md](02-ecrans.md#boucle-principale)).
+
+Abandon de la partie (`commandes` = 40h pendant un tour) : les fiches et `heros_en_jeu` sont restaurés depuis la copie faite par `lance_quete`, et `numero_quete` est remis à 0.
+
 ## Plateau en mémoire
 
 `lance_quete` recopie les 1024 premiers octets de QUESTn.BIN en DS:546F (`grille_zones`) : zone de chaque case (bits 0 à 5), puis (+0x200) murs et portes. La grille des occupants suit, en DS:586F (= `grille_zones` + 0x400) : pour chaque case, le numéro du monstre qui l'occupe (1 à 32) ou le code du mobilier et des pièges (0x30 et plus, voir [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#quêtes--questnbin)). `index_case` (0x607E) donne l'index d'une case à partir de (x, y).

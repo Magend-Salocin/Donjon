@@ -141,7 +141,7 @@ loc_0162:
 loc_0177:
 00177  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 0017c  72 d2                jb loc_0150
-0017e  80 3e e7 3f 00       cmp byte ptr [0x3fe7], 0
+0017e  80 3e e7 3f 00       cmp byte ptr [0x3fe7], 0    ; fin_du_jeu
 00183  74 cb                je loc_0150
 00185  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 0018a  75 49                jne loc_01d5
@@ -709,7 +709,7 @@ loc_06f5:
 006f5  fe 06 c3 3f          inc byte ptr [0x3fc3]
 006f9  e8 29 11             call sub_1825
 006fc  be ee 00             mov si, 0xee
-006ff  e9 33 13             jmp sub_1a35
+006ff  e9 33 13             jmp message_puis_sortie
 loc_0702:
 00702  80 3e c0 3f 00       cmp byte ptr [0x3fc0], 0    ; evenement_b
 00707  75 01                jne loc_070a
@@ -1337,7 +1337,7 @@ loc_0c11:
 00c20  bb a8 00             mov bx, 0xa8    ; message « L'EMPEREUR OFFRE 200 / PIECES D'OR A / L'ASSASSIN D'ULAG »
 00c23  e8 c7 7c             call affiche_message
 00c26  ba 64 00             mov dx, 0x64
-00c29  e9 da 5c             jmp sub_6906
+00c29  e9 da 5c             jmp ajoute_or
 
 ; ======== sub_0c2c   (routine probable : non appelée directement)
 00c2c  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
@@ -1349,7 +1349,7 @@ loc_0c34:
 00c36  e8 46 51             call sub_5d7f
 00c39  8b fe                mov di, si
 00c3b  ba 96 00             mov dx, 0x96
-00c3e  e8 c9 5c             call sub_690a
+00c3e  e8 c9 5c             call ajoute_or_di
 00c41  9d                   popf
 00c42  58                   pop ax
 00c43  fe c0                inc al
@@ -1376,7 +1376,7 @@ loc_0c57:
 00c65  bb e0 00             mov bx, 0xe0    ; message « VOUS RECEVEZ UNE PRIME / DE »
 00c68  e8 82 7c             call affiche_message
 00c6b  5a                   pop dx
-00c6c  e9 97 5c             jmp sub_6906
+00c6c  e9 97 5c             jmp ajoute_or
 
 ; ======== sub_0c6f   (routine probable : non appelée directement)
 00c6f  e8 09 00             call sub_0c7b
@@ -1392,7 +1392,7 @@ loc_0c57:
 ; ======== etoile_ouest
 ; « LE ZOMBI LACHE L'ETOILE DE L'OUEST »
 00c82  ba c8 00             mov dx, 0xc8
-00c85  e8 7e 5c             call sub_6906
+00c85  e8 7e 5c             call ajoute_or
 00c88  bb ec 00             mov bx, 0xec    ; message « LE ZOMBI LACHE / L'ETOILE DE L'OUEST. VOUS / RECEVEZ 200 PIECES D'OR »
 00c8b  e8 5f 7c             call affiche_message
 00c8e  c3                   ret
@@ -1910,7 +1910,7 @@ loc_10d2:
 010d5  e9 d2 01             jmp loc_12aa
 
 ; ======== mort_heros   (appelée depuis 10d2, 2c70, 6f95, 9749)
-; « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES », « LES JOUEURS SONT TOUS ELIMINES »
+; fiche SI : points de corps, or, équipement et artefacts à zéro, sort de la quête ; « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES »
 010d8  c6 44 06 00          mov byte ptr [si + 6], 0
 010dc  c6 04 00             mov byte ptr [si], 0
 010df  c6 44 0e 00          mov byte ptr [si + 0xe], 0
@@ -1920,7 +1920,7 @@ loc_10d2:
 010f0  c6 44 11 00          mov byte ptr [si + 0x11], 0
 010f4  c6 44 12 00          mov byte ptr [si + 0x12], 0
 010f8  c6 44 13 00          mov byte ptr [si + 0x13], 0
-010fc  e8 e3 15             call sub_26e2
+010fc  e8 e3 15             call heros_hors_quete
 010ff  bb 20 00             mov bx, 0x20    ; message « VOUS AVEZ ESSUYE / DES BLESSURES MORTELLES. / VOUS AVEZ ECHOUE / DANS CETTE QUETE »
 01102  e8 e8 77             call affiche_message
 01105  e8 1d 07             call sub_1825
@@ -2795,7 +2795,7 @@ loc_177f:
 0184d  c3                   ret
 
 ; ======== fin_quete   (appelée depuis 045f)
-; récompenses de fin de quête (Sir Ragnar, or du prince...)
+; héros sur l'escalier (codes 0x38 à 0x3B) : il sort de la quête ; routine de fin de la quête (fins_quetes)
 0184e  8b 3e 39 46          mov di, word ptr [0x4639]
 01852  80 3d 01             cmp byte ptr [di], 1
 01855  74 01                je loc_1858
@@ -2817,7 +2817,7 @@ loc_186f:
 0187c  74 1b                je loc_1899
 0187e  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 01881  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
-01884  e8 5b 0e             call sub_26e2
+01884  e8 5b 0e             call heros_hors_quete
 01887  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 0188b  32 ff                xor bh, bh
 0188d  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
@@ -2837,11 +2837,11 @@ loc_18b7:
 018b7  bb 4c 02             mov bx, 0x24c    ; message « VOUS AVEZ ECHAPPE INDEMNE / A LA QUETE »
 018ba  e8 30 70             call affiche_message
 018bd  c3                   ret
-loc_18be:
-018be  fe 06 bd 3f          inc byte ptr [0x3fbd]
-018c2  80 3e bd 3f 01       cmp byte ptr [0x3fbd], 1
+fin_labyrinthe:    ; quête 1 : 100 pièces au premier sorti
+018be  fe 06 bd 3f          inc byte ptr [0x3fbd]    ; heros_sortis
+018c2  80 3e bd 3f 01       cmp byte ptr [0x3fbd], 1    ; heros_sortis
 018c7  74 03                je loc_18cc
-018c9  e9 6e 01             jmp tous_elimines
+018c9  e9 6e 01             jmp apres_sortie
 loc_18cc:
 018cc  be 92 00             mov si, 0x92
 018cf  ba 64 00             mov dx, 0x64
@@ -2850,20 +2850,20 @@ loc_18d2:
 018d3  8b de                mov bx, si
 018d5  e8 15 70             call affiche_message
 018d8  5a                   pop dx
-018d9  e8 2a 50             call sub_6906
-018dc  e9 5b 01             jmp tous_elimines
-loc_18df:
+018d9  e8 2a 50             call ajoute_or
+018dc  e9 5b 01             jmp apres_sortie
+fin_karlen:    ; quête 7 : 100 pièces si Karlen a été trouvé
 018df  80 3e c0 3f ff       cmp byte ptr [0x3fc0], 0xff    ; evenement_b
 018e4  75 03                jne loc_18e9
-018e6  e9 51 01             jmp tous_elimines
+018e6  e9 51 01             jmp apres_sortie
 loc_18e9:
 018e9  ba 64 00             mov dx, 0x64
 018ec  be c6 00             mov si, 0xc6
 018ef  eb e1                jmp loc_18d2
-loc_18f1:
+fin_ragnar:    ; quête 2 : Sir Ragnar sorti, 200 pièces à celui qui l'a trouvé (le message dit 100)
 018f1  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 018f6  74 03                je loc_18fb
-018f8  e9 3f 01             jmp tous_elimines
+018f8  e9 3f 01             jmp apres_sortie
 loc_18fb:
 018fb  bb 9c 00             mov bx, 0x9c    ; message « L'EMPEREUR OFFRE 100 / PIECES D'OR AU / SAUVEUR DE SIR RAGNARD »
 018fe  e8 ec 6f             call affiche_message
@@ -2871,19 +2871,19 @@ loc_18fb:
 01904  e8 78 44             call sub_5d7f
 01907  8b fe                mov di, si
 01909  ba c8 00             mov dx, 0xc8
-0190c  e8 fb 4f             call sub_690a
-0190f  e9 28 01             jmp tous_elimines
-loc_1912:
+0190c  e8 fb 4f             call ajoute_or_di
+0190f  e9 28 01             jmp apres_sortie
+fin_or_faux:    ; quête 10 : l'or de la mine était faux, 5000 pièces retirées
 01912  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01916  f6 45 0f 20          test byte ptr [di + 0xf], 0x20
 0191a  75 03                jne loc_191f
-0191c  e9 1b 01             jmp tous_elimines
+0191c  e9 1b 01             jmp apres_sortie
 loc_191f:
 0191f  81 6d 09 88 13       sub word ptr [di + 9], 0x1388
 01924  be dc 00             mov si, 0xdc
-01927  e9 0b 01             jmp sub_1a35
-loc_192a:
-0192a  e8 0d 01             call tous_elimines
+01927  e9 0b 01             jmp message_puis_sortie
+fin_or_prince:    ; quête 4 : garder ou rendre le coffre, retourner chercher de l'or
+0192a  e8 0d 01             call apres_sortie
 0192d  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01931  f6 45 0f 40          test byte ptr [di + 0xf], 0x40
 01935  74 2d                je loc_1964
@@ -2904,7 +2904,7 @@ loc_1953:
 0195c  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01960  83 6d 09 32          sub word ptr [di + 9], 0x32
 loc_1964:
-01964  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3
+01964  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_rapportes
 01969  74 76                je loc_19e1
 0196b  bb b4 00             mov bx, 0xb4    ; message « IL Y A ENCORE DE L'OR A / RECUPERER. VOULEZ-VOUS / RETOURNER LE CHERCHER »
 0196e  e8 7c 6f             call affiche_message
@@ -2918,14 +2918,14 @@ loc_1964:
 0198a  c6 05 ff             mov byte ptr [di], 0xff
 0198d  b0 03                mov al, 3
 0198f  b4 0b                mov ah, 0xb
-01991  e8 2e 00             call prime_balur
+01991  e8 2e 00             call case_prise_heros
 01994  73 12                jae loc_19a8
 01996  fe c0                inc al
-01998  e8 27 00             call prime_balur
+01998  e8 27 00             call case_prise_heros
 0199b  73 0b                jae loc_19a8
 0199d  fe c8                dec al
 0199f  fe c4                inc ah
-019a1  e8 1e 00             call prime_balur
+019a1  e8 1e 00             call case_prise_heros
 019a4  72 02                jb loc_19a8
 019a6  fe c8                dec al
 loc_19a8:
@@ -2937,7 +2937,8 @@ loc_19a8:
 019bc  e8 f1 54             call sub_6eb0
 019bf  e9 e8 54             jmp loc_6eaa
 
-; ======== prime_balur   (appelée depuis 1991, 1998, 19a1)
+; ======== case_prise_heros   (appelée depuis 1991, 1998, 19a1)
+; CF posé si un autre héros que DI est en (AL, AH)
 019c2  50                   push ax
 019c3  b9 04 00             mov cx, 4
 019c6  be 63 46             mov si, 0x4663    ; fiches_personnages
@@ -2960,7 +2961,7 @@ loc_19df:
 loc_19e1:
 019e1  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 019e4  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
-019e7  e8 f8 0c             call sub_26e2
+019e7  e8 f8 0c             call heros_hors_quete
 019ea  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 019ee  32 ff                xor bh, bh
 019f0  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
@@ -2968,31 +2969,33 @@ loc_19e1:
 019f9  c6 05 00             mov byte ptr [di], 0
 019fc  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
 01a01  e9 a6 54             jmp loc_6eaa
-loc_1a04:
+fin_course:    ; quête 9 : retire l'objet de quête (+0x0F bit 0x40)
 01a04  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01a08  80 65 0f bf          and byte ptr [di + 0xf], 0xbf
-01a0c  eb 2c                jmp tous_elimines
+01a0c  eb 2c                jmp apres_sortie
 ; ---- 1 octets non atteints (1a0e-1a0e)
-loc_1a0f:
+fin_balur:    ; quête 8 : 150 pièces au héros qui a tué Balur
 01a0f  be ce 00             mov si, 0xce
 01a12  80 3e c0 3f ff       cmp byte ptr [0x3fc0], 0xff    ; evenement_b
-01a17  74 1c                je sub_1a35
+01a17  74 1c                je message_puis_sortie
 01a19  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 01a1c  3a 06 c0 3f          cmp al, byte ptr [0x3fc0]    ; evenement_b
-01a20  75 18                jne tous_elimines
+01a20  75 18                jne apres_sortie
 01a22  bb cc 00             mov bx, 0xcc    ; message « L'EMPEREUR OFFRE AUX / ASSASSINS DE BALUR UNE / RECOMPENSE DE 150 PIECES D'OR »
 01a25  e8 c5 6e             call affiche_message
 01a28  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01a2c  ba 96 00             mov dx, 0x96
-01a2f  e8 d4 4e             call sub_6906
-01a32  eb 06                jmp tous_elimines
+01a2f  e8 d4 4e             call ajoute_or
+01a32  eb 06                jmp apres_sortie
 ; ---- 1 octets non atteints (1a34-1a34)
 
-; ======== sub_1a35   (appelée depuis 6f1f, 6f74, 6ffd)
+; ======== message_puis_sortie   (appelée depuis 6f1f, 6f74, 6ffd)
+; affiche le message SI, puis apres_sortie
 01a35  8b de                mov bx, si
 01a37  e8 b3 6e             call affiche_message
 
-; ======== tous_elimines   (appelée depuis 18b3, 192a, 7168, 71a2)
+; ======== apres_sortie   (appelée depuis 18b3, 192a, 7168, 71a2)
+; « LES JOUEURS SONT TOUS ELIMINES » si plus aucun héros dans la quête
 01a3a  e8 e8 fd             call sub_1825
 01a3d  e8 74 ec             call quete_continue
 01a40  0a c0                or al, al
@@ -4450,7 +4453,8 @@ loc_26ce:
 026dc  c6 06 9c 3f 00       mov byte ptr [0x3f9c], 0    ; deplacement_restant
 026e1  c3                   ret
 
-; ======== sub_26e2   (appelée depuis 10fc, 1884, 19e7)
+; ======== heros_hors_quete   (appelée depuis 10fc, 1884, 19e7)
+; pose le bit du héros DS:3FCA dans etat_quete et heros_absents
 026e2  bb c6 3f             mov bx, 0x3fc6
 026e5  e8 03 00             call sub_26eb
 
@@ -5184,7 +5188,7 @@ loc_2b9f:
 02bdb  c3                   ret
 
 ; ======== sub_2bdc   (routine probable : non appelée directement)
-02bdc  c6 06 e7 3f 01       mov byte ptr [0x3fe7], 1
+02bdc  c6 06 e7 3f 01       mov byte ptr [0x3fe7], 1    ; fin_du_jeu
 02be1  c3                   ret
 
 ; ======== sub_2be2   (appelée depuis 22a3)
@@ -12657,10 +12661,12 @@ loc_68f1:
 loc_6905:
 06905  c3                   ret
 
-; ======== sub_6906   (appelée depuis 0c85, 18d9, 1a2f, 6d15, 6f58, 6f66, 714b, 7195)
+; ======== ajoute_or   (appelée depuis 0c85, 18d9, 1a2f, 6d15, 6f58, 6f66, 714b, 7195)
+; ajoute DX pièces au héros courant (rien si l'or atteint déjà 9999)
 06906  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 
-; ======== sub_690a   (appelée depuis 0c3e, 190c)
+; ======== ajoute_or_di   (appelée depuis 0c3e, 190c)
+; même chose pour la fiche DI
 0690a  81 7d 09 0f 27       cmp word ptr [di + 9], 0x270f
 0690f  72 01                jb loc_6912
 06911  c3                   ret
@@ -13141,7 +13147,7 @@ loc_6d0a:
 loc_6d12:
 06d12  50                   push ax
 06d13  32 f6                xor dh, dh
-06d15  e8 ee fb             call sub_6906
+06d15  e8 ee fb             call ajoute_or
 06d18  e8 bb f7             call sub_64d6
 06d1b  58                   pop ax
 06d1c  02 c0                add al, al
@@ -13366,14 +13372,14 @@ loc_6eef:
 
 ; ======== sub_6f0c   (routine probable : non appelée directement)
 06f0c  be 96 00             mov si, 0x96
-06f0f  e9 23 ab             jmp sub_1a35
+06f0f  e9 23 ab             jmp message_puis_sortie
 
 ; ======== fouille_vide
 06f12  80 3e c2 4b ff       cmp byte ptr [0x4bc2], 0xff
 06f17  74 18                je loc_6f31
 06f19  e8 8b bb             call sub_2aa7
 06f1c  be 98 00             mov si, 0x98
-06f1f  e8 13 ab             call sub_1a35
+06f1f  e8 13 ab             call message_puis_sortie
 06f22  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06f26  8a 45 06             mov al, byte ptr [di + 6]
 06f29  3c 01                cmp al, 1
@@ -13402,18 +13408,18 @@ loc_6f48:
 loc_6f54:
 06f54  80 4d 10 08          or byte ptr [di + 0x10], 8
 loc_6f58:
-06f58  e8 ab f9             call sub_6906
+06f58  e8 ab f9             call ajoute_or
 06f5b  8b de                mov bx, si
 06f5d  e8 8d 19             call affiche_message
-06f60  e9 d7 aa             jmp tous_elimines
+06f60  e9 d7 aa             jmp apres_sortie
 
 ; ======== sub_6f63   (routine probable : non appelée directement)
 06f63  ba 64 00             mov dx, 0x64
-06f66  e8 9d f9             call sub_6906
+06f66  e8 9d f9             call ajoute_or
 06f69  81 3e c0 4b ff 00    cmp word ptr [0x4bc0], 0xff
 06f6f  74 14                je loc_6f85
 06f71  be 98 00             mov si, 0x98
-06f74  e8 be aa             call sub_1a35
+06f74  e8 be aa             call message_puis_sortie
 06f77  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06f7b  8a 45 06             mov al, byte ptr [di + 6]
 06f7e  3c 01                cmp al, 1
@@ -13421,7 +13427,7 @@ loc_6f58:
 06f82  fe 4d 06             dec byte ptr [di + 6]
 loc_6f85:
 06f85  be a4 00             mov si, 0xa4
-06f88  e9 aa aa             jmp sub_1a35
+06f88  e9 aa aa             jmp message_puis_sortie
 loc_6f8b:
 06f8b  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06f8e  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
@@ -13440,10 +13446,10 @@ loc_6fac:
 06fac  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06fb0  80 4d 0e 40          or byte ptr [di + 0xe], 0x40
 06fb4  be a6 00             mov si, 0xa6
-06fb7  e9 7b aa             jmp sub_1a35
+06fb7  e9 7b aa             jmp message_puis_sortie
 
 ; ======== sub_6fba   (routine probable : non appelée directement)
-06fba  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3
+06fba  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_rapportes
 06fbf  74 05                je loc_6fc6
 06fc1  c6 06 93 4b 07       mov byte ptr [0x4b93], 7
 loc_6fc6:
@@ -13452,8 +13458,8 @@ loc_6fc6:
 06fce  74 03                je loc_6fd3
 06fd0  e9 d7 fe             jmp loc_6eaa
 loc_6fd3:
-06fd3  8a 1e be 3f          mov bl, byte ptr [0x3fbe]
-06fd7  fe 06 be 3f          inc byte ptr [0x3fbe]
+06fd3  8a 1e be 3f          mov bl, byte ptr [0x3fbe]    ; coffres_rapportes
+06fd7  fe 06 be 3f          inc byte ptr [0x3fbe]    ; coffres_rapportes
 06fdb  b7 00                mov bh, 0
 06fdd  d0 e3                shl bl, 1
 06fdf  8b 8f d9 44          mov cx, word ptr [bx + 0x44d9]
@@ -13462,11 +13468,11 @@ loc_6fd3:
 06feb  be aa 00             mov si, 0xaa
 06fee  80 4d 0f 40          or byte ptr [di + 0xf], 0x40
 06ff2  81 45 09 fa 00       add word ptr [di + 9], 0xfa
-06ff7  e9 3b aa             jmp sub_1a35
+06ff7  e9 3b aa             jmp message_puis_sortie
 
 ; ======== sub_6ffa   (routine probable : non appelée directement)
 06ffa  be b6 00             mov si, 0xb6
-06ffd  e8 35 aa             call sub_1a35
+06ffd  e8 35 aa             call message_puis_sortie
 07000  c6 06 d1 58 00       mov byte ptr [0x58d1], 0
 07005  bb eb 56             mov bx, 0x56eb
 07008  b9 04 00             mov cx, 4
@@ -13501,13 +13507,13 @@ loc_7035:
 07047  80 4d 0d 04          or byte ptr [di + 0xd], 4
 0704b  80 45 07 02          add byte ptr [di + 7], 2
 0704f  be ba 00             mov si, 0xba
-07052  e9 e0 a9             jmp sub_1a35
+07052  e9 e0 a9             jmp message_puis_sortie
 
 ; ======== sub_7055   (routine probable : non appelée directement)
 07055  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 07059  80 4d 0d 01          or byte ptr [di + 0xd], 1
 0705d  be c0 00             mov si, 0xc0
-07060  e9 d2 a9             jmp sub_1a35
+07060  e9 d2 a9             jmp message_puis_sortie
 
 ; ======== sub_7063   (routine probable : non appelée directement)
 07063  ba c8 00             mov dx, 0xc8
@@ -13515,7 +13521,7 @@ loc_7035:
 07069  e9 ec fe             jmp loc_6f58
 
 ; ======== sub_706c   (routine probable : non appelée directement)
-0706c  80 3e be 3f 01       cmp byte ptr [0x3fbe], 1
+0706c  80 3e be 3f 01       cmp byte ptr [0x3fbe], 1    ; coffres_rapportes
 07071  74 05                je loc_7078
 07073  c6 06 89 4b 0d       mov byte ptr [0x4b89], 0xd
 loc_7078:
@@ -13523,10 +13529,10 @@ loc_7078:
 0707c  be d2 00             mov si, 0xd2
 0707f  f6 45 0f 40          test byte ptr [di + 0xf], 0x40
 07083  74 03                je loc_7088
-07085  e9 b2 a9             jmp tous_elimines
+07085  e9 b2 a9             jmp apres_sortie
 loc_7088:
-07088  8a 1e be 3f          mov bl, byte ptr [0x3fbe]
-0708c  fe 06 be 3f          inc byte ptr [0x3fbe]
+07088  8a 1e be 3f          mov bl, byte ptr [0x3fbe]    ; coffres_rapportes
+0708c  fe 06 be 3f          inc byte ptr [0x3fbe]    ; coffres_rapportes
 07090  b7 00                mov bh, 0
 07092  d0 e3                shl bl, 1
 07094  8b 8f df 44          mov cx, word ptr [bx + 0x44df]
@@ -13544,7 +13550,7 @@ loc_7088:
 070bb  80 4d 0f 20          or byte ptr [di + 0xf], 0x20
 070bf  80 4d 0f 10          or byte ptr [di + 0xf], 0x10
 070c3  be da 00             mov si, 0xda
-070c6  e9 6c a9             jmp sub_1a35
+070c6  e9 6c a9             jmp message_puis_sortie
 
 ; ======== sub_70c9   (routine probable : non appelée directement)
 070c9  ba c8 00             mov dx, 0xc8
@@ -13609,7 +13615,7 @@ loc_712d:
 loc_7131:
 07131  bb 4a 02             mov bx, 0x24a    ; message « VOUS TROUVEZ UNE POTION / CURATIVE DANS LE COFFRE »
 07134  e8 b6 17             call affiche_message
-07137  e9 00 a9             jmp tous_elimines
+07137  e9 00 a9             jmp apres_sortie
 
 ; ======== sub_713a   (routine probable : non appelée directement)
 0713a  f6 45 10 04          test byte ptr [di + 0x10], 4
@@ -13620,10 +13626,10 @@ loc_7131:
 loc_7147:
 07147  80 4d 10 08          or byte ptr [di + 0x10], 8
 loc_714b:
-0714b  e8 b8 f7             call sub_6906
+0714b  e8 b8 f7             call ajoute_or
 0714e  8b de                mov bx, si
 07150  e8 9a 17             call affiche_message
-07153  e9 e4 a8             jmp tous_elimines
+07153  e9 e4 a8             jmp apres_sortie
 
 ; ======== coffre_fleche
 ; « LE COFFRE ETAIT PIEGE ! UNE FLECHE PART DU MUR »
@@ -13632,7 +13638,7 @@ loc_714b:
 0715f  fe 4d 06             dec byte ptr [di + 6]
 07162  bb 30 02             mov bx, 0x230    ; message « LE COFFRE ETAIT PIEGE ! UNE / FLECHE PART DU MUR. VOUS / PERDEZ UN POINT DE CORPS »
 07165  e8 85 17             call affiche_message
-07168  e8 cf a8             call tous_elimines
+07168  e8 cf a8             call apres_sortie
 0716b  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0716f  80 7d 06 00          cmp byte ptr [di + 6], 0
 07173  75 03                jne loc_7178
@@ -13644,7 +13650,7 @@ loc_7178:
 07179  c6 06 91 4b ff       mov byte ptr [0x4b91], 0xff
 0717e  bb 96 00             mov bx, 0x96    ; message « VOUS DECOUVREZ QUE LE / COFFRE A ETE PIEGE. VOUS / LE DESARMEZ »
 07181  e8 69 17             call affiche_message
-07184  e9 b3 a8             jmp tous_elimines
+07184  e9 b3 a8             jmp apres_sortie
 
 ; ======== cles_agrain
 ; « LES CLES D'AGRAIN SONT SUR LA TABLE »
@@ -13653,11 +13659,11 @@ loc_7178:
 0718c  f6 45 0f 40          test byte ptr [di + 0xf], 0x40
 07190  75 26                jne loc_71b8
 07192  ba 64 00             mov dx, 0x64
-07195  e8 6e f7             call sub_6906
+07195  e8 6e f7             call ajoute_or
 07198  80 4d 0f 40          or byte ptr [di + 0xf], 0x40
 0719c  bb 36 02             mov bx, 0x236    ; message « LES CLES D'AGRAIN SONT SUR / LA TABLE. PRENEZ-EN UNE D'UNE / VALEUR DE 100 PIECES D'OR »
 0719f  e8 4b 17             call affiche_message
-071a2  e8 95 a8             call tous_elimines
+071a2  e8 95 a8             call apres_sortie
 071a5  5e                   pop si
 071a6  fe 06 e8 3f          inc byte ptr [0x3fe8]
 071aa  80 3e e8 3f 04       cmp byte ptr [0x3fe8], 4
@@ -13685,16 +13691,16 @@ loc_71b8:
 071d6  75 0b                jne loc_71e3
 071d8  c6 06 99 4b 0e       mov byte ptr [0x4b99], 0xe
 071dd  be e4 00             mov si, 0xe4
-071e0  e9 52 a8             jmp sub_1a35
+071e0  e9 52 a8             jmp message_puis_sortie
 loc_71e3:
 071e3  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 071e7  80 4d 0f 01          or byte ptr [di + 0xf], 1
 071eb  be e4 00             mov si, 0xe4
-071ee  e9 44 a8             jmp sub_1a35
+071ee  e9 44 a8             jmp message_puis_sortie
 
 ; ======== sub_71f1   (routine probable : non appelée directement)
 071f1  be e8 00             mov si, 0xe8
-071f4  e9 3e a8             jmp sub_1a35
+071f4  e9 3e a8             jmp message_puis_sortie
 
 ; ======== coffre_gargouille
 ; « LA GARGOUILLE S'ANIME SUBITEMENT »

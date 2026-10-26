@@ -161,13 +161,13 @@
 0x70d2  code  prend_lame_esprit      « VOUS PRENEZ LA LAME DE L'ESPRIT »
 0x7187  code  cles_agrain            « LES CLES D'AGRAIN SONT SUR LA TABLE »
 0x2c36  code  brume_de_mort          « L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL »
-0x10d8  code  mort_heros             « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES », « LES JOUEURS SONT TOUS ELIMINES »
-0x1a3a  code  tous_elimines
-0x184e  code  fin_quete              récompenses de fin de quête (Sir Ragnar, or du prince...)
+0x10d8  code  mort_heros             fiche SI : points de corps, or, équipement et artefacts à zéro, sort de la quête ; « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES »
+0x1a3a  code  apres_sortie           « LES JOUEURS SONT TOUS ELIMINES » si plus aucun héros dans la quête
+0x184e  code  fin_quete              héros sur l'escalier (codes 0x38 à 0x3B) : il sort de la quête ; routine de fin de la quête (fins_quetes)
 0x0c20  code  prime_ulag             « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG »
 0x0c52  code  prime_monstre          « VOUS RECEVEZ UNE PRIME DE .. PIECE D'OR »
 0x0c82  code  etoile_ouest           « LE ZOMBI LACHE L'ETOILE DE L'OUEST »
-0x19c2  code  prime_balur
+0x19c2  code  case_prise_heros       CF posé si un autre héros que DI est en (AL, AH)
 
 0xaa00  table zones_menu_titre       zones cliquables du menu titre (lues par zone_cliquee)
 0xaa1a  table saut_menu_titre        routines des icônes du menu titre, indexées par le numéro de zone
@@ -233,7 +233,7 @@
 # ---- Fouilles scriptées, fins de quête, déplacement, sorts (voir original/notes/03-regles.md)
 0x4b9b  table portes_fouillees         octets 1079-1121 de QUESTn.BIN : FFh quand les portes secrètes de la zone ont été cherchées
 0x5a89  table evenements_fouille     30 routines (coffre piégé, potion, clés d'Agrain, Lame de l'esprit...), indexées par le numéro - 1
-0x44a9  table fins_quetes            une routine de fin par quête, appelée par fin_quete
+0x44a9  table fins_quetes            une routine par quête du code 0 à 14, appelée quand un héros sort
 0x40f9  table deplacements           4 routines, une par direction
 0x2c74  code  action_sort            icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
 0x2d84  code  retire_sort            efface le bit du sort lancé (+0x0B / +0x0C de la fiche) et le sort choisi (+0x16)
@@ -310,3 +310,19 @@
 0x248b  code  case_libre             AL = 0 libre, 1 un héros, 2 un occupant, 3 autre zone (case DX, zone du monstre DI)
 0x245d  code  pas_chemin             ajoute le pas (AL, AH) au chemin du monstre
 0x253f  code  marque_case            cadre ODDS&SOD 0x6320 (24 × 24) sur la case du monstre DI
+
+# ---- Fin de quête (voir original/notes/03-regles.md#fin-de-quête)
+0x18be  etiq  fin_labyrinthe         quête 1 : 100 pièces au premier sorti
+0x18f1  etiq  fin_ragnar             quête 2 : Sir Ragnar sorti, 200 pièces à celui qui l'a trouvé (le message dit 100)
+0x192a  etiq  fin_or_prince          quête 4 : garder ou rendre le coffre, retourner chercher de l'or
+0x18df  etiq  fin_karlen             quête 7 : 100 pièces si Karlen a été trouvé
+0x1a0f  etiq  fin_balur              quête 8 : 150 pièces au héros qui a tué Balur
+0x1a04  etiq  fin_course             quête 9 : retire l'objet de quête (+0x0F bit 0x40)
+0x1912  etiq  fin_or_faux            quête 10 : l'or de la mine était faux, 5000 pièces retirées
+0x1a35  code  message_puis_sortie    affiche le message SI, puis apres_sortie
+0x26e2  code  heros_hors_quete       pose le bit du héros DS:3FCA dans etat_quete et heros_absents
+0x6906  code  ajoute_or              ajoute DX pièces au héros courant (rien si l'or atteint déjà 9999)
+0x690a  code  ajoute_or_di           même chose pour la fiche DI
+0x3fbd  var   heros_sortis           nombre de héros sortis (quête 1)
+0x3fbe  var   coffres_rapportes      quête 4 : coffres d'or rapportés (3 en tout) (?)
+0x3fe7  var   fin_du_jeu             posé : écran final après la 15e quête ; qui le pose : à trouver

@@ -1,7 +1,7 @@
-; Routines de QUEST.EXE : 380, dont 142 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 146 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
-000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe7 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom  "questb.ega"
+000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom fichier_offset  "questb.ega"
 00246  partie                     173    1  | 10h/? 21h/4c    3196 3197 3198 3fe9 4635 commandes commandes_joueurs numero_quete
 002f3  prepare_heros               86    1  |     fiche_heros_courant
 00349  tour_personnage            313    5  |     0e0e 0e0f 0e11 3f97 3f9a 3fb3 3fc8 3fce 402c 40cc 4639 commande_type
@@ -80,10 +80,10 @@
 017b9  sub_17b9                    49    1  |     3f94 3fde 586f
 017ea  sub_17ea                    59    2  |     3fe2 index_case_courante seg_graphics segment_source
 01825  sub_1825                    41   16  |     3f99
-0184e  fin_quete                  371    1  |     3f9a 3fbd 3fbe 3fc8 4639 choix_menu deplacement_restant evenement_a evenement_b fiche_heros_courant heros_courant numero_quete
-019c2  prime_balur                112    3  |     3f9a evenement_b fiche_heros_courant heros_courant personnage_courant
-01a35  sub_1a35                     5    3  |     
-01a3a  tous_elimines               22    4  |     
+0184e  fin_quete                  371    1  |     3f9a 3fc8 4639 choix_menu coffres_rapportes deplacement_restant evenement_a evenement_b fiche_heros_courant heros_courant heros_sortis numero_quete
+019c2  case_prise_heros           112    3  |     3f9a evenement_b fiche_heros_courant heros_courant personnage_courant
+01a35  message_puis_sortie          5    3  |     
+01a3a  apres_sortie                22    4  |     
 01a50  sub_1a50                   357    7  |     37eb 37ed 37ef 3fb0 erreur_fichier personnage_courant seg_annexe segment_source  "AND TRY AGAIN"
 01bb5  sub_1bb5                    21    1  |     
 01bca  sub_1bca                   133    1  |     37ed 37ef
@@ -111,7 +111,7 @@
 025bf  piege_des                  239    0  |     3f97 3fbc 3fc2 3fec 586f 5870 5924 593e fiche_heros_courant heros_courant numero_quete personnage_courant
 026af  trois_des_un_point          40    0  |     26c9 heros_courant
 026d7  sub_26d7                    11    3  |     3f9b deplacement_restant
-026e2  sub_26e2                     6    3  |     
+026e2  heros_hors_quete             6    3  |     
 026e8  sub_26e8                     3    1  |     
 026eb  sub_26eb                    23    1  |     heros_courant
 02702  sub_2702                    33    6  |     fiche_heros_courant numero_quete
@@ -132,7 +132,7 @@
 02b06  sub_2b06                   136    1  | 60h    0e57 319e son_actif son_pilote
 02b8e  sub_2b8e                    42   12  |   0x42 0x61  
 02bb8  sub_2bb8                    36    0  |     3f97 5932 5933 5934 594c 594d 594e
-02bdc  sub_2bdc                     6    0  |     3fe7
+02bdc  sub_2bdc                     6    0  |     fin_du_jeu
 02be2  sub_2be2                    12    1  |     3fe6
 02bee  sub_2bee                    12    1  |     3fe6
 02bfa  sub_2bfa                    16    1  |     3fe6
@@ -291,8 +291,8 @@
 066f9  sub_66f9                   139    2  |     3f90 4639 4b6f commandes deplacement_restant des_deplacement
 06784  sub_6784                   297    1  |     0e11 3fc8 3fcc 3fe4 3fee 3fef 3ff0 3ff1 3ff5 3ff6 4639 47e7
 068ae  sub_68ae                    88    1  |     3f9a 3f9b des_deplacement fiche_heros_courant personnage_courant
-06906  sub_6906                     4    8  |     fiche_heros_courant
-0690a  sub_690a                    12    2  |     
+06906  ajoute_or                    4    8  |     fiche_heros_courant
+0690a  ajoute_or_di                12    2  |     
 06916  sub_6916                    30    2  |     4639 fiche_heros_courant
 06934  sub_6934                    34    2  |     3fe0 index_case_courante
 06956  sub_6956                   203    1  |     erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille mode_video seg_annexe  "maps.ega"
@@ -310,12 +310,12 @@
 06f40  sub_6f40                    35    0  |     
 06f63  sub_6f63                    65    0  |     4bc0 fiche_heros_courant heros_courant personnage_courant
 06fa4  sub_6fa4                    22    0  |     fiche_heros_courant personnage_courant
-06fba  sub_6fba                    64    0  |     3fbe 4b93 fiche_heros_courant
+06fba  sub_6fba                    64    0  |     4b93 coffres_rapportes fiche_heros_courant
 06ffa  sub_6ffa                    72    0  |     56d2 58d1
 07043  sub_7043                    18    0  |     fiche_heros_courant
 07055  sub_7055                    14    0  |     fiche_heros_courant
 07063  sub_7063                     9    0  |     
-0706c  sub_706c                    65    0  |     3fbe 4b89 fiche_heros_courant
+0706c  sub_706c                    65    0  |     4b89 coffres_rapportes fiche_heros_courant
 070ad  sub_70ad                    28    0  |     evenement_b fiche_heros_courant
 070c9  sub_70c9                     9    0  |     
 070d2  prend_lame_esprit           15    0  |     fiche_heros_courant
