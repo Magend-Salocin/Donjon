@@ -85,6 +85,46 @@ def images():
     return len(extracteur.frames)
 
 
+def combat():
+    """Gros plan du combat (animation_combat, 0x1F14) : les 31 poses de MEN.VGA et les séquences d'animation.
+    Tables de QUEST.EXE (DS) : A0FD position dans MEN, A13B taille (largeur, hauteur), A179 position à l'écran,
+    A381 séquence d'attaque de chaque type de héros (7 octets), A3A4 arme lancée, A1B7 position du monstre
+    par classe, A1D9 / A1E9 / A1F9 / A209 séquences du monstre (touché sans mourir, tué, puis les mêmes
+    contre une arme lancée). Codes de séquence : FFh fin, 7Dh image inchangée, FEh projectile déplacé."""
+    quest = graphismes.exepack_unpack(JEU / 'QUEST.EXE')
+    ds = graphismes.DATA_SEGMENT
+
+    def mots(offset, nombre):
+        return list(struct.unpack(f'<{nombre}H', quest[ds + offset:ds + offset + 2 * nombre]))
+
+    def sequence(offset):
+        fin = quest.index(b'\xff', ds + offset)
+        return list(quest[ds + offset:fin])
+
+    men = graphismes.vga_unpack((JEU / 'MEN.VGA').read_bytes())
+    palette = palette_vga(list(quest[ds + graphismes.PALETTE:][:768]))
+    dossier = SORTIE / 'images' / 'combat'
+    dossier.mkdir(parents=True, exist_ok=True)
+    poses = []
+    for numero, (debut, taille, ecran) in enumerate(zip(mots(0xA0FD, 31), mots(0xA13B, 31), mots(0xA179, 31))):
+        largeur, hauteur = taille & 0xFF, taille >> 8
+        ecrire_image(dossier / f'men-{numero:02d}.png', men[debut:debut + largeur * hauteur], (largeur, hauteur), palette)
+        poses.append({'men': debut, 'largeur': largeur, 'hauteur': hauteur, 'x': ecran % 320, 'y': ecran // 320})
+
+    donnees = {
+        'poses': poses,
+        'heros': [sequence(0xA381 + 7 * t) for t in range(5)],
+        'arme_lancee': sequence(0xA3A4),
+        'monstre_position': [{'x': p % 320, 'y': p // 320} for p in mots(0xA1B7, 8)],
+        'monstre_touche': [sequence(o) for o in mots(0xA1D9, 8)],
+        'monstre_tue': [sequence(o) for o in mots(0xA1E9, 8)],
+        'monstre_touche_distance': [sequence(o) for o in mots(0xA1F9, 8)],
+        'monstre_tue_distance': [sequence(o) for o in mots(0xA209, 8)],
+    }
+    (SORTIE / 'combat.json').write_text(json.dumps(donnees, indent=1), encoding='utf-8')
+    return len(poses)
+
+
 def textes():
     dossier = SORTIE / 'textes'
     dossier.mkdir(parents=True, exist_ok=True)
@@ -190,7 +230,8 @@ def quetes():
 
 def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
-    print(f'{palettes_et_ecrans()} écrans, {images()} sprites du plateau, {textes()} langues, {quetes()} quêtes')
+    print(f'{palettes_et_ecrans()} écrans, {images()} sprites du plateau, {combat()} poses de combat, '
+          f'{textes()} langues, {quetes()} quêtes')
 
 
 if __name__ == '__main__':

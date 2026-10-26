@@ -41,10 +41,10 @@ Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` d
 ## Phase 2 : compléter les données
 
 1. Index des messages des fichiers de textes : fait (`original/donnees/textes/*-messages.txt`), boutons compris (position, libellé, numéro).
-2. MEN.VGA : table des poses (hauteurs), pour les animations de combat.
+2. MEN.VGA : fait (31 poses et séquences du gros plan du combat, `original/donnees/combat.json`).
 3. ANIMS.VGA (intro) : autre format de compression.
 4. Musique et effets : `GAME&FX.ALB` et `.RLD` (AdLib), `ADLIB.DRV`.
-5. `QUEST.SAV` : fait (32 personnages, noms et fiches ; voir FORMATS.md). Reste à savoir où sont mémorisées les quêtes accomplies.
+5. `QUEST.SAV` : fait (32 personnages, noms et fiches ; voir FORMATS.md). Les quêtes accomplies ne sont mémorisées nulle part : le fichier fait exactement 32 noms et 32 fiches, et le joueur choisit librement sa quête.
 
 ## Phase 3 : portage JavaScript
 

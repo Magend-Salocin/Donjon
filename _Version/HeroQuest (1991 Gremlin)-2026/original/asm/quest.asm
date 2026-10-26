@@ -2410,7 +2410,7 @@ loc_14bf:
 014fe  32 ff                xor bh, bh
 01500  03 db                add bx, bx
 01502  03 db                add bx, bx
-01504  81 c3 38 4f          add bx, 0x4f38
+01504  81 c3 38 4f          add bx, 0x4f38    ; images_personnages
 01508  8b 07                mov ax, word ptr [bx]
 0150a  89 44 06             mov word ptr [si + 6], ax
 0150d  8b 47 02             mov ax, word ptr [bx + 2]
@@ -3568,7 +3568,7 @@ loc_1f2d:
 01f33  80 75 11 40          xor byte ptr [di + 0x11], 0x40
 01f37  80 75 0e 40          xor byte ptr [di + 0xe], 0x40
 loc_1f3b:
-01f3b  ba a4 a3             mov dx, 0xa3a4
+01f3b  ba a4 a3             mov dx, 0xa3a4    ; sequence_arme_lancee
 01f3e  eb 19                jmp loc_1f59
 ; ---- 1 octets non atteints (1f40-1f40)
 loc_1f41:
@@ -3580,7 +3580,7 @@ loc_1f41:
 01f4e  d0 e2                shl dl, 1
 01f50  02 d0                add dl, al
 01f52  02 55 19             add dl, byte ptr [di + 0x19]
-01f55  81 c2 81 a3          add dx, 0xa381
+01f55  81 c2 81 a3          add dx, 0xa381    ; sequences_heros
 loc_1f59:
 01f59  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 01f5d  8a 5c 08             mov bl, byte ptr [si + 8]
@@ -3627,7 +3627,7 @@ loc_1fbf:
 01fd6  a1 29 5e             mov ax, word ptr [0x5e29]    ; seg_monsters
 01fd9  a3 e5 4b             mov word ptr [0x4be5], ax
 01fdc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
-01fdf  81 3e f1 37 a4 a3    cmp word ptr [0x37f1], 0xa3a4
+01fdf  81 3e f1 37 a4 a3    cmp word ptr [0x37f1], 0xa3a4    ; sequence_arme_lancee
 01fe5  75 19                jne loc_2000
 01fe7  c7 06 d6 4b e6 8e    mov word ptr [0x4bd6], 0x8ee6
 01fed  c6 06 cc 4b 10       mov byte ptr [0x4bcc], 0x10
@@ -3649,7 +3649,7 @@ loc_2003:
 0201d  32 ff                xor bh, bh
 0201f  d1 e3                shl bx, 1
 02021  d1 e3                shl bx, 1
-02023  8b 87 38 4f          mov ax, word ptr [bx + 0x4f38]
+02023  8b 87 38 4f          mov ax, word ptr [bx + 0x4f38]    ; images_personnages
 02027  89 44 06             mov word ptr [si + 6], ax
 0202a  8b 87 3a 4f          mov ax, word ptr [bx + 0x4f3a]
 0202e  89 44 0c             mov word ptr [si + 0xc], ax
@@ -10421,7 +10421,7 @@ loc_583f:
 0584e  b7 00                mov bh, 0
 05850  03 db                add bx, bx
 05852  03 db                add bx, bx
-05854  81 c3 38 4f          add bx, 0x4f38
+05854  81 c3 38 4f          add bx, 0x4f38    ; images_personnages
 05858  8b 07                mov ax, word ptr [bx]
 0585a  89 44 06             mov word ptr [si + 6], ax
 0585d  8b 47 02             mov ax, word ptr [bx + 2]

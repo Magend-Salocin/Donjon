@@ -89,7 +89,7 @@ Images 8 bits rangées les unes après les autres, sans en-tête : il faut les t
 | SHOPSP | 57 344 | objets de l'armurerie et portraits de sélection des héros |
 | INVENT | 51 776 | cartes de catégorie et objets de l'armurerie |
 | SPELLIT | 12 288 | 12 objets 32 × 32 (potions, sac, mortier, bougie, livre…) |
-| MEN | 31 832 | héros de dos en train d'attaquer et héros à terre (découpage approché) |
+| MEN | 31 832 | 31 poses des héros en combat, de dos, et à terre (tables DS:A0FD, A13B, A179 ; voir les notes du remake, « Gros plan du combat ») |
 
 Les offsets de « Écrans et interface » viennent des appels à la routine de copie d'image 0x3B53 (BP = largeur, CX = hauteur, SI = source, segment source en DS:0x374E). Les fichiers passent par un tampon (segment 0x1463), puis sont décompressés dans un segment rangé en DS : 0x5E23 écran courant, 0x5E25 SHOPSP, 0x5E27 MAPS, SHOPMP, MEN, INVENT ou SPELLIT selon l'écran, 0x5E29 MONSTERS, 0x5E2B GRAPHICS, 0x5E2D ODDS&SOD. `heroquest-outils.py catalogue` exporte toutes ces images en PNG (327 images).
 
@@ -134,8 +134,7 @@ Positions en hexadécimal dans le fichier décompressé ; les images d'une séri
 | INVENT | 0xA280 | 32 × 32 | case vide ; 0xA680 à 0xC680 non identifié |
 | INVENT | 0xC680 | 16 × 20, 3 | crochets du cadre |
 | SPELLIT | 0x0000 | 32 × 32, 12 | objets |
-| MEN | 0x0000 à 0x2A00 | 24 de large | barbare et elfe de dos en train d'attaquer (hauteurs à confirmer) |
-| MEN | 0x2A00 à 0x7C58 | 32 de large | nain, magicien et autres en train d'attaquer, puis héros à terre |
+| MEN | 0x0000 à 0x7C58 | 24 × 40, 32 × 40, 32 × 20 | 31 poses, découpage exact dans `combat.json` du remake |
 
 Routines utiles : écran de sélection des héros autour de 0x7755 (portraits SHOPSP, pas 0xC00), menu titre autour de 0x7353 (logo et icônes SHOPMP), armurerie autour de 0x8304 et 0x8E8E (cartes INVENT), panneau de jeu autour de 0x6651 (portrait ODDS&SOD).
 
@@ -234,7 +233,6 @@ Effets des pièges, cartes trésor (0x87DD : mélange des 25 cartes) et fouilles
 - Intelligence des monstres : chercher les appels de 0x1E90 depuis le tour de Morcar.
 
 - Événements scriptés : relier les numéros d'événement par zone (position 1036 des quêtes) aux textes de `FRENCH.BIN` et au code qui les déclenche. C'est ce qui manque pour convertir les quêtes 5 (passage secret) et 10 (portails magiques), et pour les objectifs « délivrer » ou « trouver ».
-- MEN : retrouver la table des images (hauteur de chaque pose) en suivant le dessin des personnages en combat ; les enregistrements de sprite gardent leur segment en `[si+8]` (voir 0x1376).
 - Compléter le découpage des icônes 16 × 16 d'ODDS&SOD, de SHOPSP 0x6000 et d'INVENT 0xA680.
 - Écran de fond : `BOOK.VGA` (le livre et Morcar) n'est pas encore utilisé par la vue isométrique.
 - `ANIMS.VGA` (intro) : autre format de compression.

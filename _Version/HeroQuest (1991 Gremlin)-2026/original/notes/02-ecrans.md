@@ -107,6 +107,29 @@ Le choix donne `numero_quete` (0 à 23, + 14 pour la page 2). `lance_quete` (0x8
    - 7e et 8e : le drapeau d'événement DS:3FC0 est posé (FFh).
 10. Mélange les 25 cartes trésor (`pioche_tresors`, DS:463B) et place le pointeur de pioche au début.
 
+## Gros plan du combat
+
+`animation_combat` (0x1F14) joue deux séquences en parallèle, une image toutes les 50 unités de `sub_4687` (la première attend 500) : celle du héros, dessiné de dos, et celle du monstre. Données extraites par `extraire.py` dans `original/donnees/combat.json` et `original/donnees/images/combat/men-NN.png`.
+
+Poses du héros : 31 images de MEN.VGA, qui couvrent tout le fichier décompressé (31 832 octets). Tables DS:A0FD (position dans MEN), DS:A13B (largeur, hauteur), DS:A179 (position à l'écran).
+
+| Poses | Taille | Contenu |
+| --- | --- | --- |
+| 0 à 3 | 24 × 40 | barbare |
+| 4 à 7 | 24 × 40 | elfe |
+| 8 | 24 × 40 | enchanteur |
+| 9 à 12 | 24 × 40 | Sir Ragnar |
+| 13 à 17 | 32 × 40 | nain |
+| 18 à 24 | 32 × 40 | barbare, enchanteur lançant un sort, Sir Ragnar, elfe |
+| 25 à 29 | 32 × 20 | héros à terre : barbare, elfe, nain, enchanteur, Sir Ragnar |
+| 30 | 24 × 33 | nain |
+
+Séquence d'attaque de chaque héros (DS:A381, 7 octets) : trois poses aller-retour, par exemple 0, 1, 2, 2, 1, 0 pour le barbare (nain 13 à 15, elfe 4 à 6, enchanteur 8, 19, 20, Sir Ragnar 9 à 11). Avec une arme lancée (DS:A3A4), le héros ne bouge pas et un projectile (ODDS&SOD 0x8EE6, 16 × 16) part de (224, 37) : chaque code FEh le déplace de 8 pixels à droite et 4 vers le haut.
+
+Le monstre : position par classe (DS:A1B7) et 4 séquences par classe (classes 0 à 7 ; la classe 9 prend celles de la classe 1, les autres au-delà de 7 celles de la classe 7). Les numéros d'image renvoient à la table des personnages (DS:4F38, 4 octets par image). Touché sans mourir (DS:A1D9) : deux images d'attaque en balancement ; tué (DS:A1E9) : puis les images 120 à 125 (disparition) ; contre une arme lancée (DS:A1F9, DS:A209), le monstre reste immobile pendant le vol.
+
+Codes des séquences : FFh fin, 7Dh image inchangée, FEh projectile déplacé.
+
 ## Affichage
 
 Le jeu dessine dans un tampon hors écran (segment 0x1463), puis l'envoie à l'écran :

@@ -424,3 +424,16 @@
 0x2c0a  code  brume_gauche_2         x - 1
 0x2c16  code  brume_bas              y + 1 jusqu'à 18
 0x2c26  code  brume_droite           x + 1 jusqu'à 24
+
+# ---- Gros plan du combat (voir original/notes/02-ecrans.md#gros-plan-du-combat)
+0xa0fd  table poses_men_position     31 mots : position de la pose dans MEN.VGA
+0xa13b  table poses_men_taille       31 mots : largeur (octet bas), hauteur (octet haut)
+0xa179  table poses_men_ecran        31 mots : position à l'écran (y × 320 + x)
+0xa381  table sequences_heros        7 octets par type de héros : poses de l'attaque, FFh
+0xa3a4  table sequence_arme_lancee   7Dh image inchangée, FEh projectile déplacé
+0xa1b7  table monstre_combat_ecran   position du monstre par classe
+0xa1d9  table sequences_monstre_touche
+0xa1e9  table sequences_monstre_tue
+0xa1f9  table sequences_monstre_touche_distance
+0xa209  table sequences_monstre_tue_distance
+0x4f38  table images_personnages     4 octets par image : largeur, hauteur, position (SPRITES, MONSTERS)

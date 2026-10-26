@@ -1364,6 +1364,7 @@ DS:4ef0  20 00 20 00 20 00 20 00 20 00 20 00 20 00 c4 74   . . . . . . ..t
 DS:4f00  c2 79 42 77 c4 74 c4 79 96 6e 96 6e 1c 62 98 5a  .yBw.t.y.n.n.b.Z
 DS:4f10  98 5a 1a 62 1c 62 9c 55 9c 55 1c 6c 9c 55 9c 55  .Z.b.b.U.U.l.U.U
 DS:4f20  9c 55 9c 55 9c 55 9c 55 9c 55 9c 55 9c 55 9c 55  .U.U.U.U.U.U.U.U
+; DS:4f38  images_personnages
 DS:4f30  9c 55 9c 55 9c 55 9c 55 18 20 00 8c 20 20 00 78  .U.U.U.U. ..  .x
 DS:4f40  20 28 80 43 20 30 80 25 20 2c 80 5c 18 28 00 00   (.C 0.% ,.\.(..
 DS:4f50  18 28 c0 12 20 32 00 9b 20 32 00 9b 20 20 00 78  .(.. 2.. 2..  .x
@@ -2689,23 +2690,31 @@ DS:a0b0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
 DS:a0c0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
 DS:a0d0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
 DS:a0e0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+; DS:a0fd  poses_men_position
 DS:a0f0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c0  ................
 DS:a100  03 80 07 40 0b 00 0f c0 12 80 16 40 1a 00 1e c0  ...@.......@....
 DS:a110  21 80 25 40 29 00 2d c0 30 c0 35 c0 3a c0 3f c0  !.%@).-.0.5.:.?.
 DS:a120  44 c0 49 c0 4e c0 53 c0 58 c0 5d c0 62 c0 67 c0  D.I.N.S.X.].b.g.
+; DS:a13b  poses_men_taille
 DS:a130  6c 40 6f c0 71 40 74 c0 76 40 79 18 28 18 28 18  l@o.q@t.v@y.(.(.
 DS:a140  28 18 28 18 28 18 28 18 28 18 28 18 28 18 28 18  (.(.(.(.(.(.(.(.
 DS:a150  28 18 28 18 28 20 28 20 28 20 28 20 28 20 28 20  (.(.( ( ( ( ( ( 
 DS:a160  28 20 28 20 28 20 28 20 28 20 28 20 28 20 14 20  ( ( ( ( ( ( ( . 
+; DS:a179  poses_men_ecran
 DS:a170  14 20 14 20 14 20 14 18 21 cb 6f cb 6f 0b 71 c6  . . . ..!.o.o.q.
 DS:a180  6f 07 71 07 71 07 71 87 73 46 72 87 73 87 73 87  o.q.q.q.sFr.s.s.
 DS:a190  73 87 73 bc 6f c2 6f c2 6f 81 6e c1 6f bf 6f 43  s.s.o.o.o.n.o.oC
 DS:a1a0  72 44 72 01 71 01 71 44 72 03 71 b8 8d 7f 8c b3  rDr.q.qDr.q.....
+; DS:a1b7  monstre_combat_ecran
 DS:a1b0  8d 3c 90 bf 92 c3 74 58 72 90 6e 52 63 d4 56 10  .<....tXr.nRc.V.
 DS:a1c0  5d 18 67 1a 67 14 58 14 58 19 a2 21 a2 29 a2 31  ].g.g.X.X..!.).1
+; DS:a1d9  sequences_monstre_touche
 DS:a1d0  a2 39 a2 41 a2 49 a2 51 a2 59 a2 5f a2 65 a2 6b  .9.A.I.Q.Y._.e.k
+; DS:a1e9  sequences_monstre_tue
 DS:a1e0  a2 71 a2 77 a2 7d a2 83 a2 89 a2 94 a2 9f a2 aa  .q.w.}..........
+; DS:a1f9  sequences_monstre_touche_distance
 DS:a1f0  a2 b5 a2 c0 a2 cb a2 d6 a2 e1 a2 e8 a2 ef a2 f6  ................
+; DS:a209  sequences_monstre_tue_distance
 DS:a200  a2 fd a2 04 a3 0b a3 12 a3 19 a3 26 a3 33 a3 40  ...........&.3.@
 DS:a210  a3 4d a3 5a a3 67 a3 74 a3 00 59 5a 5b 5a 59 00  .M.Z.g.t..YZ[ZY.
 DS:a220  ff 01 5d 5e 5f 5e 5d 01 ff 02 61 62 63 62 61 02  ..]^_^]...abcba.
@@ -2730,8 +2739,10 @@ DS:a340  65 65 65 65 65 65 78 79 7a 7b 7c 7d ff 69 69 69  eeeeeexyz{|}.iii
 DS:a350  69 69 69 78 79 7a 7b 7c 7d ff 6d 6d 6d 6d 6d 6d  iiixyz{|}.mmmmmm
 DS:a360  78 79 7a 7b 7c 7d ff 71 71 71 71 71 71 78 79 7a  xyz{|}.qqqqqqxyz
 DS:a370  7b 7c 7d ff 75 75 75 75 75 75 78 79 7a 7b 7c 7d  {|}.uuuuuuxyz{|}
+; DS:a381  sequences_heros
 DS:a380  ff 00 01 02 02 01 00 ff 0d 0e 0f 0f 0e 0d ff 04  ................
 DS:a390  05 06 06 05 04 ff 08 13 14 14 13 08 ff 09 0a 0b  ................
+; DS:a3a4  sequence_arme_lancee
 DS:a3a0  0b 0a 09 ff 7d fe fe fe fe fe 7d ff b6 a3 bd a3  ....}.....}.....
 DS:a3b0  c4 a3 cb a3 d2 a3 00 03 12 12 03 00 ff 1e 10 11  ................
 DS:a3c0  11 10 1e ff 04 07 18 18 07 04 ff 08 15 16 16 15  ................
