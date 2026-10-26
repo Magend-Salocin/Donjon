@@ -1,7 +1,7 @@
 ; Routines de INTRO.EXE : 85, dont 0 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
-044b0  sub_44b0                  1116    5  | 10h/00 10h/? 16h 21h/09 21h/3d 21h/3e 21h/41 21h/4a 21h/4c    10a2 1440 1442 1443 1444 1445 1446 1447 1448 19f2 19f8 19fb  "quest.exe"
+044b0  sub_44b0                  1116    0  | 10h/00 10h/? 16h 21h/09 21h/3d 21h/3e 21h/41 21h/4a 21h/4c    10a2 1440 1442 1443 1444 1445 1446 1447 1448 19f2 19f8 19fb  "quest.exe"
 04912  sub_4912                   109    3  |     1440 19f0  "uest.exe"
 04980  sub_4980                    98    2  |   dx  1440
 049e2  sub_49e2                    26    1  | 10h/00    1440

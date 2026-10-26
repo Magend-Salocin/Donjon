@@ -4,6 +4,7 @@
 #   adresse : hexadécimal ; pour var et table, offset dans DS.
 # Enrichir ce fichier au fil de l'étude, puis relancer outils/desassembler.py.
 
+0x0000  code  ecran_shields          non appelée : écran SHIELDS (EGA) ; reste d'une version antérieure (?)
 0x00ed  code  demarrage              point d'entrée : DS = 0x097C, réduit la mémoire (int 21h AH=4Ah)
 0x0936  code  attaque_heros          le héros attaque : crânes (DS:3FB8 dés) contre boucliers noirs du monstre (DS:3FBB dés)
 0x0be6  code  affiche_des            affiche un résultat de dés (icône BX, position BP)

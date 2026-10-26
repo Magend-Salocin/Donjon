@@ -1,13 +1,22 @@
 ; QUEST.EXE décompressé, désassemblé par outils/desassembler.py. Ne pas modifier : enrichir original/symboles.txt puis relancer.
 
-loc_0020:
+
+; ======== ecran_shields   (appelée depuis 2088)
+; non appelée : écran SHIELDS (EGA) ; reste d'une version antérieure (?)
+00000  ff 36 90 31          push word ptr [0x3190]    ; mode_video
+00004  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
+00009  75 0e                jne loc_0019
+0000b  c7 06 90 31 06 00    mov word ptr [0x3190], 6    ; mode_video
+00011  e8 02 60             call sub_6016
+00014  c6 06 59 37 00       mov byte ptr [0x3759], 0
+loc_0019:
+00019  83 3e 90 31 04       cmp word ptr [0x3190], 4    ; mode_video
+0001e  75 05                jne loc_0025
 00020  c6 06 62 09 0c       mov byte ptr [0x962], 0xc
+loc_0025:
 00025  e8 da 61             call efface_tampon
 00028  e8 b9 60             call affiche_tampon
 0002b  c7 06 07 39 13 0e    mov word ptr [0x3907], 0xe13    ; fichier_nom, "shields.ega"
-; ---- -1 octets non atteints (0031-002f)
-loc_0030:
-00030  0e                   push cs
 00031  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 00037  b8 63 14             mov ax, 0x1463
 0003a  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
@@ -193,11 +202,6 @@ loc_01fd:
 loc_020b:
 0020b  e8 ee 37             call fichier_lit
 0020e  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
-; ---- -2 octets non atteints (0213-0210)
-loc_0211:
-00211  37                   aaa
-00212  00 75 e8             add byte ptr [di - 0x18], dh
-; ---- -2 octets non atteints (0215-0212)
 00213  75 e8                jne loc_01fd
 00215  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 00218  e8 9f 34             call clavier_installe
@@ -299,7 +303,6 @@ loc_0308:
 0030b  89 3e 37 46          mov word ptr [0x4637], di    ; fiche_heros_courant
 0030f  80 3d 00             cmp byte ptr [di], 0
 00312  74 09                je loc_031d
-loc_0314:
 00314  e8 04 13             call sub_161b
 00317  e8 b1 02             call sub_05cb
 0031a  e8 e5 23             call sub_2702
@@ -388,10 +391,6 @@ loc_03f8:
 0040a  e8 73 62             call sub_6680
 0040d  e8 24 4e             call dessine_icones
 00410  e8 5c 61             call sauve_tampon
-; ---- -2 octets non atteints (0413-0410)
-loc_0411:
-00411  5c                   pop sp
-00412  61                   popaw
 loc_0413:
 00413  e8 e6 5f             call curseur_memorise
 00416  e8 fa 5f             call sub_6413
@@ -1025,7 +1024,6 @@ loc_09a9:
 009b9  e8 64 17             call retire_monstre
 loc_09bc:
 009bc  e8 69 01             call calcule_des_monstre
-loc_09bf:
 009bf  be 50 00             mov si, 0x50
 009c2  8b 16 d2 3f          mov dx, word ptr [0x3fd2]    ; cranes
 009c6  3a d6                cmp dl, dh
@@ -1060,13 +1058,6 @@ loc_0a00:
 ; ---- 1 octets non atteints (0a0f-0a0f)
 loc_0a10:
 00a10  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe    ; choix_menu
-; ---- -4 octets non atteints (0a15-0a10)
-loc_0a11:
-00a11  3e 7a ab             jp loc_09bf
-; ---- -1 octets non atteints (0a14-0a12)
-loc_0a13:
-00a13  ab                   stosw word ptr es:[di], ax
-; ---- 1 octets non atteints (0a14-0a14)
 00a15  75 03                jne loc_0a1a
 00a17  eb 0e                jmp loc_0a27
 ; ---- 1 octets non atteints (0a19-0a19)
@@ -1321,14 +1312,8 @@ loc_0bf7:
 00c0b  58                   pop ax
 00c0c  bd 10 00             mov bp, 0x10
 00c0f  b9 10 00             mov cx, 0x10
-; ---- -1 octets non atteints (0c12-0c10)
-loc_0c11:
-00c11  00 1e e8 3d          add byte ptr [0x3de8], bl
-; ---- -3 octets non atteints (0c15-0c11)
 00c12  1e                   push ds
 00c13  e8 3d 2f             call copie_image
-; ---- -1 octets non atteints (0c16-0c14)
-00c15  2f                   das
 00c16  1f                   pop ds
 00c17  5b                   pop bx
 00c18  5a                   pop dx
@@ -1338,14 +1323,14 @@ loc_0c11:
 00c1d  e2 d8                loop loc_0bf7
 00c1f  c3                   ret
 
-; ======== prime_ulag
+; ======== prime_ulag   (appelée depuis 214b)
 ; « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG », mais ajoute 100
 00c20  bb a8 00             mov bx, 0xa8    ; message « L'EMPEREUR OFFRE 200 / PIECES D'OR A / L'ASSASSIN D'ULAG »
 00c23  e8 c7 7c             call affiche_message
 00c26  ba 64 00             mov dx, 0x64
 00c29  e9 da 5c             jmp ajoute_or
 
-; ======== mort_balur
+; ======== mort_balur   (appelée depuis 214b)
 ; tous les héros reçoivent 150 pièces ; evenement_b = le tueur
 00c2c  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 00c2f  a2 c0 3f             mov byte ptr [0x3fc0], al    ; evenement_b
@@ -1364,14 +1349,14 @@ loc_0c34:
 00c47  75 eb                jne loc_0c34
 00c49  c3                   ret
 
-; ======== prime_10
+; ======== prime_10   (appelée depuis 214b)
 ; prime de 10 pièces (type 14)
 00c4a  b0 31                mov al, 0x31
 00c4c  ba 0a 00             mov dx, 0xa
 00c4f  eb 06                jmp loc_0c57
 ; ---- 1 octets non atteints (0c51-0c51)
 
-; ======== prime_monstre
+; ======== prime_monstre   (appelée depuis 214b)
 ; prime de 20 pièces (type 15) : « VOUS RECEVEZ UNE PRIME DE 20 PIECE D'OR »
 00c52  b0 32                mov al, 0x32
 00c54  ba 14 00             mov dx, 0x14
@@ -1386,20 +1371,20 @@ loc_0c57:
 00c6b  5a                   pop dx
 00c6c  e9 97 5c             jmp ajoute_or
 
-; ======== mort_chaos_poison
+; ======== mort_chaos_poison   (appelée depuis 214b)
 ; prime de 30 et poison d'orc (type 18) : « LE GUERRIER DU CHAOS LACHE LE POISON DE L'ORC »
 00c6f  e8 09 00             call prime_30
 00c72  80 4d 0d 08          or byte ptr [di + 0xd], 8
 00c76  be ea 00             mov si, 0xea
 00c79  eb 14                jmp loc_0c8f
 
-; ======== prime_30   (appelée depuis 0c6f)
+; ======== prime_30   (appelée depuis 0c6f, 214b)
 ; prime de 30 pièces (types 16, 17)
 00c7b  b0 33                mov al, 0x33
 00c7d  ba 1e 00             mov dx, 0x1e
 00c80  eb d5                jmp loc_0c57
 
-; ======== etoile_ouest
+; ======== etoile_ouest   (appelée depuis 214b)
 ; « LE ZOMBI LACHE L'ETOILE DE L'OUEST »
 00c82  ba c8 00             mov dx, 0xc8
 00c85  e8 7e 5c             call ajoute_or
@@ -3626,10 +3611,6 @@ loc_1f9c:
 01fa0  c7 06 cc 3f 86 28    mov word ptr [0x3fcc], 0x2886
 01fa6  c6 06 c8 3f 06       mov byte ptr [0x3fc8], 6
 01fab  80 3e b7 3f 00       cmp byte ptr [0x3fb7], 0    ; attaque_a_distance
-; ---- -1 octets non atteints (1fb0-1fae)
-loc_1faf:
-01faf  00 74 04             add byte ptr [si + 4], dh
-; ---- -2 octets non atteints (1fb2-1faf)
 01fb0  74 04                je loc_1fb6
 01fb2  8b 8f 09 a2          mov cx, word ptr [bx - 0x5df7]
 loc_1fb6:
@@ -3651,31 +3632,14 @@ loc_1fbf:
 01fe7  c7 06 d6 4b e6 8e    mov word ptr [0x4bd6], 0x8ee6
 01fed  c6 06 cc 4b 10       mov byte ptr [0x4bcc], 0x10
 01ff2  c6 06 cd 4b 10       mov byte ptr [0x4bcd], 0x10
-; ---- -4 octets non atteints (1ff7-1ff2)
-loc_1ff3:
-01ff3  06                   push es
-01ff4  cd 4b                int 0x4b
-01ff6  10 c7                adc bh, al
-; ---- -1 octets non atteints (1ff8-1ff6)
 01ff7  c7 06 d2 4b 20 2f    mov word ptr [0x4bd2], 0x2f20
-; ---- -5 octets non atteints (1ffd-1ff7)
-01ff8  06                   push es
-01ff9  d2 4b 20             ror byte ptr [bp + di + 0x20], cl
-01ffc  2f                   das
 01ffd  a1 2d 5e             mov ax, word ptr [0x5e2d]    ; seg_odds
 loc_2000:
 02000  a3 ce 4b             mov word ptr [0x4bce], ax
 loc_2003:
 02003  e8 92 45             call sub_6598
 02006  be dd 4b             mov si, 0x4bdd
-; ---- -2 octets non atteints (2009-2006)
-loc_2007:
-02007  dd 4b 8b             fisttp qword ptr [bp + di - 0x75]
-; ---- -1 octets non atteints (200a-2008)
 02009  8b 3e ed 37          mov di, word ptr [0x37ed]
-; ---- -3 octets non atteints (200d-2009)
-0200a  3e ed                in ax, dx
-0200c  37                   aaa
 0200d  8a 1d                mov bl, byte ptr [di]
 0200f  80 fb ff             cmp bl, 0xff
 02012  74 1d                je loc_2031
@@ -3684,18 +3648,8 @@ loc_2007:
 0201b  74 17                je loc_2034
 0201d  32 ff                xor bh, bh
 0201f  d1 e3                shl bx, 1
-; ---- -1 octets non atteints (2021-201f)
-loc_2020:
-02020  e3 d1                jcxz loc_1ff3
-; ---- -1 octets non atteints (2022-2020)
 02021  d1 e3                shl bx, 1
-; ---- -1 octets non atteints (2023-2021)
-02022  e3 8b                jcxz loc_1faf
-; ---- -1 octets non atteints (2024-2022)
 02023  8b 87 38 4f          mov ax, word ptr [bx + 0x4f38]
-; ---- -3 octets non atteints (2027-2023)
-02024  87 38                xchg word ptr [bx + si], di
-02026  4f                   dec di
 02027  89 44 06             mov word ptr [si + 6], ax
 0202a  8b 87 3a 4f          mov ax, word ptr [bx + 0x4f3a]
 0202e  89 44 0c             mov word ptr [si + 0xc], ax
@@ -5190,7 +5144,7 @@ loc_2b9f:
 02bb6  58                   pop ax
 02bb7  c3                   ret
 
-; ======== mort_ouvre_escalier
+; ======== mort_ouvre_escalier   (appelée depuis 214b)
 ; type 22 : pose l'escalier (codes 0x38 à 0x3B)
 02bb8  c6 06 32 59 00       mov byte ptr [0x5932], 0
 02bbd  c6 06 4c 59 00       mov byte ptr [0x594c], 0
@@ -5201,7 +5155,7 @@ loc_2b9f:
 02bd6  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
 02bdb  c3                   ret
 
-; ======== mort_sorcier_final
+; ======== mort_sorcier_final   (appelée depuis 214b)
 ; type 26 : fin_du_jeu = 1
 02bdc  c6 06 e7 3f 01       mov byte ptr [0x3fe7], 1    ; fin_du_jeu
 02be1  c3                   ret
@@ -5663,125 +5617,7 @@ loc_2fe1:
 02fe4  cd 21                int 0x21
 02fe6  e8 08 07             call clavier_retire
 02fe9  e9 a5 18             jmp loc_4891
-; ---- 34 octets non atteints (2fec-300d)
-loc_300e:
-0300e  00 00                add byte ptr [bx + si], al
-03010  0f 00 00             sldt word ptr [bx + si]
-03013  00 00                add byte ptr [bx + si], al
-03015  00 00                add byte ptr [bx + si], al
-03017  00 00                add byte ptr [bx + si], al
-03019  00 00                add byte ptr [bx + si], al
-0301b  00 00                add byte ptr [bx + si], al
-0301d  00 00                add byte ptr [bx + si], al
-0301f  00 0f                add byte ptr [bx], cl
-03021  00 00                add byte ptr [bx + si], al
-03023  00 00                add byte ptr [bx + si], al
-03025  00 00                add byte ptr [bx + si], al
-03027  00 00                add byte ptr [bx + si], al
-03029  00 00                add byte ptr [bx + si], al
-0302b  00 00                add byte ptr [bx + si], al
-0302d  00 00                add byte ptr [bx + si], al
-0302f  00 0f                add byte ptr [bx], cl
-03031  00 00                add byte ptr [bx + si], al
-03033  00 00                add byte ptr [bx + si], al
-03035  00 00                add byte ptr [bx + si], al
-03037  00 00                add byte ptr [bx + si], al
-03039  00 00                add byte ptr [bx + si], al
-0303b  00 00                add byte ptr [bx + si], al
-0303d  00 00                add byte ptr [bx + si], al
-0303f  00 0f                add byte ptr [bx], cl
-03041  00 00                add byte ptr [bx + si], al
-03043  00 00                add byte ptr [bx + si], al
-03045  00 00                add byte ptr [bx + si], al
-03047  00 00                add byte ptr [bx + si], al
-03049  00 00                add byte ptr [bx + si], al
-0304b  00 00                add byte ptr [bx + si], al
-0304d  00 00                add byte ptr [bx + si], al
-0304f  00 0f                add byte ptr [bx], cl
-03051  00 00                add byte ptr [bx + si], al
-03053  00 00                add byte ptr [bx + si], al
-03055  00 00                add byte ptr [bx + si], al
-03057  00 00                add byte ptr [bx + si], al
-03059  00 00                add byte ptr [bx + si], al
-0305b  00 00                add byte ptr [bx + si], al
-0305d  00 00                add byte ptr [bx + si], al
-0305f  00 0f                add byte ptr [bx], cl
-03061  00 00                add byte ptr [bx + si], al
-03063  00 00                add byte ptr [bx + si], al
-03065  00 00                add byte ptr [bx + si], al
-03067  00 00                add byte ptr [bx + si], al
-03069  00 00                add byte ptr [bx + si], al
-0306b  00 00                add byte ptr [bx + si], al
-0306d  00 00                add byte ptr [bx + si], al
-0306f  00 0f                add byte ptr [bx], cl
-03071  00 00                add byte ptr [bx + si], al
-03073  00 00                add byte ptr [bx + si], al
-03075  00 00                add byte ptr [bx + si], al
-03077  00 00                add byte ptr [bx + si], al
-03079  00 00                add byte ptr [bx + si], al
-0307b  00 00                add byte ptr [bx + si], al
-0307d  00 00                add byte ptr [bx + si], al
-0307f  00 0f                add byte ptr [bx], cl
-03081  00 00                add byte ptr [bx + si], al
-03083  00 00                add byte ptr [bx + si], al
-03085  00 00                add byte ptr [bx + si], al
-03087  00 00                add byte ptr [bx + si], al
-03089  00 00                add byte ptr [bx + si], al
-0308b  00 00                add byte ptr [bx + si], al
-0308d  00 00                add byte ptr [bx + si], al
-0308f  00 0f                add byte ptr [bx], cl
-03091  00 00                add byte ptr [bx + si], al
-03093  00 00                add byte ptr [bx + si], al
-03095  00 00                add byte ptr [bx + si], al
-03097  00 00                add byte ptr [bx + si], al
-03099  00 00                add byte ptr [bx + si], al
-0309b  00 00                add byte ptr [bx + si], al
-0309d  00 00                add byte ptr [bx + si], al
-0309f  00 0f                add byte ptr [bx], cl
-030a1  00 00                add byte ptr [bx + si], al
-030a3  00 00                add byte ptr [bx + si], al
-030a5  00 00                add byte ptr [bx + si], al
-030a7  00 00                add byte ptr [bx + si], al
-030a9  00 00                add byte ptr [bx + si], al
-030ab  00 00                add byte ptr [bx + si], al
-030ad  00 00                add byte ptr [bx + si], al
-030af  00 0f                add byte ptr [bx], cl
-030b1  00 00                add byte ptr [bx + si], al
-030b3  00 00                add byte ptr [bx + si], al
-030b5  00 00                add byte ptr [bx + si], al
-030b7  00 00                add byte ptr [bx + si], al
-030b9  00 00                add byte ptr [bx + si], al
-030bb  00 00                add byte ptr [bx + si], al
-030bd  00 00                add byte ptr [bx + si], al
-030bf  00 0f                add byte ptr [bx], cl
-030c1  00 00                add byte ptr [bx + si], al
-030c3  00 00                add byte ptr [bx + si], al
-030c5  00 00                add byte ptr [bx + si], al
-030c7  00 00                add byte ptr [bx + si], al
-030c9  00 00                add byte ptr [bx + si], al
-030cb  00 00                add byte ptr [bx + si], al
-030cd  00 00                add byte ptr [bx + si], al
-030cf  00 0f                add byte ptr [bx], cl
-030d1  00 00                add byte ptr [bx + si], al
-030d3  00 00                add byte ptr [bx + si], al
-030d5  00 00                add byte ptr [bx + si], al
-030d7  00 00                add byte ptr [bx + si], al
-030d9  00 00                add byte ptr [bx + si], al
-030db  00 00                add byte ptr [bx + si], al
-030dd  00 00                add byte ptr [bx + si], al
-030df  00 0f                add byte ptr [bx], cl
-030e1  00 00                add byte ptr [bx + si], al
-030e3  00 00                add byte ptr [bx + si], al
-030e5  00 00                add byte ptr [bx + si], al
-030e7  00 00                add byte ptr [bx + si], al
-030e9  00 00                add byte ptr [bx + si], al
-030eb  00 00                add byte ptr [bx + si], al
-030ed  00 00                add byte ptr [bx + si], al
-030ef  00 00                add byte ptr [bx + si], al
-030f1  00 00                add byte ptr [bx + si], al
-030f3  00 00                add byte ptr [bx + si], al
-030f5  00 e8                add al, ch
-; ---- -1 octets non atteints (30f7-30f5)
+; ---- 266 octets non atteints (2fec-30f5)
 
 ; ======== lit_configuration   (appelée depuis 0107)
 ; charge QUEST.CFG en DS:3190 (9 octets), teste la souris (int 33h), étalonne le joystick si besoin
@@ -11536,7 +11372,8 @@ loc_5fff:
 06012  cd 10                int 0x10
 06014  f8                   clc
 06015  c3                   ret
-loc_6016:
+
+; ======== sub_6016   (appelée depuis 0011, 5fe1)
 06016  50                   push ax
 06017  b8 7c 09             mov ax, 0x97c
 0601a  8e c0                mov es, ax
@@ -13981,7 +13818,7 @@ loc_73d2:
 loc_73ec:
 073ec  c3                   ret
 
-; ======== choix_quete
+; ======== choix_quete   (appelée depuis 73e8)
 ; icône plateau : quête, briefing (QUESTB, EQUESTS.BIN) ; « AUCUN PERSONNAGE ACTIF... »
 073ed  bb a0 44             mov bx, 0x44a0    ; heros_en_jeu
 073f0  32 c0                xor al, al
@@ -14284,7 +14121,7 @@ loc_7704:
 07711  e8 a6 bf             call clavier_installe
 07714  e9 13 fc             jmp loc_732a
 
-; ======== ecran_heros
+; ======== ecran_heros   (appelée depuis 73e8)
 ; icône héros : choix et création des personnages
 07717  c6 06 9e 40 ff       mov byte ptr [0x409e], 0xff    ; heros_selectionne
 loc_771c:
@@ -15253,7 +15090,7 @@ loc_8063:
 0806a  e8 db a9             call son_effet_2
 0806d  e9 e4 b8             jmp sub_3954
 
-; ======== armurerie
+; ======== armurerie   (appelée depuis 73e8)
 ; icône armurerie : achats (« VOUS NE POUVEZ PAS VOUS PERMETTRE CELA »)
 08070  c7 06 37 46 00 00    mov word ptr [0x4637], 0    ; fiche_heros_courant
 08076  c7 06 f1 47 20 2e    mov word ptr [0x47f1], 0x2e20
@@ -17618,15 +17455,7 @@ loc_96f5:
 096fc  e9 84 00             jmp loc_9783
 loc_96ff:
 096ff  8b d8                mov bx, ax
-; ---- -1 octets non atteints (9701-96ff)
-loc_9700:
-09700  d8 80 3e a7          fadd dword ptr [bx + si - 0x58c2]
-; ---- -3 octets non atteints (9704-9700)
 09701  80 3e a7 3f 01       cmp byte ptr [0x3fa7], 1    ; personnage_courant
-; ---- -2 octets non atteints (9706-9703)
-09704  3f                   aas
-09705  01 74 55             add word ptr [si + 0x55], si
-; ---- -2 octets non atteints (9708-9705)
 09706  74 55                je loc_975d
 09708  53                   push bx
 09709  e8 ab 8a             call de_combat

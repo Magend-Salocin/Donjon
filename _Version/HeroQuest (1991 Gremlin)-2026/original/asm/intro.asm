@@ -1,7 +1,7 @@
 ; INTRO.EXE décompressé, désassemblé par outils/desassembler.py. Ne pas modifier : enrichir original/symboles.txt puis relancer.
 
 
-; ======== sub_44b0   (appelée depuis 4e2c, 6a56, 6f1e, 7417, 799c)
+; ======== sub_44b0
 044b0  50                   push ax
 044b1  b8 00 00             mov ax, 0
 044b4  8e d8                mov ds, ax

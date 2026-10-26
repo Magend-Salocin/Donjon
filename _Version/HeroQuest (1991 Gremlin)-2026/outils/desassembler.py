@@ -38,6 +38,17 @@ PROGRAMMES = {
     'INTRO': {'entree': 0x44B0, 'code': (0x44B0, None), 'base': 0x44B0, 'ds': 0x0000},
 }
 
+# Tables de saut de taille connue : offset DS -> (nombre d'entrées, pas). Sans cela, la lecture continue
+# au-delà de la table ou suit un pas de 2, et les fausses cibles cassent le décodage.
+TABLES_ESPACEES = {
+    'QUEST': {
+        0x4809: (27, 5),            # types_monstres + 3 : routine de mort de chaque type (lea bx, [bx + 0x4809])
+        0x44a9: (15, 2),            # fins_quetes : une routine par quête du code 0 à 14
+        0x4657: (6, 2),             # circuit_brume
+        0xaa1a: (4, 2),             # saut_menu_titre : zones 2, 4, 6 (l'entrée 0 est vide)
+    },
+}
+
 AFFICHE_MESSAGE = 0x88ED            # routine de QUEST.EXE qui affiche le message BX (voir original/notes/02-ecrans.md)
 MESSAGES = RACINE / 'original' / 'donnees' / 'textes' / 'french.bin'
 
@@ -80,8 +91,9 @@ def charger_symboles(fichier):
 
 
 class Desassembleur:
-    def __init__(self, image, entree, ds, symboles, code, base):
+    def __init__(self, image, entree, ds, symboles, code, base, espacees):
         self.image, self.entree, self.ds, self.sym = image, entree, ds, symboles
+        self.espacees = espacees
         self.debut_code, self.fin_code = code
         self.base = base
         self.md = Cs(CS_ARCH_X86, CS_MODE_16)
@@ -112,14 +124,16 @@ class Desassembleur:
         return struct.unpack('<H', self.image[a:a + 2])[0] if a + 2 <= len(self.image) else None
 
     def plausible(self, adresse):
-        return max(0x10, self.debut_code) <= adresse < self.fin_code
+        """Dans la zone de code ; les 16 premiers octets ne sont acceptés que s'ils sont nommés (cibles douteuses)."""
+        return max(0x10, self.debut_code) <= adresse < self.fin_code or (
+            self.debut_code <= adresse < self.fin_code and adresse in self.sym['code'])
 
     def parcourir(self):
         a_voir = [self.entree] + sorted(a for a in self.sym['code'] if self.plausible(a))
         while a_voir:
             adresse = a_voir.pop()
             precedentes = []
-            while self.plausible(adresse) and adresse not in self.instructions:
+            while self.debut_code <= adresse < self.fin_code and adresse not in self.instructions:
                 code = self.image[adresse:adresse + 8]
                 instr = next(self.md.disasm(code, adresse), None)
                 if instr is None:
@@ -177,10 +191,12 @@ class Desassembleur:
 
     def lire_table(self, table, nombre, pas, toutes=False):
         """Entrées plausibles d'une table ; sans `toutes`, la lecture s'arrête à la première entrée invalide."""
+        if table in self.espacees:
+            (nombre, pas), toutes = self.espacees[table], True
         cibles = []
         for i in range(nombre):
             v = self.mot_ds(table + i * pas)
-            v = None if v is None else self.base + v      # les tables contiennent des IP
+            v = None if not v else self.base + v          # les tables contiennent des IP ; 0 = entrée vide
             if v is None or not self.plausible(v):
                 if toutes:
                     continue
@@ -383,7 +399,7 @@ def main():
     reglage = PROGRAMMES[prefixe]
     code = (reglage['code'][0], reglage['code'][1] or len(image))
     symboles = charger_symboles(RACINE / 'original' / ('symboles.txt' if prefixe == 'QUEST' else f'symboles-{prefixe.lower()}.txt'))
-    d = Desassembleur(image, reglage['entree'], reglage['ds'], symboles, code, reglage['base'])
+    d = Desassembleur(image, reglage['entree'], reglage['ds'], symboles, code, reglage['base'], TABLES_ESPACEES.get(prefixe, {}))
     d.parcourir()
     d.zones_non_atteintes()
     d.ecrire(prefixe)

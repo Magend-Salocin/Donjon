@@ -32,11 +32,11 @@ Les fichiers de `original/asm/` et `original/donnees/` sont générés : ne pas 
 
 ## Le désassembleur
 
-`desassembler.py` décompresse l'exécutable (EXEPACK), puis suit le flot d'exécution depuis le point d'entrée : appels, sauts, tables de saut par mode vidéo (`mov bx, table ; add bx, [0x3190] ; jmp [bx]`), pointeurs de routine écrits en mémoire (`mov word ptr [x], routine`). Une seconde passe ajoute les zones qui suivent un `ret` et se décodent proprement jusqu'à un `ret` : ces routines sont marquées « probables » dans le listing, à confirmer.
+`desassembler.py` décompresse l'exécutable (EXEPACK), puis suit le flot d'exécution depuis le point d'entrée : appels, sauts, tables de saut par mode vidéo (`mov bx, table ; add bx, [0x3190] ; jmp [bx]`), pointeurs de routine écrits en mémoire (`mov word ptr [x], routine`). Une seconde passe ajoute les zones qui suivent un `ret` et se décodent proprement jusqu'à un `ret` : ces routines sont marquées « probables » dans le listing, à confirmer. Les tables de saut de taille connue, ou dont les entrées ne sont pas des mots consécutifs, sont déclarées dans `TABLES_ESPACEES` : lues au hasard, elles produisent de fausses cibles qui décodent des données comme du code.
 
 Couverture actuelle (voir `original/asm/*-rapport.txt`) :
 
 | Programme | Code atteint | Routines | Sauts indirects non résolus |
 | --- | --- | --- | --- |
-| QUEST.EXE | 99,3 % | 380, dont 62 probables | 6 |
+| QUEST.EXE | 98,7 % | 380, dont 27 probables | 4 |
 | INTRO.EXE | 95,9 % | 85, dont 26 probables | 1 |

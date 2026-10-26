@@ -7,7 +7,7 @@
 | Livrable | État |
 | --- | --- |
 | Exécutables décompressés (EXEPACK) | `original/binaires/` |
-| Désassemblage suivant le flot, annoté par `symboles.txt` | QUEST 99,2 %, INTRO 95,9 % du code |
+| Désassemblage suivant le flot, annoté par `symboles.txt` | QUEST 98,7 %, INTRO 95,9 % du code (le reste : des données dans le segment de code) |
 | Segment de données en clair | `original/asm/*-donnees.txt` |
 | Palettes du jeu et des 9 écrans de l'intro | `original/donnees/palettes.json` |
 | Écrans, sprites, images d'interface | 13 écrans, 176 sprites, 327 images |
