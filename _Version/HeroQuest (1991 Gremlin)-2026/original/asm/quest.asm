@@ -5403,7 +5403,7 @@ loc_2dc3:
 02dd5  c6 06 c8 3f 00       mov byte ptr [0x3fc8], 0
 02dda  c7 06 f3 3f 00 00    mov word ptr [0x3ff3], 0
 02de0  c7 06 cc 3f 00 00    mov word ptr [0x3fcc], 0
-02de6  bf 0e 0a             mov di, 0xa0e
+02de6  bf 0e 0a             mov di, 0xa0e    ; texte_briefing
 02de9  b9 00 01             mov cx, 0x100
 02dec  50                   push ax
 02ded  b8 7c 09             mov ax, 0x97c
@@ -5498,7 +5498,7 @@ loc_2eb2:
 02ed7  32 f6                xor dh, dh
 02ed9  03 c2                add ax, dx
 02edb  8b e8                mov bp, ax
-02edd  81 c5 0e 0a          add bp, 0xa0e
+02edd  81 c5 0e 0a          add bp, 0xa0e    ; texte_briefing
 02ee1  3e 8a 4e 00          mov cl, byte ptr ds:[bp]
 02ee5  38 0e f3 3f          cmp byte ptr [0x3ff3], cl
 02ee9  73 46                jae loc_2f31
@@ -11158,7 +11158,8 @@ loc_5d98:
 05d9c  8a c2                mov al, dl
 05d9e  c3                   ret
 
-; ======== sub_5d9f   (appelée depuis 8839, 88c7)
+; ======== texte_sous_curseur   (appelée depuis 8839, 88c7)
+; ZF posé si le curseur est sur le texte BP
 05d9f  e8 f8 e6             call sub_449a
 05da2  83 ee 03             sub si, 3
 05da5  89 36 3c ad          mov word ptr [0xad3c], si
@@ -13002,8 +13003,8 @@ loc_6bf6:
 loc_6c07:
 06c07  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
 06c0b  b7 00                mov bh, 0
-06c0d  8a 87 70 4b          mov al, byte ptr [bx + 0x4b70]
-06c11  c6 87 70 4b ff       mov byte ptr [bx + 0x4b70], 0xff
+06c0d  8a 87 70 4b          mov al, byte ptr [bx + 0x4b70]    ; evenement_par_zone
+06c11  c6 87 70 4b ff       mov byte ptr [bx + 0x4b70], 0xff    ; evenement_par_zone
 06c16  3c ff                cmp al, 0xff
 06c18  75 03                jne loc_6c1d
 06c1a  e9 42 01             jmp loc_6d5f
@@ -13071,7 +13072,7 @@ loc_6c89:
 06c8f  e2 d3                loop loc_6c64
 06c91  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
 06c95  b7 00                mov bh, 0
-06c97  c6 87 70 4b 00       mov byte ptr [bx + 0x4b70], 0
+06c97  c6 87 70 4b 00       mov byte ptr [bx + 0x4b70], 0    ; evenement_par_zone
 06c9c  e9 57 ff             jmp loc_6bf6
 loc_6c9f:
 06c9f  bb 4c 00             mov bx, 0x4c    ; message « VOUS FOUILLEZ MAIS / NE DECOUVREZ RIEN »
@@ -13170,9 +13171,9 @@ loc_6d5f:
 06d65  c3                   ret
 
 ; ======== sub_6d66   (appelée depuis 6c24)
-06d66  a0 3b 46             mov al, byte ptr [0x463b]
+06d66  a0 3b 46             mov al, byte ptr [0x463b]    ; pioche_tresors
 06d69  50                   push ax
-06d6a  bd 3b 46             mov bp, 0x463b
+06d6a  bd 3b 46             mov bp, 0x463b    ; pioche_tresors
 06d6d  be 3c 46             mov si, 0x463c
 06d70  b9 19 00             mov cx, 0x19
 loc_6d73:
@@ -13186,15 +13187,15 @@ loc_6d73:
 06d81  3e 88 46 00          mov byte ptr ds:[bp], al
 loc_6d85:
 06d85  58                   pop ax
-06d86  89 2e 55 46          mov word ptr [0x4655], bp
+06d86  89 2e 55 46          mov word ptr [0x4655], bp    ; carte_tresor
 06d8a  c3                   ret
 
 ; ======== sub_6d8b   (appelée depuis 6c48, 6cb6, 6cd5)
-06d8b  8b 1e 55 46          mov bx, word ptr [0x4655]
+06d8b  8b 1e 55 46          mov bx, word ptr [0x4655]    ; carte_tresor
 06d8f  88 07                mov byte ptr [bx], al
 06d91  43                   inc bx
 06d92  c6 07 ff             mov byte ptr [bx], 0xff
-06d95  89 1e 55 46          mov word ptr [0x4655], bx
+06d95  89 1e 55 46          mov word ptr [0x4655], bx    ; carte_tresor
 06d99  c3                   ret
 
 ; ======== sub_6d9a   (appelée depuis 6bf6)
@@ -13262,7 +13263,7 @@ loc_6e0a:
 06e0d  e8 39 f2             call sub_6049
 06e10  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
 06e14  b7 00                mov bh, 0
-06e16  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
+06e16  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
 06e1b  75 03                jne loc_6e20
 06e1d  e9 3f ff             jmp loc_6d5f
 loc_6e20:
@@ -13274,7 +13275,7 @@ loc_6e20:
 06e32  32 ff                xor bh, bh
 06e34  83 3e ed 37 00       cmp word ptr [0x37ed], 0
 06e39  74 17                je loc_6e52
-06e3b  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
+06e3b  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
 06e40  e8 e4 b9             call son_effet_1
 06e43  bb 1a 00             mov bx, 0x1a    ; message « UNE PORTE SECRETE S'OUVRE / EN GRINcANT DANS LE MUR »
 06e46  e8 a4 1a             call affiche_message
@@ -13287,10 +13288,10 @@ loc_6e52:
 06e59  eb 4f                jmp loc_6eaa
 ; ---- 1 octets non atteints (6e5b-6e5b)
 loc_6e5c:
-06e5c  80 bf 9b 4b 00       cmp byte ptr [bx + 0x4b9b], 0    ; evenement_par_zone
+06e5c  80 bf 9b 4b 00       cmp byte ptr [bx + 0x4b9b], 0    ; portes_fouillees
 06e61  75 1e                jne loc_6e81
 06e63  c7 06 ed 37 01 00    mov word ptr [0x37ed], 1
-06e69  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
+06e69  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
 06e6e  83 3e ed 37 00       cmp word ptr [0x37ed], 0
 06e73  75 03                jne loc_6e78
 06e75  eb 33                jmp loc_6eaa
@@ -13301,12 +13302,12 @@ loc_6e78:
 06e7e  eb 2a                jmp loc_6eaa
 ; ---- 1 octets non atteints (6e80-6e80)
 loc_6e81:
-06e81  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
+06e81  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
 06e86  75 03                jne loc_6e8b
 06e88  e9 d4 fe             jmp loc_6d5f
 loc_6e8b:
-06e8b  8a 87 9b 4b          mov al, byte ptr [bx + 0x4b9b]    ; evenement_par_zone
-06e8f  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
+06e8b  8a 87 9b 4b          mov al, byte ptr [bx + 0x4b9b]    ; portes_fouillees
+06e8f  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
 loc_6e94:
 06e94  fe c8                dec al
 06e96  32 e4                xor ah, ah
@@ -15671,12 +15672,12 @@ loc_84e8:
 084ee  eb d5                jmp loc_84c5
 
 ; ======== lance_quete
-; remet l'état à zéro, garde les fiches en DS:A98F, charge QUESTn.BIN (noms en DS:A3FC)
+; prépare la quête (QUESTn.BIN), affiche le briefing et attend « JE COMPRENDS MENTOR » ; règles propres aux quêtes 2, 6 et 8 du jeu
 084f0  50                   push ax
 084f1  b8 7c 09             mov ax, 0x97c
 084f4  8e c0                mov es, ax
 084f6  58                   pop ax
-084f7  bf 0e 0a             mov di, 0xa0e
+084f7  bf 0e 0a             mov di, 0xa0e    ; texte_briefing
 084fa  b9 00 02             mov cx, 0x200
 084fd  33 c0                xor ax, ax
 084ff  f3 ab                rep stosw word ptr es:[di], ax
@@ -15763,9 +15764,9 @@ loc_85c0:
 085c7  88 04                mov byte ptr [si], al
 085c9  0a c0                or al, al
 085cb  75 0b                jne loc_85d8
-085cd  a0 c5 3f             mov al, byte ptr [0x3fc5]
+085cd  a0 c5 3f             mov al, byte ptr [0x3fc5]    ; heros_absents
 085d0  0a c1                or al, cl
-085d2  a2 c5 3f             mov byte ptr [0x3fc5], al
+085d2  a2 c5 3f             mov byte ptr [0x3fc5], al    ; heros_absents
 085d5  a2 c6 3f             mov byte ptr [0x3fc6], al    ; etat_quete
 loc_85d8:
 085d8  d0 e1                shl cl, 1
@@ -15797,7 +15798,7 @@ loc_85d8:
 08617  8e c0                mov es, ax
 08619  58                   pop ax
 0861a  be 0c 04             mov si, 0x40c
-0861d  bf 70 4b             mov di, 0x4b70
+0861d  bf 70 4b             mov di, 0x4b70    ; evenement_par_zone
 08620  b9 2b 00             mov cx, 0x2b
 08623  f3 a5                rep movsw word ptr es:[di], word ptr [si]
 08625  bf 62 04             mov di, 0x462
@@ -15805,7 +15806,7 @@ loc_85d8:
 08629  8b 35                mov si, word ptr [di]
 0862b  03 f7                add si, di
 0862d  8b 4d 02             mov cx, word ptr [di + 2]
-08630  bf 0e 0a             mov di, 0xa0e
+08630  bf 0e 0a             mov di, 0xa0e    ; texte_briefing
 08633  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
 08635  50                   push ax
 08636  b8 7c 09             mov ax, 0x97c
@@ -15824,7 +15825,7 @@ loc_85d8:
 08646  e8 da e3             call fond_vers_tampon
 08649  c6 06 59 37 01       mov byte ptr [0x3759], 1
 0864e  c6 06 50 37 11       mov byte ptr [0x3750], 0x11
-08653  bd 0e 0a             mov bp, 0xa0e
+08653  bd 0e 0a             mov bp, 0xa0e    ; texte_briefing
 08656  e8 23 ab             call affiche_texte
 08659  e8 88 da             call affiche_tampon
 0865c  e8 10 df             call sauve_tampon
@@ -15892,7 +15893,7 @@ loc_869a:
 loc_86de:
 086de  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 086e3  e8 16 dd             call curseur_memorise
-086e6  e8 3e 01             call sub_8827
+086e6  e8 3e 01             call attente_briefing
 086e9  e8 28 d7             call curseur_sauve_fond
 086ec  e8 f5 d9             call affiche_tampon
 086ef  e8 e5 d6             call curseur_dessine
@@ -15930,7 +15931,7 @@ loc_8730:
 08742  8e c0                mov es, ax
 08744  58                   pop ax
 08745  be 6e 46             mov si, 0x466e
-08748  bf 9f 4a             mov di, 0x4a9f
+08748  bf 9f 4a             mov di, 0x4a9f    ; equipement_confisque
 0874b  b9 05 00             mov cx, 5
 0874e  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
 08750  c7 06 6e 46 00 00    mov word ptr [0x466e], 0
@@ -15965,7 +15966,7 @@ loc_87b5:
 087c3  be b1 46             mov si, 0x46b1
 087c6  80 64 0c 38          and byte ptr [si + 0xc], 0x38
 loc_87ca:
-087ca  bb 3b 46             mov bx, 0x463b
+087ca  bb 3b 46             mov bx, 0x463b    ; pioche_tresors
 087cd  32 c0                xor al, al
 loc_87cf:
 087cf  88 07                mov byte ptr [bx], al
@@ -15983,7 +15984,7 @@ melange_tresors:    ; mélange les 25 cartes trésor
 087e7  03 d9                add bx, cx
 087e9  03 db                add bx, bx
 loc_87eb:
-087eb  be 3b 46             mov si, 0x463b
+087eb  be 3b 46             mov si, 0x463b    ; pioche_tresors
 087ee  51                   push cx
 087ef  b9 18 00             mov cx, 0x18
 loc_87f2:
@@ -15999,7 +16000,7 @@ loc_8802:
 08803  e2 ed                loop loc_87f2
 08805  59                   pop cx
 08806  e2 e3                loop loc_87eb
-08808  c7 06 55 46 54 46    mov word ptr [0x4655], 0x4654
+08808  c7 06 55 46 54 46    mov word ptr [0x4655], 0x4654    ; carte_tresor
 0880e  80 3e 92 3f 07       cmp byte ptr [0x3f92], 7    ; numero_quete
 08813  75 05                jne loc_881a
 08815  c6 06 c0 3f ff       mov byte ptr [0x3fc0], 0xff    ; evenement_b
@@ -16010,13 +16011,14 @@ loc_881a:
 loc_8826:
 08826  c3                   ret
 
-; ======== sub_8827   (appelée depuis 86e6)
+; ======== attente_briefing   (appelée depuis 86e6)
+; « JE COMPRENDS MENTOR » en surbrillance sous le curseur ; clic ou bouton droit
 08827  bb 04 00             mov bx, 4
 0882a  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
 0882e  81 c6 c1 5f          add si, 0x5fc1    ; textes
 08832  c6 06 50 37 11       mov byte ptr [0x3750], 0x11
 08837  8b ee                mov bp, si
-08839  e8 63 d5             call sub_5d9f
+08839  e8 63 d5             call texte_sous_curseur
 0883c  75 1c                jne loc_885a
 0883e  c6 06 50 37 26       mov byte ptr [0x3750], 0x26
 08843  83 3e 90 31 04       cmp word ptr [0x3190], 4    ; mode_video
@@ -16064,7 +16066,7 @@ loc_887e:
 088c4  eb 24                jmp loc_88ea
 ; ---- 1 octets non atteints (88c6-88c6)
 loc_88c7:
-088c7  e8 d5 d4             call sub_5d9f
+088c7  e8 d5 d4             call texte_sous_curseur
 088ca  75 1e                jne loc_88ea
 088cc  c6 06 50 37 26       mov byte ptr [0x3750], 0x26
 088d1  83 3e 90 31 04       cmp word ptr [0x3190], 4    ; mode_video

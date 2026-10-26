@@ -182,7 +182,7 @@
 0x2217  code  tour_monstre           un monstre (DI = son enregistrement de 10 octets)
 0x4663  table fiches_personnages     5 fiches de 26 octets : 4 héros, puis un personnage joué par le joueur 1 (escorté ?)
 0x4d4a  table monstres               32 monstres de 10 octets, même format que dans QUESTn.BIN
-0x3fc6  var   etat_quete             0x0F : fin de quête (?)
+0x3fc6  var   etat_quete             bit n : héros n hors de la quête (absent au départ ou mort) ; 0x0F = plus aucun héros
 
 # ---- Tour d'un personnage et panneau d'icônes (voir original/notes/03-regles.md)
 0x0480  code  evenements_quete       messages scriptés des quêtes 1, 6, 9, 15, 16 selon les drapeaux DS:3FBF et DS:3FC0
@@ -202,8 +202,8 @@
 0x40a2  table chemin_monstre         pas (dx, dy) du chemin d'un monstre
 0x4277  table icones_panneau         12 octets par icône : +4 largeur, +5 hauteur, +6 état (FF cachée, 1 normale, 1C enfoncée, sinon grisée), +7 à redessiner, +8 position écran, +A image dans ODDS&SOD
 0x4337  table zone_annuler_attaque   (224, 180)-(240, 196)
-0x546f  table grille_zones           zone de chaque case de la quête en cours (?) ; +0x200 : objets (codes 0x30 à 0x5F)
-0x586f  table grille_occupants       occupant de chaque case (?)
+0x546f  table grille_zones           octets 0 à 0x3FF de QUESTn.BIN : zone de chaque case (bits 0-5), puis (+0x200) murs et portes
+0x586f  table grille_occupants       contenu de chaque case : numéro de monstre (1 à 32) ou code de mobilier et de piège (0x30 et plus) ; lu aussi en [grille_zones + 0x400]
 
 # ---- Écran des héros (voir original/notes/02-ecrans.md)
 0x7887  code  choisit_heros_1        sélectionne le héros 1 (DS:409E) et passe aux commandes de son joueur ; 0x7895, 0x78A3, 0x78B1 pour 2 à 4
@@ -226,13 +226,13 @@
 
 # ---- Choix de la quête
 0x8379  code  menu_liste             menu de lignes de texte ; choix (numéro + 1) dans DS:AB7A
-0x84f0  code  lance_quete            remet l'état à zéro, garde les fiches en DS:A98F, charge QUESTn.BIN (noms en DS:A3FC)
+0x84f0  code  lance_quete            prépare la quête (QUESTn.BIN), affiche le briefing et attend « JE COMPRENDS MENTOR » ; règles propres aux quêtes 2, 6 et 8 du jeu
 0xab7a  var   choix_menu
 0xa3fc  table fichiers_quetes        noms des 24 QUESTn.BIN
 0xa98f  table fiches_avant_quete     copie des fiches, restaurée si la partie est abandonnée
 
 # ---- Fouilles scriptées, fins de quête, déplacement, sorts (voir original/notes/03-regles.md)
-0x4b9b  table evenement_par_zone     numéro d'événement de fouille de chaque zone (octets 1036-1078 de QUESTn.BIN) ; effacé une fois utilisé
+0x4b9b  table portes_fouillees         octets 1079-1121 de QUESTn.BIN : FFh quand les portes secrètes de la zone ont été cherchées
 0x5a89  table evenements_fouille     30 routines (coffre piégé, potion, clés d'Agrain, Lame de l'esprit...), indexées par le numéro - 1
 0x44a9  table fins_quetes            une routine de fin par quête, appelée par fin_quete
 0x40f9  table deplacements           4 routines, une par direction
@@ -285,3 +285,13 @@
 0x96cb  etiq  trousse_outils         désarme un piège sur la case ou à côté ; le nain réussit toujours
 0x979a  code  piege_case             AL = 0x31 à 0x36 si la case (CL, CH) de la zone DL porte un piège, qu'il efface
 0x45ab  code  numero_bit             numéro du premier bit posé de AL (0 à 7)
+
+# ---- Préparation d'une quête (voir original/notes/02-ecrans.md#briefing)
+0x4b70  table evenement_par_zone     octets 1036-1078 de QUESTn.BIN : événement de fouille de chaque zone ; FFh une fois fouillée
+0x0a0e  table texte_briefing         texte du briefing recopié de QUESTn.BIN (1024 octets)
+0x3fc5  var   heros_absents          héros absents au départ de la quête (bit n)
+0x463b  table pioche_tresors         les 25 cartes trésor (0 à 24, puis FFh), mélangées à chaque quête
+0x4655  var   carte_tresor           pointeur sur la prochaine carte de la pioche
+0x4a9f  table equipement_confisque   quête 6 du jeu : octets +0x0B à +0x0F des 4 fiches, retirés au départ
+0x8827  code  attente_briefing       « JE COMPRENDS MENTOR » en surbrillance sous le curseur ; clic ou bouton droit
+0x5d9f  code  texte_sous_curseur     ZF posé si le curseur est sur le texte BP

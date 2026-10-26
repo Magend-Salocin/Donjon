@@ -147,8 +147,8 @@ Cases numérotées `y × 26 + x` sur 26 × 19.
 |---|---|
 | 0 | 494 octets : zone de chaque case (0 = hors quête, 1-20 couloirs, 21-42 pièces) |
 | 512 | 494 octets : murs et portes. 0x80 mur en haut, 0x40 mur à gauche, 0x20 porte en haut, 0x10 porte à gauche ; 0x08 et 0x04 accompagnent certaines portes (portes secrètes ou verrouillées, non vérifié) ; 0x01 est un détail de rendu du plateau standard |
-| 1024 | 4 × 3 octets : départ des héros (x, y, ?) |
-| 1036 | 43 octets : numéro d'événement scripté par zone, puis 43 octets d'un second drapeau par zone |
+| 1024 | 4 × 3 octets : départ des héros (x, y, image du personnage : 29 + 12n, plus 0, 3, 6 ou 9 selon l'orientation) |
+| 1036 | 43 octets : événement de fouille de trésor par zone (0 = carte trésor, n = routine scriptée n), puis 43 octets pour la fouille des portes secrètes ; le jeu y écrit FFh quand la zone a été fouillée |
 | 1122 | 6 mots : position du texte, longueur du texte, position des monstres, taille des monstres, position du mobilier, nombre d'objets (positions depuis 1122) |
 | monstres | 10 octets : actif (0x81), x, y, 0, 0, 0, drapeaux, classe, type, ? Le premier enregistrement, inactif, est le monstre errant |
 | mobilier | 3 octets : x, y, code ; les cases supplémentaires d'un meuble (codes 0x42 à 0x4A) suivent son code |

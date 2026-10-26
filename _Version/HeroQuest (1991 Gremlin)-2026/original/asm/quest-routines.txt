@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 380, dont 129 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 131 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe7 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom  "questb.ega"
@@ -243,7 +243,7 @@
 05c80  charge_men                 252    2  |     47f1 erreur_fichier fiche_heros_courant fichier_nom fichier_offset fichier_segment fichier_taille index_case_courante mode_video seg_annexe  "men.ega"
 05d7f  sub_5d7f                    13   11  |     
 05d8c  compte_cranes               19    4  |     
-05d9f  sub_5d9f                    56    2  |     ad3c curseur_x curseur_y
+05d9f  texte_sous_curseur          56    2  |     ad3c curseur_x curseur_y
 05dd7  curseur_dessine             33   15  |     
 05df8  sub_5df8                    28    0  |     
 05e14  curseur_sauve_fond         155   14  |     3997 curseur_x curseur_y mode_video
@@ -298,8 +298,8 @@
 06956  sub_6956                   203    1  |     erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille mode_video seg_annexe  "maps.ega"
 06a23  fond_vers_tampon           443   19  |     6a58 6a59 mode_video seg_ecran seg_furn
 06be0  fouille_tresor             385    0  |     3f94 3f9b 3fbc 3fc7 42f5 fiche_heros_courant heros_courant personnage_courant
-06d66  sub_6d66                    37    1  |     463b 4655
-06d8b  sub_6d8b                    15    3  |     4655
+06d66  sub_6d66                    37    1  |     463b carte_tresor
+06d8b  sub_6d8b                    15    3  |     carte_tresor
 06d9a  sub_6d9a                    61    1  |     3f94 3fc7 3fe4 fiche_heros_courant
 06dd7  sub_6dd7                    35    1  |     3fc7
 06dfa  fouille_portes             178    0  |     37eb 37ed 3f94 3f9b 42ad 4635 fiche_heros_courant personnage_courant
@@ -363,8 +363,8 @@
 082e0  sub_82e0                   153    1  |     ac13 ac14 ac15 ac16 seg_annexe segment_source
 08379  menu_liste                 202    2  |     3750 abba abbb abbc abbd choix_menu commandes curseur_y mode_video
 08443  sauve_quest_sav            173    1  |     erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille seg_annexe  "SIGMAR"
-084f0  lance_quete                822    0  |     3750 3759 3fc5 3fe9 4655 466e 4670 4672 4688 468a 468c 46a2
-08827  sub_8827                    65    1  |     3750 choix_menu commandes mode_video
+084f0  lance_quete                822    0  |     3750 3759 3fe9 466e 4670 4672 4688 468a 468c 46a2 46a4 46a6
+08827  attente_briefing            65    1  |     3750 choix_menu commandes mode_video
 08870  sub_8870                    40    2  |     ad37 erreur_fichier
 08898  sub_8898                    84    1  |     3750 ad3b choix_menu commandes erreur_fichier mode_video
 088ed  affiche_message            387  111  |     3750 3759 3f97 3fe9 4635 ad20 ad22 ad24 ad26 ad28 ad2a ad2c

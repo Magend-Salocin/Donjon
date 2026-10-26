@@ -2,7 +2,7 @@
 
 Comment le jeu enchaîne ses écrans, affiche, dialogue avec le joueur et fait tourner une quête. Adresses et noms : `original/asm/quest.asm` et `original/symboles.txt`.
 
-État : boucle principale, menu titre, écran des héros, armurerie, choix de la quête, affichage et boucle des tours lus. Le tour lui-même est décrit dans [03-regles.md](03-regles.md). L'inventaire aussi. Reste : le briefing (texte de QUESTn.BIN sur le parchemin) et le menu de sauvegarde.
+État : boucle principale, menu titre, écran des héros, armurerie, choix de la quête, affichage et boucle des tours lus. Le tour lui-même est décrit dans [03-regles.md](03-regles.md). L'inventaire et le briefing aussi. Reste : le menu de sauvegarde.
 
 ## Boucle principale
 
@@ -89,6 +89,24 @@ Ce sont les prix du jeu de plateau. `achete_objet` refuse si le héros possède 
 
 Le choix donne `numero_quete` (0 à 23, + 14 pour la page 2). `lance_quete` (0x84F0) remet l'état de la partie à zéro, garde une copie des fiches (DS:A98F) pour les restaurer si la partie est abandonnée, et charge le QUESTn.BIN de la quête (noms en DS:A3FC).
 
+## Briefing
+
+`lance_quete` (0x84F0), dans l'ordre :
+
+1. Remet à zéro l'état de la partie (DS:3F93, 270 octets) et le texte du briefing (DS:0A0E). Copie les 5 fiches et `heros_en_jeu` en DS:A98F.
+2. Charge QUESTn.BIN ([format](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#quêtes--questnbin)) : zones et murs dans `grille_zones` (DS:546F), le reste du fichier en DS:0000.
+3. Pour chacun des 4 héros : en jeu ou non (`heros_en_jeu`, remis à zéro), case de départ et image (fiche +1, +2, +8). Un héros absent pose son bit dans `etat_quete`. La fiche perd ses potions (+0x10), son sort choisi, ses effets en cours (+0x16 à +0x18) et les bits 0x10 à 0x40 de +0x0F.
+4. Recopie les deux tables par zone (DS:4B70 et DS:4B9B) et le texte du briefing, qu'il affiche par `affiche_texte` (couleur 11h) sur le fond déjà chargé par `choix_quete` (le parchemin QUESTB).
+5. Charge les 32 monstres (DS:4D4A) et pose le mobilier dans `grille_occupants` (DS:586F).
+6. Vide la fiche de Sir Ragnar. Dans la 2e quête, la place en (6, 1), avec 2 points de corps et l'image 0x50.
+7. Attend : « JE COMPRENDS MENTOR » (ligne 22, colonne 10) s'allume sous le curseur ; un clic dessus, ou le bouton droit, ferme le briefing (`attente_briefing`).
+8. Range chaque monstre sur sa case : zone, index de case, et son numéro (1 à 32) dans `grille_occupants`. Le type 0x15 est sauté.
+9. Règles propres à certaines quêtes (numéros du jeu) :
+   - 6e, L'héritage du seigneur de guerre orque : les héros, capturés, perdent sorts et équipement (+0x0B à +0x0F, gardés en DS:4A9F) ;
+   - 8e, Le mage du feu : l'elfe et l'enchanteur perdent leurs sorts de feu (+0x0C &= 38h) ;
+   - 7e et 8e : le drapeau d'événement DS:3FC0 est posé (FFh).
+10. Mélange les 25 cartes trésor (`pioche_tresors`, DS:463B) et place le pointeur de pioche au début.
+
 ## Affichage
 
 Le jeu dessine dans un tampon hors écran (segment 0x1463), puis l'envoie à l'écran :
@@ -151,5 +169,4 @@ Les 36 objets (table `objets`, DS:44FE : nom et image) et ce qu'un clic fait sur
 
 ## À lire ensuite
 
-- Le briefing : affichage du texte de QUESTn.BIN sur le parchemin, après `lance_quete`.
 - `sauvegarde_menu` : le déroulé du menu (le format de QUEST.SAV est dans [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#questsav)).

@@ -13,7 +13,7 @@ Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes,
 | +3 | zone (pièce ou couloir) où il se trouve |
 | +6 | points de corps (0 : mort ; remis à la valeur de DS:4394 par `heros_renouvele`) |
 | +7 | points d'esprit (confirmé par QUEST.SAV : elfe neuf 6 et 4, enchanteur 4 et 6) |
-| +8 | rôle à trouver |
+| +8 | image du personnage, donnée par la case de départ de QUESTn.BIN : 29 + 12n pour le héros n, plus 0, 3, 6 ou 9 selon l'orientation (?) |
 | +9, +0x0A | or, sur 16 bits |
 | +0x0B, +0x0C | sorts connus, un bit par sort : sorts 1 à 6 dans +0x0B, 7 à 12 dans +0x0C |
 | +0x0D | artefacts possédés : 1 armure de Borin, 2 baguette de rappel (lue au début du tour), 4 talisman du savoir, 8 poison d'orc, 0x10 lame de l'esprit |
@@ -67,7 +67,9 @@ Les numéros de quête du code (`numero_quete`, DS:3F92) commencent à 0 : la qu
 
 ## Fouilles scriptées
 
-Chaque zone de la quête a un numéro d'événement de fouille : les octets 1036 à 1078 de QUESTn.BIN, recopiés en DS:4B9B (`evenement_par_zone`). Quand un héros fouille la zone, le jeu appelle la routine numéro − 1 de la table `evenements_fouille` (DS:5A89, 30 routines), puis met le numéro à FFh : l'événement ne se produit qu'une fois.
+Chaque zone de la quête a un numéro d'événement de fouille : les octets 1036 à 1078 de QUESTn.BIN, recopiés en DS:4B70 (`evenement_par_zone`). Quand un héros cherche un trésor dans la zone, le jeu met l'octet à FFh (« CETTE PIECE A DEJA ETE FOUILLEE » la fois suivante). S'il valait 0, le héros tire une carte trésor ; sinon, le jeu appelle la routine numéro − 1 de la table `evenements_fouille` (DS:5A89, 30 routines). L'événement ne se produit donc qu'une fois.
+
+Les octets 1079 à 1121 (DS:4B9B, `portes_fouillees`) jouent le même rôle pour la recherche des portes secrètes : FFh une fois la zone fouillée.
 
 Routines identifiées dans la table : `fouille_vide`, `coffre_potion`, `coffre_fleche`, `coffre_desarme`, `coffre_gargouille`, `cles_agrain`, `prend_lame_esprit`. Exemple : dans la 2e quête du jeu, la zone 0x15 a l'événement 6 et la zone 0x27 l'événement 2. C'est ce qui manquait à donjon-v2 pour les objets et passages scriptés (quêtes 5 et 10).
 
@@ -154,4 +156,4 @@ Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTIL
 
 ## Plateau en mémoire
 
-La quête en cours semble rangée à partir de DS:546F : zone de chaque case, puis (+0x200) codes des objets (éboulis, pièges, escalier, meubles), et une grille des occupants en DS:586F. `index_case` (0x607E) donne l'index d'une case à partir de (x, y). À confirmer en comparant avec QUESTn.BIN au débogueur.
+`lance_quete` recopie les 1024 premiers octets de QUESTn.BIN en DS:546F (`grille_zones`) : zone de chaque case (bits 0 à 5), puis (+0x200) murs et portes. La grille des occupants suit, en DS:586F (= `grille_zones` + 0x400) : pour chaque case, le numéro du monstre qui l'occupe (1 à 32) ou le code du mobilier et des pièges (0x30 et plus, voir [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#quêtes--questnbin)). `index_case` (0x607E) donne l'index d'une case à partir de (x, y).
