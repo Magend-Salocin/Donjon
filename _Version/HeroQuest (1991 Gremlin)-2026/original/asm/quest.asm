@@ -903,7 +903,7 @@ loc_0894:
 0089d  75 03                jne loc_08a2
 0089f  e9 08 0a             jmp loc_12aa
 loc_08a2:
-008a2  e8 a8 18             call sub_214d
+008a2  e8 a8 18             call calcule_attaque_heros
 008a5  e8 96 01             call sub_0a3e
 008a8  a2 a8 3f             mov byte ptr [0x3fa8], al    ; resultat_vise
 008ab  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
@@ -972,8 +972,8 @@ loc_0924:
 0093d  89 36 d6 3f          mov word ptr [0x3fd6], si    ; attaquant
 loc_0941:
 00941  e8 3c 53             call charge_men
-00944  e8 fd 01             call sub_0b44
-00947  e8 de 01             call sub_0b28
+00944  e8 fd 01             call bonus_attaque_heros
+00947  e8 de 01             call calcule_des_monstre
 0094a  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0094e  32 c0                xor al, al
 00950  8a 36 b8 3f          mov dh, byte ptr [0x3fb8]    ; des_attaque_heros
@@ -1017,9 +1017,9 @@ loc_09a9:
 009af  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 009b3  80 7c 07 00          cmp byte ptr [si + 7], 0
 009b7  75 03                jne loc_09bc
-009b9  e8 64 17             call sub_2120
+009b9  e8 64 17             call retire_monstre
 loc_09bc:
-009bc  e8 69 01             call sub_0b28
+009bc  e8 69 01             call calcule_des_monstre
 loc_09bf:
 009bf  be 50 00             mov si, 0x50
 009c2  8b 16 d2 3f          mov dx, word ptr [0x3fd2]    ; cranes
@@ -1199,7 +1199,8 @@ loc_0b11:
 00b24  a2 b2 3f             mov byte ptr [0x3fb2], al
 00b27  c3                   ret
 
-; ======== sub_0b28   (appelée depuis 0947, 09bc, 1db0)
+; ======== calcule_des_monstre   (appelée depuis 0947, 09bc, 1db0)
+; dés d'attaque (DS:3FBA) et de défense (DS:3FBB) du monstre DS:3FD4
 00b28  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 00b2c  8a 5c 09             mov bl, byte ptr [si + 9]
 00b2f  02 db                add bl, bl
@@ -1207,11 +1208,12 @@ loc_0b11:
 00b33  02 5c 09             add bl, byte ptr [si + 9]
 00b36  b7 00                mov bh, 0
 00b38  8b 87 07 48          mov ax, word ptr [bx + 0x4807]
-00b3c  a2 ba 3f             mov byte ptr [0x3fba], al    ; des_attaque_b
+00b3c  a2 ba 3f             mov byte ptr [0x3fba], al    ; des_attaque_monstre
 00b3f  88 26 bb 3f          mov byte ptr [0x3fbb], ah    ; des_defense_monstre
 00b43  c3                   ret
 
-; ======== sub_0b44   (appelée depuis 0944)
+; ======== bonus_attaque_heros   (appelée depuis 0944)
+; Sorcier-Roi sans la lame de l'esprit : 0 dé ; +2 force, +2 courage (consommés)
 00b44  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 00b48  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 00b4c  8a 44 09             mov al, byte ptr [si + 9]
@@ -1244,7 +1246,8 @@ loc_0b87:
 00b87  a2 b8 3f             mov byte ptr [0x3fb8], al    ; des_attaque_heros
 00b8a  c3                   ret
 
-; ======== sub_0b8b   (appelée depuis 1dad)
+; ======== calcule_defense_heros   (appelée depuis 1dad)
+; +0x15, armures, bouclier, casque, ténacité, peau de pierre -> DS:3FB9
 00b8b  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 00b8f  32 c0                xor al, al
 00b91  f6 45 0f 20          test byte ptr [di + 0xf], 0x20
@@ -1283,7 +1286,7 @@ loc_0bd6:
 00bdc  80 65 18 bf          and byte ptr [di + 0x18], 0xbf
 00be0  04 02                add al, 2
 loc_0be2:
-00be2  a2 b9 3f             mov byte ptr [0x3fb9], al    ; des_defense_b
+00be2  a2 b9 3f             mov byte ptr [0x3fb9], al    ; des_defense_heros
 00be5  c3                   ret
 
 ; ======== affiche_des   (appelée depuis 0984, 0993, 1ec5, 1ed4)
@@ -1885,7 +1888,7 @@ loc_1084:
 010a4  bb 54 00             mov bx, 0x54
 010a7  e9 c3 fe             jmp sort_message
 loc_10aa:
-010aa  e8 73 10             call sub_2120
+010aa  e8 73 10             call retire_monstre
 010ad  bb 4e 00             mov bx, 0x4e
 010b0  e9 ba fe             jmp sort_message
 
@@ -3399,8 +3402,8 @@ loc_1d84:
 01d89  e8 18 43             call sub_60a4
 01d8c  e9 55 43             jmp affiche_tampon
 
-; ======== carte_quete   (appelée depuis 2539, 6f06)
-; MAPS.VGA : carte de la quête (?)
+; ======== combat_monstre   (appelée depuis 2539, 6f06)
+; un monstre frappe le héros SI (DS:3FD6) : images MEN, dés, attaque_contre_heros, puis recharge MAPS
 01d8f  c6 06 b6 3f 01       mov byte ptr [0x3fb6], 1
 01d94  ff 36 37 46          push word ptr [0x4637]    ; fiche_heros_courant
 01d98  ff 36 a7 3f          push word ptr [0x3fa7]    ; personnage_courant
@@ -3409,8 +3412,8 @@ loc_1d84:
 01da2  8b 1e d6 3f          mov bx, word ptr [0x3fd6]    ; attaquant
 01da6  89 1e 37 46          mov word ptr [0x4637], bx    ; fiche_heros_courant
 01daa  e8 d3 3e             call charge_men
-01dad  e8 db ed             call sub_0b8b
-01db0  e8 75 ed             call sub_0b28
+01dad  e8 db ed             call calcule_defense_heros
+01db0  e8 75 ed             call calcule_des_monstre
 01db3  e8 da 00             call attaque_contre_heros
 01db6  c6 06 b6 3f 00       mov byte ptr [0x3fb6], 0
 01dbb  8f 06 a7 3f          pop word ptr [0x3fa7]    ; personnage_courant
@@ -3494,10 +3497,10 @@ loc_1e63:
 01e8f  c3                   ret
 
 ; ======== attaque_contre_heros   (appelée depuis 1db3)
-; un monstre attaque un héros (message « VOUS AVEZ SURVECU A L'ATTAQUE ») ; défense comptée sur les faces autres que 1 : à vérifier
+; le héros compte comme boucliers les faces autres que le bouclier blanc (4 sur 6) ; crânes du monstre moins boucliers = blessures
 01e90  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01e94  32 d2                xor dl, dl
-01e96  8a 0e b9 3f          mov cl, byte ptr [0x3fb9]    ; des_defense_b
+01e96  8a 0e b9 3f          mov cl, byte ptr [0x3fb9]    ; des_defense_heros
 01e9a  0a c9                or cl, cl
 01e9c  74 10                je loc_1eae
 01e9e  8a ea                mov ch, dl
@@ -3512,7 +3515,7 @@ loc_1eab:
 01eac  e2 f2                loop loc_1ea0
 loc_1eae:
 01eae  88 16 d3 3f          mov byte ptr [0x3fd3], dl    ; boucliers
-01eb2  8a 36 ba 3f          mov dh, byte ptr [0x3fba]    ; des_attaque_b
+01eb2  8a 36 ba 3f          mov dh, byte ptr [0x3fba]    ; des_attaque_monstre
 01eb6  e8 d3 3e             call compte_cranes
 01eb9  a2 d2 3f             mov byte ptr [0x3fd2], al    ; cranes
 01ebc  bd 48 71             mov bp, 0x7148
@@ -3775,7 +3778,8 @@ loc_20f2:
 loc_211d:
 0211d  e9 9f fe             jmp loc_1fbf
 
-; ======== sub_2120   (appelée depuis 09b9, 10aa, 4cbd, 4d4f)
+; ======== retire_monstre   (appelée depuis 09b9, 10aa, 4cbd, 4d4f)
+; efface le monstre SI et appelle sa routine de mort (types_monstres +3)
 02120  80 64 07 0f          and byte ptr [si + 7], 0xf
 02124  c6 04 00             mov byte ptr [si], 0
 02127  c6 44 06 00          mov byte ptr [si + 6], 0
@@ -3793,7 +3797,8 @@ loc_2147:
 02147  8d 9f 09 48          lea bx, [bx + 0x4809]
 0214b  ff 27                jmp word ptr [bx]
 
-; ======== sub_214d   (appelée depuis 08a2)
+; ======== calcule_attaque_heros   (appelée depuis 08a2)
+; +0x14 ou l'arme en main, poison d'orc, lame de l'esprit -> DS:3FB8
 0214d  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 02151  8a 45 14             mov al, byte ptr [di + 0x14]
 02154  a2 b8 3f             mov byte ptr [0x3fb8], al    ; des_attaque_heros
@@ -3833,7 +3838,7 @@ loc_21a3:
 021a3  49                   dec cx
 021a4  8b d9                mov bx, cx
 021a6  8a c8                mov cl, al
-021a8  8a 87 ff 47          mov al, byte ptr [bx + 0x47ff]
+021a8  8a 87 ff 47          mov al, byte ptr [bx + 0x47ff]    ; des_armes
 021ac  24 03                and al, 3
 021ae  75 01                jne loc_21b1
 021b0  c3                   ret
@@ -3959,7 +3964,7 @@ loc_229a:
 022a8  e8 a5 f7             call sub_1a50
 022ab  5f                   pop di
 022ac  57                   push di
-022ad  e8 8f 02             call sub_253f
+022ad  e8 8f 02             call marque_case
 022b0  5f                   pop di
 022b1  57                   push di
 022b2  e8 81 09             call brume_de_mort
@@ -3972,7 +3977,7 @@ loc_229a:
 022c2  c3                   ret
 
 ; ======== monstre_vise   (appelée depuis 2268)
-; le monstre DI regarde le personnage SI : même zone, chemin vers lui (DS:40A2, DS:3FA9) ; résultat DS:3FA8
+; chemin en L du monstre DI vers le personnage SI (pas en DS:40A2) ; DS:3FA8 = 0 attaque possible, 2 bloqué
 022c3  c6 06 a8 3f 00       mov byte ptr [0x3fa8], 0    ; resultat_vise
 022c8  80 3c 00             cmp byte ptr [si], 0
 022cb  75 03                jne loc_22d0
@@ -3993,7 +3998,7 @@ loc_22e4:
 022e9  e8 64 f7             call sub_1a50
 022ec  5f                   pop di
 022ed  57                   push di
-022ee  e8 4e 02             call sub_253f
+022ee  e8 4e 02             call marque_case
 022f1  e8 f0 3d             call affiche_tampon
 022f4  b9 f4 01             mov cx, 0x1f4
 022f7  e8 8d 23             call sub_4687
@@ -4047,7 +4052,7 @@ loc_2351:
 02369  02 db                add bl, bl
 0236b  02 5d 09             add bl, byte ptr [di + 9]
 0236e  32 ff                xor bh, bh
-02370  8a 87 06 48          mov al, byte ptr [bx + 0x4806]
+02370  8a 87 06 48          mov al, byte ptr [bx + 0x4806]    ; types_monstres
 02374  a2 9c 3f             mov byte ptr [0x3f9c], al    ; deplacement_restant
 02377  8a 0e a2 3f          mov cl, byte ptr [0x3fa2]
 0237b  a0 a1 3f             mov al, byte ptr [0x3fa1]
@@ -4063,7 +4068,7 @@ loc_2385:
 02392  0a c0                or al, al
 02394  74 1e                je loc_23b4
 02396  02 f0                add dh, al
-02398  e8 dd 00             call sub_2478
+02398  e8 dd 00             call case_cible
 0239b  3c ff                cmp al, 0xff
 0239d  75 03                jne loc_23a2
 0239f  e9 b5 00             jmp loc_2457
@@ -4071,7 +4076,7 @@ loc_23a2:
 023a2  0a c0                or al, al
 023a4  75 0e                jne loc_23b4
 023a6  8a 26 a4 3f          mov ah, byte ptr [0x3fa4]
-023aa  e8 b0 00             call sub_245d
+023aa  e8 b0 00             call pas_chemin
 023ad  73 03                jae loc_23b2
 023af  e9 99 00             jmp loc_244b
 loc_23b2:
@@ -4089,7 +4094,7 @@ loc_23c2:
 023c9  e9 85 00             jmp loc_2451
 loc_23cc:
 023cc  02 d0                add dl, al
-023ce  e8 a7 00             call sub_2478
+023ce  e8 a7 00             call case_cible
 023d1  3c ff                cmp al, 0xff
 023d3  75 03                jne loc_23d8
 023d5  e9 7f 00             jmp loc_2457
@@ -4101,7 +4106,7 @@ loc_23d8:
 loc_23df:
 023df  a0 a3 3f             mov al, byte ptr [0x3fa3]
 023e2  32 e4                xor ah, ah
-023e4  e8 76 00             call sub_245d
+023e4  e8 76 00             call pas_chemin
 023e7  73 03                jae loc_23ec
 023e9  eb 60                jmp loc_244b
 ; ---- 1 octets non atteints (23eb-23eb)
@@ -4116,7 +4121,7 @@ loc_23ee:
 023fc  0a c0                or al, al
 023fe  74 1f                je loc_241f
 02400  02 d0                add dl, al
-02402  e8 73 00             call sub_2478
+02402  e8 73 00             call case_cible
 02405  3c ff                cmp al, 0xff
 02407  75 03                jne loc_240c
 02409  eb 4c                jmp loc_2457
@@ -4126,7 +4131,7 @@ loc_240c:
 0240e  75 0f                jne loc_241f
 02410  a0 a3 3f             mov al, byte ptr [0x3fa3]
 02413  32 e4                xor ah, ah
-02415  e8 45 00             call sub_245d
+02415  e8 45 00             call pas_chemin
 02418  73 03                jae loc_241d
 0241a  eb 2f                jmp loc_244b
 ; ---- 1 octets non atteints (241c-241c)
@@ -4140,13 +4145,13 @@ loc_241f:
 0242c  0a c0                or al, al
 0242e  74 21                je loc_2451
 02430  02 f0                add dh, al
-02432  e8 43 00             call sub_2478
+02432  e8 43 00             call case_cible
 02435  3c ff                cmp al, 0xff
 02437  74 1e                je loc_2457
 02439  0a c0                or al, al
 0243b  75 14                jne loc_2451
 0243d  8a 26 a4 3f          mov ah, byte ptr [0x3fa4]
-02441  e8 19 00             call sub_245d
+02441  e8 19 00             call pas_chemin
 02444  73 03                jae loc_2449
 02446  eb 03                jmp loc_244b
 ; ---- 1 octets non atteints (2448-2448)
@@ -4162,7 +4167,8 @@ loc_2457:
 02457  c6 06 a8 3f 00       mov byte ptr [0x3fa8], 0    ; resultat_vise
 0245c  c3                   ret
 
-; ======== sub_245d   (appelée depuis 23aa, 23e4, 2415, 2441)
+; ======== pas_chemin   (appelée depuis 23aa, 23e4, 2415, 2441)
+; ajoute le pas (AL, AH) au chemin du monstre
 0245d  89 16 9f 3f          mov word ptr [0x3f9f], dx
 02461  8b 1e ca 40          mov bx, word ptr [0x40ca]
 02465  88 07                mov byte ptr [bx], al
@@ -4172,17 +4178,19 @@ loc_2457:
 02473  fe 0e 9c 3f          dec byte ptr [0x3f9c]    ; deplacement_restant
 02477  c3                   ret
 
-; ======== sub_2478   (appelée depuis 2398, 23ce, 2402, 2432)
+; ======== case_cible   (appelée depuis 2398, 23ce, 2402, 2432)
+; AL = FFh si DX est la case du personnage visé, sinon case_libre
 02478  a0 bc 3f             mov al, byte ptr [0x3fbc]
 0247b  e8 01 39             call sub_5d7f
 0247e  80 3c 00             cmp byte ptr [si], 0
-02481  74 08                je sub_248b
+02481  74 08                je case_libre
 02483  3b 54 01             cmp dx, word ptr [si + 1]
-02486  75 03                jne sub_248b
+02486  75 03                jne case_libre
 02488  b0 ff                mov al, 0xff
 0248a  c3                   ret
 
-; ======== sub_248b   (appelée depuis 2619, 2656, 6c7f)
+; ======== case_libre   (appelée depuis 2619, 2656, 6c7f)
+; AL = 0 libre, 1 un héros, 2 un occupant, 3 autre zone (case DX, zone du monstre DI)
 0248b  b5 00                mov ch, 0
 loc_248d:
 0248d  38 2e bc 3f          cmp byte ptr [0x3fbc], ch
@@ -4244,7 +4252,7 @@ loc_24e3:
 02516  89 5d 04             mov word ptr [di + 4], bx
 02519  e8 34 f5             call sub_1a50
 0251c  8b 3e d4 3f          mov di, word ptr [0x3fd4]    ; cible
-02520  e8 1c 00             call sub_253f
+02520  e8 1c 00             call marque_case
 02523  e8 be 3b             call affiche_tampon
 02526  b9 f4 01             mov cx, 0x1f4
 02529  e8 5b 21             call sub_4687
@@ -4257,10 +4265,11 @@ loc_2533:
 02533  e8 6a 11             call sub_36a0
 02536  e2 fb                loop loc_2533
 02538  59                   pop cx
-02539  e8 53 f8             call carte_quete
+02539  e8 53 f8             call combat_monstre
 0253c  e9 91 31             jmp sub_56d0
 
-; ======== sub_253f   (appelée depuis 22ad, 22ee, 2520)
+; ======== marque_case   (appelée depuis 22ad, 22ee, 2520)
+; cadre ODDS&SOD 0x6320 (24 × 24) sur la case du monstre DI
 0253f  8a 45 02             mov al, byte ptr [di + 2]
 02542  32 e4                xor ah, ah
 02544  ba 00 0a             mov dx, 0xa00    ; "AND TRY AGAIN"
@@ -4355,7 +4364,7 @@ loc_25ec:
 02610  ba 19 07             mov dx, 0x719
 02613  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 02616  a2 bc 3f             mov byte ptr [0x3fbc], al
-02619  e8 6f fe             call sub_248b
+02619  e8 6f fe             call case_libre
 0261c  bb 3e 59             mov bx, 0x593e
 0261f  3c 01                cmp al, 1
 02621  75 03                jne loc_2626
@@ -4379,7 +4388,7 @@ loc_263a:
 0264d  ba 00 00             mov dx, 0
 02650  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 02653  a2 bc 3f             mov byte ptr [0x3fbc], al
-02656  e8 32 fe             call sub_248b
+02656  e8 32 fe             call case_libre
 02659  bb 6f 58             mov bx, 0x586f    ; grille_occupants
 0265c  3c 01                cmp al, 1
 0265e  74 4f                je trois_des_un_point
@@ -9281,7 +9290,7 @@ loc_4ca8:
 04cb2  3a 64 02             cmp ah, byte ptr [si + 2]
 04cb5  75 0c                jne loc_4cc3
 04cb7  c7 06 ea 3f d4 00    mov word ptr [0x3fea], 0xd4    ; message_en_attente
-04cbd  e8 60 d4             call sub_2120
+04cbd  e8 60 d4             call retire_monstre
 04cc0  e9 ed 21             jmp sub_6eb0
 loc_4cc3:
 04cc3  83 c6 0a             add si, 0xa
@@ -9343,7 +9352,7 @@ loc_4d40:
 04d48  75 0b                jne loc_4d55
 04d4a  3a 64 02             cmp ah, byte ptr [si + 2]
 04d4d  75 06                jne loc_4d55
-04d4f  e8 ce d3             call sub_2120
+04d4f  e8 ce d3             call retire_monstre
 04d52  eb 06                jmp loc_4d5a
 ; ---- 1 octets non atteints (4d54-4d54)
 loc_4d55:
@@ -13059,7 +13068,7 @@ loc_6c64:
 06c7c  eb 0b                jmp loc_6c89
 ; ---- 1 octets non atteints (6c7e-6c7e)
 loc_6c7f:
-06c7f  e8 09 b8             call sub_248b
+06c7f  e8 09 b8             call case_libre
 06c82  0a c0                or al, al
 06c84  75 03                jne loc_6c89
 06c86  eb 1e                jmp loc_6ca6
@@ -13352,7 +13361,7 @@ loc_6eef:
 06efc  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06eff  a2 bc 3f             mov byte ptr [0x3fbc], al
 06f02  89 3e d4 3f          mov word ptr [0x3fd4], di    ; cible
-06f06  e8 86 ae             call carte_quete
+06f06  e8 86 ae             call combat_monstre
 06f09  e9 9e a3             jmp loc_12aa
 
 ; ======== sub_6f0c   (routine probable : non appelée directement)
@@ -17325,7 +17334,7 @@ loc_9517:
 loc_951e:
 0951e  fe 06 7a ab          inc byte ptr [0xab7a]    ; choix_menu
 09522  8b f3                mov si, bx
-09524  e9 f9 8b             jmp sub_2120
+09524  e9 f9 8b             jmp retire_monstre
 
 ; ======== dessine_objets   (appelée depuis 91dc)
 ; dessine les 12 cases, et le cadre 0xA280 sur les objets en service

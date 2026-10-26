@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 380, dont 133 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 142 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe7 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom  "questb.ega"
@@ -25,9 +25,9 @@
 00b03  sub_0b03                     6    0  |     
 00b09  sub_0b09                    19    1  |     3fb7
 00b1c  sub_0b1c                    12    1  |     3fb2 resultat_vise
-00b28  sub_0b28                    28    3  |     cible des_attaque_b des_defense_monstre
-00b44  sub_0b44                    71    1  |     cible des_attaque_heros fiche_heros_courant numero_quete
-00b8b  sub_0b8b                    91    1  |     des_defense_b fiche_heros_courant
+00b28  calcule_des_monstre         28    3  |     cible des_attaque_monstre des_defense_monstre
+00b44  bonus_attaque_heros         71    1  |     cible des_attaque_heros fiche_heros_courant numero_quete
+00b8b  calcule_defense_heros       91    1  |     des_defense_heros fiche_heros_courant
 00be6  affiche_des                 63    4  |     3de8 seg_odds segment_source
 00c20  prime_ulag                  12    0  |     
 00c2c  sub_0c2c                    30    0  |     evenement_b personnage_courant
@@ -94,20 +94,20 @@
 01d5d  sub_1d5d                     8    1  |     3fde
 01d65  sub_1d65                    36    2  |     
 01d89  sub_1d89                     6    0  |     
-01d8f  carte_quete                255    2  |     3fb6 3fbc attaquant erreur_fichier fiche_heros_courant fichier_nom fichier_offset fichier_segment fichier_taille mode_video personnage_courant seg_annexe  "maps.ega"
-01e90  attaque_contre_heros       131    1  |     attaquant boucliers cranes des_attaque_b des_defense_b fiche_heros_courant heros_courant
+01d8f  combat_monstre             255    2  |     3fb6 3fbc attaquant erreur_fichier fiche_heros_courant fichier_nom fichier_offset fichier_segment fichier_taille mode_video personnage_courant seg_annexe  "maps.ega"
+01e90  attaque_contre_heros       131    1  |     attaquant boucliers cranes des_attaque_monstre des_defense_heros fiche_heros_courant heros_courant
 01f14  sub_1f14                   446    1  | 4bh  dx  37ed 37f1 37f7 3fb7 3fc8 3fcc 4bcc 4bcd 4bce 4bd2 4bd6 4be5
 020bb  sub_20bb                   100    1  |     3fc8 3fcc attaquant cible erreur_fichier
-02120  sub_2120                    45    4  |     
-0214d  sub_214d                   106    1  |     3fb7 cible des_attaque_heros fiche_heros_courant
+02120  retire_monstre              45    4  |     
+0214d  calcule_attaque_heros      106    1  |     3fb7 cible des_attaque_heros fiche_heros_courant
 021b7  de_combat                   10   10  |     
 021c1  tour_morcar                 86    1  |     3f9d 3fe9 467b 4695 46af 46c9 46e3 47f1
 02217  tour_monstre               172    1  |     3fbc 3fe6 attaquant numero_quete resultat_vise
 022c3  monstre_vise               404    1  |     3f9f 3fa1 3fa2 3fa3 3fa4 3fa5 3fa6 40ca deplacement_restant longueur_chemin resultat_vise
-0245d  sub_245d                    27    4  |     3f9f 40ca deplacement_restant longueur_chemin
-02478  sub_2478                    19    4  |     3fbc
-0248b  sub_248b                   180    3  |     3fbc 40ca cible longueur_chemin
-0253f  sub_253f                   128    3  |     3fc2 4639 fiche_heros_courant heros_courant personnage_courant seg_odds segment_source  "AND TRY AGAIN"
+0245d  pas_chemin                  27    4  |     3f9f 40ca deplacement_restant longueur_chemin
+02478  case_cible                  19    4  |     3fbc
+0248b  case_libre                 180    3  |     3fbc 40ca cible longueur_chemin
+0253f  marque_case                128    3  |     3fc2 4639 fiche_heros_courant heros_courant personnage_courant seg_odds segment_source  "AND TRY AGAIN"
 025bf  piege_des                  239    0  |     3f97 3fbc 3fc2 3fec 586f 5870 5924 593e fiche_heros_courant heros_courant numero_quete personnage_courant
 026af  trois_des_un_point          40    0  |     26c9 heros_courant
 026d7  sub_26d7                    11    3  |     3f9b deplacement_restant

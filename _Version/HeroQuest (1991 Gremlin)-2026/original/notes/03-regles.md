@@ -149,10 +149,48 @@ Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTIL
 
 1. Rien si le monstre n'existe pas ou porte le bit 0x80.
 2. Octet +6 : bit 1 = réveillé (sinon il ne joue pas) ; bit 4 = endormi, il ne se réveille que sur un 6 ; bit 2 = passe ce tour.
-3. Pour chacun des 5 personnages, `monstre_vise` : le personnage doit être dans la même zone et ne pas porter le bit 1 de +0x18. Le monstre calcule alors un chemin vers lui (pas dx, dy rangés en DS:40A2, leur nombre en DS:3FA9). Si le résultat (DS:3FA8) vaut 0 ou 3, le monstre agit : il avance pas à pas sur le chemin (`monstre_avance`, 0x24CE), en mettant à jour la grille des occupants (DS:586F).
-4. Quête 16 : la brume de la mort se déplace de 6 cases par tour, par une table de routines (DS:4657).
+3. Pour chacun des 5 personnages, dans l'ordre des fiches, `monstre_vise` cherche un chemin jusqu'à lui (ci-dessous). Le premier personnage atteignable est attaqué : le monstre avance (`monstre_avance`), puis frappe (`combat_monstre`). Sinon le monstre reste sur place.
+4. Quête 16 du code (17e du jeu, Les couloirs silencieux) : la brume de la mort se déplace 6 fois par tour, par une table de routines (DS:4657).
 
-À lire : le reste de `monstre_vise` (distance, attaque quand le monstre est au contact, `attaque_contre_heros`).
+`monstre_vise` (0x22C3) :
+
+1. Le personnage doit exister, être dans la même zone que le monstre et ne pas porter le voile de brume (+0x18 bit 1).
+2. Le chemin est en L : d'abord sur l'axe où l'écart est le plus grand, puis sur l'autre, une case à la fois vers le personnage. Chaque pas (dx, dy) est rangé en DS:40A2.
+3. Chaque case testée (`case_libre`) : la case du personnage visé termine le chemin (résultat 0 : attaque) ; un autre héros, un occupant (monstre, meuble) ou une autre zone le bloque (résultat 2 : pas d'attaque). Le monstre ne contourne pas un obstacle.
+4. Le déplacement du monstre (premier octet de `types_monstres`) est décompté à chaque pas, mais le test qui devrait arrêter le chemin ne peut jamais réussir (retenue d'un `add` sur un pointeur) : le chemin n'est pas limité. À confirmer au débogueur.
+
+`combat_monstre` (0x1D8F) charge les images de combat (MEN), calcule les dés, appelle `attaque_contre_heros`, puis recharge MAPS. Les dés :
+
+- Attaque du monstre : deuxième octet de `types_monstres` (DS:4806, 5 octets par type : déplacement, attaque, défense, routine appelée à sa mort).
+- Défense du héros (`calcule_defense_heros`, 0x0B8B) : +0x15, remplacé par 4 avec l'armure de Borin ou l'armure de plates, 3 avec la cotte de mailles ; +1 avec le bouclier, +1 avec le casque ; +2 avec la potion de ténacité ou la peau de pierre, effets consommés par cette défense. Aucun dé si +0x0F bit 0x20 est posé (?).
+- `attaque_contre_heros` : le héros compte comme boucliers toutes les faces sauf le bouclier blanc (4 faces sur 6, au lieu des 2 boucliers blancs du jeu de plateau) ; les crânes du monstre moins ces boucliers sont retirés des points de corps. « VOUS AVEZ SURVECU A L'ATTAQUE », ou `mort_heros`.
+
+Types de monstres (`types_monstres`) :
+
+| Type | Déplacement | Attaque | Défense | Type | Déplacement | Attaque | Défense |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 gobelin | 10 | 2 | 1 | 7 gargouille | 6 | 4 | 4 |
+| 1 orc | 8 | 3 | 2 | 8 Ulag | 10 | 4 | 5 |
+| 2 fimir | 6 | 3 | 3 | 9 Grak | 8 | 4 | 4 |
+| 3 guerrier du chaos | 6 | 3 | 4 | 10 Balur | 8 | 2 | 5 |
+| 4 squelette | 6 | 2 | 2 | 11 Sorcier-Roi (sur son trône ?) | 1 | 2 | 6 |
+| 5 zombi | 4 | 2 | 3 | 12 Sorcier-Roi | 10 | 5 | 6 |
+| 6 momie | 4 | 3 | 4 | 13 (?) | 6 | 3 | 5 |
+
+Les types 14 à 26 (extension) sont dans la même table. Une routine de mort est donnée pour Ulag (prime de l'empereur), Balur, et les types 14 à 19, 22 et 26 (primes, objets lâchés comme l'étoile de l'ouest) ; `retire_monstre` (0x2120) l'appelle.
+
+## Attaque du héros
+
+`calcule_attaque_heros` (0x214D) : +0x14 de la fiche, remplacé par le nombre de dés de l'arme en main (table DS:47FF, bits 0-1, plus 1) :
+
+| Arme | Dés | Arme | Dés |
+| --- | --- | --- | --- |
+| Bâton | 2 | Arbalète | 3 |
+| Épée courte | 2 | Hache à main | 2 |
+| Glaive (épée large) | 3 | Lance | 2 |
+| Hache d'armes | 4 | | |
+
+Les bits hauts de la table (0x80 pour le bâton, l'épée courte, la lance et l'arbalète ; 0x40, 0x20, 0x10) sont sans doute les portées (diagonale, lancer, tir) : à lire. Le poison d'orc donne 2 dés, la lame de l'esprit 3 (4 contre squelettes, zombis et momies). Puis (0x0B44) : contre le Sorcier-Roi, aucun dé sans la lame de l'esprit ; +2 avec la potion de force ou le courage, consommés par cette attaque.
 
 ## Plateau en mémoire
 

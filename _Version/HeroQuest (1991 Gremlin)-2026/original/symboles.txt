@@ -9,7 +9,7 @@
 0x0be6  code  affiche_des            affiche un résultat de dés (icône BX, position BP)
 0x1411  code  prepare_meuble         sprite d'un meuble : (code - 0x4B) * 6 + DS:43FC
 0x17a5  code  source_mur             source d'un mur selon l'orientation
-0x1e90  code  attaque_contre_heros    un monstre attaque un héros (message « VOUS AVEZ SURVECU A L'ATTAQUE ») ; défense comptée sur les faces autres que 1 : à vérifier
+0x1e90  code  attaque_contre_heros   le héros compte comme boucliers les faces autres que le bouclier blanc (4 sur 6) ; crânes du monstre moins boucliers = blessures
 0x21b7  code  de_combat              face d'un dé de combat dans BL : 0 crâne, 1 bouclier blanc, 2 bouclier noir
 0x25bf  code  piege_des              jet de dé d'un piège selon AL
 0x26af  code  trois_des_un_point     trois dés lancés, un point de corps perdu ; code automodifié en 0x26C9
@@ -92,8 +92,8 @@
 0x3f93  var   index_case_courante
 0x3f9c  var   deplacement_restant
 0x3fb8  var   des_attaque_heros
-0x3fb9  var   des_defense_b
-0x3fba  var   des_attaque_b
+0x3fb9  var   des_defense_heros      dés de défense du héros attaqué par un monstre
+0x3fba  var   des_attaque_monstre
 0x3fbb  var   des_defense_monstre
 0x3fc4  var   des_deplacement
 0x3fca  var   heros_courant
@@ -137,7 +137,7 @@
 0x54b1  code  charge_ecran_plateau   BOOK, MAPS, SPRITES ; version VGA en 0x54BA
 0x5292  code  charge_ecran_menus     BORDERED, SHOPSP, SHOPMP ; version VGA en 0x529B
 0x5c80  code  charge_men             MEN.VGA (héros en combat)
-0x1d8f  code  carte_quete            MAPS.VGA : carte de la quête (?)
+0x1d8f  code  combat_monstre         un monstre frappe le héros SI (DS:3FD6) : images MEN, dés, attaque_contre_heros, puis recharge MAPS
 
 # ---- Déroulement d'une session
 0x7310  code  menu_titre             logo et 3 icônes ; clic -> table DS:AA1A (2 plateau, 4 héros, 6 armurerie) ; bit 0x40 = quitter
@@ -191,13 +191,13 @@
 0x5a7d  code  icones_actives         toutes les icônes à l'état 1 ; sorts cachés pour barbare, nain et 5e personnage
 0x5abe  code  icones_init
 0x5ae4  code  icones_selon_situation grise les fouilles si un monstre réveillé est dans la zone, etc.
-0x22c3  code  monstre_vise           le monstre DI regarde le personnage SI : même zone, chemin vers lui (DS:40A2, DS:3FA9) ; résultat DS:3FA8
+0x22c3  code  monstre_vise           chemin en L du monstre DI vers le personnage SI (pas en DS:40A2) ; DS:3FA8 = 0 attaque possible, 2 bloqué
 0x24ce  etiq  monstre_avance         déplace le monstre pas à pas sur le chemin calculé
 0x607e  code  index_case             index de la case (x, y) passée dans DX, dans BX
 0x3fbf  var   evenement_a            drapeau d'événement de quête (0x80 : message à afficher)
 0x3fc0  var   evenement_b
 0x3fea  var   message_en_attente     numéro de message à afficher au prochain tour (quête 9)
-0x3fa8  var   resultat_vise          0 ou 3 : le monstre agit sur ce personnage
+0x3fa8  var   resultat_vise          0 : le monstre peut atteindre ce personnage et l'attaque ; 2 : bloqué
 0x3fa9  var   longueur_chemin
 0x40a2  table chemin_monstre         pas (dx, dy) du chemin d'un monstre
 0x4277  table icones_panneau         12 octets par icône : +4 largeur, +5 hauteur, +6 état (FF cachée, 1 normale, 1C enfoncée, sinon grisée), +7 à redessiner, +8 position écran, +A image dans ODDS&SOD
@@ -297,3 +297,16 @@
 0x7b7a  code  liste_emplacements     les 8 emplacements de QUEST.SAV du type du héros ; DI nom, SI fiche de l'emplacement choisi
 0x7bfa  code  dessine_cadre          cadre d'une boîte de texte (images SHOPMP 0xB7C0 à 0xBEC0, 16 × 16)
 0xab7a  var   choix_menu             rang du bouton choisi (0, 1...), FEh = bouton droit
+
+# ---- Combat (voir original/notes/03-regles.md#monstres)
+0x4806  table types_monstres         5 octets par type (0 à 26) : déplacement, dés d'attaque, dés de défense, routine de mort
+0x47ff  table des_armes              7 armes (indice 6 - bit) : bits 0-1 dés - 1, bits 4-7 portée (?)
+0x0b28  code  calcule_des_monstre            dés d'attaque (DS:3FBA) et de défense (DS:3FBB) du monstre DS:3FD4
+0x0b44  code  bonus_attaque_heros    Sorcier-Roi sans la lame de l'esprit : 0 dé ; +2 force, +2 courage (consommés)
+0x0b8b  code  calcule_defense_heros      +0x15, armures, bouclier, casque, ténacité, peau de pierre -> DS:3FB9
+0x214d  code  calcule_attaque_heros      +0x14 ou l'arme en main, poison d'orc, lame de l'esprit -> DS:3FB8
+0x2120  code  retire_monstre         efface le monstre SI et appelle sa routine de mort (types_monstres +3)
+0x2478  code  case_cible             AL = FFh si DX est la case du personnage visé, sinon case_libre
+0x248b  code  case_libre             AL = 0 libre, 1 un héros, 2 un occupant, 3 autre zone (case DX, zone du monstre DI)
+0x245d  code  pas_chemin             ajoute le pas (AL, AH) au chemin du monstre
+0x253f  code  marque_case            cadre ODDS&SOD 0x6320 (24 × 24) sur la case du monstre DI

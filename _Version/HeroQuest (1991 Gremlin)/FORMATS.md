@@ -182,7 +182,7 @@ Si le fichier manque, le jeu en crée un : `sauve_quest_sav` (0x8443) écrit les
 
 ## Code du jeu (règles)
 
-État de l'étude : le hasard, les dés, le déplacement, l'attaque du héros et la pioche des trésors sont identifiés. Le déroulement des tours, l'intelligence des monstres, les sorts et les événements scriptés ne le sont pas encore. Le plateau de Donjon v2 n'utilise pas ce code : il garde ses propres règles (modules JavaScript de 2009).
+État de l'étude : le hasard, les dés, le déplacement, l'attaque du héros et la pioche des trésors sont décrits ici. Le déroulement des tours, les monstres, les sorts, les objets et les événements scriptés sont dans les notes du remake (`HeroQuest (1991 Gremlin)-2026/original/notes/`). Le plateau de Donjon v2 n'utilise pas ce code : il garde ses propres règles (modules JavaScript de 2009).
 
 ### Hasard
 
@@ -207,9 +207,9 @@ Le héros lance DS:0x3FC4 dés (2 en temps normal) et la somme va dans DS:0x3F9C
 3. Le monstre lance DS:0x3FBB dés et compte les boucliers noirs (face 2), rangés en DS:0x3FD3.
 4. Si crânes > boucliers, le champ +7 de l'enregistrement du monstre passe à 0 (monstre touché), puis 0x1F14 applique le résultat et 0x2120 retire le monstre s'il est mort.
 
-### Autre combat (0x1E90)
+### Attaque d'un monstre contre un héros (0x1E90)
 
-Le défenseur lance DS:0x3FB9 dés en comptant les faces **différentes** du bouclier blanc, l'attaquant lance DS:0x3FBA dés et compte les crânes. La différence, si elle est positive, est retirée du champ +6 de la cible (ses points de corps). Le comptage inversé et les textes « FORCE D'ATTAQUE DU GENIE / FORCE DE DEFENCE DE L'ADVERSAIRE » de FRENCH.BIN laissent penser au sort Génie ; à confirmer.
+Le héros lance DS:0x3FB9 dés en comptant les faces **différentes** du bouclier blanc (crânes et boucliers noirs, 4 faces sur 6), le monstre lance DS:0x3FBA dés et compte les crânes. La différence, si elle est positive, est retirée des points de corps du héros (+6). Le calcul des dés et le déplacement du monstre sont décrits dans les notes du remake (`HeroQuest (1991 Gremlin)-2026/original/notes/03-regles.md`, « Monstres »).
 
 ### Pièges et cartes
 
