@@ -1,10 +1,9 @@
 QUEST.EXE : image de 83504 octets, code de 0x0000 à 0x97c0, segment de données à 0x97c0.
-Instructions atteintes : 14889 (38522 octets, 99.2 % de la zone de code).
-Routines : 378 (dont 113 probables), étiquettes : 1657, tables de saut lues : 21.
+Instructions atteintes : 14935 (38595 octets, 99.3 % de la zone de code).
+Routines : 381 (dont 83 probables), étiquettes : 1659, tables de saut lues : 21.
 Sauts ou appels indirects non résolus : 6
-  214b 6462 73e8 0f04 6ea8 7885
+  214b 73e8 7885 6ea8 6462 0f04
 
 Zones de code non atteintes (plus de 16 octets) :
   00000-0001f  32 octets
   02fec-0300d  34 octets
-  03709-03751  73 octets

@@ -1,0 +1,88 @@
+; Routines de INTRO.EXE : 85, dont 0 nommées dans symboles.txt.
+; adresse  nom  taille  appelants  | int  ports  variables  chaînes
+
+044b0  sub_44b0                  1116    5  | 10h/00 10h/? 16h 21h/09 21h/3d 21h/3e 21h/41 21h/4a 21h/4c    10a2 1440 1442 1443 1444 1445 1446 1447 1448 19f2 19f8 19fb  "quest.exe"
+04912  sub_4912                   109    3  |     1440 19f0  "uest.exe"
+04980  sub_4980                    98    2  |   dx  1440
+049e2  sub_49e2                    26    1  | 10h/00    1440
+049fc  sub_49fc                    16    2  | 10h/00    
+04a0c  sub_4a0c                     5    1  |     
+04a11  sub_4a11                    60    0  |     128e
+04a4d  sub_4a4d                    29    0  |     
+04a6a  sub_4a6a                    40    0  |     
+04a92  sub_4a92                   135    0  |     128e 1290
+04b19  sub_4b19                   103    0  |     128e 1290
+04b80  sub_4b80                    78    0  |     128e
+04bda  sub_4bda                     7    6  |     
+04be1  sub_4be1                    28    4  |     
+04bfd  sub_4bfd                    34    4  |     
+04c1f  sub_4c1f                    55    8  |     
+04c56  sub_4c56                   125    1  |     
+04cd3  sub_4cd3                   125    1  |     
+04d50  sub_4d50                    67    4  |     
+04d93  sub_4d93                    73    1  |     
+04ddc  sub_4ddc                    73    1  |     
+04e25  sub_4e25                    30    2  | 10h/?    1440
+04e43  sub_4e43                    24    3  |   dx  
+04e5b  sub_4e5b                   113    2  |     1ba3 1ba5 1ba9
+04ecd  sub_4ecd                    78    3  |     
+04f1b  sub_4f1b                    24    1  | 16h    
+04f33  sub_4f33                    79    2  |     
+04f82  sub_4f82                    61    2  |     
+04fbf  sub_4fbf                    46    3  |     
+04fed  sub_4fed                  6322    1  |     23ef
+06a3c  sub_6a3c                    15   14  |     
+06a4b  sub_6a4b                  1038    4  |   dx  1440 19f2 19f3 19f4 19f6 19f8 19fa 19fb
+06e5e  sub_6e5e                    13    0  | 10h/00    1440
+06e6b  sub_6e6b                    27    1  |       " SPACEBAR"
+06e86  sub_6e86                    15    0  |     
+06e95  sub_6e95                    13    1  |     
+06ea2  sub_6ea2                    41    2  |     
+06ecb  sub_6ecb                     8    1  |     
+06ed3  sub_6ed3                    45    0  |     1b9f 1ba0 1ba1 1ba2
+06f00  sub_6f00                    96    0  |   dx  1440 19f3 19f4 19f6
+06f60  sub_6f60                    13    1  |   dx  
+06f7a  sub_6f7a                    55    1  | 21h/25 21h/35    1c3d
+06fb1  sub_6fb1                    24   10  | 21h/25    
+07012  sub_7012                    87    5  |     1bb5 1bd1 1c34 1c35
+07069  sub_7069                   138    1  |     1443 14ac 14ad 14af 1c34
+070f5  sub_70f5                    81    1  |     1c34 1c35 1c37
+07146  sub_7146                    86    1  | 33h/00    1443 1c34 1c35 1c37
+0719d  sub_719d                    18    0  | 33h/00    1443
+071af  sub_71af                    11    0  |     1c34
+071ba  sub_71ba                    52    1  |     1c34
+071ee  sub_71ee                    38    0  |     1c34
+07214  sub_7214                    45    0  |     1c34
+07241  sub_7241                    29   12  |     1a8b 1ba7
+07260  sub_7260                    22    2  |     1a8b
+07276  sub_7276                    18    1  | 21h/3c    1ba9 1bab
+07288  sub_7288                    26    1  | 21h/3d    1a8b 1ba9 1bab
+072a2  sub_72a2                    26    1  | 21h/40    1ba3 1ba5 1ba7 1bab
+072bc  sub_72bc                    24    1  | 21h/3f    1ba3 1ba5 1bab
+072d4  sub_72d4                    11    1  | 21h/3e    1bab
+072df  sub_72df                   134    1  |     19f4 1d26 1d28 1d2a 1d2c
+07365  sub_7365                    52    0  |     1d2a 1d2c
+07399  sub_7399                    59    1  |     1a9b 1a9d
+073d4  sub_73d4                    60    2  |     1a9b 1a9d
+07410  sub_7410                  1413    1  |     1440 19f0 1a9b 1a9d 2500 2502 2504
+07995  sub_7995                   815    0  |     1440 19f0 1a9b 1a9d 2500 2502 2504
+07cc4  sub_7cc4                   147    0  |     19f2 1a87 1a89
+07d57  sub_7d57                    13    0  |     
+07d64  sub_7d64                     6    0  |     
+07d6a  sub_7d6a                   196    1  |     19f2 19f4 19f6 19fb
+07e2e  sub_7e2e                    30    9  |     1a95
+07e4c  sub_7e4c                     6    2  |     
+07e52  sub_7e52                    14    2  |     
+07e60  sub_7e60                     8    2  |       "0123456789ABCDEF"
+07e68  sub_7e68                    20    0  |     
+07e7c  sub_7e7c                    14    0  | 21h/25    
+07e8d  sub_7e8d                   182    8  |     
+07f43  sub_7f43                     8    1  |     
+07f4b  sub_7f4b                    28    8  |   dx  1d24
+07f67  sub_7f67                    19    1  |     1d22 1d24
+07fca  sub_7fca                    68    1  |   dx  14ac
+08011  sub_8011                    25    1  |   dx  
+0802a  sub_802a                    56    1  | 60h  0x61  1442 1449 144c 144e
+08062  sub_8062                   104    1  | 21h/48 60h    1442 1449 144a 14a8 1a8b 1ba3 1ba5 1ba9
+080ca  sub_80ca                    43    1  | 60h    1442 144a 144c
+080f5  sub_80f5                    65    1  | 60h  0x61  1442 1449 144c 1bf8

@@ -9,17 +9,57 @@
 0x0be6  code  affiche_des            affiche un résultat de dés (icône BX, position BP)
 0x1411  code  prepare_meuble         sprite d'un meuble : (code - 0x4B) * 6 + DS:43FC
 0x17a5  code  source_mur             source d'un mur selon l'orientation
-0x1e90  code  combat_genie           combat à comptage inversé (sort Génie ?), dégâts sur le champ +6 de la cible
+0x1e90  code  attaque_contre_heros    un monstre attaque un héros (message « VOUS AVEZ SURVECU A L'ATTAQUE ») ; défense comptée sur les faces autres que 1 : à vérifier
 0x21b7  code  de_combat              face d'un dé de combat dans BL : 0 crâne, 1 bouclier blanc, 2 bouclier noir
 0x25bf  code  piege_des              jet de dé d'un piège selon AL
 0x26af  code  trois_des_un_point     trois dés lancés, un point de corps perdu ; code automodifié en 0x26C9
 0x3174  code  ligne_ecran            BX += AX * 320
-0x36ba  code  souris_affiche         (supposé) réaffiche la souris
-0x36f1  code  souris_cache           (supposé) cache la souris
 0x3613  code  hasard                 nombre de 1 à BL dans AL (registre à décalage DS:38FD)
-0x3981  code  charge_fichier_b       variante du chargement
 0x3b53  code  copie_image            copie une image : BP largeur, CX hauteur, SI source, DI écran, segment source DS:374E
 0x45d1  code  lz_decompresse         décompression LZ : DS:SI vers ES:DI
+
+# ---- Socle : configuration (voir original/notes/01-socle.md)
+0x30f6  code  lit_configuration      charge QUEST.CFG en DS:3190 (9 octets), teste la souris (int 33h), étalonne le joystick si besoin
+0x359e  code  mode_tandy             mode vidéo 4 : int 10h mode 8 (Tandy / PCjr)
+0x5fe3  code  mode_vga               mode 13h, puis palette DS:5B23
+0x4e10  code  alloue_memoire         réserve les segments graphiques (int 21h AH=48h), selon le mode vidéo
+0x5070  code  charge_donnees         charge le fichier de textes de la langue DS:3194, puis les graphismes
+0x45bf  code  installe_erreur_disque détourne int 24h (erreur critique) vers erreur_disque
+0x45cd  code  erreur_disque          gestionnaire int 24h : AL = 0, ignorer l'erreur
+
+# ---- Socle : fichiers
+0x3981  code  charge_fichier         ouvre, lit et ferme DS:3907 vers DS:3901:3903 ; taille lue dans DS:3905
+0x39a0  code  sauve_fichier          crée, écrit et ferme DS:3907 depuis DS:3901:3903, DS:3905 octets
+0x39b6  code  fichier_cree           int 21h AH=3Ch
+0x39c8  code  fichier_ouvre          int 21h AH=3Dh ; erreur dans DS:37E9 (2 = fichier absent)
+0x39e2  code  fichier_ecrit          int 21h AH=40h
+0x39fc  code  fichier_lit            int 21h AH=3Fh
+0x3a14  code  fichier_ferme          int 21h AH=3Eh
+
+# ---- Socle : clavier, souris, joystick
+0x36ba  code  clavier_installe       détourne int 9 vers clavier_interruption et vide la table des touches DS:3912
+0x36f1  code  clavier_retire         remet l'ancien vecteur int 9 (avant chaque accès disque)
+0x3709  code  clavier_interruption   int 9 : lit le port 60h, met à 1 ou 0 l'octet de la touche dans DS:3912
+0x3752  code  lit_commandes          fusionne clavier, joystick et souris dans DS:3992 ; déplace le curseur DS:3993/3995
+0x37a9  code  lit_joystick           si DS:3193 = 2
+0x3835  code  curseur_clavier        déplace le curseur de 4 pixels selon les bits de direction
+0x3886  code  lit_souris             si DS:3193 = 0 : int 33h AX=3, boutons et position
+0x38dd  code  souris_position        int 33h AX=4 (place le curseur de la souris)
+0x38ef  code  attend_commande        attend une commande (DS:3992 non nul)
+0x38fa  code  attend_relache         attend que DS:3992 revienne à 0
+0x3905  etiq  attend_bouton_droit    attend le bouton droit seul (0x20), puis son relâchement
+0x46be  code  etalonne_joystick      message et étalonnage (DS:320A à 320D)
+
+# ---- Socle : son (pilote ADLIB.DRV, TANDY.DRV... appelé par int 60h)
+0x47a6  code  son_charge_pilote      réserve la mémoire et charge le pilote choisi par DS:3192 (tables DS:31F0, DS:31D0)
+0x476e  code  son_arret              int 60h AX=0Bh, coupe le haut-parleur (port 61h)
+0x4825  code  son_prepare            int 60h AX=2 puis AX=3 (?)
+0x4850  code  son_musique            lance la musique si DS:3956 = 1 (?)
+0x2827  code  son_effet_1            effets sonores : même schéma (DS:3199 actif, DS:3192 pilote), 8 appels
+0x2a48  code  son_effet_2            15 appels
+
+# ---- Sauvegarde
+0x7954  code  sauvegarde_menu        charge ou enregistre QUEST.SAV
 0x5d8c  code  compte_cranes          lance DH dés de combat, renvoie les crânes dans AL
 0x5f82  code  initialise_jeu         graine du hasard (heure DOS), puis chargements
 0x5ff8  etiq  mode_video_palette     mode 13h et palette DS:5B23 (int 10h AX=1012h)
@@ -27,7 +67,19 @@
 0x672a  etiq  lancer_deplacement     somme de DS:3FC4 dés à 6 faces dans DS:3F9C
 0x87dd  etiq  melange_tresors        mélange les 25 cartes trésor
 
-0x3190  var   mode_video             index des tables de saut d'affichage (8 = VGA)
+0x3190  var   mode_video             index des tables de saut d'affichage (8 = VGA) ; QUEST.CFG octets 0-1
+0x3192  var   son_pilote             QUEST.CFG octet 2 : pilote de son (0 = haut-parleur ?)
+0x3193  var   commande_type          QUEST.CFG octet 3 : 0 souris, 1 clavier, 2 joystick
+0x3194  var   langue                 QUEST.CFG octet 4 : fichier de textes (0 anglais, 1 français, 2 espagnol, 3 allemand, 4 italien)
+0x3195  var   commandes_joueurs      QUEST.CFG octets 5-8 : commande de chaque joueur (0 souris, 1 clavier, 2 joystick)
+0x3199  var   son_actif
+0x3211  var   souris_presente        résultat de int 33h AX=0 (0 = pas de souris)
+0x390b  table touches_commandes      6 codes clavier : Entrée (bouton droit), Espace (clic), P, O, A, Q
+0x3912  table etat_touches           un octet par code clavier, 1 = enfoncée
+0x3992  var   commandes              1 haut, 2 bas, 4 gauche, 8 droite, 0x10 bouton gauche, 0x20 bouton droit, 0x40 ?
+0x3993  var   curseur_x
+0x3995  var   curseur_y
+0x3999  var   ancien_int9            segment puis offset du gestionnaire clavier du BIOS
 0x374e  var   segment_source         segment source de copie_image
 0x38fd  var   graine                 4 octets du générateur de hasard
 0x3901  var   fichier_segment        destination du chargement
@@ -68,3 +120,69 @@
 0x50d0  table sols_speciaux          sol des codes 0x30 à 0x3B
 0x5b23  table palette                768 octets VGA
 0xa543  table sols_zones             sol de chaque zone
+
+# ---- Écrans et affichage (voir original/notes/02-ecrans.md)
+0x88ed  code  affiche_message        boîte de message BX (offset dans la table des textes chargée en DS:5FC1)
+0x317c  code  affiche_texte          texte pointé par BP, codes de contrôle 01 (position), 11 (ligne, colonne), 10, 12
+0x6202  code  efface_tampon          remplit le tampon d'écran (segment 1463) ; version VGA en 0x6248
+0x6a23  code  fond_vers_tampon       recopie l'écran de fond (DS:5E23) dans le tampon
+0x60e4  code  affiche_tampon         envoie le tampon à l'écran ; version VGA en 0x6148
+0x656f  code  sauve_tampon           copie le tampon (64 000 octets en VGA) vers le segment DS:5E35
+0x5e14  code  curseur_sauve_fond     sprite du curseur (DS:47E5, 16 x 16) : sauve ce qu'il recouvre
+0x5dd7  code  curseur_dessine
+0x63fc  code  curseur_memorise       copie curseur_x et curseur_y dans DS:47E7
+0x4f05  code  zone_cliquee           si clic : numéro x 2 de la zone de la table SI sous le curseur, dans BX
+0x4f1a  code  zone_sous_curseur      même recherche sans attendre de clic
+0x392e  code  attend_relache_clic    (?) même schéma que attend_bouton_droit
+0x54b1  code  charge_ecran_plateau   BOOK, MAPS, SPRITES ; version VGA en 0x54BA
+0x5292  code  charge_ecran_menus     BORDERED, SHOPSP, SHOPMP ; version VGA en 0x529B
+0x5c80  code  charge_men             MEN.VGA (héros en combat)
+0x1d8f  code  carte_quete            MAPS.VGA : carte de la quête (?)
+
+# ---- Déroulement d'une session
+0x7310  code  menu_titre             logo et 3 icônes ; clic -> table DS:AA1A (2 plateau, 4 héros, 6 armurerie) ; bit 0x40 = quitter
+0x73ed  code  choix_quete            icône plateau : quête, briefing (QUESTB, EQUESTS.BIN) ; « AUCUN PERSONNAGE ACTIF... »
+0x7717  code  ecran_heros            icône héros : choix et création des personnages
+0x78cd  code  heros_renouvele        « LE PERSONNAGE A ETE RENOUVELE »
+0x8070  code  armurerie              icône armurerie : achats (« VOUS NE POUVEZ PAS VOUS PERMETTRE CELA »)
+0x8443  code  sauve_quest_sav        écrit QUEST.SAV
+0x0246  code  partie                 une quête : préparation des 4 joueurs (DS:3195-3198), puis le jeu
+0x8c20  code  inventaire_sorts       WIZBACK, INVENT, SPELLIT : équipement et sorts pendant la quête (?)
+
+# ---- Actions et événements pendant une quête
+0x6be0  code  fouille_tresor         « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN », « CETTE PIECE A DEJA ETE FOUILLEE »
+0x6dfa  code  fouille_portes         « UNE PORTE SECRETE S'OUVRE »
+0x6f12  code  fouille_vide
+0x7247  code  fouille_pieges         « VOUS TROUVEZ ET DESARMEZ UN PIEGE A LANCES », « ... L'ENTREE D'UNE TRAPPE »
+0x7120  code  coffre_potion          « VOUS TROUVEZ UNE POTION CURATIVE DANS LE COFFRE »
+0x7156  code  coffre_fleche          « LE COFFRE ETAIT PIEGE ! UNE FLECHE PART DU MUR »
+0x7179  code  coffre_desarme
+0x71f7  code  coffre_gargouille      « LA GARGOUILLE S'ANIME SUBITEMENT »
+0x70d2  code  prend_lame_esprit      « VOUS PRENEZ LA LAME DE L'ESPRIT »
+0x7187  code  cles_agrain            « LES CLES D'AGRAIN SONT SUR LA TABLE »
+0x93b1  code  boit_potion            « LE FLUIDE VOUS RANIME »
+0x9670  code  sort_genie             « ORDONNEZ AU GENIE DE ... »
+0x2c36  code  brume_de_mort          « L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL »
+0x0f45  code  sort_sans_effet        « CE SORT N'A AUCUN EFFET SUR UN ENNEMI »
+0x10d8  code  mort_heros             « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES », « LES JOUEURS SONT TOUS ELIMINES »
+0x1a3a  code  tous_elimines
+0x184e  code  fin_quete              récompenses de fin de quête (Sir Ragnar, or du prince...)
+0x0c20  code  prime_ulag             « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG »
+0x0c52  code  prime_monstre          « VOUS RECEVEZ UNE PRIME DE .. PIECE D'OR »
+0x0c82  code  etoile_ouest           « LE ZOMBI LACHE L'ETOILE DE L'OUEST »
+0x19c2  code  prime_balur
+
+0xaa00  table zones_menu_titre       zones cliquables du menu titre (lues par zone_cliquee)
+0xaa1a  table saut_menu_titre        routines des icônes du menu titre, indexées par le numéro de zone
+0x47e5  table sprite_curseur         enregistrement de sprite du curseur
+0x5fc1  table textes                 fichier de textes de la langue (table d'offsets, puis messages)
+
+# ---- Tours de jeu (voir original/notes/02-ecrans.md, « Une partie »)
+0x02f3  code  prepare_heros          prépare les fiches des héros avant la quête
+0x0349  code  tour_personnage        tour d'un personnage : AH type de commande, BX fiche, DX ?, AL numéro (0-4)
+0x06b4  code  quete_continue         AL = 1 tant que la quête continue
+0x21c1  code  tour_morcar            joue les 32 monstres (DS:4D4A), en vérifiant la fin de quête après chacun
+0x2217  code  tour_monstre           un monstre (DI = son enregistrement de 10 octets)
+0x4663  table fiches_personnages     5 fiches de 26 octets : 4 héros, puis un personnage joué par le joueur 1 (escorté ?)
+0x4d4a  table monstres               32 monstres de 10 octets, même format que dans QUESTn.BIN
+0x3fc6  var   etat_quete             0x0F : fin de quête (?)

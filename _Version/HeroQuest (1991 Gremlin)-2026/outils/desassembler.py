@@ -38,12 +38,37 @@ PROGRAMMES = {
     'INTRO': {'entree': 0x44B0, 'code': (0x44B0, None), 'base': 0x44B0, 'ds': 0x0000},
 }
 
+AFFICHE_MESSAGE = 0x88ED            # routine de QUEST.EXE qui affiche le message BX (voir original/notes/02-ecrans.md)
+MESSAGES = RACINE / 'original' / 'donnees' / 'textes' / 'french.bin'
+
 FINS = {'ret', 'retf', 'iret', 'jmp', 'ljmp'}
+
+
+def charger_messages():
+    """Texte des messages (BX -> lignes jointes), d'après le fichier de textes décompressé par extraire.py."""
+    if not MESSAGES.exists():
+        return {}
+    brut, debuts, fin_table = MESSAGES.read_bytes(), [], None
+    fin_table = len(brut)
+    while 2 * len(debuts) < fin_table:
+        offset = struct.unpack('<H', brut[2 * len(debuts):2 * len(debuts) + 2])[0]
+        debuts.append(offset)
+        fin_table = min(fin_table, offset)
+    messages = {}
+    for index, debut in enumerate(debuts):
+        entree = brut[debut:debut + 400]
+        lignes = [m[2:].split(b'\x00')[0].decode('cp437').strip() for m in entree.split(b'\x00')[0:1][0].split(b'\x11')[1:]]
+        bout = entree.split(b'\xff\xff', 1)
+        if len(bout) == 2:
+            lignes = [m[2:].split(b'\x00')[0].decode('cp437').strip() for m in bout[1].split(b'\x00', 1)[0].split(b'\x11')[1:]]
+        if lignes:
+            messages[2 * index] = ' / '.join(l for l in lignes if l)
+    return messages
 SAUTS = re.compile(r'^(j\w+|loop\w*|jcxz)$')
 
 
 def charger_symboles(fichier):
-    symboles = {'code': {}, 'var': {}, 'table': {}, 'commentaire': {}}
+    symboles = {'code': {}, 'var': {}, 'table': {}, 'commentaire': {}, 'routines': set()}
     if not fichier.exists():
         return symboles
     for ligne in fichier.read_text(encoding='utf-8').splitlines():
@@ -54,6 +79,8 @@ def charger_symboles(fichier):
         commentaire = parties[3] if len(parties) > 3 else ''
         cle = 'code' if genre in ('code', 'etiq') else genre
         symboles[cle][adresse] = nom
+        if genre == 'code':                      # début de routine, même si elle n'est jamais appelée (vecteur d'interruption)
+            symboles['routines'].add(adresse)
         if commentaire:
             symboles['commentaire'][(cle, adresse)] = commentaire
     return symboles
@@ -66,13 +93,14 @@ class Desassembleur:
         self.base = base
         self.md = Cs(CS_ARCH_X86, CS_MODE_16)
         self.instructions = {}                           # adresse -> instruction
-        self.routines = {entree}
+        self.routines = {entree} | symboles['routines']
         self.etiquettes = set()
         self.appelants = defaultdict(set)
         self.indirects = []                              # sauts et appels indirects non résolus
         self.tables = {}                                 # adresse DS -> liste de cibles
         self.probables = set()                           # routines trouvées par la passe des zones non atteintes
         self.ecritures = self.ecritures_constantes()     # adresse DS -> valeurs écrites par mov word ptr [X], valeur
+        self.messages = charger_messages() if base == 0 else {}
 
     def ecritures_constantes(self):
         """Balayage linéaire de tout le code : `mov word ptr [X], valeur` (pointeurs de routine posés à l'exécution)."""
@@ -81,6 +109,10 @@ class Desassembleur:
             cible, valeur = struct.unpack('<H', m.group(1))[0], struct.unpack('<H', m.group(2))[0]
             ecritures[cible].add(self.base + valeur)
         return ecritures
+
+    def dans_segment(self, adresse):
+        """Un saut relatif reste dans le segment de code : IP est sur 16 bits."""
+        return self.base + ((adresse - self.base) & 0xFFFF)
 
     def mot_ds(self, offset):
         a = self.ds + offset
@@ -102,7 +134,7 @@ class Desassembleur:
                 self.instructions[adresse] = instr
                 precedentes = (precedentes + [instr])[-4:]
                 m, op = instr.mnemonic, instr.op_str
-                cible = int(op, 16) if re.fullmatch(r'0x[0-9a-f]+', op) else None
+                cible = self.dans_segment(int(op, 16)) if re.fullmatch(r'0x[0-9a-f]+', op) else None
                 if m == 'call' and cible is not None:
                     self.routines.add(cible)
                     self.appelants[cible].add(adresse)
@@ -218,8 +250,15 @@ class Desassembleur:
         texte = f'{instr.mnemonic} {instr.op_str}'.strip()
         op = instr.op_str
         if re.fullmatch(r'0x[0-9a-f]+', op) and (instr.mnemonic == 'call' or SAUTS.match(instr.mnemonic) or instr.mnemonic == 'jmp'):
-            texte = f'{instr.mnemonic} {self.nom(int(op, 16))}'
+            texte = f'{instr.mnemonic} {self.nom(self.dans_segment(int(op, 16)))}'
         notes = []
+        # mov bx, MESSAGE ; call affiche_message : texte du message (version française)
+        m = re.fullmatch(r'bx, (0x[0-9a-f]+|\d+)', op) if instr.mnemonic == 'mov' else None
+        suivante = self.instructions.get(instr.address + instr.size)
+        if m and suivante and suivante.mnemonic == 'call' and suivante.op_str == f'{AFFICHE_MESSAGE:#x}':
+            message = self.messages.get(int(m.group(1), 0))
+            if message:
+                notes.append(f'message « {message} »')
         for valeur in re.findall(r'\[(?:[a-z]+ \+ )?(0x[0-9a-f]+)\]', op):
             v = int(valeur, 16)
             for genre in ('var', 'table'):
@@ -288,6 +327,43 @@ class Desassembleur:
         (SORTIE / f'{prefixe.lower()}-rapport.txt').write_text('\n'.join(rapport) + '\n', encoding='utf-8')
         print('\n'.join(rapport[:4]))
 
+    def ecrire_routines(self, prefixe):
+        """Une ligne par routine : taille, appelants, interruptions, ports, variables et chaînes. Sert à classer
+        les routines par sous-système avant de les lire. Une instruction appartient à la routine qui la précède."""
+        departs = sorted(self.routines & set(self.instructions))
+        par_routine = defaultdict(list)
+        for adresse in sorted(self.instructions):
+            i = max(0, next((k for k, d in enumerate(departs) if d > adresse), len(departs)) - 1)
+            if departs and departs[i] <= adresse:
+                par_routine[departs[i]].append(self.instructions[adresse])
+        nommees = sum(1 for d in departs if d in self.sym['code'])
+        lignes = [f'; Routines de {prefixe}.EXE : {len(departs)}, dont {nommees} nommées dans symboles.txt.',
+                  '; adresse  nom  taille  appelants  | int  ports  variables  chaînes', '']
+        for depart in departs:
+            corps = par_routine[depart]
+            ints = sorted({f'{i.op_str[2:]}h' + (f'/{self.ah_avant(corps, k)}' if i.op_str in ('0x21', '0x10', '0x33') else '')
+                           for k, i in enumerate(corps) if i.mnemonic == 'int'})
+            ports = sorted({i.op_str.split(', ')[0 if i.mnemonic == 'out' else 1] for i in corps if i.mnemonic in ('in', 'out')})
+            variables = sorted({self.sym['var'].get(v, f'{v:04x}') for i in corps
+                                for v in (int(x, 16) for x in re.findall(r'\[(0x[0-9a-f]{3,4})\]', i.op_str))})
+            chaines = sorted({c for i in corps for v in re.findall(r', (0x[0-9a-f]{3,4})$', i.op_str)
+                              if (c := self.chaine_ds(int(v, 16)))})
+            taille = sum(i.size for i in corps)
+            lignes.append(f'{depart:05x}  {self.nom(depart):<24} {taille:5}  {len(self.appelants[depart]):3}  | '
+                          f'{" ".join(ints)}  {" ".join(ports)}  {" ".join(variables[:12])}'
+                          + (f'  "{chaines[0]}"' if chaines else ''))
+        (SORTIE / f'{prefixe.lower()}-routines.txt').write_text('\n'.join(lignes) + '\n', encoding='utf-8')
+
+    @staticmethod
+    def ah_avant(corps, k):
+        """Valeur de AH posée juste avant une interruption (fonction appelée), si elle est visible."""
+        for i in reversed(corps[max(0, k - 6):k]):
+            m = re.fullmatch(r'(ah|ax), (0x[0-9a-f]+|\d+)', i.op_str) if i.mnemonic == 'mov' else None
+            if m:
+                v = int(m.group(2), 0)
+                return f'{(v >> 8 if m.group(1) == "ax" else v):02x}'
+        return '?'
+
     def ecrire_donnees(self, prefixe):
         """Segment de données en hexadécimal, avec chaînes et symboles."""
         lignes = [f'; Segment de données de {prefixe}.EXE (DS:0000 = image 0x{self.ds:04x}).', '']
@@ -318,6 +394,7 @@ def main():
     d.parcourir()
     d.zones_non_atteintes()
     d.ecrire(prefixe)
+    d.ecrire_routines(prefixe)
     d.ecrire_donnees(prefixe)
 
 

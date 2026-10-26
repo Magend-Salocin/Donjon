@@ -93,9 +93,43 @@ def textes():
         (dossier / f'{langue.lower()}.bin').write_bytes(brut)
         lignes = [f'{m.start():05x}  {m.group().decode("cp437")}' for m in re.finditer(rb'[\x20-\x7e\x80-\xa8]{3,}', brut)]
         (dossier / f'{langue.lower()}.txt').write_text('\n'.join(lignes) + '\n', encoding='utf-8')
+        (dossier / f'{langue.lower()}-messages.txt').write_text(messages(brut), encoding='utf-8')
     titres = [m.group().decode('cp437') for m in re.finditer(rb'[\x20-\x7e]{4,}', (JEU / 'EQUESTS.BIN').read_bytes())]
     (dossier / 'titres-quetes.txt').write_text('\n'.join(titres) + '\n', encoding='utf-8')
     return len(LANGUES)
+
+
+def messages(brut):
+    """Messages d'un fichier de textes, tel que le jeu le charge en DS:5FC1 (voir original/notes/02-ecrans.md).
+    Numéro = valeur passée dans BX à affiche_message (offset de l'entrée dans la table du début du fichier)."""
+    # La table d'offsets s'arrête là où commence le premier message : le plus petit offset lu jusque-là.
+    debuts, fin_table = [], len(brut)
+    while 2 * len(debuts) < fin_table:
+        offset = struct.unpack('<H', brut[2 * len(debuts):2 * len(debuts) + 2])[0]
+        debuts.append(offset)
+        fin_table = min(fin_table, offset)
+    bornes = sorted(set(debuts)) + [len(brut)]                 # des entrées partagent le même texte
+    lignes = ['# numéro (BX)  boîte : colonne ligne largeur hauteur  |  mots (boutons ?)  |  lignes : (ligne, colonne) texte', '']
+    for index, debut in enumerate(debuts):
+        numero = 2 * index
+        fin = next(b for b in bornes if b > debut) if debut < len(brut) else debut
+        entree = brut[debut:fin]
+        if len(entree) < 6:
+            lignes.append(f'{numero:04x}  (entrée vide ou hors du fichier : offset {debut:04x})')
+            continue
+        x, y, largeur, hauteur, a, b = entree[:6]
+        mots, i = [], 6
+        while i + 1 < len(entree) and entree[i:i + 2] != b'\xff\xff':
+            mots.append(struct.unpack('<H', entree[i:i + 2])[0])
+            i += 2
+        texte = []
+        for morceau in entree[i + 2:].split(b'\x11')[1:]:
+            if len(morceau) >= 2:
+                contenu = morceau[2:].split(b'\x00')[0].decode('cp437')
+                texte.append(f'({morceau[0]},{morceau[1]}) {contenu}')
+        lignes.append(f'{numero:04x}  {x} {y} {largeur} {hauteur} ({a} {b})  |  {" ".join(f"{m:04x}" for m in mots)}  |  '
+                      + ' / '.join(texte))
+    return '\n'.join(lignes) + '\n'
 
 
 def quetes():

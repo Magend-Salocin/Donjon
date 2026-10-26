@@ -2,8 +2,8 @@
 
 loc_0020:
 00020  c6 06 62 09 0c       mov byte ptr [0x962], 0xc
-00025  e8 da 61             call sub_6202
-00028  e8 b9 60             call sub_60e4
+00025  e8 da 61             call efface_tampon
+00028  e8 b9 60             call affiche_tampon
 0002b  c7 06 07 39 13 0e    mov word ptr [0x3907], 0xe13    ; fichier_nom, "shields.ega"
 ; ---- -1 octets non atteints (0031-002f)
 loc_0030:
@@ -11,7 +11,7 @@ loc_0030:
 00031  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 00037  b8 63 14             mov ax, 0x1463
 0003a  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-0003d  e8 41 39             call charge_fichier_b
+0003d  e8 41 39             call charge_fichier
 00040  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 00043  8e c0                mov es, ax
 00045  33 f6                xor si, si
@@ -24,9 +24,9 @@ loc_0030:
 00056  b8 7c 09             mov ax, 0x97c
 00059  8e d8                mov ds, ax
 0005b  58                   pop ax
-0005c  e8 a3 61             call sub_6202
+0005c  e8 a3 61             call efface_tampon
 0005f  bd 60 09             mov bp, 0x960
-00062  e8 17 31             call sub_317c
+00062  e8 17 31             call affiche_texte
 loc_0065:
 00065  b3 1d                mov bl, 0x1d
 00067  e8 a9 35             call hasard
@@ -49,7 +49,7 @@ loc_0065:
 00091  1e                   push ds
 00092  e8 be 3a             call copie_image
 00095  1f                   pop ds
-00096  e8 4b 60             call sub_60e4
+00096  e8 4b 60             call affiche_tampon
 00099  e8 46 35             call sub_35e2
 0009c  3c 20                cmp al, 0x20
 0009e  74 0e                je loc_00ae
@@ -60,16 +60,16 @@ loc_0065:
 000ac  eb b7                jmp loc_0065
 loc_00ae:
 000ae  bd 98 09             mov bp, 0x998
-000b1  e8 c8 30             call sub_317c
-000b4  e8 2d 60             call sub_60e4
+000b1  e8 c8 30             call affiche_texte
+000b4  e8 2d 60             call affiche_tampon
 000b7  e8 ee 39             call sub_3aa8
 000ba  2d 02 00             sub ax, 2
 000bd  3b 06 ed 37          cmp ax, word ptr [0x37ed]
 000c1  74 15                je loc_00d8
 000c3  c7 06 e9 37 ff ff    mov word ptr [0x37e9], 0xffff    ; erreur_fichier
 000c9  bd f6 09             mov bp, 0x9f6
-000cc  e8 ad 30             call sub_317c
-000cf  e8 12 60             call sub_60e4
+000cc  e8 ad 30             call affiche_texte
+000cf  e8 12 60             call affiche_tampon
 000d2  e8 00 35             call sub_35d5
 000d5  eb 07                jmp loc_00de
 ; ---- 1 octets non atteints (00d7-00d7)
@@ -79,7 +79,7 @@ loc_00de:
 000de  8f 06 90 31          pop word ptr [0x3190]    ; mode_video
 000e2  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 000e7  75 03                jne loc_00ec
-000e9  e8 f7 5e             call sub_5fe3
+000e9  e8 f7 5e             call mode_vga
 loc_00ec:
 000ec  c3                   ret
 
@@ -96,15 +96,15 @@ loc_00ec:
 000fe  b4 4a                mov ah, 0x4a
 00100  cd 21                int 0x21
 00102  72 10                jb loc_0114
-00104  e8 b3 35             call souris_affiche
-00107  e8 ec 2f             call sub_30f6
+00104  e8 b3 35             call clavier_installe
+00107  e8 ec 2f             call lit_configuration
 0010a  73 03                jae loc_010f
 0010c  e9 bd 2e             jmp loc_2fcc
 loc_010f:
 0010f  e8 70 5e             call initialise_jeu
 00112  73 0d                jae loc_0121
 loc_0114:
-00114  e8 da 35             call souris_cache
+00114  e8 da 35             call clavier_retire
 00117  ba 10 36             mov dx, 0x3610
 0011a  b4 09                mov ah, 9
 0011c  cd 21                int 0x21
@@ -117,8 +117,8 @@ loc_0121:
 00129  eb 03                jmp loc_012e
 ; ---- 3 octets non atteints (012b-012d)
 loc_012e:
-0012e  e8 d1 60             call sub_6202
-00131  e8 b0 5f             call sub_60e4
+0012e  e8 d1 60             call efface_tampon
+00131  e8 b0 5f             call affiche_tampon
 00134  e8 8a 64             call sub_65c1
 00137  c6 06 a0 44 ff       mov byte ptr [0x44a0], 0xff
 0013c  c6 06 a1 44 00       mov byte ptr [0x44a1], 0
@@ -127,15 +127,15 @@ loc_012e:
 0014b  c6 06 8b 46 80       mov byte ptr [0x468b], 0x80
 loc_0150:
 00150  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
-00155  e8 b8 71             call sub_7310
-00158  f6 06 92 39 40       test byte ptr [0x3992], 0x40
+00155  e8 b8 71             call menu_titre
+00158  f6 06 92 39 40       test byte ptr [0x3992], 0x40    ; commandes
 0015d  74 03                je loc_0162
 0015f  e9 5a 01             jmp loc_02bc
 loc_0162:
-00162  e8 4c 53             call sub_54b1
+00162  e8 4c 53             call charge_ecran_plateau
 00165  c6 06 e9 3f 00       mov byte ptr [0x3fe9], 0
-0016a  e8 d9 00             call sub_0246
-0016d  f6 06 92 39 40       test byte ptr [0x3992], 0x40
+0016a  e8 d9 00             call partie
+0016d  f6 06 92 39 40       test byte ptr [0x3992], 0x40    ; commandes
 00172  74 03                je loc_0177
 00174  e9 45 01             jmp loc_02bc
 loc_0177:
@@ -151,24 +151,24 @@ loc_0177:
 0019b  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_019e:
 0019e  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-001a4  e8 4a 35             call souris_cache
-001a7  e8 1e 38             call sub_39c8
+001a4  e8 4a 35             call clavier_retire
+001a7  e8 1e 38             call fichier_ouvre
 001aa  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 001af  75 03                jne loc_01b4
 001b1  eb 0f                jmp loc_01c2
 ; ---- 1 octets non atteints (01b3-01b3)
 loc_01b4:
-001b4  e8 03 35             call souris_affiche
+001b4  e8 03 35             call clavier_installe
 001b7  bb 52 02             mov bx, 0x252
-001ba  e8 30 87             call sub_ffff88ed
-001bd  e8 31 35             call souris_cache
+001ba  e8 30 87             call affiche_message
+001bd  e8 31 35             call clavier_retire
 001c0  eb dc                jmp loc_019e
 loc_01c2:
-001c2  e8 37 38             call sub_39fc
+001c2  e8 37 38             call fichier_lit
 001c5  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 001ca  75 e8                jne loc_01b4
 001cc  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-001cf  e8 e8 34             call souris_affiche
+001cf  e8 e8 34             call clavier_installe
 001d2  eb 47                jmp loc_021b
 ; ---- 1 octets non atteints (01d4-01d4)
 loc_01d5:
@@ -178,20 +178,20 @@ loc_01d5:
 001e4  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_01e7:
 001e7  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-001ed  e8 01 35             call souris_cache
-001f0  e8 d5 37             call sub_39c8
+001ed  e8 01 35             call clavier_retire
+001f0  e8 d5 37             call fichier_ouvre
 001f3  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 001f8  75 03                jne loc_01fd
 001fa  eb 0f                jmp loc_020b
 ; ---- 1 octets non atteints (01fc-01fc)
 loc_01fd:
-001fd  e8 ba 34             call souris_affiche
+001fd  e8 ba 34             call clavier_installe
 00200  bb 52 02             mov bx, 0x252
-00203  e8 e7 86             call sub_ffff88ed
-00206  e8 e8 34             call souris_cache
+00203  e8 e7 86             call affiche_message
+00206  e8 e8 34             call clavier_retire
 00209  eb dc                jmp loc_01e7
 loc_020b:
-0020b  e8 ee 37             call sub_39fc
+0020b  e8 ee 37             call fichier_lit
 0020e  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 ; ---- -2 octets non atteints (0213-0210)
 loc_0211:
@@ -200,75 +200,76 @@ loc_0211:
 ; ---- -2 octets non atteints (0215-0212)
 00213  75 e8                jne loc_01fd
 00215  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-00218  e8 9f 34             call souris_affiche
+00218  e8 9f 34             call clavier_installe
 loc_021b:
-0021b  e8 05 68             call sub_6a23
+0021b  e8 05 68             call fond_vers_tampon
 0021e  c6 06 50 37 11       mov byte ptr [0x3750], 0x11
 00223  c6 06 59 37 01       mov byte ptr [0x3759], 1
 00228  bd c4 a5             mov bp, 0xa5c4
-0022b  e8 4e 2f             call sub_317c
-0022e  e8 b3 5e             call sub_60e4
-00231  e8 fa 36             call sub_392e
-00234  e8 ec 67             call sub_6a23
+0022b  e8 4e 2f             call affiche_texte
+0022e  e8 b3 5e             call affiche_tampon
+00231  e8 fa 36             call attend_relache_clic
+00234  e8 ec 67             call fond_vers_tampon
 00237  bd c2 a7             mov bp, 0xa7c2
-0023a  e8 3f 2f             call sub_317c
-0023d  e8 a4 5e             call sub_60e4
-00240  e8 eb 36             call sub_392e
+0023a  e8 3f 2f             call affiche_texte
+0023d  e8 a4 5e             call affiche_tampon
+00240  e8 eb 36             call attend_relache_clic
 00243  e9 0a ff             jmp loc_0150
 
-; ======== sub_0246   (appelée depuis 016a)
+; ======== partie   (appelée depuis 016a)
+; une quête : préparation des 4 joueurs (DS:3195-3198), puis le jeu
 00246  c7 06 35 46 a4 48    mov word ptr [0x4635], 0x48a4
 0024c  c6 06 e9 3f 00       mov byte ptr [0x3fe9], 0
-00251  e8 cf 67             call sub_6a23
+00251  e8 cf 67             call fond_vers_tampon
 00254  e8 6a 63             call sub_65c1
-00257  e8 99 00             call sub_02f3
+00257  e8 99 00             call prepare_heros
 loc_025a:
 0025a  ba c6 4b             mov dx, 0x4bc6
-0025d  bb 63 46             mov bx, 0x4663
-00260  8a 26 95 31          mov ah, byte ptr [0x3195]
+0025d  bb 63 46             mov bx, 0x4663    ; fiches_personnages
+00260  8a 26 95 31          mov ah, byte ptr [0x3195]    ; commandes_joueurs
 00264  32 c0                xor al, al
-00266  e8 e0 00             call sub_0349
+00266  e8 e0 00             call tour_personnage
 00269  ba dd 4b             mov dx, 0x4bdd
 0026c  bb 7d 46             mov bx, 0x467d
 0026f  8a 26 96 31          mov ah, byte ptr [0x3196]
 00273  b0 01                mov al, 1
-00275  e8 d1 00             call sub_0349
+00275  e8 d1 00             call tour_personnage
 00278  ba f4 4b             mov dx, 0x4bf4
 0027b  bb 97 46             mov bx, 0x4697
 0027e  8a 26 97 31          mov ah, byte ptr [0x3197]
 00282  b0 02                mov al, 2
-00284  e8 c2 00             call sub_0349
+00284  e8 c2 00             call tour_personnage
 00287  ba 0b 4c             mov dx, 0x4c0b
 0028a  bb b1 46             mov bx, 0x46b1
 0028d  8a 26 98 31          mov ah, byte ptr [0x3198]
 00291  b0 03                mov al, 3
-00293  e8 b3 00             call sub_0349
+00293  e8 b3 00             call tour_personnage
 00296  ba f1 4c             mov dx, 0x4cf1
 00299  bb cb 46             mov bx, 0x46cb
-0029c  8a 26 95 31          mov ah, byte ptr [0x3195]
+0029c  8a 26 95 31          mov ah, byte ptr [0x3195]    ; commandes_joueurs
 002a0  b0 04                mov al, 4
-002a2  e8 a4 00             call sub_0349
-002a5  e8 0c 04             call sub_06b4
+002a2  e8 a4 00             call tour_personnage
+002a5  e8 0c 04             call quete_continue
 002a8  0a c0                or al, al
 002aa  75 01                jne loc_02ad
 002ac  c3                   ret
 loc_02ad:
-002ad  e8 11 1f             call sub_21c1
-002b0  f6 06 92 39 40       test byte ptr [0x3992], 0x40
+002ad  e8 11 1f             call tour_morcar
+002b0  f6 06 92 39 40       test byte ptr [0x3992], 0x40    ; commandes
 002b5  74 03                je loc_02ba
 002b7  e9 96 fe             jmp loc_0150
 loc_02ba:
 002ba  eb 9e                jmp loc_025a
 loc_02bc:
-002bc  e8 af 44             call sub_476e
-002bf  e8 2f 34             call souris_cache
+002bc  e8 af 44             call son_arret
+002bf  e8 2f 34             call clavier_retire
 002c2  32 e4                xor ah, ah
 002c4  b0 03                mov al, 3
 002c6  cd 10                int 0x10
 002c8  b8 00 4c             mov ax, 0x4c00
 002cb  cd 21                int 0x21
 loc_02cd:
-002cd  bf 63 46             mov di, 0x4663
+002cd  bf 63 46             mov di, 0x4663    ; fiches_personnages
 002d0  be 8f a9             mov si, 0xa98f
 002d3  50                   push ax
 002d4  b8 7c 09             mov ax, 0x97c
@@ -280,12 +281,13 @@ loc_02cd:
 002e2  b9 02 00             mov cx, 2
 002e5  f3 a5                rep movsw word ptr es:[di], word ptr [si]
 002e7  c6 06 92 3f 00       mov byte ptr [0x3f92], 0    ; numero_quete
-002ec  c6 06 92 39 00       mov byte ptr [0x3992], 0
+002ec  c6 06 92 39 00       mov byte ptr [0x3992], 0    ; commandes
 002f1  58                   pop ax
 002f2  c3                   ret
 
-; ======== sub_02f3   (appelée depuis 0257)
-002f3  bf 63 46             mov di, 0x4663
+; ======== prepare_heros   (appelée depuis 0257)
+; prépare les fiches des héros avant la quête
+002f3  bf 63 46             mov di, 0x4663    ; fiches_personnages
 002f6  89 3e 37 46          mov word ptr [0x4637], di    ; fiche_heros_courant
 002fa  80 3d 00             cmp byte ptr [di], 0
 002fd  74 09                je loc_0308
@@ -321,8 +323,9 @@ loc_033f:
 00345  e8 ba 23             call sub_2702
 00348  c3                   ret
 
-; ======== sub_0349   (appelée depuis 0266, 0275, 0284, 0293, 02a2)
-00349  88 26 93 31          mov byte ptr [0x3193], ah
+; ======== tour_personnage   (appelée depuis 0266, 0275, 0284, 0293, 02a2)
+; tour d'un personnage : AH type de commande, BX fiche, DX ?, AL numéro (0-4)
+00349  88 26 93 31          mov byte ptr [0x3193], ah    ; commande_type
 0034d  89 16 39 46          mov word ptr [0x4639], dx
 00351  89 1e 37 46          mov word ptr [0x4637], bx    ; fiche_heros_courant
 00355  c7 06 0f 0e ff ff    mov word ptr [0xe0f], 0xffff
@@ -344,7 +347,7 @@ loc_037a:
 0038f  c6 06 c4 3f 00       mov byte ptr [0x3fc4], 0    ; des_deplacement
 00394  c6 06 0e 0e 00       mov byte ptr [0xe0e], 0
 00399  e8 22 57             call sub_5abe
-0039c  e8 84 66             call sub_6a23
+0039c  e8 84 66             call fond_vers_tampon
 0039f  e8 7a 62             call sub_661c
 003a2  e8 81 01             call sub_0526
 003a5  e8 06 65             call sub_68ae
@@ -361,7 +364,7 @@ loc_037a:
 loc_03c6:
 003c6  f6 45 18 02          test byte ptr [di + 0x18], 2
 003ca  74 2c                je loc_03f8
-003cc  e8 a0 61             call sub_656f
+003cc  e8 a0 61             call sauve_tampon
 003cf  ff 36 c4 3f          push word ptr [0x3fc4]    ; des_deplacement
 003d3  c6 06 c4 3f 01       mov byte ptr [0x3fc4], 1    ; des_deplacement
 003d8  e8 1e 63             call sub_66f9
@@ -373,27 +376,27 @@ loc_03e7:
 003e7  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 003eb  80 65 18 fd          and byte ptr [di + 0x18], 0xfd
 003ef  bb 66 00             mov bx, 0x66
-003f2  e8 f8 84             call sub_ffff88ed
+003f2  e8 f8 84             call affiche_message
 003f5  e8 2d 14             call sub_1825
 loc_03f8:
 003f8  e8 82 56             call sub_5a7d
 003fb  e8 36 4e             call sub_5234
-003fe  e8 6e 61             call sub_656f
+003fe  e8 6e 61             call sauve_tampon
 00401  e8 f5 62             call sub_66f9
 00404  e8 b7 56             call sub_5abe
 00407  e8 ea 54             call sub_58f4
 0040a  e8 73 62             call sub_6680
 0040d  e8 24 4e             call sub_5234
-00410  e8 5c 61             call sub_656f
+00410  e8 5c 61             call sauve_tampon
 ; ---- -2 octets non atteints (0413-0410)
 loc_0411:
 00411  5c                   pop sp
 00412  61                   popaw
 loc_0413:
-00413  e8 e6 5f             call sub_63fc
+00413  e8 e6 5f             call curseur_memorise
 00416  e8 fa 5f             call sub_6413
 00419  c6 06 cc 40 ff       mov byte ptr [0x40cc], 0xff
-0041e  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+0041e  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 00423  74 03                je loc_0428
 00425  e8 2e 03             call sub_0756
 loc_0428:
@@ -408,15 +411,15 @@ loc_0428:
 00440  e8 a1 56             call sub_5ae4
 00443  e8 1e 60             call sub_6464
 00446  e8 cf 60             call sub_6518
-00449  e8 c8 59             call sub_5e14
+00449  e8 c8 59             call curseur_sauve_fond
 0044c  80 3e 9a 3f 00       cmp byte ptr [0x3f9a], 0
 00451  75 03                jne loc_0456
-00453  e8 8e 5c             call sub_60e4
+00453  e8 8e 5c             call affiche_tampon
 loc_0456:
-00456  e8 7e 59             call sub_5dd7
+00456  e8 7e 59             call curseur_dessine
 00459  e8 59 54             call sub_58b5
 0045c  e8 21 00             call sub_0480
-0045f  e8 ec 13             call sub_184e
+0045f  e8 ec 13             call fin_quete
 00462  80 3e 97 3f 00       cmp byte ptr [0x3f97], 0
 00467  74 03                je loc_046c
 00469  e8 ba 00             call sub_0526
@@ -425,7 +428,7 @@ loc_046c:
 00471  74 01                je loc_0474
 00473  c3                   ret
 loc_0474:
-00474  80 3e 92 39 40       cmp byte ptr [0x3992], 0x40
+00474  80 3e 92 39 40       cmp byte ptr [0x3992], 0x40    ; commandes
 00479  75 03                jne loc_047e
 0047b  e9 4f fe             jmp loc_02cd
 loc_047e:
@@ -444,7 +447,7 @@ loc_0497:
 00497  b9 2c 01             mov cx, 0x12c
 0049a  e8 ea 41             call sub_4687
 0049d  8b de                mov bx, si
-0049f  e8 4b 84             call sub_ffff88ed
+0049f  e8 4b 84             call affiche_message
 004a2  c3                   ret
 loc_04a3:
 004a3  80 3e 92 3f 06       cmp byte ptr [0x3f92], 6    ; numero_quete
@@ -468,7 +471,7 @@ loc_04c4:
 004d2  8b 36 ea 3f          mov si, word ptr [0x3fea]
 004d6  c7 06 ea 3f 00 00    mov word ptr [0x3fea], 0
 004dc  8b de                mov bx, si
-004de  e8 0c 84             call sub_ffff88ed
+004de  e8 0c 84             call affiche_message
 loc_04e1:
 004e1  80 3e c0 3f 02       cmp byte ptr [0x3fc0], 2
 004e6  74 01                je loc_04e9
@@ -499,7 +502,7 @@ loc_0525:
 00525  c3                   ret
 
 ; ======== sub_0526   (appelée depuis 03a2, 0469)
-00526  e8 fa 64             call sub_6a23
+00526  e8 fa 64             call fond_vers_tampon
 00529  c7 06 58 0e 00 00    mov word ptr [0xe58], 0
 0052f  c7 06 5a 0e 00 00    mov word ptr [0xe5a], 0
 00535  e8 89 60             call sub_65c1
@@ -509,7 +512,7 @@ loc_0525:
 00545  e8 d4 60             call sub_661c
 00548  e8 35 61             call sub_6680
 0054b  e8 e6 4c             call sub_5234
-0054e  e8 1e 60             call sub_656f
+0054e  e8 1e 60             call sauve_tampon
 00551  e8 ed 0d             call sub_1341
 00554  c3                   ret
 
@@ -663,9 +666,10 @@ loc_0692:
 006b0  88 44 01             mov byte ptr [si + 1], al
 006b3  c3                   ret
 
-; ======== sub_06b4   (appelée depuis 02a5, 1116, 1a3d, 21d2, 21e5)
+; ======== quete_continue   (appelée depuis 02a5, 1116, 1a3d, 21d2, 21e5)
+; AL = 1 tant que la quête continue
 006b4  32 c0                xor al, al
-006b6  80 3e c6 3f 0f       cmp byte ptr [0x3fc6], 0xf
+006b6  80 3e c6 3f 0f       cmp byte ptr [0x3fc6], 0xf    ; etat_quete
 006bb  75 10                jne loc_06cd
 006bd  80 3e 92 3f 01       cmp byte ptr [0x3f92], 1    ; numero_quete
 006c2  74 01                je loc_06c5
@@ -739,7 +743,7 @@ loc_0726:
 00744  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
 00746  e8 dc 10             call sub_1825
 00749  bb bc 00             mov bx, 0xbc
-0074c  e8 9e 81             call sub_ffff88ed
+0074c  e8 9e 81             call affiche_message
 0074f  e8 5e 67             call sub_6eb0
 00752  e9 f5 12             jmp loc_1a4a
 ; ---- 1 octets non atteints (0755-0755)
@@ -760,7 +764,7 @@ loc_0766:
 00774  80 4d 18 20          or byte ptr [di + 0x18], 0x20
 00778  80 65 18 7f          and byte ptr [di + 0x18], 0x7f
 loc_077c:
-0077c  e8 c9 22             call sub_2a48
+0077c  e8 c9 22             call son_effet_2
 0077f  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
 00784  c3                   ret
 ; ---- 3 octets non atteints (0785-0787)
@@ -806,7 +810,7 @@ loc_07bd:
 007d6  f6 07 f7             test byte ptr [bx], 0xf7
 007d9  74 18                je loc_07f3
 007db  80 0f 04             or byte ptr [bx], 4
-007de  e8 46 20             call sub_2827
+007de  e8 46 20             call son_effet_1
 007e1  53                   push bx
 007e2  bd 01 00             mov bp, 1
 007e5  f6 07 10             test byte ptr [bx], 0x10
@@ -826,7 +830,7 @@ loc_07f3:
 00801  74 0b                je loc_080e
 00803  80 0f 04             or byte ptr [bx], 4
 00806  53                   push bx
-00807  e8 1d 20             call sub_2827
+00807  e8 1d 20             call son_effet_1
 0080a  e8 f2 0a             call sub_12ff
 0080d  5b                   pop bx
 loc_080e:
@@ -848,7 +852,7 @@ loc_0824:
 00829  c3                   ret
 loc_082a:
 0082a  80 0f 04             or byte ptr [bx], 4
-0082d  e8 f7 1f             call sub_2827
+0082d  e8 f7 1f             call son_effet_1
 00830  e9 cc 0a             jmp sub_12ff
 
 ; ======== sub_0833   (routine probable : non appelée directement)
@@ -865,26 +869,26 @@ loc_0843:
 0084b  74 01                je loc_084e
 0084d  c3                   ret
 loc_084e:
-0084e  e8 f7 21             call sub_2a48
+0084e  e8 f7 21             call son_effet_2
 00851  c6 06 b1 3f 00       mov byte ptr [0x3fb1], 0
 00856  c6 06 ac 3f 00       mov byte ptr [0x3fac], 0
 0085b  c6 06 91 3f 01       mov byte ptr [0x3f91], 1
 00860  e8 6d 4e             call sub_56d0
 loc_0863:
 00863  e8 29 3e             call sub_468f
-00866  e8 93 5b             call sub_63fc
+00866  e8 93 5b             call curseur_memorise
 00869  e8 2c 04             call sub_0c98
-0086c  e8 a5 55             call sub_5e14
-0086f  e8 72 58             call sub_60e4
-00872  e8 62 55             call sub_5dd7
-00875  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+0086c  e8 a5 55             call curseur_sauve_fond
+0086f  e8 72 58             call affiche_tampon
+00872  e8 62 55             call curseur_dessine
+00875  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 0087a  74 03                je loc_087f
 0087c  e9 2b 0a             jmp loc_12aa
 loc_087f:
 0087f  be 37 43             mov si, 0x4337
-00882  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+00882  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 00887  74 03                je loc_088c
-00889  e8 8e 46             call sub_4f1a
+00889  e8 8e 46             call zone_sous_curseur
 loc_088c:
 0088c  83 fb 02             cmp bx, 2
 0088f  75 03                jne loc_0894
@@ -955,15 +959,17 @@ loc_0921:
 loc_0924:
 00924  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 00929  8b de                mov bx, si
-0092b  e8 bf 7f             call sub_88ed
+0092b  e8 bf 7f             call affiche_message
 0092e  c6 06 e9 3f 00       mov byte ptr [0x3fe9], 0
 00933  e9 74 09             jmp loc_12aa
-attaque_heros:    ; le héros attaque : crânes (DS:3FB8 dés) contre boucliers noirs du monstre (DS:3FBB dés)
+
+; ======== attaque_heros
+; le héros attaque : crânes (DS:3FB8 dés) contre boucliers noirs du monstre (DS:3FBB dés)
 00936  e8 10 57             call sub_6049
 00939  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 0093d  89 36 d6 3f          mov word ptr [0x3fd6], si    ; attaquant
 loc_0941:
-00941  e8 3c 53             call sub_5c80
+00941  e8 3c 53             call charge_men
 00944  e8 fd 01             call sub_0b44
 00947  e8 de 01             call sub_0b28
 0094a  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -997,7 +1003,7 @@ loc_0971:
 0098d  ba f0 ff             mov dx, 0xfff0
 00990  bb 20 61             mov bx, 0x6120
 00993  e8 50 02             call affiche_des
-00996  e8 d6 5b             call sub_656f
+00996  e8 d6 5b             call sauve_tampon
 00999  8b 16 d2 3f          mov dx, word ptr [0x3fd2]    ; cranes
 0099d  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 009a1  3a d6                cmp dl, dh
@@ -1005,7 +1011,7 @@ loc_0971:
 009a5  c6 44 07 00          mov byte ptr [si + 7], 0
 loc_09a9:
 009a9  e8 68 15             call sub_1f14
-009ac  e8 c0 5b             call sub_656f
+009ac  e8 c0 5b             call sauve_tampon
 009af  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 009b3  80 7c 07 00          cmp byte ptr [si + 7], 0
 009b7  75 03                jne loc_09bc
@@ -1020,7 +1026,7 @@ loc_09bf:
 009ca  be 4e 00             mov si, 0x4e
 loc_09cd:
 009cd  8b de                mov bx, si
-009cf  e8 1b 7f             call sub_88ed
+009cf  e8 1b 7f             call affiche_message
 009d2  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 009d6  80 7c 08 01          cmp byte ptr [si + 8], 1
 009da  75 4b                jne loc_0a27
@@ -1039,8 +1045,8 @@ loc_09f6:
 009fd  eb 28                jmp loc_0a27
 ; ---- 1 octets non atteints (09ff-09ff)
 loc_0a00:
-00a00  bb 22 01             mov bx, 0x122
-00a03  e8 e7 7e             call sub_88ed
+00a00  bb 22 01             mov bx, 0x122    ; message « VOULEZ-VOUS ATTAQUER / A NOUVEAU? »
+00a03  e8 e7 7e             call affiche_message
 00a06  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1
 00a0b  75 03                jne loc_0a10
 00a0d  eb 18                jmp loc_0a27
@@ -1321,9 +1327,10 @@ loc_0c11:
 00c1d  e2 d8                loop loc_0bf7
 00c1f  c3                   ret
 
-; ======== sub_0c20   (routine probable : non appelée directement)
-00c20  bb a8 00             mov bx, 0xa8
-00c23  e8 c7 7c             call sub_88ed
+; ======== prime_ulag
+; « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG »
+00c20  bb a8 00             mov bx, 0xa8    ; message « L'EMPEREUR OFFRE 200 / PIECES D'OR A / L'ASSASSIN D'ULAG »
+00c23  e8 c7 7c             call affiche_message
 00c26  ba 64 00             mov dx, 0x64
 00c29  e9 da 5c             jmp sub_6906
 
@@ -1351,17 +1358,18 @@ loc_0c34:
 00c4f  eb 06                jmp loc_0c57
 ; ---- 1 octets non atteints (0c51-0c51)
 
-; ======== sub_0c52   (routine probable : non appelée directement)
+; ======== prime_monstre
+; « VOUS RECEVEZ UNE PRIME DE .. PIECE D'OR »
 00c52  b0 32                mov al, 0x32
 00c54  ba 14 00             mov dx, 0x14
 loc_0c57:
 00c57  bb b0 01             mov bx, 0x1b0
-00c5a  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-00c5e  81 c6 c1 5f          add si, 0x5fc1
+00c5a  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+00c5e  81 c6 c1 5f          add si, 0x5fc1    ; textes
 00c62  88 04                mov byte ptr [si], al
 00c64  52                   push dx
-00c65  bb e0 00             mov bx, 0xe0
-00c68  e8 82 7c             call sub_88ed
+00c65  bb e0 00             mov bx, 0xe0    ; message « VOUS RECEVEZ UNE PRIME / DE00 PIECE D'OR »
+00c68  e8 82 7c             call affiche_message
 00c6b  5a                   pop dx
 00c6c  e9 97 5c             jmp sub_6906
 
@@ -1369,20 +1377,22 @@ loc_0c57:
 00c6f  e8 09 00             call sub_0c7b
 00c72  80 4d 0d 08          or byte ptr [di + 0xd], 8
 00c76  be ea 00             mov si, 0xea
-00c79  eb 14                jmp loc_0c8f
+00c79  eb 14                jmp sub_0c8f
 
 ; ======== sub_0c7b   (appelée depuis 0c6f)
 00c7b  b0 33                mov al, 0x33
 00c7d  ba 1e 00             mov dx, 0x1e
 00c80  eb d5                jmp loc_0c57
 
-; ======== sub_0c82   (routine probable : non appelée directement)
+; ======== etoile_ouest
+; « LE ZOMBI LACHE L'ETOILE DE L'OUEST »
 00c82  ba c8 00             mov dx, 0xc8
 00c85  e8 7e 5c             call sub_6906
-00c88  bb ec 00             mov bx, 0xec
-00c8b  e8 5f 7c             call sub_88ed
+00c88  bb ec 00             mov bx, 0xec    ; message « LE ZOMBI LACHE / L'ETOILE DE L'OUEST. VOUS / RECEVEZ 200 PIECES D'OR »
+00c8b  e8 5f 7c             call affiche_message
 00c8e  c3                   ret
-loc_0c8f:
+
+; ======== sub_0c8f   (routine probable : non appelée directement)
 00c8f  e9 c4 59             jmp sub_6656
 
 ; ======== sub_0c92   (routine probable : non appelée directement)
@@ -1390,7 +1400,7 @@ loc_0c8f:
 00c95  e9 b4 4a             jmp loc_574c
 
 ; ======== sub_0c98   (appelée depuis 0869)
-00c98  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+00c98  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 00c9d  75 03                jne loc_0ca2
 00c9f  eb 58                jmp loc_0cf9
 ; ---- 1 octets non atteints (0ca1-0ca1)
@@ -1407,19 +1417,19 @@ loc_0caa:
 00cb3  c6 06 91 3f 01       mov byte ptr [0x3f91], 1
 00cb8  e8 15 4a             call sub_56d0
 loc_0cbb:
-00cbb  e8 3e 57             call sub_63fc
+00cbb  e8 3e 57             call curseur_memorise
 00cbe  e8 28 00             call sub_0ce9
-00cc1  e8 50 51             call sub_5e14
-00cc4  e8 1d 54             call sub_60e4
-00cc7  e8 0d 51             call sub_5dd7
-00cca  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+00cc1  e8 50 51             call curseur_sauve_fond
+00cc4  e8 1d 54             call affiche_tampon
+00cc7  e8 0d 51             call curseur_dessine
+00cca  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 00ccf  74 03                je loc_0cd4
 00cd1  e9 d6 05             jmp loc_12aa
 loc_0cd4:
 00cd4  be 37 43             mov si, 0x4337
-00cd7  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+00cd7  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 00cdc  74 03                je loc_0ce1
-00cde  e8 39 42             call sub_4f1a
+00cde  e8 39 42             call zone_sous_curseur
 loc_0ce1:
 00ce1  83 fb 02             cmp bx, 2
 00ce4  75 d5                jne loc_0cbb
@@ -1427,7 +1437,7 @@ loc_0ce1:
 
 ; ======== sub_0ce9   (appelée depuis 0cbe, 2cfc)
 00ce9  e8 f9 56             call sub_63e5
-00cec  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+00cec  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 00cf1  74 06                je loc_0cf9
 00cf3  c6 06 9d 3f 01       mov byte ptr [0x3f9d], 1
 00cf8  c3                   ret
@@ -1442,7 +1452,7 @@ loc_0cf9:
 00d14  be bd 5f             mov si, 0x5fbd
 00d17  e8 9a 53             call sub_60b4
 00d1a  be 37 43             mov si, 0x4337
-00d1d  e8 fa 41             call sub_4f1a
+00d1d  e8 fa 41             call zone_sous_curseur
 00d20  83 fb 02             cmp bx, 2
 00d23  75 1f                jne loc_0d44
 00d25  be 20 42             mov si, 0x4220
@@ -1489,7 +1499,7 @@ loc_0d71:
 00d77  a2 96 40             mov byte ptr [0x4096], al
 00d7a  bb c5 5a             mov bx, 0x5ac5
 00d7d  e8 5b 53             call sub_60db
-00d80  a1 93 39             mov ax, word ptr [0x3993]
+00d80  a1 93 39             mov ax, word ptr [0x3993]    ; curseur_x
 00d83  3d 38 00             cmp ax, 0x38
 00d86  73 01                jae loc_0d89
 00d88  c3                   ret
@@ -1551,7 +1561,7 @@ loc_0dfc:
 00dfc  e9 aa 52             jmp sub_60a9
 loc_0dff:
 00dff  b9 05 00             mov cx, 5
-00e02  be 63 46             mov si, 0x4663
+00e02  be 63 46             mov si, 0x4663    ; fiches_personnages
 00e05  bb 4b 43             mov bx, 0x434b    ; "UC_CiCsC}CBARBARIAN"
 loc_0e08:
 00e08  80 3c 00             cmp byte ptr [si], 0
@@ -1578,7 +1588,7 @@ loc_0e3a:
 00e3a  c6 06 ad 3f 01       mov byte ptr [0x3fad], 1
 00e3f  c3                   ret
 
-; ======== sub_0e40   (appelée depuis 0dc7, 13d5, 1c7b, 281f, 6de8)
+; ======== sub_0e40   (appelée depuis 0dc7, 13d5, 1c7b, 281f, 6de8, 9505)
 00e40  fe c8                dec al
 00e42  d0 e0                shl al, 1
 00e44  32 e4                xor ah, ah
@@ -1697,7 +1707,8 @@ loc_0f1e:
 00f42  eb 29                jmp loc_0f6d
 ; ---- 1 octets non atteints (0f44-0f44)
 
-; ======== sub_0f45   (routine probable : non appelée directement)
+; ======== sort_sans_effet
+; « CE SORT N'A AUCUN EFFET SUR UN ENNEMI »
 00f45  3c 05                cmp al, 5
 00f47  75 03                jne loc_0f4c
 00f49  eb 0b                jmp loc_0f56
@@ -1713,14 +1724,15 @@ loc_0f56:
 00f5e  bb 62 00             mov bx, 0x62
 00f61  eb 0a                jmp loc_0f6d
 ; ---- 1 octets non atteints (0f63-0f63)
-loc_0f64:
+
+; ======== sub_0f64   (routine probable : non appelée directement)
 00f64  bb 78 00             mov bx, 0x78
 00f67  eb 04                jmp loc_0f6d
 ; ---- 1 octets non atteints (0f69-0f69)
 loc_0f6a:
-00f6a  bb 56 00             mov bx, 0x56
+00f6a  bb 56 00             mov bx, 0x56    ; message « CE SORT N'A AUCUN / EFFET SUR UN ENNEMI. / IL A ETE GASPILLE »
 loc_0f6d:
-00f6d  e8 7d 79             call sub_88ed
+00f6d  e8 7d 79             call affiche_message
 00f70  e8 b1 01             call sub_1124
 00f73  e9 34 03             jmp loc_12aa
 
@@ -1752,10 +1764,10 @@ loc_0fa6:
 00fa8  e9 27 01             jmp loc_10d2
 loc_0fab:
 00fab  88 54 06             mov byte ptr [si + 6], dl
-00fae  eb b4                jmp loc_0f64
+00fae  eb b4                jmp sub_0f64
 loc_0fb0:
 00fb0  80 3e ca 3f 05       cmp byte ptr [0x3fca], 5    ; heros_courant
-00fb5  75 ad                jne loc_0f64
+00fb5  75 ad                jne sub_0f64
 00fb7  bb 72 00             mov bx, 0x72
 00fba  eb b1                jmp loc_0f6d
 
@@ -1829,8 +1841,8 @@ loc_1016:
 01054  1e                   push ds
 01055  e8 fb 2a             call copie_image
 01058  1f                   pop ds
-01059  e8 13 55             call sub_656f
-0105c  e8 85 50             call sub_60e4
+01059  e8 13 55             call sauve_tampon
+0105c  e8 85 50             call affiche_tampon
 0105f  e9 59 fc             jmp loc_0cbb
 loc_1062:
 01062  b6 05                mov dh, 5
@@ -1853,12 +1865,12 @@ loc_1084:
 01084  72 4c                jb loc_10d2
 01086  80 c2 30             add dl, 0x30
 01089  bb 88 01             mov bx, 0x188
-0108c  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-01090  81 c6 c1 5f          add si, 0x5fc1
+0108c  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+01090  81 c6 c1 5f          add si, 0x5fc1    ; textes
 01094  88 14                mov byte ptr [si], dl
 01096  bb 8a 01             mov bx, 0x18a
-01099  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-0109d  81 c6 c1 5f          add si, 0x5fc1
+01099  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+0109d  81 c6 c1 5f          add si, 0x5fc1    ; textes
 010a1  c6 04 30             mov byte ptr [si], 0x30
 010a4  bb 54 00             mov bx, 0x54
 010a7  e9 c3 fe             jmp loc_0f6d
@@ -1880,10 +1892,11 @@ loc_10cb:
 010cb  80 4c 18 20          or byte ptr [si + 0x18], 0x20
 010cf  e9 9b fe             jmp loc_0f6d
 loc_10d2:
-010d2  e8 03 00             call sub_10d8
+010d2  e8 03 00             call mort_heros
 010d5  e9 d2 01             jmp loc_12aa
 
-; ======== sub_10d8   (appelée depuis 10d2, 2c70, 6f95)
+; ======== mort_heros   (appelée depuis 10d2, 2c70, 6f95, 9749)
+; « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES », « LES JOUEURS SONT TOUS ELIMINES »
 010d8  c6 44 06 00          mov byte ptr [si + 6], 0
 010dc  c6 04 00             mov byte ptr [si], 0
 010df  c6 44 0e 00          mov byte ptr [si + 0xe], 0
@@ -1894,18 +1907,18 @@ loc_10d2:
 010f4  c6 44 12 00          mov byte ptr [si + 0x12], 0
 010f8  c6 44 13 00          mov byte ptr [si + 0x13], 0
 010fc  e8 e3 15             call sub_26e2
-010ff  bb 20 00             mov bx, 0x20
-01102  e8 e8 77             call sub_88ed
+010ff  bb 20 00             mov bx, 0x20    ; message « VOUS AVEZ ESSUYE / DES BLESSURES MORTELLES. / VOUS AVEZ ECHOUE / DANS CETTE QUETE »
+01102  e8 e8 77             call affiche_message
 01105  e8 1d 07             call sub_1825
 01108  a0 a7 3f             mov al, byte ptr [0x3fa7]
 0110b  3a 06 ca 3f          cmp al, byte ptr [0x3fca]    ; heros_courant
 0110f  75 05                jne loc_1116
 01111  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
 loc_1116:
-01116  e8 9b f5             call sub_06b4
+01116  e8 9b f5             call quete_continue
 01119  75 09                jne sub_1124
-0111b  bb 1e 00             mov bx, 0x1e
-0111e  e8 cc 77             call sub_88ed
+0111b  bb 1e 00             mov bx, 0x1e    ; message « LES JOUEURS SONT TOUS ELIMINES »
+0111e  e8 cc 77             call affiche_message
 01121  e8 01 07             call sub_1825
 
 ; ======== sub_1124   (appelée depuis 0f70)
@@ -2077,7 +2090,7 @@ loc_1284:
 01287  51                   push cx
 01288  57                   push di
 01289  b9 05 00             mov cx, 5
-0128c  bf 63 46             mov di, 0x4663
+0128c  bf 63 46             mov di, 0x4663    ; fiches_personnages
 0128f  33 c0                xor ax, ax
 loc_1291:
 01291  80 3d 00             cmp byte ptr [di], 0
@@ -2098,8 +2111,8 @@ loc_12aa:
 012af  c6 06 e9 3f 00       mov byte ptr [0x3fe9], 0
 012b4  c6 06 91 3f 00       mov byte ptr [0x3f91], 0
 012b9  c7 06 f1 47 20 2c    mov word ptr [0x47f1], 0x2c20
-012bf  e8 86 17             call sub_2a48
-012c2  e8 5e 57             call sub_6a23
+012bf  e8 86 17             call son_effet_2
+012c2  e8 5e 57             call fond_vers_tampon
 012c5  e8 54 53             call sub_661c
 012c8  e8 f6 52             call sub_65c1
 012cb  e8 87 f2             call sub_0555
@@ -2116,11 +2129,11 @@ loc_12e8:
 012e8  83 c7 0c             add di, 0xc
 012eb  e2 ed                loop loc_12da
 012ed  e8 44 3f             call sub_5234
-012f0  e8 7c 52             call sub_656f
+012f0  e8 7c 52             call sauve_tampon
 012f3  e8 1e 45             call sub_5814
 012f6  e8 bf 44             call sub_57b8
 012f9  e8 58 26             call sub_3954
-012fc  e9 e5 4d             jmp sub_60e4
+012fc  e9 e5 4d             jmp affiche_tampon
 
 ; ======== sub_12ff   (appelée depuis 07ef, 080a, 1035, 703d, 72f8)
 012ff  81 eb 00 02          sub bx, 0x200
@@ -2158,7 +2171,7 @@ loc_1335:
 0133e  e9 23 53             jmp loc_6664
 
 ; ======== sub_1341   (appelée depuis 0551, 12ce, 1833)
-01341  bf 63 46             mov di, 0x4663
+01341  bf 63 46             mov di, 0x4663    ; fiches_personnages
 01344  be c6 4b             mov si, 0x4bc6
 01347  e8 2f 00             call sub_1379
 0134a  bf 7d 46             mov di, 0x467d
@@ -2254,7 +2267,9 @@ loc_1409:
 loc_140e:
 0140e  32 e4                xor ah, ah
 01410  50                   push ax
-prepare_meuble:    ; sprite d'un meuble : (code - 0x4B) * 6 + DS:43FC
+
+; ======== prepare_meuble
+; sprite d'un meuble : (code - 0x4B) * 6 + DS:43FC
 01411  2c 4b                sub al, 0x4b
 01413  8a d8                mov bl, al
 01415  b7 00                mov bh, 0
@@ -2476,7 +2491,7 @@ loc_15e2:
 015e2  80 0f c0             or byte ptr [bx], 0xc0
 015e5  43                   inc bx
 015e6  e2 fa                loop loc_15e2
-015e8  bb 4a 4d             mov bx, 0x4d4a
+015e8  bb 4a 4d             mov bx, 0x4d4a    ; monstres
 015eb  b1 20                mov cl, 0x20
 loc_15ed:
 015ed  80 37 80             xor byte ptr [bx], 0x80
@@ -2492,7 +2507,7 @@ loc_15fd:
 015fd  f6 d0                not al
 015ff  a2 9e 3f             mov byte ptr [0x3f9e], al
 
-; ======== sub_1602   (appelée depuis 2744, 4c3f, 4c7c, 4d1e, 6fe3, 7098, 948f)
+; ======== sub_1602   (appelée depuis 2744, 4c3f, 4c7c, 4d1e, 6fe3, 7098, 948f, 979b)
 01602  8a dd                mov bl, ch
 01604  b7 00                mov bh, 0
 01606  03 db                add bx, bx
@@ -2689,7 +2704,9 @@ loc_177f:
 
 ; ======== sub_17a2   (appelée depuis 1700, 1731)
 017a2  ba 7e 44             mov dx, 0x447e
-source_mur:    ; source d'un mur selon l'orientation
+
+; ======== source_mur
+; source d'un mur selon l'orientation
 017a5  8a 1e 93 3f          mov bl, byte ptr [0x3f93]    ; index_case_courante
 017a9  32 ff                xor bh, bh
 017ab  8a 9f 82 44          mov bl, byte ptr [bx + 0x4482]
@@ -2751,7 +2768,7 @@ source_mur:    ; source d'un mur selon l'orientation
 ; ======== sub_1825   (appelée depuis 03f5, 06f9, 0746, 1105, 1121, 193d, 194d, 1959)
 01825  c6 06 99 3f 00       mov byte ptr [0x3f99], 0
 0182a  e8 94 4d             call sub_65c1
-0182d  e8 f3 51             call sub_6a23
+0182d  e8 f3 51             call fond_vers_tampon
 01830  e8 22 ed             call sub_0555
 01833  e8 0b fb             call sub_1341
 01836  e8 e3 4d             call sub_661c
@@ -2763,7 +2780,8 @@ source_mur:    ; source d'un mur selon l'orientation
 01848  c6 06 99 3f 01       mov byte ptr [0x3f99], 1
 0184d  c3                   ret
 
-; ======== sub_184e   (appelée depuis 045f)
+; ======== fin_quete   (appelée depuis 045f)
+; récompenses de fin de quête (Sir Ragnar, or du prince...)
 0184e  8b 3e 39 46          mov di, word ptr [0x4639]
 01852  80 3d 01             cmp byte ptr [di], 1
 01855  74 01                je loc_1858
@@ -2779,7 +2797,7 @@ loc_1867:
 0186c  72 01                jb loc_186f
 0186e  c3                   ret
 loc_186f:
-0186f  e8 65 45             call sub_5dd7
+0186f  e8 65 45             call curseur_dessine
 01872  c6 06 c8 3f 00       mov byte ptr [0x3fc8], 0
 01877  80 3e 92 3f 03       cmp byte ptr [0x3f92], 3    ; numero_quete
 0187c  74 1b                je loc_1899
@@ -2795,35 +2813,35 @@ loc_1899:
 01899  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
 0189e  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 018a3  73 12                jae loc_18b7
-018a5  bb 1c 00             mov bx, 0x1c
-018a8  e8 42 70             call sub_88ed
+018a5  bb 1c 00             mov bx, 0x1c    ; message « VOUS AVEZ ECHAPPE INDEMNE / A LA QUETE »
+018a8  e8 42 70             call affiche_message
 018ab  8a 1e 92 3f          mov bl, byte ptr [0x3f92]    ; numero_quete
 018af  32 ff                xor bh, bh
 018b1  d0 e3                shl bl, 1
 018b3  ff a7 a9 44          jmp word ptr [bx + 0x44a9]
 loc_18b7:
-018b7  bb 4c 02             mov bx, 0x24c
-018ba  e8 30 70             call sub_88ed
+018b7  bb 4c 02             mov bx, 0x24c    ; message « VOUS AVEZ ECHAPPE INDEMNE / A LA QUETE »
+018ba  e8 30 70             call affiche_message
 018bd  c3                   ret
 loc_18be:
 018be  fe 06 bd 3f          inc byte ptr [0x3fbd]
 018c2  80 3e bd 3f 01       cmp byte ptr [0x3fbd], 1
 018c7  74 03                je loc_18cc
-018c9  e9 6e 01             jmp sub_1a3a
+018c9  e9 6e 01             jmp tous_elimines
 loc_18cc:
 018cc  be 92 00             mov si, 0x92
 018cf  ba 64 00             mov dx, 0x64
 loc_18d2:
 018d2  52                   push dx
 018d3  8b de                mov bx, si
-018d5  e8 15 70             call sub_88ed
+018d5  e8 15 70             call affiche_message
 018d8  5a                   pop dx
 018d9  e8 2a 50             call sub_6906
-018dc  e9 5b 01             jmp sub_1a3a
+018dc  e9 5b 01             jmp tous_elimines
 loc_18df:
 018df  80 3e c0 3f ff       cmp byte ptr [0x3fc0], 0xff
 018e4  75 03                jne loc_18e9
-018e6  e9 51 01             jmp sub_1a3a
+018e6  e9 51 01             jmp tous_elimines
 loc_18e9:
 018e9  ba 64 00             mov dx, 0x64
 018ec  be c6 00             mov si, 0xc6
@@ -2831,51 +2849,51 @@ loc_18e9:
 loc_18f1:
 018f1  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
 018f6  74 03                je loc_18fb
-018f8  e9 3f 01             jmp sub_1a3a
+018f8  e9 3f 01             jmp tous_elimines
 loc_18fb:
-018fb  bb 9c 00             mov bx, 0x9c
-018fe  e8 ec 6f             call sub_88ed
+018fb  bb 9c 00             mov bx, 0x9c    ; message « L'EMPEREUR OFFRE 100 / PIECES D'OR AU / AUVEUR DE SIR RAGNARD »
+018fe  e8 ec 6f             call affiche_message
 01901  a0 bf 3f             mov al, byte ptr [0x3fbf]
 01904  e8 78 44             call sub_5d7f
 01907  8b fe                mov di, si
 01909  ba c8 00             mov dx, 0xc8
 0190c  e8 fb 4f             call sub_690a
-0190f  e9 28 01             jmp sub_1a3a
+0190f  e9 28 01             jmp tous_elimines
 loc_1912:
 01912  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01916  f6 45 0f 20          test byte ptr [di + 0xf], 0x20
 0191a  75 03                jne loc_191f
-0191c  e9 1b 01             jmp sub_1a3a
+0191c  e9 1b 01             jmp tous_elimines
 loc_191f:
 0191f  81 6d 09 88 13       sub word ptr [di + 9], 0x1388
 01924  be dc 00             mov si, 0xdc
 01927  e9 0b 01             jmp sub_1a35
 loc_192a:
-0192a  e8 0d 01             call sub_1a3a
+0192a  e8 0d 01             call tous_elimines
 0192d  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01931  f6 45 0f 40          test byte ptr [di + 0xf], 0x40
 01935  74 2d                je loc_1964
-01937  bb b2 00             mov bx, 0xb2
-0193a  e8 b0 6f             call sub_88ed
+01937  bb b2 00             mov bx, 0xb2    ; message « VOUS DEVEZ DECIDER DE CE QUE / VOUS VOULEZ FAIRE AVEC LE / COFFRE QUE VOUS AVEZ RECUPERE »
+0193a  e8 b0 6f             call affiche_message
 0193d  e8 e5 fe             call sub_1825
 01940  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1
 01945  74 0c                je loc_1953
-01947  bb ae 00             mov bx, 0xae
-0194a  e8 a0 6f             call sub_88ed
+01947  bb ae 00             mov bx, 0xae    ; message « VOUS DEVENEZ PLUS RICHE MAIS NE / SEREZ PEUT-ETRE JAMAIS CHAMPION »
+0194a  e8 a0 6f             call affiche_message
 0194d  e8 d5 fe             call sub_1825
 01950  eb 12                jmp loc_1964
 ; ---- 1 octets non atteints (1952-1952)
 loc_1953:
-01953  bb b0 00             mov bx, 0xb0
-01956  e8 94 6f             call sub_88ed
+01953  bb b0 00             mov bx, 0xb0    ; message « LE PRINCE VOUS REMERCIE / D'AVOIR RAPPORTE SON OR. / SA RECOMPENSE EST DE 200 PIECES »
+01956  e8 94 6f             call affiche_message
 01959  e8 c9 fe             call sub_1825
 0195c  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01960  83 6d 09 32          sub word ptr [di + 9], 0x32
 loc_1964:
 01964  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3
 01969  74 76                je loc_19e1
-0196b  bb b4 00             mov bx, 0xb4
-0196e  e8 7c 6f             call sub_88ed
+0196b  bb b4 00             mov bx, 0xb4    ; message « IL Y A ENCORE DE L'OR A / RECUPERER. VOULEZ-VOUS / RETOURNER LE CHERCHER »
+0196e  e8 7c 6f             call affiche_message
 01971  e8 b1 fe             call sub_1825
 01974  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
 01979  74 66                je loc_19e1
@@ -2886,14 +2904,14 @@ loc_1964:
 0198a  c6 05 ff             mov byte ptr [di], 0xff
 0198d  b0 03                mov al, 3
 0198f  b4 0b                mov ah, 0xb
-01991  e8 2e 00             call sub_19c2
+01991  e8 2e 00             call prime_balur
 01994  73 12                jae loc_19a8
 01996  fe c0                inc al
-01998  e8 27 00             call sub_19c2
+01998  e8 27 00             call prime_balur
 0199b  73 0b                jae loc_19a8
 0199d  fe c8                dec al
 0199f  fe c4                inc ah
-019a1  e8 1e 00             call sub_19c2
+019a1  e8 1e 00             call prime_balur
 019a4  72 02                jb loc_19a8
 019a6  fe c8                dec al
 loc_19a8:
@@ -2905,10 +2923,10 @@ loc_19a8:
 019bc  e8 f1 54             call sub_6eb0
 019bf  e9 e8 54             jmp loc_6eaa
 
-; ======== sub_19c2   (appelée depuis 1991, 1998, 19a1)
+; ======== prime_balur   (appelée depuis 1991, 1998, 19a1)
 019c2  50                   push ax
 019c3  b9 04 00             mov cx, 4
-019c6  be 63 46             mov si, 0x4663
+019c6  be 63 46             mov si, 0x4663    ; fiches_personnages
 loc_19c9:
 019c9  3b fe                cmp di, si
 019cb  74 0c                je loc_19d9
@@ -2939,7 +2957,7 @@ loc_19e1:
 loc_1a04:
 01a04  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01a08  80 65 0f bf          and byte ptr [di + 0xf], 0xbf
-01a0c  eb 2c                jmp sub_1a3a
+01a0c  eb 2c                jmp tous_elimines
 ; ---- 1 octets non atteints (1a0e-1a0e)
 loc_1a0f:
 01a0f  be ce 00             mov si, 0xce
@@ -2947,26 +2965,26 @@ loc_1a0f:
 01a17  74 1c                je sub_1a35
 01a19  a0 a7 3f             mov al, byte ptr [0x3fa7]
 01a1c  3a 06 c0 3f          cmp al, byte ptr [0x3fc0]
-01a20  75 18                jne sub_1a3a
-01a22  bb cc 00             mov bx, 0xcc
-01a25  e8 c5 6e             call sub_88ed
+01a20  75 18                jne tous_elimines
+01a22  bb cc 00             mov bx, 0xcc    ; message « L'EMPEREUR OFFRE AUX / ASSASSINS DE BALUR UNE / RECOMPENSE DE 150 PIECES D'OR »
+01a25  e8 c5 6e             call affiche_message
 01a28  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01a2c  ba 96 00             mov dx, 0x96
 01a2f  e8 d4 4e             call sub_6906
-01a32  eb 06                jmp sub_1a3a
+01a32  eb 06                jmp tous_elimines
 ; ---- 1 octets non atteints (1a34-1a34)
 
 ; ======== sub_1a35   (appelée depuis 6f1f, 6f74, 6ffd)
 01a35  8b de                mov bx, si
-01a37  e8 b3 6e             call sub_88ed
+01a37  e8 b3 6e             call affiche_message
 
-; ======== sub_1a3a   (appelée depuis 18b3, 192a, 7168, 71a2)
+; ======== tous_elimines   (appelée depuis 18b3, 192a, 7168, 71a2)
 01a3a  e8 e8 fd             call sub_1825
-01a3d  e8 74 ec             call sub_06b4
+01a3d  e8 74 ec             call quete_continue
 01a40  0a c0                or al, al
 01a42  75 06                jne loc_1a4a
-01a44  bb 1e 00             mov bx, 0x1e
-01a47  e8 a3 6e             call sub_88ed
+01a44  bb 1e 00             mov bx, 0x1e    ; message « LES JOUEURS SONT TOUS ELIMINES »
+01a47  e8 a3 6e             call affiche_message
 loc_1a4a:
 01a4a  e8 11 4c             call sub_665e
 01a4d  e9 5a 54             jmp loc_6eaa
@@ -3082,7 +3100,7 @@ loc_1b52:
 01b53  83 06 eb 37 08       add word ptr [0x37eb], 8
 01b58  ff 06 ef 37          inc word ptr [0x37ef]
 01b5c  e2 de                loop loc_1b3c
-01b5e  be 63 46             mov si, 0x4663
+01b5e  be 63 46             mov si, 0x4663    ; fiches_personnages
 01b61  b9 05 00             mov cx, 5
 loc_1b64:
 01b64  51                   push cx
@@ -3368,9 +3386,10 @@ loc_1d84:
 
 ; ======== sub_1d89   (routine probable : non appelée directement)
 01d89  e8 18 43             call sub_60a4
-01d8c  e9 55 43             jmp sub_60e4
+01d8c  e9 55 43             jmp affiche_tampon
 
-; ======== sub_1d8f   (appelée depuis 2539, 6f06)
+; ======== carte_quete   (appelée depuis 2539, 6f06)
+; MAPS.VGA : carte de la quête (?)
 01d8f  c6 06 b6 3f 01       mov byte ptr [0x3fb6], 1
 01d94  ff 36 37 46          push word ptr [0x4637]    ; fiche_heros_courant
 01d98  ff 36 a7 3f          push word ptr [0x3fa7]
@@ -3378,10 +3397,10 @@ loc_1d84:
 01d9f  a2 a7 3f             mov byte ptr [0x3fa7], al
 01da2  8b 1e d6 3f          mov bx, word ptr [0x3fd6]    ; attaquant
 01da6  89 1e 37 46          mov word ptr [0x4637], bx    ; fiche_heros_courant
-01daa  e8 d3 3e             call sub_5c80
+01daa  e8 d3 3e             call charge_men
 01dad  e8 db ed             call sub_0b8b
 01db0  e8 75 ed             call sub_0b28
-01db3  e8 da 00             call combat_genie
+01db3  e8 da 00             call attaque_contre_heros
 01db6  c6 06 b6 3f 00       mov byte ptr [0x3fb6], 0
 01dbb  8f 06 a7 3f          pop word ptr [0x3fa7]
 01dbf  8f 06 37 46          pop word ptr [0x4637]    ; fiche_heros_courant
@@ -3393,24 +3412,24 @@ loc_1d84:
 01dd9  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_1ddc:
 01ddc  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-01de2  e8 0c 19             call souris_cache
-01de5  e8 e0 1b             call sub_39c8
+01de2  e8 0c 19             call clavier_retire
+01de5  e8 e0 1b             call fichier_ouvre
 01de8  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 01ded  75 03                jne loc_1df2
 01def  eb 0f                jmp loc_1e00
 ; ---- 1 octets non atteints (1df1-1df1)
 loc_1df2:
-01df2  e8 c5 18             call souris_affiche
-01df5  bb 52 02             mov bx, 0x252
-01df8  e8 f2 6a             call sub_88ed
-01dfb  e8 f3 18             call souris_cache
+01df2  e8 c5 18             call clavier_installe
+01df5  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+01df8  e8 f2 6a             call affiche_message
+01dfb  e8 f3 18             call clavier_retire
 01dfe  eb dc                jmp loc_1ddc
 loc_1e00:
-01e00  e8 f9 1b             call sub_39fc
+01e00  e8 f9 1b             call fichier_lit
 01e03  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 01e08  75 e8                jne loc_1df2
 01e0a  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-01e0d  e8 aa 18             call souris_affiche
+01e0d  e8 aa 18             call clavier_installe
 01e10  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 01e13  8e c0                mov es, ax
 01e15  33 f6                xor si, si
@@ -3431,24 +3450,24 @@ loc_1e2d:
 01e3c  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_1e3f:
 01e3f  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-01e45  e8 a9 18             call souris_cache
-01e48  e8 7d 1b             call sub_39c8
+01e45  e8 a9 18             call clavier_retire
+01e48  e8 7d 1b             call fichier_ouvre
 01e4b  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 01e50  75 03                jne loc_1e55
 01e52  eb 0f                jmp loc_1e63
 ; ---- 1 octets non atteints (1e54-1e54)
 loc_1e55:
-01e55  e8 62 18             call souris_affiche
-01e58  bb 52 02             mov bx, 0x252
-01e5b  e8 8f 6a             call sub_88ed
-01e5e  e8 90 18             call souris_cache
+01e55  e8 62 18             call clavier_installe
+01e58  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+01e5b  e8 8f 6a             call affiche_message
+01e5e  e8 90 18             call clavier_retire
 01e61  eb dc                jmp loc_1e3f
 loc_1e63:
-01e63  e8 96 1b             call sub_39fc
+01e63  e8 96 1b             call fichier_lit
 01e66  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 01e6b  75 e8                jne loc_1e55
 01e6d  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-01e70  e8 47 18             call souris_affiche
+01e70  e8 47 18             call clavier_installe
 01e73  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 01e76  8e c0                mov es, ax
 01e78  33 f6                xor si, si
@@ -3463,8 +3482,8 @@ loc_1e63:
 01e8e  58                   pop ax
 01e8f  c3                   ret
 
-; ======== combat_genie   (appelée depuis 1db3)
-; combat à comptage inversé (sort Génie ?), dégâts sur le champ +6 de la cible
+; ======== attaque_contre_heros   (appelée depuis 1db3)
+; un monstre attaque un héros (message « VOUS AVEZ SURVECU A L'ATTAQUE ») ; défense comptée sur les faces autres que 1 : à vérifier
 01e90  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01e94  32 d2                xor dl, dl
 01e96  8a 0e b9 3f          mov cl, byte ptr [0x3fb9]    ; des_defense_b
@@ -3494,7 +3513,7 @@ loc_1eae:
 01ece  bd e0 70             mov bp, 0x70e0
 01ed1  ba f0 ff             mov dx, 0xfff0
 01ed4  e8 0f ed             call affiche_des
-01ed7  e8 95 46             call sub_656f
+01ed7  e8 95 46             call sauve_tampon
 01eda  8b 36 d6 3f          mov si, word ptr [0x3fd6]    ; attaquant
 01ede  8a 44 19             mov al, byte ptr [si + 0x19]
 01ee1  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
@@ -3514,10 +3533,10 @@ loc_1efd:
 01f00  8b 36 d6 3f          mov si, word ptr [0x3fd6]    ; attaquant
 01f04  80 7c 06 00          cmp byte ptr [si + 6], 0
 01f08  75 03                jne loc_1f0d
-01f0a  e9 cb f1             jmp sub_10d8
+01f0a  e9 cb f1             jmp mort_heros
 loc_1f0d:
-01f0d  bb 52 00             mov bx, 0x52
-01f10  e8 da 69             call sub_88ed
+01f0d  bb 52 00             mov bx, 0x52    ; message « VOUS AVEZ SURVECU A L'ATTAQUE »
+01f10  e8 da 69             call affiche_message
 01f13  c3                   ret
 
 ; ======== sub_1f14   (appelée depuis 09a9)
@@ -3683,7 +3702,7 @@ loc_2076:
 02076  e8 68 37             call sub_57e1
 loc_2079:
 02079  e8 9c 44             call sub_6518
-0207c  e8 65 40             call sub_60e4
+0207c  e8 65 40             call affiche_tampon
 0207f  fe 0e c8 3f          dec byte ptr [0x3fc8]
 02083  75 05                jne loc_208a
 02085  bb cc 3f             mov bx, 0x3fcc
@@ -3819,18 +3838,19 @@ loc_21b1:
 021bc  8a 9f f9 47          mov bl, byte ptr [bx + 0x47f9]    ; faces_de
 021c0  c3                   ret
 
-; ======== sub_21c1   (appelée depuis 02ad)
+; ======== tour_morcar   (appelée depuis 02ad)
+; joue les 32 monstres (DS:4D4A), en vérifiant la fin de quête après chacun
 021c1  e8 0c 35             call sub_56d0
-021c4  bf 4a 4d             mov di, 0x4d4a
+021c4  bf 4a 4d             mov di, 0x4d4a    ; monstres
 021c7  b1 20                mov cl, 0x20
 021c9  32 ed                xor ch, ch
 loc_21cb:
 021cb  51                   push cx
 021cc  57                   push di
-021cd  e8 47 00             call sub_2217
+021cd  e8 47 00             call tour_monstre
 021d0  5f                   pop di
 021d1  59                   pop cx
-021d2  e8 df e4             call sub_06b4
+021d2  e8 df e4             call quete_continue
 021d5  0a c0                or al, al
 021d7  75 01                jne loc_21da
 021d9  c3                   ret
@@ -3839,7 +3859,7 @@ loc_21da:
 021dd  e2 ec                loop loc_21cb
 021df  b9 2c 01             mov cx, 0x12c
 021e2  e8 a2 24             call sub_4687
-021e5  e8 cc e4             call sub_06b4
+021e5  e8 cc e4             call quete_continue
 021e8  0a c0                or al, al
 021ea  75 01                jne loc_21ed
 021ec  c3                   ret
@@ -3854,7 +3874,8 @@ loc_21ed:
 02211  80 26 e3 46 fe       and byte ptr [0x46e3], 0xfe
 02216  c3                   ret
 
-; ======== sub_2217   (appelée depuis 21cd)
+; ======== tour_monstre   (appelée depuis 21cd)
+; un monstre (DI = son enregistrement de 10 octets)
 02217  8a 05                mov al, byte ptr [di]
 02219  0a c0                or al, al
 0221b  75 01                jne loc_221e
@@ -3872,7 +3893,7 @@ loc_2223:
 loc_2231:
 02231  57                   push di
 02232  e8 1b f8             call sub_1a50
-02235  e8 ac 3e             call sub_60e4
+02235  e8 ac 3e             call affiche_tampon
 02238  5f                   pop di
 02239  f6 45 06 04          test byte ptr [di + 6], 4
 0223d  74 0d                je loc_224c
@@ -3888,7 +3909,7 @@ loc_224c:
 02252  80 65 06 fd          and byte ptr [di + 6], 0xfd
 02256  c3                   ret
 loc_2257:
-02257  be 63 46             mov si, 0x4663
+02257  be 63 46             mov si, 0x4663    ; fiches_personnages
 0225a  b9 05 00             mov cx, 5
 loc_225d:
 0225d  51                   push cx
@@ -3930,7 +3951,7 @@ loc_229a:
 022ad  e8 8f 02             call sub_253f
 022b0  5f                   pop di
 022b1  57                   push di
-022b2  e8 81 09             call sub_2c36
+022b2  e8 81 09             call brume_de_mort
 022b5  b9 96 00             mov cx, 0x96
 022b8  e8 cc 23             call sub_4687
 022bb  5f                   pop di
@@ -3961,7 +3982,7 @@ loc_22e4:
 022ec  5f                   pop di
 022ed  57                   push di
 022ee  e8 4e 02             call sub_253f
-022f1  e8 f0 3d             call sub_60e4
+022f1  e8 f0 3d             call affiche_tampon
 022f4  b9 f4 01             mov cx, 0x1f4
 022f7  e8 8d 23             call sub_4687
 022fa  5f                   pop di
@@ -4212,7 +4233,7 @@ loc_24e3:
 02519  e8 34 f5             call sub_1a50
 0251c  8b 3e d4 3f          mov di, word ptr [0x3fd4]    ; cible
 02520  e8 1c 00             call sub_253f
-02523  e8 be 3b             call sub_60e4
+02523  e8 be 3b             call affiche_tampon
 02526  b9 f4 01             mov cx, 0x1f4
 02529  e8 5b 21             call sub_4687
 0252c  59                   pop cx
@@ -4224,7 +4245,7 @@ loc_2533:
 02533  e8 6a 11             call sub_36a0
 02536  e2 fb                loop loc_2533
 02538  59                   pop cx
-02539  e8 53 f8             call sub_1d8f
+02539  e8 53 f8             call carte_quete
 0253c  e9 91 31             jmp sub_56d0
 
 ; ======== sub_253f   (appelée depuis 22ad, 22ee, 2520)
@@ -4273,7 +4294,7 @@ loc_2593:
 02596  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0259a  fe 4d 06             dec byte ptr [di + 6]
 0259d  8b de                mov bx, si
-0259f  e8 4b 63             call sub_88ed
+0259f  e8 4b 63             call affiche_message
 025a2  e8 80 f2             call sub_1825
 025a5  e8 b6 40             call sub_665e
 025a8  e8 2c 01             call sub_26d7
@@ -4285,15 +4306,17 @@ loc_2593:
 025bb  e9 14 eb             jmp loc_10d2
 loc_25be:
 025be  c3                   ret
-piege_des:    ; jet de dé d'un piège selon AL
+
+; ======== piege_des
+; jet de dé d'un piège selon AL
 025bf  3c 02                cmp al, 2
 025c1  75 13                jne loc_25d6
 025c3  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0
 025c8  e8 ec fb             call de_combat
 025cb  0a db                or bl, bl
 025cd  75 c1                jne loc_2590
-025cf  bb 1e 01             mov bx, 0x11e
-025d2  e8 18 63             call sub_88ed
+025cf  bb 1e 01             mov bx, 0x11e    ; message « LE MECANISME DE LA TRAPPE / CRAQUE SOUS VOTRE POIDS / MAIS TIENT BON »
+025d2  e8 18 63             call affiche_message
 025d5  c3                   ret
 loc_25d6:
 025d6  3c 03                cmp al, 3
@@ -4312,8 +4335,8 @@ loc_25ec:
 025f6  74 34                je loc_262c
 025f8  80 3e 92 3f 04       cmp byte ptr [0x3f92], 4    ; numero_quete
 025fd  75 67                jne loc_2666
-025ff  bb 3e 00             mov bx, 0x3e
-02602  e8 e8 62             call sub_88ed
+025ff  bb 3e 00             mov bx, 0x3e    ; message « UN ROCHER TOMBE / DANS LE COULOIR ET / BOUCHE LE PASSAGE »
+02602  e8 e8 62             call affiche_message
 02605  e8 1d f2             call sub_1825
 02608  e8 a5 48             call sub_6eb0
 0260b  c6 06 24 59 00       mov byte ptr [0x5924], 0
@@ -4337,8 +4360,8 @@ loc_262c:
 02639  c3                   ret
 loc_263a:
 0263a  e8 9a 00             call sub_26d7
-0263d  bb 3e 00             mov bx, 0x3e
-02640  e8 aa 62             call sub_88ed
+0263d  bb 3e 00             mov bx, 0x3e    ; message « UN ROCHER TOMBE / DANS LE COULOIR ET / BOUCHE LE PASSAGE »
+02640  e8 aa 62             call affiche_message
 02643  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
 02648  c6 06 70 58 00       mov byte ptr [0x5870], 0
 0264d  ba 00 00             mov dx, 0
@@ -4371,7 +4394,7 @@ loc_2690:
 02690  be 42 00             mov si, 0x42
 loc_2693:
 02693  8b de                mov bx, si
-02695  e8 55 62             call sub_88ed
+02695  e8 55 62             call affiche_message
 02698  e8 8a f1             call sub_1825
 0269b  e8 39 00             call sub_26d7
 0269e  5e                   pop si
@@ -4380,7 +4403,9 @@ loc_2693:
 026a8  80 7c 06 00          cmp byte ptr [si + 6], 0
 026ac  74 20                je loc_26ce
 026ae  c3                   ret
-trois_des_un_point:    ; trois dés lancés, un point de corps perdu ; code automodifié en 0x26C9
+
+; ======== trois_des_un_point
+; trois dés lancés, un point de corps perdu ; code automodifié en 0x26C9
 026af  2e 89 1e c9 26       mov word ptr cs:[0x26c9], bx
 026b4  b6 03                mov dh, 3
 026b6  e8 d3 36             call compte_cranes
@@ -4584,12 +4609,13 @@ loc_281e:
 02825  5b                   pop bx
 02826  c3                   ret
 
-; ======== sub_2827   (appelée depuis 07de, 0807, 082d, 492a, 49f1, 4ab7, 4b82, 6e40)
-02827  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+; ======== son_effet_1   (appelée depuis 07de, 0807, 082d, 492a, 49f1, 4ab7, 4b82, 6e40)
+; effets sonores : même schéma (DS:3199 actif, DS:3192 pilote), 8 appels
+02827  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 0282c  74 01                je loc_282f
 0282e  c3                   ret
 loc_282f:
-0282f  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+0282f  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 02834  75 22                jne loc_2858
 02836  9c                   pushf
 02837  50                   push ax
@@ -4618,7 +4644,7 @@ loc_282f:
 02856  9d                   popf
 02857  c3                   ret
 loc_2858:
-02858  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+02858  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 0285d  75 09                jne loc_2868
 0285f  ba 08 00             mov dx, 8
 02862  b8 05 00             mov ax, 5
@@ -4642,11 +4668,11 @@ loc_2868:
 02885  c3                   ret
 
 ; ======== sub_2886   (appelée depuis 2088)
-02886  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+02886  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 0288b  74 01                je loc_288e
 0288d  c3                   ret
 loc_288e:
-0288e  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+0288e  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 02893  75 36                jne loc_28cb
 02895  9c                   pushf
 02896  50                   push ax
@@ -4685,7 +4711,7 @@ loc_28a2:
 028c9  9d                   popf
 028ca  c3                   ret
 loc_28cb:
-028cb  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+028cb  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 028d0  75 09                jne loc_28db
 028d2  ba 03 00             mov dx, 3
 028d5  b8 05 00             mov ax, 5
@@ -4709,7 +4735,7 @@ loc_28db:
 028f8  c3                   ret
 
 ; ======== sub_28f9   (appelée depuis 583f)
-028f9  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+028f9  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 028fe  74 01                je loc_2901
 02900  c3                   ret
 loc_2901:
@@ -4718,7 +4744,7 @@ loc_2901:
 02907  c3                   ret
 loc_2908:
 02908  c6 06 57 0e 03       mov byte ptr [0xe57], 3
-0290d  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+0290d  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 02912  75 22                jne loc_2936
 02914  9c                   pushf
 02915  50                   push ax
@@ -4747,7 +4773,7 @@ loc_2908:
 02934  9d                   popf
 02935  c3                   ret
 loc_2936:
-02936  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+02936  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 0293b  75 09                jne loc_2946
 0293d  ba 00 00             mov dx, 0
 02940  b8 05 00             mov ax, 5
@@ -4771,11 +4797,11 @@ loc_2946:
 02963  c3                   ret
 
 ; ======== sub_2964   (appelée depuis 0e9d)
-02964  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+02964  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02969  74 01                je loc_296c
 0296b  c3                   ret
 loc_296c:
-0296c  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+0296c  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 02971  75 2f                jne loc_29a2
 02973  9c                   pushf
 02974  50                   push ax
@@ -4809,7 +4835,7 @@ loc_296c:
 029a0  9d                   popf
 029a1  c3                   ret
 loc_29a2:
-029a2  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+029a2  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 029a7  75 09                jne loc_29b2
 029a9  ba 01 00             mov dx, 1
 029ac  b8 05 00             mov ax, 5
@@ -4833,11 +4859,11 @@ loc_29b2:
 029cf  c3                   ret
 
 ; ======== sub_29d0   (appelée depuis 2088)
-029d0  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+029d0  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 029d5  74 01                je loc_29d8
 029d7  c3                   ret
 loc_29d8:
-029d8  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+029d8  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 029dd  75 3b                jne loc_2a1a
 029df  9c                   pushf
 029e0  50                   push ax
@@ -4879,7 +4905,7 @@ loc_29fd:
 02a18  9d                   popf
 02a19  c3                   ret
 loc_2a1a:
-02a1a  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+02a1a  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 02a1f  75 09                jne loc_2a2a
 02a21  ba 01 00             mov dx, 1
 02a24  b8 05 00             mov ax, 5
@@ -4902,12 +4928,13 @@ loc_2a2a:
 02a46  5f                   pop di
 02a47  c3                   ret
 
-; ======== sub_2a48   (appelée depuis 077c, 084e, 12bf, 73e5, 787e, 7e6f, 7f5e, 806a)
-02a48  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+; ======== son_effet_2   (appelée depuis 077c, 084e, 12bf, 73e5, 787e, 7e6f, 7f5e, 806a)
+; 15 appels
+02a48  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02a4d  74 01                je loc_2a50
 02a4f  c3                   ret
 loc_2a50:
-02a50  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+02a50  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 02a55  75 22                jne loc_2a79
 02a57  9c                   pushf
 02a58  50                   push ax
@@ -4936,7 +4963,7 @@ loc_2a50:
 02a77  9d                   popf
 02a78  c3                   ret
 loc_2a79:
-02a79  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+02a79  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 02a7e  75 09                jne loc_2a89
 02a80  ba 06 00             mov dx, 6
 02a83  b8 05 00             mov ax, 5
@@ -4960,11 +4987,11 @@ loc_2a89:
 02aa6  c3                   ret
 
 ; ======== sub_2aa7   (appelée depuis 2593, 2687, 6f19)
-02aa7  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+02aa7  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02aac  74 01                je loc_2aaf
 02aae  c3                   ret
 loc_2aaf:
-02aaf  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+02aaf  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 02ab4  75 22                jne loc_2ad8
 02ab6  9c                   pushf
 02ab7  50                   push ax
@@ -4993,7 +5020,7 @@ loc_2aaf:
 02ad6  9d                   popf
 02ad7  c3                   ret
 loc_2ad8:
-02ad8  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+02ad8  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 02add  75 09                jne loc_2ae8
 02adf  ba 04 00             mov dx, 4
 02ae2  b8 05 00             mov ax, 5
@@ -5017,11 +5044,11 @@ loc_2ae8:
 02b05  c3                   ret
 
 ; ======== sub_2b06   (appelée depuis 4f47)
-02b06  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+02b06  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02b0b  74 01                je loc_2b0e
 02b0d  c3                   ret
 loc_2b0e:
-02b0e  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+02b0e  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 02b13  75 4b                jne loc_2b60
 02b15  9c                   pushf
 02b16  50                   push ax
@@ -5071,7 +5098,7 @@ loc_2b43:
 02b5e  9d                   popf
 02b5f  c3                   ret
 loc_2b60:
-02b60  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+02b60  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 02b65  75 09                jne loc_2b70
 02b67  ba 05 00             mov dx, 5
 02b6a  b8 05 00             mov ax, 5
@@ -5190,7 +5217,8 @@ loc_2c30:
 02c30  c6 06 e6 3f 00       mov byte ptr [0x3fe6], 0
 02c35  c3                   ret
 
-; ======== sub_2c36   (appelée depuis 22b2)
+; ======== brume_de_mort   (appelée depuis 22b2)
+; « L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL »
 02c36  32 c0                xor al, al
 loc_2c38:
 02c38  50                   push ax
@@ -5207,19 +5235,19 @@ loc_2c38:
 02c55  76 15                jbe loc_2c6c
 02c57  fe 4c 06             dec byte ptr [si + 6]
 02c5a  58                   pop ax
-02c5b  bb 32 02             mov bx, 0x232
-02c5e  e8 8c 5c             call sub_88ed
+02c5b  bb 32 02             mov bx, 0x232    ; message « L'AIR GLACIAL DE LA BRUME / DE LA MORT VOUS FAIT DU MAL. / VOUS PERDEZ 1 POINT DE CORPS »
+02c5e  e8 8c 5c             call affiche_message
 02c61  c3                   ret
 loc_2c62:
 02c62  58                   pop ax
 02c63  fe c0                inc al
 02c65  3c 04                cmp al, 4
 02c67  75 cf                jne loc_2c38
-02c69  e9 78 34             jmp sub_60e4
+02c69  e9 78 34             jmp affiche_tampon
 loc_2c6c:
 02c6c  58                   pop ax
 02c6d  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
-02c70  e8 65 e4             call sub_10d8
+02c70  e8 65 e4             call mort_heros
 02c73  c3                   ret
 
 ; ======== sub_2c74   (routine probable : non appelée directement)
@@ -5253,7 +5281,7 @@ loc_2cb1:
 02cb1  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 loc_2cb6:
 02cb6  c6 06 67 ad 05       mov byte ptr [0xad67], 5
-02cbb  e8 62 5f             call sub_8c20
+02cbb  e8 62 5f             call inventaire_sorts
 02cbe  80 3e af 3f 00       cmp byte ptr [0x3faf], 0
 02cc3  75 01                jne loc_2cc6
 02cc5  c3                   ret
@@ -5272,13 +5300,13 @@ loc_2cc6:
 02cef  c6 06 ad 3f 00       mov byte ptr [0x3fad], 0
 02cf4  c6 06 b5 3f ff       mov byte ptr [0x3fb5], 0xff
 loc_2cf9:
-02cf9  e8 00 37             call sub_63fc
+02cf9  e8 00 37             call curseur_memorise
 02cfc  e8 ea df             call sub_0ce9
-02cff  e8 12 31             call sub_5e14
-02d02  e8 df 33             call sub_60e4
-02d05  e8 cf 30             call sub_5dd7
+02cff  e8 12 31             call curseur_sauve_fond
+02d02  e8 df 33             call affiche_tampon
+02d05  e8 cf 30             call curseur_dessine
 02d08  be 37 43             mov si, 0x4337
-02d0b  e8 f7 21             call sub_4f05
+02d0b  e8 f7 21             call zone_cliquee
 02d0e  83 fb 02             cmp bx, 2
 02d11  75 03                jne loc_2d16
 02d13  e9 94 e5             jmp loc_12aa
@@ -5314,8 +5342,8 @@ loc_2d5e:
 02d6c  c6 06 ca 3f 06       mov byte ptr [0x3fca], 6    ; heros_courant
 02d71  e9 0b e1             jmp loc_0e7f
 loc_2d74:
-02d74  bb 56 00             mov bx, 0x56
-02d77  e8 73 5b             call sub_88ed
+02d74  bb 56 00             mov bx, 0x56    ; message « CE SORT N'A AUCUN / EFFET SUR UN ENNEMI. / IL A ETE GASPILLE »
+02d77  e8 73 5b             call affiche_message
 02d7a  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 02d7e  e8 03 00             call sub_2d84
 02d81  e9 26 e5             jmp loc_12aa
@@ -5585,7 +5613,7 @@ loc_2fcc:
 loc_2fe1:
 02fe1  b8 ff 4c             mov ax, 0x4cff
 02fe4  cd 21                int 0x21
-02fe6  e8 08 07             call souris_cache
+02fe6  e8 08 07             call clavier_retire
 02fe9  e9 a5 18             jmp loc_4891
 ; ---- 34 octets non atteints (2fec-300d)
 loc_300e:
@@ -5707,13 +5735,14 @@ loc_300e:
 030f5  00 e8                add al, ch
 ; ---- -1 octets non atteints (30f7-30f5)
 
-; ======== sub_30f6   (appelée depuis 0107)
-030f6  e8 c6 14             call sub_45bf
+; ======== lit_configuration   (appelée depuis 0107)
+; charge QUEST.CFG en DS:3190 (9 octets), teste la souris (int 33h), étalonne le joystick si besoin
+030f6  e8 c6 14             call installe_erreur_disque
 030f9  c7 06 07 39 8d 36    mov word ptr [0x3907], 0x368d    ; fichier_nom, "quest.cfg"
 030ff  c7 06 03 39 90 31    mov word ptr [0x3903], 0x3190    ; fichier_offset
 03105  b8 7c 09             mov ax, 0x97c
 03108  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-0310b  e8 73 08             call charge_fichier_b
+0310b  e8 73 08             call charge_fichier
 0310e  83 3e e9 37 02       cmp word ptr [0x37e9], 2    ; erreur_fichier
 03113  74 03                je loc_3118
 03115  eb 13                jmp loc_312a
@@ -5726,7 +5755,7 @@ loc_3118:
 03121  b4 09                mov ah, 9
 03123  cd 21                int 0x21
 loc_3125:
-03125  e8 c9 05             call souris_cache
+03125  e8 c9 05             call clavier_retire
 03128  f9                   stc
 03129  c3                   ret
 loc_312a:
@@ -5734,19 +5763,19 @@ loc_312a:
 0312d  cd 21                int 0x21
 0312f  8c c0                mov ax, es
 03131  0b c3                or ax, bx
-03133  a3 11 32             mov word ptr [0x3211], ax
+03133  a3 11 32             mov word ptr [0x3211], ax    ; souris_presente
 03136  74 09                je loc_3141
 03138  33 c0                xor ax, ax
 0313a  cd 33                int 0x33
 0313c  0b c0                or ax, ax
-0313e  a3 11 32             mov word ptr [0x3211], ax
+0313e  a3 11 32             mov word ptr [0x3211], ax    ; souris_presente
 loc_3141:
 03141  b9 04 00             mov cx, 4
 03144  bb 95 31             mov bx, 0x3195
 loc_3147:
 03147  80 3f 00             cmp byte ptr [bx], 0
 0314a  75 07                jne loc_3153
-0314c  83 3e 11 32 00       cmp word ptr [0x3211], 0
+0314c  83 3e 11 32 00       cmp word ptr [0x3211], 0    ; souris_presente
 03151  74 13                je loc_3166
 loc_3153:
 03153  43                   inc bx
@@ -5766,7 +5795,7 @@ loc_3166:
 0316b  cd 21                int 0x21
 0316d  eb b6                jmp loc_3125
 loc_316f:
-0316f  e8 4c 15             call sub_46be
+0316f  e8 4c 15             call etalonne_joystick
 03172  f8                   clc
 03173  c3                   ret
 
@@ -5777,7 +5806,8 @@ loc_316f:
 03179  03 d8                add bx, ax
 0317b  c3                   ret
 
-; ======== sub_317c   (appelée depuis 0062, 00b1, 00cc, 022b, 023a, 444a, 446e, 448c)
+; ======== affiche_texte   (appelée depuis 0062, 00b1, 00cc, 022b, 023a, 444a, 446e, 448c)
+; texte pointé par BP, codes de contrôle 01 (position), 11 (ligne, colonne), 10, 12
 0317c  3e 8a 46 00          mov al, byte ptr ds:[bp]
 03180  22 c0                and al, al
 03182  75 01                jne loc_3185
@@ -5785,7 +5815,7 @@ loc_316f:
 loc_3185:
 03185  e8 03 00             call sub_318b
 03188  45                   inc bp
-03189  eb f1                jmp sub_317c
+03189  eb f1                jmp affiche_texte
 
 ; ======== sub_318b   (appelée depuis 3185, 3a7a, 3a9b, 45a7)
 0318b  3c 01                cmp al, 1
@@ -6290,7 +6320,8 @@ loc_358c:
 0359a  83 c5 02             add bp, 2
 0359d  c3                   ret
 
-; ======== sub_359e   (routine probable : non appelée directement)
+; ======== mode_tandy
+; mode vidéo 4 : int 10h mode 8 (Tandy / PCjr)
 0359e  c7 06 90 31 04 00    mov word ptr [0x3190], 4    ; mode_video
 035a4  b4 00                mov ah, 0
 035a6  b0 08                mov al, 8
@@ -6356,7 +6387,7 @@ loc_35b8:
 035ea  fc                   cld
 035eb  b9 80 00             mov cx, 0x80
 035ee  b0 01                mov al, 1
-035f0  bf 12 39             mov di, 0x3912
+035f0  bf 12 39             mov di, 0x3912    ; etat_touches
 loc_35f3:
 035f3  26 38 05             cmp byte ptr es:[di], al
 035f6  74 07                je loc_35ff
@@ -6462,8 +6493,8 @@ loc_36a5:
 036ac  c3                   ret
 ; ---- 13 octets non atteints (36ad-36b9)
 
-; ======== souris_affiche   (appelée depuis 0104, 01b4, 01cf, 01fd, 0218, 1df2, 1e0d, 1e55)
-; (supposé) réaffiche la souris
+; ======== clavier_installe   (appelée depuis 0104, 01b4, 01cf, 01fd, 0218, 1df2, 1e0d, 1e55)
+; détourne int 9 vers clavier_interruption et vide la table des touches DS:3912
 036ba  bb 09 37             mov bx, 0x3709
 036bd  39 1e 9b 39          cmp word ptr [0x399b], bx
 036c1  75 01                jne loc_36c4
@@ -6485,7 +6516,7 @@ loc_36c4:
 036dc  b0 09                mov al, 9
 036de  cd 21                int 0x21
 036e0  1f                   pop ds
-036e1  bf 12 39             mov di, 0x3912
+036e1  bf 12 39             mov di, 0x3912    ; etat_touches
 036e4  b8 7c 09             mov ax, 0x97c
 036e7  8e c0                mov es, ax
 036e9  33 c0                xor ax, ax
@@ -6493,8 +6524,8 @@ loc_36c4:
 036ee  f3 ab                rep stosw word ptr es:[di], ax
 036f0  c3                   ret
 
-; ======== souris_cache   (appelée depuis 0114, 01a4, 01bd, 01ed, 0206, 02bf, 1de2, 1dfb)
-; (supposé) cache la souris
+; ======== clavier_retire   (appelée depuis 0114, 01a4, 01bd, 01ed, 0206, 02bf, 1de2, 1dfb)
+; remet l'ancien vecteur int 9 (avant chaque accès disque)
 036f1  1e                   push ds
 036f2  bf 99 39             mov di, 0x3999
 036f5  8b 55 02             mov dx, word ptr [di + 2]
@@ -6508,43 +6539,95 @@ loc_36c4:
 loc_3707:
 03707  1f                   pop ds
 03708  c3                   ret
-; ---- 73 octets non atteints (3709-3751)
 
-; ======== sub_3752   (appelée depuis 38ef, 38fa, 3916, 393f, 3965, 63ea, 6745, 73c5)
-03752  c6 06 92 39 00       mov byte ptr [0x3992], 0
+; ======== clavier_interruption
+; int 9 : lit le port 60h, met à 1 ou 0 l'octet de la touche dans DS:3912
+03709  9c                   pushf
+0370a  50                   push ax
+0370b  53                   push bx
+0370c  51                   push cx
+0370d  52                   push dx
+0370e  57                   push di
+0370f  56                   push si
+03710  55                   push bp
+03711  06                   push es
+03712  1e                   push ds
+03713  50                   push ax
+03714  b8 7c 09             mov ax, 0x97c
+03717  8e d8                mov ds, ax
+03719  58                   pop ax
+0371a  e4 60                in al, 0x60
+0371c  8a d8                mov bl, al
+0371e  e4 61                in al, 0x61
+03720  8a e0                mov ah, al
+03722  0c 80                or al, 0x80
+03724  e6 61                out 0x61, al
+03726  86 e0                xchg al, ah
+03728  e6 61                out 0x61, al
+0372a  8a c3                mov al, bl
+0372c  32 e4                xor ah, ah
+0372e  bb 12 39             mov bx, 0x3912    ; etat_touches
+03731  a8 80                test al, 0x80
+03733  75 07                jne loc_373c
+03735  03 d8                add bx, ax
+03737  c6 07 01             mov byte ptr [bx], 1
+0373a  eb 07                jmp loc_3743
+loc_373c:
+0373c  24 7f                and al, 0x7f
+0373e  03 d8                add bx, ax
+03740  c6 07 00             mov byte ptr [bx], 0
+loc_3743:
+03743  b0 61                mov al, 0x61
+03745  e6 20                out 0x20, al
+03747  1f                   pop ds
+03748  07                   pop es
+03749  5d                   pop bp
+0374a  5e                   pop si
+0374b  5f                   pop di
+0374c  5a                   pop dx
+0374d  59                   pop cx
+0374e  5b                   pop bx
+0374f  58                   pop ax
+03750  9d                   popf
+03751  cf                   iret
+
+; ======== lit_commandes   (appelée depuis 38ef, 38fa, 3916, 393f, 3965, 63ea, 6745, 73c5)
+; fusionne clavier, joystick et souris dans DS:3992 ; déplace le curseur DS:3993/3995
+03752  c6 06 92 39 00       mov byte ptr [0x3992], 0    ; commandes
 03757  b9 06 00             mov cx, 6
 0375a  33 db                xor bx, bx
-0375c  be 0b 39             mov si, 0x390b
-0375f  bf 12 39             mov di, 0x3912
+0375c  be 0b 39             mov si, 0x390b    ; touches_commandes
+0375f  bf 12 39             mov di, 0x3912    ; etat_touches
 loc_3762:
 03762  8a 1c                mov bl, byte ptr [si]
 03764  8a 01                mov al, byte ptr [bx + di]
 03766  d0 e8                shr al, 1
-03768  d0 16 92 39          rcl byte ptr [0x3992]
+03768  d0 16 92 39          rcl byte ptr [0x3992]    ; commandes
 0376c  46                   inc si
 0376d  e2 f3                loop loc_3762
-0376f  80 26 92 39 7f       and byte ptr [0x3992], 0x7f
+0376f  80 26 92 39 7f       and byte ptr [0x3992], 0x7f    ; commandes
 03774  f6 06 13 39 01       test byte ptr [0x3913], 1
 03779  74 13                je loc_378e
 0377b  f6 06 2f 39 01       test byte ptr [0x392f], 1
 03780  74 05                je loc_3787
-03782  80 0e 92 39 40       or byte ptr [0x3992], 0x40
+03782  80 0e 92 39 40       or byte ptr [0x3992], 0x40    ; commandes
 loc_3787:
 03787  a0 2f 39             mov al, byte ptr [0x392f]
 0378a  8a 26 13 39          mov ah, byte ptr [0x3913]
 loc_378e:
-0378e  e8 18 00             call sub_37a9
-03791  e8 a1 00             call sub_3835
-03794  e8 ef 00             call sub_3886
-03797  81 3e 93 39 2f 01    cmp word ptr [0x3993], 0x12f
+0378e  e8 18 00             call lit_joystick
+03791  e8 a1 00             call curseur_clavier
+03794  e8 ef 00             call lit_souris
+03797  81 3e 93 39 2f 01    cmp word ptr [0x3993], 0x12f    ; curseur_x
 0379d  76 06                jbe loc_37a5
-0379f  c7 06 93 39 2f 01    mov word ptr [0x3993], 0x12f
+0379f  c7 06 93 39 2f 01    mov word ptr [0x3993], 0x12f    ; curseur_x
 loc_37a5:
-037a5  e8 a8 10             call sub_4850
+037a5  e8 a8 10             call son_musique
 037a8  c3                   ret
 
-; ======== sub_37a9   (appelée depuis 378e)
-037a9  80 3e 93 31 02       cmp byte ptr [0x3193], 2
+; ======== lit_joystick   (appelée depuis 378e)
+; si DS:3193 = 2
+037a9  80 3e 93 31 02       cmp byte ptr [0x3193], 2    ; commande_type
 037ae  74 01                je loc_37b1
 037b0  c3                   ret
 loc_37b1:
@@ -6559,80 +6642,82 @@ loc_37bf:
 037c5  2b 0e 0b 32          sub cx, word ptr [0x320b]
 037c9  83 f9 20             cmp cx, 0x20
 037cc  72 16                jb loc_37e4
-037ce  80 0e 92 39 02       or byte ptr [0x3992], 2
+037ce  80 0e 92 39 02       or byte ptr [0x3992], 2    ; commandes
 037d3  eb 0f                jmp loc_37e4
 ; ---- 1 octets non atteints (37d5-37d5)
 loc_37d6:
 037d6  2b 0e 0b 32          sub cx, word ptr [0x320b]
 037da  83 f9 e0             cmp cx, -0x20
 037dd  77 05                ja loc_37e4
-037df  80 0e 92 39 01       or byte ptr [0x3992], 1
+037df  80 0e 92 39 01       or byte ptr [0x3992], 1    ; commandes
 loc_37e4:
 037e4  3b 1e 0d 32          cmp bx, word ptr [0x320d]
 037e8  72 11                jb loc_37fb
 037ea  2b 1e 0d 32          sub bx, word ptr [0x320d]
 037ee  83 fb 20             cmp bx, 0x20
 037f1  72 16                jb loc_3809
-037f3  80 0e 92 39 08       or byte ptr [0x3992], 8
+037f3  80 0e 92 39 08       or byte ptr [0x3992], 8    ; commandes
 037f8  eb 0f                jmp loc_3809
 ; ---- 1 octets non atteints (37fa-37fa)
 loc_37fb:
 037fb  2b 1e 0d 32          sub bx, word ptr [0x320d]
 037ff  83 fb e0             cmp bx, -0x20
 03802  77 05                ja loc_3809
-03804  80 0e 92 39 04       or byte ptr [0x3992], 4
+03804  80 0e 92 39 04       or byte ptr [0x3992], 4    ; commandes
 loc_3809:
 03809  e8 49 0f             call sub_4755
 0380c  a9 01 00             test ax, 1
 0380f  74 05                je loc_3816
-03811  80 0e 92 39 10       or byte ptr [0x3992], 0x10
+03811  80 0e 92 39 10       or byte ptr [0x3992], 0x10    ; commandes
 loc_3816:
 03816  a9 02 00             test ax, 2
 03819  74 05                je loc_3820
-0381b  80 0e 92 39 20       or byte ptr [0x3992], 0x20
+0381b  80 0e 92 39 20       or byte ptr [0x3992], 0x20    ; commandes
 loc_3820:
 03820  a9 04 00             test ax, 4
 03823  74 05                je loc_382a
-03825  80 0e 92 39 10       or byte ptr [0x3992], 0x10
+03825  80 0e 92 39 10       or byte ptr [0x3992], 0x10    ; commandes
 loc_382a:
 0382a  a9 08 00             test ax, 8
 0382d  74 05                je loc_3834
-0382f  80 0e 92 39 20       or byte ptr [0x3992], 0x20
+0382f  80 0e 92 39 20       or byte ptr [0x3992], 0x20    ; commandes
 loc_3834:
 03834  c3                   ret
 
-; ======== sub_3835   (appelée depuis 3791)
-03835  f6 06 92 39 01       test byte ptr [0x3992], 1
+; ======== curseur_clavier   (appelée depuis 3791)
+; déplace le curseur de 4 pixels selon les bits de direction
+03835  f6 06 92 39 01       test byte ptr [0x3992], 1    ; commandes
 0383a  74 0c                je loc_3848
-0383c  83 3e 95 39 04       cmp word ptr [0x3995], 4
+0383c  83 3e 95 39 04       cmp word ptr [0x3995], 4    ; curseur_y
 03841  72 05                jb loc_3848
-03843  83 2e 95 39 04       sub word ptr [0x3995], 4
+03843  83 2e 95 39 04       sub word ptr [0x3995], 4    ; curseur_y
 loc_3848:
-03848  f6 06 92 39 02       test byte ptr [0x3992], 2
+03848  f6 06 92 39 02       test byte ptr [0x3992], 2    ; commandes
 0384d  74 0d                je loc_385c
-0384f  81 3e 95 39 c2 00    cmp word ptr [0x3995], 0xc2
+0384f  81 3e 95 39 c2 00    cmp word ptr [0x3995], 0xc2    ; curseur_y
 03855  77 05                ja loc_385c
-03857  83 06 95 39 04       add word ptr [0x3995], 4
+03857  83 06 95 39 04       add word ptr [0x3995], 4    ; curseur_y
 loc_385c:
-0385c  f6 06 92 39 04       test byte ptr [0x3992], 4
+0385c  f6 06 92 39 04       test byte ptr [0x3992], 4    ; commandes
 03861  74 0c                je loc_386f
-03863  83 3e 93 39 04       cmp word ptr [0x3993], 4
+03863  83 3e 93 39 04       cmp word ptr [0x3993], 4    ; curseur_x
 03868  72 05                jb loc_386f
-0386a  83 2e 93 39 04       sub word ptr [0x3993], 4
+0386a  83 2e 93 39 04       sub word ptr [0x3993], 4    ; curseur_x
 loc_386f:
-0386f  f6 06 92 39 08       test byte ptr [0x3992], 8
+0386f  f6 06 92 39 08       test byte ptr [0x3992], 8    ; commandes
 03874  75 01                jne loc_3877
 03876  c3                   ret
 loc_3877:
-03877  81 3e 93 39 3b 01    cmp word ptr [0x3993], 0x13b
+03877  81 3e 93 39 3b 01    cmp word ptr [0x3993], 0x13b    ; curseur_x
 0387d  76 01                jbe loc_3880
 0387f  c3                   ret
 loc_3880:
-03880  83 06 93 39 04       add word ptr [0x3993], 4
+03880  83 06 93 39 04       add word ptr [0x3993], 4    ; curseur_x
 03885  c3                   ret
 
-; ======== sub_3886   (appelée depuis 3794)
-03886  80 3e 93 31 00       cmp byte ptr [0x3193], 0
+; ======== lit_souris   (appelée depuis 3794)
+; si DS:3193 = 0 : int 33h AX=3, boutons et position
+03886  80 3e 93 31 00       cmp byte ptr [0x3193], 0    ; commande_type
 0388b  74 01                je loc_388e
 0388d  c3                   ret
 loc_388e:
@@ -6640,36 +6725,37 @@ loc_388e:
 03891  cd 33                int 0x33
 03893  f7 c3 01 00          test bx, 1
 03897  74 05                je loc_389e
-03899  80 0e 92 39 10       or byte ptr [0x3992], 0x10
+03899  80 0e 92 39 10       or byte ptr [0x3992], 0x10    ; commandes
 loc_389e:
 0389e  f7 c3 02 00          test bx, 2
 038a2  74 05                je loc_38a9
-038a4  80 0e 92 39 20       or byte ptr [0x3992], 0x20
+038a4  80 0e 92 39 20       or byte ptr [0x3992], 0x20    ; commandes
 loc_38a9:
 038a9  d1 e9                shr cx, 1
-038ab  3b 0e 93 39          cmp cx, word ptr [0x3993]
+038ab  3b 0e 93 39          cmp cx, word ptr [0x3993]    ; curseur_x
 038af  74 0e                je loc_38bf
 038b1  72 07                jb loc_38ba
-038b3  80 0e 92 39 08       or byte ptr [0x3992], 8
+038b3  80 0e 92 39 08       or byte ptr [0x3992], 8    ; commandes
 038b8  eb 05                jmp loc_38bf
 loc_38ba:
-038ba  80 0e 92 39 04       or byte ptr [0x3992], 4
+038ba  80 0e 92 39 04       or byte ptr [0x3992], 4    ; commandes
 loc_38bf:
-038bf  3b 16 95 39          cmp dx, word ptr [0x3995]
+038bf  3b 16 95 39          cmp dx, word ptr [0x3995]    ; curseur_y
 038c3  74 0f                je loc_38d4
 038c5  72 08                jb loc_38cf
-038c7  80 0e 92 39 02       or byte ptr [0x3992], 2
+038c7  80 0e 92 39 02       or byte ptr [0x3992], 2    ; commandes
 038cc  eb 06                jmp loc_38d4
 ; ---- 1 octets non atteints (38ce-38ce)
 loc_38cf:
-038cf  80 0e 92 39 01       or byte ptr [0x3992], 1
+038cf  80 0e 92 39 01       or byte ptr [0x3992], 1    ; commandes
 loc_38d4:
-038d4  89 0e 93 39          mov word ptr [0x3993], cx
-038d8  89 16 95 39          mov word ptr [0x3995], dx
+038d4  89 0e 93 39          mov word ptr [0x3993], cx    ; curseur_x
+038d8  89 16 95 39          mov word ptr [0x3995], dx    ; curseur_y
 038dc  c3                   ret
 
-; ======== sub_38dd   (appelée depuis 5f86)
-038dd  80 3e 93 31 00       cmp byte ptr [0x3193], 0
+; ======== souris_position   (appelée depuis 5f86)
+; int 33h AX=4 (place le curseur de la souris)
+038dd  80 3e 93 31 00       cmp byte ptr [0x3193], 0    ; commande_type
 038e2  74 01                je loc_38e5
 038e4  c3                   ret
 loc_38e5:
@@ -6679,18 +6765,20 @@ loc_38e5:
 038ec  cd 33                int 0x33
 038ee  c3                   ret
 
-; ======== sub_38ef   (routine probable : non appelée directement)
-038ef  e8 60 fe             call sub_3752
-038f2  80 3e 92 39 00       cmp byte ptr [0x3992], 0
-038f7  74 f6                je sub_38ef
+; ======== attend_commande
+; attend une commande (DS:3992 non nul)
+038ef  e8 60 fe             call lit_commandes
+038f2  80 3e 92 39 00       cmp byte ptr [0x3992], 0    ; commandes
+038f7  74 f6                je attend_commande
 038f9  c3                   ret
 
-; ======== sub_38fa   (appelée depuis 3920, 7954)
-038fa  e8 55 fe             call sub_3752
-038fd  80 3e 92 39 00       cmp byte ptr [0x3992], 0
-03902  75 f6                jne sub_38fa
+; ======== attend_relache   (appelée depuis 3920, 7954)
+; attend que DS:3992 revienne à 0
+038fa  e8 55 fe             call lit_commandes
+038fd  80 3e 92 39 00       cmp byte ptr [0x3992], 0    ; commandes
+03902  75 f6                jne attend_relache
 03904  c3                   ret
-loc_3905:
+attend_bouton_droit:    ; attend le bouton droit seul (0x20), puis son relâchement
 03905  9c                   pushf
 03906  50                   push ax
 03907  53                   push bx
@@ -6706,10 +6794,10 @@ loc_3905:
 03913  8e d8                mov ds, ax
 03915  58                   pop ax
 loc_3916:
-03916  e8 39 fe             call sub_3752
-03919  80 3e 92 39 20       cmp byte ptr [0x3992], 0x20
+03916  e8 39 fe             call lit_commandes
+03919  80 3e 92 39 20       cmp byte ptr [0x3992], 0x20    ; commandes
 0391e  75 f6                jne loc_3916
-03920  e8 d7 ff             call sub_38fa
+03920  e8 d7 ff             call attend_relache
 03923  1f                   pop ds
 03924  07                   pop es
 03925  5d                   pop bp
@@ -6722,7 +6810,8 @@ loc_3916:
 0392c  9d                   popf
 0392d  c3                   ret
 
-; ======== sub_392e   (appelée depuis 0231, 0240, 4f17, 5f21, 6449)
+; ======== attend_relache_clic   (appelée depuis 0231, 0240, 4f17, 5f21, 6449)
+; (?) même schéma que attend_bouton_droit
 0392e  9c                   pushf
 0392f  50                   push ax
 03930  53                   push bx
@@ -6738,8 +6827,8 @@ loc_3916:
 0393c  8e d8                mov ds, ax
 0393e  58                   pop ax
 loc_393f:
-0393f  e8 10 fe             call sub_3752
-03942  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+0393f  e8 10 fe             call lit_commandes
+03942  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 03947  74 f6                je loc_393f
 03949  1f                   pop ds
 0394a  07                   pop es
@@ -6769,10 +6858,10 @@ loc_393f:
 03962  8e d8                mov ds, ax
 03964  58                   pop ax
 loc_3965:
-03965  e8 ea fd             call sub_3752
-03968  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+03965  e8 ea fd             call lit_commandes
+03968  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 0396d  75 f6                jne loc_3965
-0396f  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+0396f  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 03974  75 ef                jne loc_3965
 03976  1f                   pop ds
 03977  07                   pop es
@@ -6786,33 +6875,35 @@ loc_3965:
 0397f  9d                   popf
 03980  c3                   ret
 
-; ======== charge_fichier_b   (appelée depuis 003d, 310b, 47f8, 4817, 50ba, 50f4, 5125, 5156)
-; variante du chargement
+; ======== charge_fichier   (appelée depuis 003d, 310b, 47f8, 4817, 50ba, 50f4, 5125, 5156)
+; ouvre, lit et ferme DS:3907 vers DS:3901:3903 ; taille lue dans DS:3905
 03981  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-03987  e8 67 fd             call souris_cache
-0398a  e8 3b 00             call sub_39c8
+03987  e8 67 fd             call clavier_retire
+0398a  e8 3b 00             call fichier_ouvre
 0398d  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 03992  74 03                je loc_3997
 03994  eb 1c                jmp loc_39b2
 ; ---- 1 octets non atteints (3996-3996)
 loc_3997:
-03997  e8 62 00             call sub_39fc
+03997  e8 62 00             call fichier_lit
 0399a  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 0399d  eb 10                jmp loc_39af
 ; ---- 1 octets non atteints (399f-399f)
 
-; ======== sub_39a0   (appelée depuis 7a03, 84dd)
+; ======== sauve_fichier   (appelée depuis 7a03, 84dd)
+; crée, écrit et ferme DS:3907 depuis DS:3901:3903, DS:3905 octets
 039a0  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-039a6  e8 48 fd             call souris_cache
-039a9  e8 0a 00             call sub_39b6
-039ac  e8 33 00             call sub_39e2
+039a6  e8 48 fd             call clavier_retire
+039a9  e8 0a 00             call fichier_cree
+039ac  e8 33 00             call fichier_ecrit
 loc_39af:
-039af  e8 62 00             call sub_3a14
+039af  e8 62 00             call fichier_ferme
 loc_39b2:
-039b2  e8 05 fd             call souris_affiche
+039b2  e8 05 fd             call clavier_installe
 039b5  c3                   ret
 
-; ======== sub_39b6   (appelée depuis 39a9)
+; ======== fichier_cree   (appelée depuis 39a9)
+; int 21h AH=3Ch
 039b6  8b 16 07 39          mov dx, word ptr [0x3907]    ; fichier_nom
 039ba  33 c9                xor cx, cx
 039bc  b0 02                mov al, 2
@@ -6822,7 +6913,8 @@ loc_39b2:
 039c4  a3 09 39             mov word ptr [0x3909], ax    ; fichier_handle
 039c7  c3                   ret
 
-; ======== sub_39c8   (appelée depuis 01a7, 01f0, 1de5, 1e48, 398a, 507f, 52b6, 52fc)
+; ======== fichier_ouvre   (appelée depuis 01a7, 01f0, 1de5, 1e48, 398a, 507f, 52b6, 52fc)
+; int 21h AH=3Dh ; erreur dans DS:37E9 (2 = fichier absent)
 039c8  8b 16 07 39          mov dx, word ptr [0x3907]    ; fichier_nom
 039cc  32 c0                xor al, al
 039ce  b4 3d                mov ah, 0x3d
@@ -6835,7 +6927,8 @@ loc_39de:
 039de  a3 e9 37             mov word ptr [0x37e9], ax    ; erreur_fichier
 039e1  c3                   ret
 
-; ======== sub_39e2   (appelée depuis 39ac)
+; ======== fichier_ecrit   (appelée depuis 39ac)
+; int 21h AH=40h
 039e2  a1 01 39             mov ax, word ptr [0x3901]    ; fichier_segment
 039e5  8b 1e 09 39          mov bx, word ptr [0x3909]    ; fichier_handle
 039e9  8b 0e 05 39          mov cx, word ptr [0x3905]    ; fichier_taille
@@ -6848,7 +6941,8 @@ loc_39de:
 039f9  72 e3                jb loc_39de
 039fb  c3                   ret
 
-; ======== sub_39fc   (appelée depuis 01c2, 020b, 1e00, 1e63, 3997, 52d1, 5317, 5379)
+; ======== fichier_lit   (appelée depuis 01c2, 020b, 1e00, 1e63, 3997, 52d1, 5317, 5379)
+; int 21h AH=3Fh
 039fc  a1 01 39             mov ax, word ptr [0x3901]    ; fichier_segment
 039ff  8b 1e 09 39          mov bx, word ptr [0x3909]    ; fichier_handle
 03a03  b9 ff ff             mov cx, 0xffff
@@ -6860,7 +6954,8 @@ loc_39de:
 03a11  1f                   pop ds
 03a12  72 ca                jb loc_39de
 
-; ======== sub_3a14   (appelée depuis 39af, 5099)
+; ======== fichier_ferme   (appelée depuis 39af, 5099)
+; int 21h AH=3Eh
 03a14  8b 1e 09 39          mov bx, word ptr [0x3909]    ; fichier_handle
 03a18  b4 3e                mov ah, 0x3e
 03a1a  cd 21                int 0x21
@@ -6878,7 +6973,7 @@ loc_39de:
 03a31  f3 aa                rep stosb byte ptr es:[di], al
 03a33  c7 06 88 3a 00 00    mov word ptr [0x3a88], 0
 loc_3a39:
-03a39  e8 a8 26             call sub_60e4
+03a39  e8 a8 26             call affiche_tampon
 03a3c  e8 96 fb             call sub_35d5
 03a3f  3c 0d                cmp al, 0xd
 03a41  75 01                jne loc_3a44
@@ -8134,7 +8229,7 @@ loc_43ef:
 04445  aa                   stosb byte ptr es:[di], al
 04446  bd 91 37             mov bp, 0x3791
 04449  06                   push es
-0444a  e8 2f ed             call sub_317c
+0444a  e8 2f ed             call affiche_texte
 0444d  07                   pop es
 0444e  bf 94 37             mov di, 0x3794
 04451  b0 20                mov al, 0x20
@@ -8152,7 +8247,7 @@ loc_4468:
 04468  55                   push bp
 04469  51                   push cx
 0446a  3e fe 46 01          inc byte ptr ds:[bp + 1]
-0446e  e8 0b ed             call sub_317c
+0446e  e8 0b ed             call affiche_texte
 04471  59                   pop cx
 04472  5d                   pop bp
 04473  e2 f3                loop loc_4468
@@ -8167,7 +8262,7 @@ loc_4468:
 04485  b0 20                mov al, 0x20
 04487  aa                   stosb byte ptr es:[di], al
 04488  3e fe 46 01          inc byte ptr ds:[bp + 1]
-0448c  e8 ed ec             call sub_317c
+0448c  e8 ed ec             call affiche_texte
 0448f  1f                   pop ds
 04490  07                   pop es
 04491  5d                   pop bp
@@ -8192,7 +8287,7 @@ loc_44a4:
 
 ; ======== sub_44a7   (routine probable : non appelée directement)
 044a7  e8 03 00             call sub_44ad
-044aa  e9 58 f4             jmp loc_3905
+044aa  e9 58 f4             jmp attend_bouton_droit
 
 ; ======== sub_44ad   (appelée depuis 44a7, 5f53)
 044ad  ff 36 50 37          push word ptr [0x3750]
@@ -8217,47 +8312,47 @@ loc_44a4:
 044cf  c6 06 59 37 00       mov byte ptr [0x3759], 0
 044d4  e8 c9 f1             call sub_36a0
 044d7  bd 13 35             mov bp, 0x3513
-044da  e8 9f ec             call sub_317c
+044da  e8 9f ec             call affiche_texte
 044dd  8b ec                mov bp, sp
 044df  8b 56 10             mov dx, word ptr [bp + 0x10]
 044e2  e8 8c 00             call sub_4571
 044e5  bd 1d 35             mov bp, 0x351d
-044e8  e8 91 ec             call sub_317c
+044e8  e8 91 ec             call affiche_texte
 044eb  8b ec                mov bp, sp
 044ed  8b 56 0e             mov dx, word ptr [bp + 0xe]
 044f0  e8 7e 00             call sub_4571
 044f3  bd 27 35             mov bp, 0x3527
-044f6  e8 83 ec             call sub_317c
+044f6  e8 83 ec             call affiche_texte
 044f9  8b ec                mov bp, sp
 044fb  8b 56 0c             mov dx, word ptr [bp + 0xc]
 044fe  e8 70 00             call sub_4571
 04501  bd 31 35             mov bp, 0x3531
-04504  e8 75 ec             call sub_317c
+04504  e8 75 ec             call affiche_texte
 04507  8b ec                mov bp, sp
 04509  8b 56 0a             mov dx, word ptr [bp + 0xa]
 0450c  e8 62 00             call sub_4571
 0450f  bd 63 35             mov bp, 0x3563
-04512  e8 67 ec             call sub_317c
+04512  e8 67 ec             call affiche_texte
 04515  8b ec                mov bp, sp
 04517  8b 56 04             mov dx, word ptr [bp + 4]
 0451a  e8 54 00             call sub_4571
 0451d  bd 3b 35             mov bp, 0x353b
-04520  e8 59 ec             call sub_317c
+04520  e8 59 ec             call affiche_texte
 04523  8b ec                mov bp, sp
 04525  8b 56 08             mov dx, word ptr [bp + 8]
 04528  e8 46 00             call sub_4571
 0452b  bd 45 35             mov bp, 0x3545
-0452e  e8 4b ec             call sub_317c
+0452e  e8 4b ec             call affiche_texte
 04531  8b ec                mov bp, sp
 04533  8b 56 06             mov dx, word ptr [bp + 6]
 04536  e8 38 00             call sub_4571
 04539  bd 4f 35             mov bp, 0x354f
-0453c  e8 3d ec             call sub_317c
+0453c  e8 3d ec             call affiche_texte
 0453f  8b ec                mov bp, sp
 04541  8b 56 02             mov dx, word ptr [bp + 2]
 04544  e8 2a 00             call sub_4571
 04547  bd 59 35             mov bp, 0x3559
-0454a  e8 2f ec             call sub_317c
+0454a  e8 2f ec             call affiche_texte
 0454d  8b ec                mov bp, sp
 0454f  8b 56 00             mov dx, word ptr [bp]
 04552  e8 1c 00             call sub_4571
@@ -8326,7 +8421,8 @@ loc_45bb:
 045bd  59                   pop cx
 045be  c3                   ret
 
-; ======== sub_45bf   (appelée depuis 30f6)
+; ======== installe_erreur_disque   (appelée depuis 30f6)
+; détourne int 24h (erreur critique) vers erreur_disque
 045bf  b4 25                mov ah, 0x25
 045c1  b0 24                mov al, 0x24
 045c3  ba cd 45             mov dx, 0x45cd
@@ -8337,7 +8433,8 @@ loc_45bb:
 045cb  1f                   pop ds
 045cc  c3                   ret
 
-; ======== sub_45cd   (routine probable : non appelée directement)
+; ======== erreur_disque
+; gestionnaire int 24h : AL = 0, ignorer l'erreur
 045cd  b0 00                mov al, 0
 045cf  f9                   stc
 045d0  c3                   ret
@@ -8490,7 +8587,8 @@ loc_46a2:
 046ba  a3 82 3a             mov word ptr [0x3a82], ax
 046bd  c3                   ret
 
-; ======== sub_46be   (appelée depuis 316f)
+; ======== etalonne_joystick   (appelée depuis 316f)
+; message et étalonnage (DS:320A à 320D)
 046be  32 e4                xor ah, ah
 046c0  b0 03                mov al, 3
 046c2  cd 10                int 0x10
@@ -8588,8 +8686,9 @@ loc_4724:
 0476c  fb                   sti
 0476d  c3                   ret
 
-; ======== sub_476e   (appelée depuis 02bc)
-0476e  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+; ======== son_arret   (appelée depuis 02bc)
+; int 60h AX=0Bh, coupe le haut-parleur (port 61h)
+0476e  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 04773  75 0b                jne loc_4780
 04775  b8 0b 00             mov ax, 0xb
 04778  cd 60                int 0x60
@@ -8597,10 +8696,10 @@ loc_4724:
 0477c  24 fc                and al, 0xfc
 0477e  e6 61                out 0x61, al
 loc_4780:
-04780  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+04780  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 04785  74 14                je loc_479b
 04787  8b 3e 9e 31          mov di, word ptr [0x319e]
-0478b  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+0478b  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 04790  74 04                je loc_4796
 04792  8b 3e 9c 31          mov di, word ptr [0x319c]
 loc_4796:
@@ -8613,9 +8712,10 @@ loc_479b:
 047a3  cd 60                int 0x60
 047a5  c3                   ret
 
-; ======== sub_47a6   (appelée depuis 5fd1)
-047a6  c6 06 99 31 00       mov byte ptr [0x3199], 0
-047ab  8a 1e 92 31          mov bl, byte ptr [0x3192]
+; ======== son_charge_pilote   (appelée depuis 5fd1)
+; réserve la mémoire et charge le pilote choisi par DS:3192 (tables DS:31F0, DS:31D0)
+047a6  c6 06 99 31 00       mov byte ptr [0x3199], 0    ; son_actif
+047ab  8a 1e 92 31          mov bl, byte ptr [0x3192]    ; son_pilote
 047af  d0 e3                shl bl, 1
 047b1  32 ff                xor bh, bh
 047b3  89 1e f9 37          mov word ptr [0x37f9], bx
@@ -8643,9 +8743,9 @@ loc_47e1:
 047ec  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 047f2  a1 9a 31             mov ax, word ptr [0x319a]
 047f5  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-047f8  e8 86 f1             call charge_fichier_b
+047f8  e8 86 f1             call charge_fichier
 loc_47fb:
-047fb  8a 1e 92 31          mov bl, byte ptr [0x3192]
+047fb  8a 1e 92 31          mov bl, byte ptr [0x3192]    ; son_pilote
 047ff  d0 e3                shl bl, 1
 04801  32 ff                xor bh, bh
 04803  8b 9f a0 31          mov bx, word ptr [bx + 0x31a0]
@@ -8653,22 +8753,23 @@ loc_47fb:
 0480b  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 04811  a1 08 32             mov ax, word ptr [0x3208]
 04814  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-04817  e8 67 f1             call charge_fichier_b
+04817  e8 67 f1             call charge_fichier
 0481a  ff 1e 06 32          lcall [0x3206]
 0481e  b8 0a 00             mov ax, 0xa
 04821  cd 60                int 0x60
 04823  f8                   clc
 04824  c3                   ret
 
-; ======== sub_4825   (appelée depuis 5fd7)
-04825  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+; ======== son_prepare   (appelée depuis 5fd7)
+; int 60h AX=2 puis AX=3 (?)
+04825  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 0482a  74 0c                je loc_4838
 0482c  8b 16 9a 31          mov dx, word ptr [0x319a]
 04830  be 00 00             mov si, 0
 04833  b8 02 00             mov ax, 2
 04836  cd 60                int 0x60
 loc_4838:
-04838  8a 1e 92 31          mov bl, byte ptr [0x3192]
+04838  8a 1e 92 31          mov bl, byte ptr [0x3192]    ; son_pilote
 0483c  32 ff                xor bh, bh
 0483e  d1 e3                shl bx, 1
 04840  8b 97 fe 31          mov dx, word ptr [bx + 0x31fe]
@@ -8678,8 +8779,9 @@ loc_4838:
 0484b  89 3e 9c 31          mov word ptr [0x319c], di
 0484f  c3                   ret
 
-; ======== sub_4850   (appelée depuis 37a5)
-04850  80 3e 99 31 01       cmp byte ptr [0x3199], 1
+; ======== son_musique   (appelée depuis 37a5)
+; lance la musique si DS:3956 = 1 (?)
+04850  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 04855  75 01                jne loc_4858
 04857  c3                   ret
 loc_4858:
@@ -8687,8 +8789,8 @@ loc_4858:
 0485d  74 01                je loc_4860
 0485f  c3                   ret
 loc_4860:
-04860  c6 06 99 31 01       mov byte ptr [0x3199], 1
-04865  80 3e 92 31 03       cmp byte ptr [0x3192], 3
+04860  c6 06 99 31 01       mov byte ptr [0x3199], 1    ; son_actif
+04865  80 3e 92 31 03       cmp byte ptr [0x3192], 3    ; son_pilote
 0486a  75 09                jne loc_4875
 0486c  ba 00 00             mov dx, 0
 0486f  b8 03 00             mov ax, 3
@@ -8698,7 +8800,7 @@ loc_4875:
 04875  8b 3e 9c 31          mov di, word ptr [0x319c]
 04879  b8 04 00             mov ax, 4
 0487c  cd 60                int 0x60
-0487e  80 3e 92 31 00       cmp byte ptr [0x3192], 0
+0487e  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 04883  75 0b                jne loc_4890
 04885  b8 0b 00             mov ax, 0xb
 04888  cd 60                int 0x60
@@ -8708,7 +8810,7 @@ loc_4875:
 loc_4890:
 04890  c3                   ret
 loc_4891:
-04891  e8 5d ee             call souris_cache
+04891  e8 5d ee             call clavier_retire
 04894  32 e4                xor ah, ah
 04896  b0 03                mov al, 3
 04898  cd 10                int 0x10
@@ -8771,7 +8873,7 @@ loc_491e:
 04923  73 08                jae loc_492d
 04925  8a 07                mov al, byte ptr [bx]
 04927  e8 5e be             call sub_0788
-0492a  e8 fa de             call sub_2827
+0492a  e8 fa de             call son_effet_1
 loc_492d:
 0492d  b5 04                mov ch, 4
 loc_492f:
@@ -8861,7 +8963,7 @@ loc_49e7:
 049e7  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 049ec  73 06                jae loc_49f4
 049ee  e8 97 bd             call sub_0788
-049f1  e8 33 de             call sub_2827
+049f1  e8 33 de             call son_effet_1
 loc_49f4:
 049f4  b5 04                mov ch, 4
 loc_49f6:
@@ -8949,7 +9051,7 @@ loc_4aad:
 04aad  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 04ab2  73 06                jae loc_4aba
 04ab4  e8 d1 bc             call sub_0788
-04ab7  e8 6d dd             call sub_2827
+04ab7  e8 6d dd             call son_effet_1
 loc_4aba:
 04aba  b5 04                mov ch, 4
 loc_4abc:
@@ -9038,7 +9140,7 @@ loc_4b78:
 04b78  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 04b7d  73 06                jae loc_4b85
 04b7f  e8 06 bc             call sub_0788
-04b82  e8 a2 dc             call sub_2827
+04b82  e8 a2 dc             call son_effet_1
 loc_4b85:
 04b85  b5 04                mov ch, 4
 loc_4b87:
@@ -9152,7 +9254,7 @@ loc_4c65:
 04c8f  80 0f 04             or byte ptr [bx], 4
 04c92  89 1e ce 3f          mov word ptr [0x3fce], bx
 04c96  c7 06 ea 3f 00 00    mov word ptr [0x3fea], 0
-04c9c  be 4a 4d             mov si, 0x4d4a
+04c9c  be 4a 4d             mov si, 0x4d4a    ; monstres
 04c9f  8a 45 01             mov al, byte ptr [di + 1]
 04ca2  8a 65 02             mov ah, byte ptr [di + 2]
 04ca5  b9 20 00             mov cx, 0x20
@@ -9170,7 +9272,7 @@ loc_4cc3:
 04cc3  83 c6 0a             add si, 0xa
 04cc6  e2 e0                loop loc_4ca8
 04cc8  b9 04 00             mov cx, 4
-04ccb  be 63 46             mov si, 0x4663
+04ccb  be 63 46             mov si, 0x4663    ; fiches_personnages
 loc_4cce:
 04cce  3b f7                cmp si, di
 04cd0  74 0d                je loc_4cdf
@@ -9195,7 +9297,7 @@ loc_4cf0:
 loc_4cfb:
 04cfb  e8 ac 00             call sub_4daa
 04cfe  b9 04 00             mov cx, 4
-04d01  be 63 46             mov si, 0x4663
+04d01  be 63 46             mov si, 0x4663    ; fiches_personnages
 loc_4d04:
 04d04  3a 44 03             cmp al, byte ptr [si + 3]
 04d07  74 f2                je loc_4cfb
@@ -9215,7 +9317,7 @@ loc_4d04:
 04d2d  b6 00                mov dh, 0
 04d2f  03 da                add bx, dx
 04d31  80 0f 04             or byte ptr [bx], 4
-04d34  be 4a 4d             mov si, 0x4d4a
+04d34  be 4a 4d             mov si, 0x4d4a    ; monstres
 04d37  8a 45 01             mov al, byte ptr [di + 1]
 04d3a  8a 65 02             mov ah, byte ptr [di + 2]
 04d3d  b9 20 00             mov cx, 0x20
@@ -9316,7 +9418,8 @@ loc_4e0d:
 04e0e  c3                   ret
 ; ---- 1 octets non atteints (4e0f-4e0f)
 
-; ======== sub_4e10   (appelée depuis 5f9f)
+; ======== alloue_memoire   (appelée depuis 5f9f)
+; réserve les segments graphiques (int 21h AH=48h), selon le mode vidéo
 04e10  bb 48 3f             mov bx, 0x3f48
 04e13  03 1e 90 31          add bx, word ptr [0x3190]    ; mode_video
 04e17  ff 27                jmp word ptr [bx]
@@ -9451,19 +9554,21 @@ loc_4f01:
 04f01  a3 35 5e             mov word ptr [0x5e35], ax    ; seg_furn
 04f04  c3                   ret
 
-; ======== sub_4f05   (appelée depuis 2d0b, 73d5, 7858, 8047, 81a4, 8f33, 92a0)
+; ======== zone_cliquee   (appelée depuis 2d0b, 73d5, 7858, 8047, 81a4, 8f33, 92a0)
+; si clic : numéro x 2 de la zone de la table SI sous le curseur, dans BX
 04f05  80 3e 98 3f 02       cmp byte ptr [0x3f98], 2
 04f0a  75 01                jne loc_4f0d
 04f0c  c3                   ret
 loc_4f0d:
 04f0d  33 db                xor bx, bx
-04f0f  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+04f0f  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 04f14  75 01                jne loc_4f17
 04f16  c3                   ret
 loc_4f17:
-04f17  e8 14 ea             call sub_392e
+04f17  e8 14 ea             call attend_relache_clic
 
-; ======== sub_4f1a   (appelée depuis 0889, 0cde, 0d1d, 825a, 8ed7, 91e8, 9265)
+; ======== zone_sous_curseur   (appelée depuis 0889, 0cde, 0d1d, 825a, 8ed7, 91e8, 9265)
+; même recherche sans attendre de clic
 04f1a  bb 02 00             mov bx, 2
 04f1d  8b 16 e7 47          mov dx, word ptr [0x47e7]
 04f21  8b 2e e9 47          mov bp, word ptr [0x47e9]
@@ -9551,7 +9656,7 @@ loc_4f71:
 04fcf  75 03                jne loc_4fd4
 04fd1  e8 73 ff             call sub_4f47
 loc_4fd4:
-04fd4  e8 0d 11             call sub_60e4
+04fd4  e8 0d 11             call affiche_tampon
 04fd7  e8 0a 00             call sub_4fe4
 04fda  fe 06 6f 4b          inc byte ptr [0x4b6f]
 04fde  80 26 6f 4b 03       and byte ptr [0x4b6f], 3
@@ -9612,7 +9717,7 @@ loc_5033:
 05058  55                   push bp
 05059  06                   push es
 0505a  1e                   push ds
-0505b  e8 1e e1             call sub_317c
+0505b  e8 1e e1             call affiche_texte
 0505e  1f                   pop ds
 0505f  07                   pop es
 05060  5d                   pop bp
@@ -9628,12 +9733,13 @@ loc_5033:
 0506d  e2 c4                loop loc_5033
 0506f  c3                   ret
 
-; ======== sub_5070   (appelée depuis 5fa5)
+; ======== charge_donnees   (appelée depuis 5fa5)
+; charge le fichier de textes de la langue DS:3194, puis les graphismes
 05070  c7 06 07 39 79 5f    mov word ptr [0x3907], 0x5f79    ; fichier_nom, "english.bin"
-05076  e8 78 e6             call souris_cache
+05076  e8 78 e6             call clavier_retire
 loc_5079:
 05079  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-0507f  e8 46 e9             call sub_39c8
+0507f  e8 46 e9             call fichier_ouvre
 05082  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05087  75 03                jne loc_508c
 05089  eb 0e                jmp loc_5099
@@ -9646,8 +9752,8 @@ loc_508c:
 05095  cd 16                int 0x16
 05097  eb e0                jmp loc_5079
 loc_5099:
-05099  e8 78 e9             call sub_3a14
-0509c  8a 1e 94 31          mov bl, byte ptr [0x3194]
+05099  e8 78 e9             call fichier_ferme
+0509c  8a 1e 94 31          mov bl, byte ptr [0x3194]    ; langue
 050a0  32 ff                xor bh, bh
 050a2  d1 e3                shl bx, 1
 050a4  81 c3 6f 5f          add bx, 0x5f6f
@@ -9656,11 +9762,11 @@ loc_5099:
 050ae  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 050b4  b8 63 14             mov ax, 0x1463
 050b7  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-050ba  e8 c4 e8             call charge_fichier_b
+050ba  e8 c4 e8             call charge_fichier
 050bd  b8 7c 09             mov ax, 0x97c
 050c0  8e c0                mov es, ax
 050c2  33 f6                xor si, si
-050c4  bf c1 5f             mov di, 0x5fc1
+050c4  bf c1 5f             mov di, 0x5fc1    ; textes
 050c7  b8 63 14             mov ax, 0x1463
 050ca  8e d8                mov ds, ax
 050cc  b9 ff ff             mov cx, 0xffff
@@ -9677,7 +9783,7 @@ loc_50e2:
 050e8  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 050ee  b8 63 14             mov ax, 0x1463
 050f1  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-050f4  e8 8a e8             call charge_fichier_b
+050f4  e8 8a e8             call charge_fichier
 050f7  a1 2d 5e             mov ax, word ptr [0x5e2d]    ; seg_odds
 050fa  8e c0                mov es, ax
 050fc  33 f6                xor si, si
@@ -9694,7 +9800,7 @@ loc_50e2:
 05119  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 0511f  b8 63 14             mov ax, 0x1463
 05122  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-05125  e8 59 e8             call charge_fichier_b
+05125  e8 59 e8             call charge_fichier
 05128  a1 29 5e             mov ax, word ptr [0x5e29]    ; seg_monsters
 0512b  8e c0                mov es, ax
 0512d  33 f6                xor si, si
@@ -9711,7 +9817,7 @@ loc_50e2:
 0514a  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 05150  b8 63 14             mov ax, 0x1463
 05153  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-05156  e8 28 e8             call charge_fichier_b
+05156  e8 28 e8             call charge_fichier
 05159  a1 2b 5e             mov ax, word ptr [0x5e2b]    ; seg_graphics
 0515c  8e c0                mov es, ax
 0515e  33 f6                xor si, si
@@ -9728,14 +9834,14 @@ loc_50e2:
 0517b  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 05181  a1 2f 5e             mov ax, word ptr [0x5e2f]    ; seg_furn_brut
 05184  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-05187  e8 f7 e7             call charge_fichier_b
+05187  e8 f7 e7             call charge_fichier
 0518a  c3                   ret
 loc_518b:
 0518b  c7 06 07 39 f5 5e    mov word ptr [0x3907], 0x5ef5    ; fichier_nom, "odds&sod.ega"
 05191  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 05197  b8 63 14             mov ax, 0x1463
 0519a  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-0519d  e8 e1 e7             call charge_fichier_b
+0519d  e8 e1 e7             call charge_fichier
 051a0  a1 2d 5e             mov ax, word ptr [0x5e2d]    ; seg_odds
 051a3  8e c0                mov es, ax
 051a5  33 f6                xor si, si
@@ -9752,7 +9858,7 @@ loc_518b:
 051c2  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 051c8  b8 63 14             mov ax, 0x1463
 051cb  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-051ce  e8 b0 e7             call charge_fichier_b
+051ce  e8 b0 e7             call charge_fichier
 051d1  a1 29 5e             mov ax, word ptr [0x5e29]    ; seg_monsters
 051d4  8e c0                mov es, ax
 051d6  33 f6                xor si, si
@@ -9769,7 +9875,7 @@ loc_518b:
 051f3  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 051f9  b8 63 14             mov ax, 0x1463
 051fc  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-051ff  e8 7f e7             call charge_fichier_b
+051ff  e8 7f e7             call charge_fichier
 05202  a1 2b 5e             mov ax, word ptr [0x5e2b]    ; seg_graphics
 05205  8e c0                mov es, ax
 05207  33 f6                xor si, si
@@ -9786,7 +9892,7 @@ loc_518b:
 05224  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 0522a  a1 2f 5e             mov ax, word ptr [0x5e2f]    ; seg_furn_brut
 0522d  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-05230  e8 4e e7             call charge_fichier_b
+05230  e8 4e e7             call charge_fichier
 05233  c3                   ret
 
 ; ======== sub_5234   (appelée depuis 03ab, 03fb, 040d, 0437, 054b, 12ed, 1845)
@@ -9834,7 +9940,8 @@ loc_528c:
 0528f  e2 b2                loop loc_5243
 05291  c3                   ret
 
-; ======== sub_5292   (appelée depuis 7327)
+; ======== charge_ecran_menus   (appelée depuis 7327)
+; BORDERED, SHOPSP, SHOPMP ; version VGA en 0x529B
 05292  bb 2a 3f             mov bx, 0x3f2a
 05295  03 1e 90 31          add bx, word ptr [0x3190]    ; mode_video
 05299  ff 27                jmp word ptr [bx]
@@ -9845,48 +9952,48 @@ loc_529b:
 052aa  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_52ad:
 052ad  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-052b3  e8 3b e4             call souris_cache
-052b6  e8 0f e7             call sub_39c8
+052b3  e8 3b e4             call clavier_retire
+052b6  e8 0f e7             call fichier_ouvre
 052b9  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 052be  75 03                jne loc_52c3
 052c0  eb 0f                jmp loc_52d1
 ; ---- 1 octets non atteints (52c2-52c2)
 loc_52c3:
-052c3  e8 f4 e3             call souris_affiche
-052c6  bb 50 02             mov bx, 0x250
-052c9  e8 21 36             call sub_88ed
-052cc  e8 22 e4             call souris_cache
+052c3  e8 f4 e3             call clavier_installe
+052c6  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+052c9  e8 21 36             call affiche_message
+052cc  e8 22 e4             call clavier_retire
 052cf  eb dc                jmp loc_52ad
 loc_52d1:
-052d1  e8 28 e7             call sub_39fc
+052d1  e8 28 e7             call fichier_lit
 052d4  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 052d7  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 052dc  75 e5                jne loc_52c3
-052de  e8 d9 e3             call souris_affiche
+052de  e8 d9 e3             call clavier_installe
 052e1  c7 06 07 39 85 5e    mov word ptr [0x3907], 0x5e85    ; fichier_nom, "shopsp.vga"
 052e7  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 052ed  b8 63 14             mov ax, 0x1463
 052f0  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_52f3:
 052f3  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-052f9  e8 f5 e3             call souris_cache
-052fc  e8 c9 e6             call sub_39c8
+052f9  e8 f5 e3             call clavier_retire
+052fc  e8 c9 e6             call fichier_ouvre
 052ff  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05304  75 03                jne loc_5309
 05306  eb 0f                jmp loc_5317
 ; ---- 1 octets non atteints (5308-5308)
 loc_5309:
-05309  e8 ae e3             call souris_affiche
-0530c  bb 50 02             mov bx, 0x250
-0530f  e8 db 35             call sub_88ed
-05312  e8 dc e3             call souris_cache
+05309  e8 ae e3             call clavier_installe
+0530c  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+0530f  e8 db 35             call affiche_message
+05312  e8 dc e3             call clavier_retire
 05315  eb dc                jmp loc_52f3
 loc_5317:
-05317  e8 e2 e6             call sub_39fc
+05317  e8 e2 e6             call fichier_lit
 0531a  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0531f  75 e8                jne loc_5309
 05321  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-05324  e8 93 e3             call souris_affiche
+05324  e8 93 e3             call clavier_installe
 05327  a1 25 5e             mov ax, word ptr [0x5e25]    ; seg_shopsp
 0532a  8e c0                mov es, ax
 0532c  33 f6                xor si, si
@@ -9905,24 +10012,24 @@ loc_5317:
 05352  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_5355:
 05355  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-0535b  e8 93 e3             call souris_cache
-0535e  e8 67 e6             call sub_39c8
+0535b  e8 93 e3             call clavier_retire
+0535e  e8 67 e6             call fichier_ouvre
 05361  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05366  75 03                jne loc_536b
 05368  eb 0f                jmp loc_5379
 ; ---- 1 octets non atteints (536a-536a)
 loc_536b:
-0536b  e8 4c e3             call souris_affiche
-0536e  bb 50 02             mov bx, 0x250
-05371  e8 79 35             call sub_88ed
-05374  e8 7a e3             call souris_cache
+0536b  e8 4c e3             call clavier_installe
+0536e  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+05371  e8 79 35             call affiche_message
+05374  e8 7a e3             call clavier_retire
 05377  eb dc                jmp loc_5355
 loc_5379:
-05379  e8 80 e6             call sub_39fc
+05379  e8 80 e6             call fichier_lit
 0537c  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05381  75 e8                jne loc_536b
 05383  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-05386  e8 31 e3             call souris_affiche
+05386  e8 31 e3             call clavier_installe
 05389  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 0538c  8e c0                mov es, ax
 0538e  33 f6                xor si, si
@@ -9943,48 +10050,48 @@ loc_53a6:
 053b5  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_53b8:
 053b8  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-053be  e8 30 e3             call souris_cache
-053c1  e8 04 e6             call sub_39c8
+053be  e8 30 e3             call clavier_retire
+053c1  e8 04 e6             call fichier_ouvre
 053c4  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 053c9  75 03                jne loc_53ce
 053cb  eb 0f                jmp loc_53dc
 ; ---- 1 octets non atteints (53cd-53cd)
 loc_53ce:
-053ce  e8 e9 e2             call souris_affiche
-053d1  bb 50 02             mov bx, 0x250
-053d4  e8 16 35             call sub_88ed
-053d7  e8 17 e3             call souris_cache
+053ce  e8 e9 e2             call clavier_installe
+053d1  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+053d4  e8 16 35             call affiche_message
+053d7  e8 17 e3             call clavier_retire
 053da  eb dc                jmp loc_53b8
 loc_53dc:
-053dc  e8 1d e6             call sub_39fc
+053dc  e8 1d e6             call fichier_lit
 053df  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 053e2  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 053e7  75 e5                jne loc_53ce
-053e9  e8 ce e2             call souris_affiche
+053e9  e8 ce e2             call clavier_installe
 053ec  c7 06 07 39 21 5f    mov word ptr [0x3907], 0x5f21    ; fichier_nom, "shopsp.ega"
 053f2  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 053f8  b8 63 14             mov ax, 0x1463
 053fb  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_53fe:
 053fe  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05404  e8 ea e2             call souris_cache
-05407  e8 be e5             call sub_39c8
+05404  e8 ea e2             call clavier_retire
+05407  e8 be e5             call fichier_ouvre
 0540a  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0540f  75 03                jne loc_5414
 05411  eb 0f                jmp loc_5422
 ; ---- 1 octets non atteints (5413-5413)
 loc_5414:
-05414  e8 a3 e2             call souris_affiche
-05417  bb 50 02             mov bx, 0x250
-0541a  e8 d0 34             call sub_88ed
-0541d  e8 d1 e2             call souris_cache
+05414  e8 a3 e2             call clavier_installe
+05417  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+0541a  e8 d0 34             call affiche_message
+0541d  e8 d1 e2             call clavier_retire
 05420  eb dc                jmp loc_53fe
 loc_5422:
-05422  e8 d7 e5             call sub_39fc
+05422  e8 d7 e5             call fichier_lit
 05425  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0542a  75 e8                jne loc_5414
 0542c  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-0542f  e8 88 e2             call souris_affiche
+0542f  e8 88 e2             call clavier_installe
 05432  a1 25 5e             mov ax, word ptr [0x5e25]    ; seg_shopsp
 05435  8e c0                mov es, ax
 05437  33 f6                xor si, si
@@ -10003,24 +10110,24 @@ loc_5422:
 0545d  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_5460:
 05460  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05466  e8 88 e2             call souris_cache
-05469  e8 5c e5             call sub_39c8
+05466  e8 88 e2             call clavier_retire
+05469  e8 5c e5             call fichier_ouvre
 0546c  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05471  75 03                jne loc_5476
 05473  eb 0f                jmp loc_5484
 ; ---- 1 octets non atteints (5475-5475)
 loc_5476:
-05476  e8 41 e2             call souris_affiche
-05479  bb 50 02             mov bx, 0x250
-0547c  e8 6e 34             call sub_88ed
-0547f  e8 6f e2             call souris_cache
+05476  e8 41 e2             call clavier_installe
+05479  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+0547c  e8 6e 34             call affiche_message
+0547f  e8 6f e2             call clavier_retire
 05482  eb dc                jmp loc_5460
 loc_5484:
-05484  e8 75 e5             call sub_39fc
+05484  e8 75 e5             call fichier_lit
 05487  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0548c  75 e8                jne loc_5476
 0548e  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-05491  e8 26 e2             call souris_affiche
+05491  e8 26 e2             call clavier_installe
 05494  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 05497  8e c0                mov es, ax
 05499  33 f6                xor si, si
@@ -10035,7 +10142,8 @@ loc_5484:
 054af  58                   pop ax
 054b0  c3                   ret
 
-; ======== sub_54b1   (appelée depuis 0162)
+; ======== charge_ecran_plateau   (appelée depuis 0162)
+; BOOK, MAPS, SPRITES ; version VGA en 0x54BA
 054b1  bb 34 3f             mov bx, 0x3f34
 054b4  03 1e 90 31          add bx, word ptr [0x3190]    ; mode_video
 054b8  ff 27                jmp word ptr [bx]
@@ -10046,48 +10154,48 @@ loc_54ba:
 054c9  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_54cc:
 054cc  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-054d2  e8 1c e2             call souris_cache
-054d5  e8 f0 e4             call sub_39c8
+054d2  e8 1c e2             call clavier_retire
+054d5  e8 f0 e4             call fichier_ouvre
 054d8  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 054dd  75 03                jne loc_54e2
 054df  eb 0f                jmp loc_54f0
 ; ---- 1 octets non atteints (54e1-54e1)
 loc_54e2:
-054e2  e8 d5 e1             call souris_affiche
-054e5  bb 50 02             mov bx, 0x250
-054e8  e8 02 34             call sub_88ed
-054eb  e8 03 e2             call souris_cache
+054e2  e8 d5 e1             call clavier_installe
+054e5  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+054e8  e8 02 34             call affiche_message
+054eb  e8 03 e2             call clavier_retire
 054ee  eb dc                jmp loc_54cc
 loc_54f0:
-054f0  e8 09 e5             call sub_39fc
+054f0  e8 09 e5             call fichier_lit
 054f3  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 054f6  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 054fb  75 e5                jne loc_54e2
-054fd  e8 ba e1             call souris_affiche
+054fd  e8 ba e1             call clavier_installe
 05500  c7 06 07 39 66 5e    mov word ptr [0x3907], 0x5e66    ; fichier_nom, "maps.vga"
 05506  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 0550c  b8 63 14             mov ax, 0x1463
 0550f  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_5512:
 05512  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05518  e8 d6 e1             call souris_cache
-0551b  e8 aa e4             call sub_39c8
+05518  e8 d6 e1             call clavier_retire
+0551b  e8 aa e4             call fichier_ouvre
 0551e  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05523  75 03                jne loc_5528
 05525  eb 0f                jmp loc_5536
 ; ---- 1 octets non atteints (5527-5527)
 loc_5528:
-05528  e8 8f e1             call souris_affiche
-0552b  bb 52 02             mov bx, 0x252
-0552e  e8 bc 33             call sub_88ed
-05531  e8 bd e1             call souris_cache
+05528  e8 8f e1             call clavier_installe
+0552b  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+0552e  e8 bc 33             call affiche_message
+05531  e8 bd e1             call clavier_retire
 05534  eb dc                jmp loc_5512
 loc_5536:
-05536  e8 c3 e4             call sub_39fc
+05536  e8 c3 e4             call fichier_lit
 05539  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0553e  75 e8                jne loc_5528
 05540  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-05543  e8 74 e1             call souris_affiche
+05543  e8 74 e1             call clavier_installe
 05546  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 05549  8e c0                mov es, ax
 0554b  33 f6                xor si, si
@@ -10106,24 +10214,24 @@ loc_5536:
 05571  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_5574:
 05574  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-0557a  e8 74 e1             call souris_cache
-0557d  e8 48 e4             call sub_39c8
+0557a  e8 74 e1             call clavier_retire
+0557d  e8 48 e4             call fichier_ouvre
 05580  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05585  75 03                jne loc_558a
 05587  eb 0f                jmp loc_5598
 ; ---- 1 octets non atteints (5589-5589)
 loc_558a:
-0558a  e8 2d e1             call souris_affiche
-0558d  bb 52 02             mov bx, 0x252
-05590  e8 5a 33             call sub_88ed
-05593  e8 5b e1             call souris_cache
+0558a  e8 2d e1             call clavier_installe
+0558d  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+05590  e8 5a 33             call affiche_message
+05593  e8 5b e1             call clavier_retire
 05596  eb dc                jmp loc_5574
 loc_5598:
-05598  e8 61 e4             call sub_39fc
+05598  e8 61 e4             call fichier_lit
 0559b  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 055a0  75 e8                jne loc_558a
 055a2  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-055a5  e8 12 e1             call souris_affiche
+055a5  e8 12 e1             call clavier_installe
 055a8  a1 25 5e             mov ax, word ptr [0x5e25]    ; seg_shopsp
 055ab  8e c0                mov es, ax
 055ad  33 f6                xor si, si
@@ -10144,48 +10252,48 @@ loc_55c5:
 055d4  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_55d7:
 055d7  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-055dd  e8 11 e1             call souris_cache
-055e0  e8 e5 e3             call sub_39c8
+055dd  e8 11 e1             call clavier_retire
+055e0  e8 e5 e3             call fichier_ouvre
 055e3  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 055e8  75 03                jne loc_55ed
 055ea  eb 0f                jmp loc_55fb
 ; ---- 1 octets non atteints (55ec-55ec)
 loc_55ed:
-055ed  e8 ca e0             call souris_affiche
-055f0  bb 50 02             mov bx, 0x250
-055f3  e8 f7 32             call sub_88ed
-055f6  e8 f8 e0             call souris_cache
+055ed  e8 ca e0             call clavier_installe
+055f0  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+055f3  e8 f7 32             call affiche_message
+055f6  e8 f8 e0             call clavier_retire
 055f9  eb dc                jmp loc_55d7
 loc_55fb:
-055fb  e8 fe e3             call sub_39fc
+055fb  e8 fe e3             call fichier_lit
 055fe  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 05601  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05606  75 e5                jne loc_55ed
-05608  e8 af e0             call souris_affiche
+05608  e8 af e0             call clavier_installe
 0560b  c7 06 07 39 02 5f    mov word ptr [0x3907], 0x5f02    ; fichier_nom, "maps.ega"
 05611  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 05617  b8 63 14             mov ax, 0x1463
 0561a  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_561d:
 0561d  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05623  e8 cb e0             call souris_cache
-05626  e8 9f e3             call sub_39c8
+05623  e8 cb e0             call clavier_retire
+05626  e8 9f e3             call fichier_ouvre
 05629  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0562e  75 03                jne loc_5633
 05630  eb 0f                jmp loc_5641
 ; ---- 1 octets non atteints (5632-5632)
 loc_5633:
-05633  e8 84 e0             call souris_affiche
-05636  bb 52 02             mov bx, 0x252
-05639  e8 b1 32             call sub_88ed
-0563c  e8 b2 e0             call souris_cache
+05633  e8 84 e0             call clavier_installe
+05636  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+05639  e8 b1 32             call affiche_message
+0563c  e8 b2 e0             call clavier_retire
 0563f  eb dc                jmp loc_561d
 loc_5641:
-05641  e8 b8 e3             call sub_39fc
+05641  e8 b8 e3             call fichier_lit
 05644  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05649  75 e8                jne loc_5633
 0564b  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-0564e  e8 69 e0             call souris_affiche
+0564e  e8 69 e0             call clavier_installe
 05651  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 05654  8e c0                mov es, ax
 05656  33 f6                xor si, si
@@ -10204,24 +10312,24 @@ loc_5641:
 0567c  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_567f:
 0567f  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05685  e8 69 e0             call souris_cache
-05688  e8 3d e3             call sub_39c8
+05685  e8 69 e0             call clavier_retire
+05688  e8 3d e3             call fichier_ouvre
 0568b  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05690  75 03                jne loc_5695
 05692  eb 0f                jmp loc_56a3
 ; ---- 1 octets non atteints (5694-5694)
 loc_5695:
-05695  e8 22 e0             call souris_affiche
-05698  bb 52 02             mov bx, 0x252
-0569b  e8 4f 32             call sub_88ed
-0569e  e8 50 e0             call souris_cache
+05695  e8 22 e0             call clavier_installe
+05698  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+0569b  e8 4f 32             call affiche_message
+0569e  e8 50 e0             call clavier_retire
 056a1  eb dc                jmp loc_567f
 loc_56a3:
-056a3  e8 56 e3             call sub_39fc
+056a3  e8 56 e3             call fichier_lit
 056a6  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 056ab  75 e8                jne loc_5695
 056ad  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-056b0  e8 07 e0             call souris_affiche
+056b0  e8 07 e0             call clavier_installe
 056b3  a1 25 5e             mov ax, word ptr [0x5e25]    ; seg_shopsp
 056b6  8e c0                mov es, ax
 056b8  33 f6                xor si, si
@@ -10237,8 +10345,8 @@ loc_56a3:
 056cf  c3                   ret
 
 ; ======== sub_56d0   (appelée depuis 0860, 0cb8, 21c1, 2ce2)
-056d0  e8 2f 0b             call sub_6202
-056d3  be e5 47             mov si, 0x47e5
+056d0  e8 2f 0b             call efface_tampon
+056d3  be e5 47             mov si, 0x47e5    ; sprite_curseur
 056d6  c7 44 0c 20 2d       mov word ptr [si + 0xc], 0x2d20
 056db  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 056e0  e8 6d c3             call sub_1a50
@@ -10259,8 +10367,8 @@ loc_56a3:
 05707  1f                   pop ds
 05708  e8 60 0a             call sub_616b
 loc_570b:
-0570b  e8 61 0e             call sub_656f
-0570e  e9 d3 09             jmp sub_60e4
+0570b  e8 61 0e             call sauve_tampon
+0570e  e9 d3 09             jmp affiche_tampon
 
 ; ======== sub_5711   (routine probable : non appelée directement)
 05711  8b 1e d4 3f          mov bx, word ptr [0x3fd4]    ; cible
@@ -10405,7 +10513,7 @@ loc_582c:
 05832  c3                   ret
 
 ; ======== sub_5833   (routine probable : non appelée directement)
-05833  be e5 47             mov si, 0x47e5
+05833  be e5 47             mov si, 0x47e5    ; sprite_curseur
 05836  8a 04                mov al, byte ptr [si]
 
 ; ======== sub_5838   (appelée depuis 14f8, 5829)
@@ -10718,7 +10826,7 @@ loc_5a6c:
 05a8b  75 05                jne loc_5a92
 05a8d  c6 06 01 43 ff       mov byte ptr [0x4301], 0xff
 loc_5a92:
-05a92  81 3e 37 46 63 46    cmp word ptr [0x4637], 0x4663    ; fiche_heros_courant
+05a92  81 3e 37 46 63 46    cmp word ptr [0x4637], 0x4663    ; fiche_heros_courant, fiches_personnages
 05a98  75 05                jne loc_5a9f
 05a9a  c6 06 01 43 ff       mov byte ptr [0x4301], 0xff
 loc_5a9f:
@@ -10743,7 +10851,7 @@ loc_5aac:
 05aca  75 01                jne loc_5acd
 05acc  49                   dec cx
 loc_5acd:
-05acd  81 3e 37 46 63 46    cmp word ptr [0x4637], 0x4663    ; fiche_heros_courant
+05acd  81 3e 37 46 63 46    cmp word ptr [0x4637], 0x4663    ; fiche_heros_courant, fiches_personnages
 05ad3  75 01                jne loc_5ad6
 05ad5  49                   dec cx
 loc_5ad6:
@@ -10782,7 +10890,7 @@ loc_5b36:
 loc_5b39:
 05b39  c6 06 ad 42 0b       mov byte ptr [0x42ad], 0xb
 05b3e  c6 06 f5 42 0b       mov byte ptr [0x42f5], 0xb
-05b43  bb 4a 4d             mov bx, 0x4d4a
+05b43  bb 4a 4d             mov bx, 0x4d4a    ; monstres
 05b46  b1 20                mov cl, 0x20
 05b48  32 ed                xor ch, ch
 05b4a  a0 94 3f             mov al, byte ptr [0x3f94]
@@ -10911,7 +11019,8 @@ loc_5c7a:
 05c7d  e2 b0                loop loc_5c2f
 05c7f  c3                   ret
 
-; ======== sub_5c80   (appelée depuis 0941, 1daa)
+; ======== charge_men   (appelée depuis 0941, 1daa)
+; MEN.VGA (héros en combat)
 05c80  c7 06 f1 47 20 2c    mov word ptr [0x47f1], 0x2c20
 05c86  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 05c8b  74 65                je loc_5cf2
@@ -10921,24 +11030,24 @@ loc_5c7a:
 05c9c  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_5c9f:
 05c9f  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05ca5  e8 49 da             call souris_cache
-05ca8  e8 1d dd             call sub_39c8
+05ca5  e8 49 da             call clavier_retire
+05ca8  e8 1d dd             call fichier_ouvre
 05cab  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05cb0  75 03                jne loc_5cb5
 05cb2  eb 0f                jmp loc_5cc3
 ; ---- 1 octets non atteints (5cb4-5cb4)
 loc_5cb5:
-05cb5  e8 02 da             call souris_affiche
-05cb8  bb 52 02             mov bx, 0x252
-05cbb  e8 2f 2c             call sub_88ed
-05cbe  e8 30 da             call souris_cache
+05cb5  e8 02 da             call clavier_installe
+05cb8  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+05cbb  e8 2f 2c             call affiche_message
+05cbe  e8 30 da             call clavier_retire
 05cc1  eb dc                jmp loc_5c9f
 loc_5cc3:
-05cc3  e8 36 dd             call sub_39fc
+05cc3  e8 36 dd             call fichier_lit
 05cc6  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05ccb  75 e8                jne loc_5cb5
 05ccd  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-05cd0  e8 e7 d9             call souris_affiche
+05cd0  e8 e7 d9             call clavier_installe
 05cd3  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 05cd6  8e c0                mov es, ax
 05cd8  33 f6                xor si, si
@@ -10960,24 +11069,24 @@ loc_5cf2:
 05d01  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_5d04:
 05d04  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05d0a  e8 e4 d9             call souris_cache
-05d0d  e8 b8 dc             call sub_39c8
+05d0a  e8 e4 d9             call clavier_retire
+05d0d  e8 b8 dc             call fichier_ouvre
 05d10  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05d15  75 03                jne loc_5d1a
 05d17  eb 0f                jmp loc_5d28
 ; ---- 1 octets non atteints (5d19-5d19)
 loc_5d1a:
-05d1a  e8 9d d9             call souris_affiche
-05d1d  bb 52 02             mov bx, 0x252
-05d20  e8 ca 2b             call sub_88ed
-05d23  e8 cb d9             call souris_cache
+05d1a  e8 9d d9             call clavier_installe
+05d1d  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+05d20  e8 ca 2b             call affiche_message
+05d23  e8 cb d9             call clavier_retire
 05d26  eb dc                jmp loc_5d04
 loc_5d28:
-05d28  e8 d1 dc             call sub_39fc
+05d28  e8 d1 dc             call fichier_lit
 05d2b  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 05d30  75 e8                jne loc_5d1a
 05d32  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-05d35  e8 82 d9             call souris_affiche
+05d35  e8 82 d9             call clavier_installe
 05d38  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 05d3b  8e c0                mov es, ax
 05d3d  33 f6                xor si, si
@@ -10991,7 +11100,7 @@ loc_5d28:
 05d51  8e d8                mov ds, ax
 05d53  58                   pop ax
 loc_5d54:
-05d54  e8 cc 0c             call sub_6a23
+05d54  e8 cc 0c             call fond_vers_tampon
 05d57  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 05d5b  8a 5d 03             mov bl, byte ptr [di + 3]
 05d5e  32 ff                xor bh, bh
@@ -11035,7 +11144,7 @@ loc_5d98:
 05d9f  e8 f8 e6             call sub_449a
 05da2  83 ee 03             sub si, 3
 05da5  89 36 3c ad          mov word ptr [0xad3c], si
-05da9  a1 93 39             mov ax, word ptr [0x3993]
+05da9  a1 93 39             mov ax, word ptr [0x3993]    ; curseur_x
 05dac  d1 e8                shr ax, 1
 05dae  d1 e8                shr ax, 1
 05db0  d1 e8                shr ax, 1
@@ -11045,7 +11154,7 @@ loc_5d98:
 05dba  02 0e 3c ad          add cl, byte ptr [0xad3c]
 05dbe  3a c1                cmp al, cl
 05dc0  73 10                jae loc_5dd2
-05dc2  a1 95 39             mov ax, word ptr [0x3995]
+05dc2  a1 95 39             mov ax, word ptr [0x3995]    ; curseur_y
 05dc5  d1 e8                shr ax, 1
 05dc7  d1 e8                shr ax, 1
 05dc9  d1 e8                shr ax, 1
@@ -11057,8 +11166,8 @@ loc_5dd2:
 05dd4  0a c0                or al, al
 05dd6  c3                   ret
 
-; ======== sub_5dd7   (appelée depuis 0456, 0872, 0cc7, 186f, 2d05, 73c2, 7845, 7f26)
-05dd7  be e5 47             mov si, 0x47e5
+; ======== curseur_dessine   (appelée depuis 0456, 0872, 0cc7, 186f, 2d05, 73c2, 7845, 7f26)
+05dd7  be e5 47             mov si, 0x47e5    ; sprite_curseur
 05dda  80 7c 07 00          cmp byte ptr [si + 7], 0
 05dde  75 01                jne loc_5de1
 05de0  c3                   ret
@@ -11090,18 +11199,19 @@ loc_5e01:
 05e12  5e                   pop si
 05e13  c3                   ret
 
-; ======== sub_5e14   (appelée depuis 0449, 086c, 0cc1, 2cff, 73bc, 783f, 7f20, 8038)
-05e14  be e5 47             mov si, 0x47e5
+; ======== curseur_sauve_fond   (appelée depuis 0449, 086c, 0cc1, 2cff, 73bc, 783f, 7f20, 8038)
+; sprite du curseur (DS:47E5, 16 x 16) : sauve ce qu'il recouvre
+05e14  be e5 47             mov si, 0x47e5    ; sprite_curseur
 05e17  c6 44 06 10          mov byte ptr [si + 6], 0x10
 05e1b  c6 44 07 10          mov byte ptr [si + 7], 0x10
 05e1f  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 05e24  74 0e                je loc_5e34
-05e26  81 3e 93 39 2f 01    cmp word ptr [0x3993], 0x12f
+05e26  81 3e 93 39 2f 01    cmp word ptr [0x3993], 0x12f    ; curseur_x
 05e2c  72 06                jb loc_5e34
-05e2e  c7 06 93 39 2f 01    mov word ptr [0x3993], 0x12f
+05e2e  c7 06 93 39 2f 01    mov word ptr [0x3993], 0x12f    ; curseur_x
 loc_5e34:
 05e34  b8 c8 00             mov ax, 0xc8
-05e37  2b 06 95 39          sub ax, word ptr [0x3995]
+05e37  2b 06 95 39          sub ax, word ptr [0x3995]    ; curseur_y
 05e3b  0a c0                or al, al
 05e3d  75 01                jne loc_5e40
 05e3f  c3                   ret
@@ -11111,7 +11221,7 @@ loc_5e40:
 05e45  88 44 07             mov byte ptr [si + 7], al
 loc_5e48:
 05e48  b8 40 01             mov ax, 0x140
-05e4b  2b 06 93 39          sub ax, word ptr [0x3993]
+05e4b  2b 06 93 39          sub ax, word ptr [0x3993]    ; curseur_x
 05e4f  0b c0                or ax, ax
 05e51  75 01                jne loc_5e54
 05e53  c3                   ret
@@ -11120,11 +11230,11 @@ loc_5e54:
 05e57  77 03                ja loc_5e5c
 05e59  88 44 06             mov byte ptr [si + 6], al
 loc_5e5c:
-05e5c  a1 95 39             mov ax, word ptr [0x3995]
+05e5c  a1 95 39             mov ax, word ptr [0x3995]    ; curseur_y
 05e5f  33 d2                xor dx, dx
 05e61  b9 40 01             mov cx, 0x140
 05e64  f7 e1                mul cx
-05e66  03 06 93 39          add ax, word ptr [0x3993]
+05e66  03 06 93 39          add ax, word ptr [0x3993]    ; curseur_x
 05e6a  a3 97 39             mov word ptr [0x3997], ax
 05e6d  89 44 10             mov word ptr [si + 0x10], ax
 05e70  1e                   push ds
@@ -11149,16 +11259,16 @@ loc_5e99:
 05e99  d1 e1                shl cx, 1
 05e9b  d1 e1                shl cx, 1
 05e9d  d1 ee                shr si, 1
-05e9f  81 3e 93 39 2f 01    cmp word ptr [0x3993], 0x12f
+05e9f  81 3e 93 39 2f 01    cmp word ptr [0x3993], 0x12f    ; curseur_x
 05ea5  72 29                jb loc_5ed0
-05ea7  c7 06 93 39 2f 01    mov word ptr [0x3993], 0x12f
+05ea7  c7 06 93 39 2f 01    mov word ptr [0x3993], 0x12f    ; curseur_x
 05ead  eb 21                jmp loc_5ed0
 ; ---- 1 octets non atteints (5eaf-5eaf)
 
 ; ======== sub_5eb0   (routine probable : non appelée directement)
 05eb0  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 05eb5  74 06                je loc_5ebd
-05eb7  c7 06 93 39 37 01    mov word ptr [0x3993], 0x137
+05eb7  c7 06 93 39 37 01    mov word ptr [0x3993], 0x137    ; curseur_x
 loc_5ebd:
 05ebd  b0 08                mov al, 8
 05ebf  a2 eb 47             mov byte ptr [0x47eb], al
@@ -11217,7 +11327,7 @@ loc_5f1c:
 05f1e  e9 32 dc             jmp copie_image
 
 ; ======== sub_5f21   (appelée depuis 5f59)
-05f21  e8 0a da             call sub_392e
+05f21  e8 0a da             call attend_relache_clic
 05f24  e9 2d da             jmp sub_3954
 
 ; ======== sub_5f27   (routine probable : non appelée directement)
@@ -11259,7 +11369,7 @@ loc_5f1c:
 05f51  58                   pop ax
 05f52  9d                   popf
 05f53  e8 57 e5             call sub_44ad
-05f56  e8 8b 01             call sub_60e4
+05f56  e8 8b 01             call affiche_tampon
 05f59  e8 c5 ff             call sub_5f21
 05f5c  9c                   pushf
 05f5d  50                   push ax
@@ -11300,24 +11410,24 @@ loc_5f1c:
 ; graine du hasard (heure DOS), puis chargements
 05f82  fc                   cld
 05f83  e8 25 e7             call sub_46ab
-05f86  e8 54 d9             call sub_38dd
+05f86  e8 54 d9             call souris_position
 05f89  b4 2c                mov ah, 0x2c
 05f8b  cd 21                int 0x21
 05f8d  89 16 fd 38          mov word ptr [0x38fd], dx    ; graine
 05f91  b8 63 14             mov ax, 0x1463
 05f94  a3 56 37             mov word ptr [0x3756], ax
-05f97  be e5 47             mov si, 0x47e5
+05f97  be e5 47             mov si, 0x47e5    ; sprite_curseur
 05f9a  c7 44 0c 20 2c       mov word ptr [si + 0xc], 0x2c20
-05f9f  e8 6e ee             call sub_4e10
+05f9f  e8 6e ee             call alloue_memoire
 05fa2  73 01                jae loc_5fa5
 05fa4  c3                   ret
 loc_5fa5:
-05fa5  e8 c8 f0             call sub_5070
+05fa5  e8 c8 f0             call charge_donnees
 05fa8  c7 06 07 39 a8 31    mov word ptr [0x3907], 0x31a8    ; fichier_nom, "beeper.drv"
-05fae  e8 40 d7             call souris_cache
+05fae  e8 40 d7             call clavier_retire
 loc_5fb1:
 05fb1  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-05fb7  e8 0e da             call sub_39c8
+05fb7  e8 0e da             call fichier_ouvre
 05fba  83 3e e9 37 02       cmp word ptr [0x37e9], 2    ; erreur_fichier
 05fbf  74 03                je loc_5fc4
 05fc1  eb 0e                jmp loc_5fd1
@@ -11330,16 +11440,17 @@ loc_5fc4:
 05fcd  cd 16                int 0x16
 05fcf  eb e0                jmp loc_5fb1
 loc_5fd1:
-05fd1  e8 d2 e7             call sub_47a6
+05fd1  e8 d2 e7             call son_charge_pilote
 05fd4  73 01                jae loc_5fd7
 05fd6  c3                   ret
 loc_5fd7:
-05fd7  e8 4b e8             call sub_4825
+05fd7  e8 4b e8             call son_prepare
 05fda  bb 5c 3f             mov bx, 0x3f5c
 05fdd  03 1e 90 31          add bx, word ptr [0x3190]    ; mode_video
 05fe1  ff 27                jmp word ptr [bx]
 
-; ======== sub_5fe3   (appelée depuis 00e9, 5fe1)
+; ======== mode_vga   (appelée depuis 00e9, 5fe1)
+; mode 13h, puis palette DS:5B23
 05fe3  50                   push ax
 05fe4  b8 7c 09             mov ax, 0x97c
 05fe7  8e c0                mov es, ax
@@ -11384,7 +11495,7 @@ loc_6016:
 
 ; ======== sub_602d   (appelée depuis 6f98)
 0602d  e8 10 d6             call sub_3640
-06030  e9 cf 01             jmp sub_6202
+06030  e9 cf 01             jmp efface_tampon
 
 ; ======== de6_moins_un   (appelée depuis 21b7, 223f, 2666, 4c12, 4daa, 4daf, 6cdd)
 ; hasard(6) - 1 dans BL
@@ -11451,12 +11562,12 @@ loc_6078:
 
 ; ======== sub_60a4   (appelée depuis 1d89, 60ce, 661f)
 060a4  8b ee                mov bp, si
-060a6  e9 d3 d0             jmp sub_317c
+060a6  e9 d3 d0             jmp affiche_texte
 
 ; ======== sub_60a9   (appelée depuis 802f, 8178)
-060a9  bb c1 5f             mov bx, 0x5fc1
+060a9  bb c1 5f             mov bx, 0x5fc1    ; textes
 060ac  8b 38                mov di, word ptr [bx + si]
-060ae  81 c7 c1 5f          add di, 0x5fc1
+060ae  81 c7 c1 5f          add di, 0x5fc1    ; textes
 060b2  8b f7                mov si, di
 
 ; ======== sub_60b4   (appelée depuis 0d17, 662e, 814f, 815d)
@@ -11481,7 +11592,8 @@ loc_60ce:
 060e1  8b 17                mov dx, word ptr [bx]
 060e3  c3                   ret
 
-; ======== sub_60e4   (appelée depuis 0028, 0096, 00b4, 00cf, 0131, 022e, 023d, 0453)
+; ======== affiche_tampon   (appelée depuis 0028, 0096, 00b4, 00cf, 0131, 022e, 023d, 0453)
+; envoie le tampon à l'écran ; version VGA en 0x6148
 060e4  bb 20 3f             mov bx, 0x3f20
 060e7  03 1e 90 31          add bx, word ptr [0x3190]    ; mode_video
 060eb  ff 27                jmp word ptr [bx]
@@ -11644,7 +11756,8 @@ loc_61f6:
 06200  c3                   ret
 ; ---- 1 octets non atteints (6201-6201)
 
-; ======== sub_6202   (appelée depuis 0025, 005c, 012e, 56d0, 7321, 744b, 763d, 8587)
+; ======== efface_tampon   (appelée depuis 0025, 005c, 012e, 56d0, 7321, 744b, 763d, 8587)
+; remplit le tampon d'écran (segment 1463) ; version VGA en 0x6248
 06202  33 c0                xor ax, ax
 06204  8b f8                mov di, ax
 06206  50                   push ax
@@ -11904,23 +12017,24 @@ loc_63cf:
 063e4  c3                   ret
 
 ; ======== sub_63e5   (appelée depuis 0ce9, 6401)
-063e5  c6 06 92 39 00       mov byte ptr [0x3992], 0
-063ea  e8 65 d3             call sub_3752
-063ed  a0 92 39             mov al, byte ptr [0x3992]
+063e5  c6 06 92 39 00       mov byte ptr [0x3992], 0    ; commandes
+063ea  e8 65 d3             call lit_commandes
+063ed  a0 92 39             mov al, byte ptr [0x3992]    ; commandes
 063f0  c3                   ret
 
 ; ======== sub_63f1   (appelée depuis 9284)
-063f1  8b ac c1 5f          mov bp, word ptr [si + 0x5fc1]
-063f5  81 c5 c1 5f          add bp, 0x5fc1
-063f9  e9 80 cd             jmp sub_317c
+063f1  8b ac c1 5f          mov bp, word ptr [si + 0x5fc1]    ; textes
+063f5  81 c5 c1 5f          add bp, 0x5fc1    ; textes
+063f9  e9 80 cd             jmp affiche_texte
 
-; ======== sub_63fc   (appelée depuis 0413, 0866, 0cbb, 2cf9, 73b9, 783c, 7e10, 8035)
+; ======== curseur_memorise   (appelée depuis 0413, 0866, 0cbb, 2cf9, 73b9, 783c, 7e10, 8035)
+; copie curseur_x et curseur_y dans DS:47E7
 063fc  80 3e c2 3f 00       cmp byte ptr [0x3fc2], 0
 06401  e8 e1 ff             call sub_63e5
 06404  bb e7 47             mov bx, 0x47e7
-06407  a1 93 39             mov ax, word ptr [0x3993]
+06407  a1 93 39             mov ax, word ptr [0x3993]    ; curseur_x
 0640a  89 07                mov word ptr [bx], ax
-0640c  a1 95 39             mov ax, word ptr [0x3995]
+0640c  a1 95 39             mov ax, word ptr [0x3995]    ; curseur_y
 0640f  89 47 02             mov word ptr [bx + 2], ax
 06412  c3                   ret
 
@@ -11948,11 +12062,11 @@ loc_643c:
 0643c  c6 06 98 3f 00       mov byte ptr [0x3f98], 0
 
 ; ======== sub_6441   (appelée depuis 7ec2)
-06441  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+06441  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 06446  75 01                jne loc_6449
 06448  c3                   ret
 loc_6449:
-06449  e8 e2 d4             call sub_392e
+06449  e8 e2 d4             call attend_relache_clic
 0644c  e8 58 00             call sub_64a7
 0644f  83 3c ff             cmp word ptr [si], -1
 06452  75 03                jne loc_6457
@@ -12080,7 +12194,7 @@ loc_653c:
 loc_6547:
 06547  c6 06 50 37 0f       mov byte ptr [0x3750], 0xf
 0654c  c6 06 59 37 01       mov byte ptr [0x3759], 1
-06551  e9 28 cc             jmp sub_317c
+06551  e9 28 cc             jmp affiche_texte
 
 ; ======== sub_6554   (appelée depuis 6518)
 06554  bd f1 44             mov bp, 0x44f1
@@ -12093,7 +12207,8 @@ loc_6547:
 06569  3e 88 46 07          mov byte ptr ds:[bp + 7], al
 0656d  eb d8                jmp loc_6547
 
-; ======== sub_656f   (appelée depuis 03cc, 03fe, 0410, 054e, 0996, 09ac, 1059, 12f0)
+; ======== sauve_tampon   (appelée depuis 03cc, 03fe, 0410, 054e, 0996, 09ac, 1059, 12f0)
+; copie le tampon (64 000 octets en VGA) vers le segment DS:5E35
 0656f  50                   push ax
 06570  a1 35 5e             mov ax, word ptr [0x5e35]    ; seg_furn
 06573  8e c0                mov es, ax
@@ -12209,16 +12324,16 @@ loc_65fc:
 
 ; ======== sub_6656   (routine probable : non appelée directement)
 06656  8b de                mov bx, si
-06658  e8 92 22             call sub_88ed
+06658  e8 92 22             call affiche_message
 
 ; ======== sub_665b   (appelée depuis 94f1)
-0665b  e8 86 fa             call sub_60e4
+0665b  e8 86 fa             call affiche_tampon
 
 ; ======== sub_665e   (appelée depuis 0a35, 1a4a, 25a5)
 0665e  b9 96 00             mov cx, 0x96
 06661  e9 23 e0             jmp sub_4687
 loc_6664:
-06664  be 4a 4d             mov si, 0x4d4a
+06664  be 4a 4d             mov si, 0x4d4a    ; monstres
 06667  b9 20 00             mov cx, 0x20
 loc_666a:
 0666a  80 3c 00             cmp byte ptr [si], 0
@@ -12315,8 +12430,8 @@ loc_6734:
 0673d  e2 f5                loop loc_6734
 0673f  e8 59 e8             call sub_4f9b
 06742  e8 70 f1             call sub_58b5
-06745  e8 0a d0             call sub_3752
-06748  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+06745  e8 0a d0             call lit_commandes
+06748  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 0674d  74 c0                je loc_670f
 0674f  8b 1e 39 46          mov bx, word ptr [0x4639]
 06753  c6 07 01             mov byte ptr [bx], 1
@@ -12565,24 +12680,24 @@ loc_6925:
 0696c  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_696f:
 0696f  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-06975  e8 79 cd             call souris_cache
-06978  e8 4d d0             call sub_39c8
+06975  e8 79 cd             call clavier_retire
+06978  e8 4d d0             call fichier_ouvre
 0697b  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 06980  75 03                jne loc_6985
 06982  eb 0f                jmp loc_6993
 ; ---- 1 octets non atteints (6984-6984)
 loc_6985:
-06985  e8 32 cd             call souris_affiche
-06988  bb 52 02             mov bx, 0x252
-0698b  e8 5f 1f             call sub_88ed
-0698e  e8 60 cd             call souris_cache
+06985  e8 32 cd             call clavier_installe
+06988  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+0698b  e8 5f 1f             call affiche_message
+0698e  e8 60 cd             call clavier_retire
 06991  eb dc                jmp loc_696f
 loc_6993:
-06993  e8 66 d0             call sub_39fc
+06993  e8 66 d0             call fichier_lit
 06996  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0699b  75 e8                jne loc_6985
 0699d  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-069a0  e8 17 cd             call souris_affiche
+069a0  e8 17 cd             call clavier_installe
 069a3  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 069a6  8e c0                mov es, ax
 069a8  33 f6                xor si, si
@@ -12603,24 +12718,24 @@ loc_69c0:
 069cf  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_69d2:
 069d2  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-069d8  e8 16 cd             call souris_cache
-069db  e8 ea cf             call sub_39c8
+069d8  e8 16 cd             call clavier_retire
+069db  e8 ea cf             call fichier_ouvre
 069de  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 069e3  75 03                jne loc_69e8
 069e5  eb 0f                jmp loc_69f6
 ; ---- 1 octets non atteints (69e7-69e7)
 loc_69e8:
-069e8  e8 cf cc             call souris_affiche
-069eb  bb 52 02             mov bx, 0x252
-069ee  e8 fc 1e             call sub_88ed
-069f1  e8 fd cc             call souris_cache
+069e8  e8 cf cc             call clavier_installe
+069eb  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+069ee  e8 fc 1e             call affiche_message
+069f1  e8 fd cc             call clavier_retire
 069f4  eb dc                jmp loc_69d2
 loc_69f6:
-069f6  e8 03 d0             call sub_39fc
+069f6  e8 03 d0             call fichier_lit
 069f9  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 069fe  75 e8                jne loc_69e8
 06a00  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-06a03  e8 b4 cc             call souris_affiche
+06a03  e8 b4 cc             call clavier_installe
 06a06  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 06a09  8e c0                mov es, ax
 06a0b  33 f6                xor si, si
@@ -12635,7 +12750,8 @@ loc_69f6:
 06a21  58                   pop ax
 06a22  c3                   ret
 
-; ======== sub_6a23   (appelée depuis 021b, 0234, 0251, 039c, 0526, 12c2, 182d, 5d54)
+; ======== fond_vers_tampon   (appelée depuis 021b, 0234, 0251, 039c, 0526, 12c2, 182d, 5d54)
+; recopie l'écran de fond (DS:5E23) dans le tampon
 06a23  50                   push ax
 06a24  b8 63 14             mov ax, 0x1463
 06a27  8e c0                mov es, ax
@@ -12846,7 +12962,8 @@ loc_6bd8:
 06bde  58                   pop ax
 06bdf  c3                   ret
 
-; ======== sub_6be0   (routine probable : non appelée directement)
+; ======== fouille_tresor
+; « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN », « CETTE PIECE A DEJA ETE FOUILLEE »
 06be0  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
 06be5  75 01                jne loc_6be8
 06be7  c3                   ret
@@ -12902,7 +13019,7 @@ loc_6c48:
 06c4b  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 06c4f  a0 a7 3f             mov al, byte ptr [0x3fa7]
 06c52  a2 bc 3f             mov byte ptr [0x3fbc], al
-06c55  bf 4a 4d             mov di, 0x4d4a
+06c55  bf 4a 4d             mov di, 0x4d4a    ; monstres
 06c58  8a 44 03             mov al, byte ptr [si + 3]
 06c5b  88 45 03             mov byte ptr [di + 3], al
 06c5e  b9 04 00             mov cx, 4
@@ -12938,8 +13055,8 @@ loc_6c89:
 06c97  c6 87 70 4b 00       mov byte ptr [bx + 0x4b70], 0
 06c9c  e9 57 ff             jmp loc_6bf6
 loc_6c9f:
-06c9f  bb 4c 00             mov bx, 0x4c
-06ca2  e8 48 1c             call sub_88ed
+06c9f  bb 4c 00             mov bx, 0x4c    ; message « VOUS FOUILLEZ MAIS / NE DECOUVREZ RIEN »
+06ca2  e8 48 1c             call affiche_message
 06ca5  c3                   ret
 loc_6ca6:
 06ca6  5e                   pop si
@@ -12947,15 +13064,15 @@ loc_6ca6:
 06ca8  59                   pop cx
 06ca9  57                   push di
 06caa  52                   push dx
-06cab  bb 06 01             mov bx, 0x106
-06cae  e8 3c 1c             call sub_88ed
+06cab  bb 06 01             mov bx, 0x106    ; message « PENDANT VOS RECHERCHES / UN MONSTRE VOUS TRAQUE / ET VOUS ATTAQUE »
+06cae  e8 3c 1c             call affiche_message
 06cb1  5a                   pop dx
 06cb2  5f                   pop di
-06cb3  e9 00 02             jmp sub_6eb6
+06cb3  e9 00 02             jmp loc_6eb6
 loc_6cb6:
 06cb6  e8 d2 00             call sub_6d8b
-06cb9  bb 0a 01             mov bx, 0x10a
-06cbc  e8 2e 1c             call sub_88ed
+06cb9  bb 0a 01             mov bx, 0x10a    ; message « VOUS SENTEZ LA PRESSION D'UN / FIL DE DETENTE SUR VOTRE JAMBE. / AVANT DE POUVOIR REAGIR VOUS ETES / ATTEINT PAR UN COUP D'ARBALETE / ET PERDEZ 1 POINT DE CORPS »
+06cbc  e8 2e 1c             call affiche_message
 06cbf  e8 63 ab             call sub_1825
 06cc2  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 06cc6  fe 4c 06             dec byte ptr [si + 6]
@@ -12964,7 +13081,7 @@ loc_6cb6:
 loc_6ccc:
 06ccc  a0 a7 3f             mov al, byte ptr [0x3fa7]
 06ccf  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
-06cd2  e9 03 a4             jmp sub_10d8
+06cd2  e9 03 a4             jmp mort_heros
 loc_6cd5:
 06cd5  e8 b3 00             call sub_6d8b
 06cd8  3c 08                cmp al, 8
@@ -12974,8 +13091,8 @@ loc_6cd5:
 06ce0  8a c3                mov al, bl
 06ce2  fe c0                inc al
 06ce4  bb b2 01             mov bx, 0x1b2
-06ce7  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-06ceb  81 c6 c1 5f          add si, 0x5fc1
+06ce7  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+06ceb  81 c6 c1 5f          add si, 0x5fc1    ; textes
 06cef  88 04                mov byte ptr [si], al
 06cf1  80 04 30             add byte ptr [si], 0x30
 06cf4  02 c0                add al, al
@@ -13002,7 +13119,7 @@ loc_6d12:
 06d1e  32 e4                xor ah, ah
 06d20  8b d8                mov bx, ax
 06d22  81 c3 f4 00          add bx, 0xf4
-06d26  e9 c4 1b             jmp sub_88ed
+06d26  e9 c4 1b             jmp affiche_message
 loc_6d29:
 06d29  2c 09                sub al, 9
 06d2b  b4 00                mov ah, 0
@@ -13017,7 +13134,7 @@ loc_6d29:
 06d40  b7 00                mov bh, 0
 06d42  81 c3 92 48          add bx, 0x4892
 06d46  8b 1f                mov bx, word ptr [bx]
-06d48  e9 a2 1b             jmp sub_88ed
+06d48  e9 a2 1b             jmp affiche_message
 loc_6d4b:
 06d4b  b5 40                mov ch, 0x40
 06d4d  bb 1c 01             mov bx, 0x11c
@@ -13027,10 +13144,10 @@ loc_6d4b:
 06d57  b5 10                mov ch, 0x10
 loc_6d59:
 06d59  08 6d 10             or byte ptr [di + 0x10], ch
-06d5c  e9 8e 1b             jmp sub_88ed
+06d5c  e9 8e 1b             jmp affiche_message
 loc_6d5f:
-06d5f  bb 4a 00             mov bx, 0x4a
-06d62  e8 88 1b             call sub_88ed
+06d5f  bb 4a 00             mov bx, 0x4a    ; message « CETTE PIECE A DEJA / ETE FOUILLEE »
+06d62  e8 88 1b             call affiche_message
 06d65  c3                   ret
 
 ; ======== sub_6d66   (appelée depuis 6c24)
@@ -13112,7 +13229,8 @@ loc_6df4:
 06df4  c6 06 c7 3f 01       mov byte ptr [0x3fc7], 1
 06df9  c3                   ret
 
-; ======== sub_6dfa   (routine probable : non appelée directement)
+; ======== fouille_portes
+; « UNE PORTE SECRETE S'OUVRE »
 06dfa  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4
 06dff  75 01                jne loc_6e02
 06e01  c3                   ret
@@ -13138,9 +13256,9 @@ loc_6e20:
 06e34  83 3e ed 37 00       cmp word ptr [0x37ed], 0
 06e39  74 17                je loc_6e52
 06e3b  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff
-06e40  e8 e4 b9             call sub_2827
-06e43  bb 1a 00             mov bx, 0x1a
-06e46  e8 a4 1a             call sub_88ed
+06e40  e8 e4 b9             call son_effet_1
+06e43  bb 1a 00             mov bx, 0x1a    ; message « UNE PORTE SECRETE S'OUVRE / EN GRINcANT DANS LE MUR »
+06e46  e8 a4 1a             call affiche_message
 06e49  c7 06 ed 37 00 00    mov word ptr [0x37ed], 0
 06e4f  eb 59                jmp loc_6eaa
 ; ---- 1 octets non atteints (6e51-6e51)
@@ -13159,8 +13277,8 @@ loc_6e5c:
 06e75  eb 33                jmp loc_6eaa
 ; ---- 1 octets non atteints (6e77-6e77)
 loc_6e78:
-06e78  bb 08 01             mov bx, 0x108
-06e7b  e8 6f 1a             call sub_88ed
+06e78  bb 08 01             mov bx, 0x108    ; message « MALGRE UNE RECHERCHE MINUTIEUSE / VOUS NE DECOUVREZ RIEN »
+06e7b  e8 6f 1a             call affiche_message
 06e7e  eb 2a                jmp loc_6eaa
 ; ---- 1 octets non atteints (6e80-6e80)
 loc_6e81:
@@ -13187,8 +13305,7 @@ loc_6eaa:
 ; ======== sub_6eb0   (appelée depuis 074f, 19bc, 2608)
 06eb0  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
 06eb5  c3                   ret
-
-; ======== sub_6eb6   (routine probable : non appelée directement)
+loc_6eb6:
 06eb6  80 3d 00             cmp byte ptr [di], 0
 06eb9  74 10                je loc_6ecb
 06ebb  52                   push dx
@@ -13215,14 +13332,14 @@ loc_6eef:
 06efc  a0 a7 3f             mov al, byte ptr [0x3fa7]
 06eff  a2 bc 3f             mov byte ptr [0x3fbc], al
 06f02  89 3e d4 3f          mov word ptr [0x3fd4], di    ; cible
-06f06  e8 86 ae             call sub_1d8f
+06f06  e8 86 ae             call carte_quete
 06f09  e9 9e a3             jmp loc_12aa
 
 ; ======== sub_6f0c   (routine probable : non appelée directement)
 06f0c  be 96 00             mov si, 0x96
 06f0f  e9 23 ab             jmp sub_1a35
 
-; ======== sub_6f12   (routine probable : non appelée directement)
+; ======== fouille_vide
 06f12  80 3e c2 4b ff       cmp byte ptr [0x4bc2], 0xff
 06f17  74 18                je loc_6f31
 06f19  e8 8b bb             call sub_2aa7
@@ -13235,8 +13352,8 @@ loc_6eef:
 06f2d  fe 4d 06             dec byte ptr [di + 6]
 06f30  c3                   ret
 loc_6f31:
-06f31  bb 4c 00             mov bx, 0x4c
-06f34  e8 b6 19             call sub_88ed
+06f31  bb 4c 00             mov bx, 0x4c    ; message « VOUS FOUILLEZ MAIS / NE DECOUVREZ RIEN »
+06f34  e8 b6 19             call affiche_message
 06f37  c3                   ret
 
 ; ======== sub_6f38   (routine probable : non appelée directement)
@@ -13258,8 +13375,8 @@ loc_6f54:
 loc_6f58:
 06f58  e8 ab f9             call sub_6906
 06f5b  8b de                mov bx, si
-06f5d  e8 8d 19             call sub_88ed
-06f60  e9 d7 aa             jmp sub_1a3a
+06f5d  e8 8d 19             call affiche_message
+06f60  e9 d7 aa             jmp tous_elimines
 
 ; ======== sub_6f63   (routine probable : non appelée directement)
 06f63  ba 64 00             mov dx, 0x64
@@ -13280,9 +13397,9 @@ loc_6f8b:
 06f8b  a0 a7 3f             mov al, byte ptr [0x3fa7]
 06f8e  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 06f91  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
-06f95  e8 40 a1             call sub_10d8
+06f95  e8 40 a1             call mort_heros
 06f98  e8 92 f0             call sub_602d
-06f9b  e8 85 fa             call sub_6a23
+06f9b  e8 85 fa             call fond_vers_tampon
 06f9e  e8 7b f6             call sub_661c
 06fa1  e9 1d f6             jmp sub_65c1
 
@@ -13324,7 +13441,7 @@ loc_6fd3:
 07000  c6 06 d1 58 00       mov byte ptr [0x58d1], 0
 07005  bb eb 56             mov bx, 0x56eb
 07008  b9 04 00             mov cx, 4
-0700b  bf 63 46             mov di, 0x4663
+0700b  bf 63 46             mov di, 0x4663    ; fiches_personnages
 loc_700e:
 0700e  39 5d 04             cmp word ptr [di + 4], bx
 07011  74 08                je loc_701b
@@ -13335,7 +13452,7 @@ loc_700e:
 loc_701b:
 0701b  bb b7 56             mov bx, 0x56b7
 0701e  b9 04 00             mov cx, 4
-07021  bf 63 46             mov di, 0x4663
+07021  bf 63 46             mov di, 0x4663    ; fiches_personnages
 loc_7024:
 07024  39 5d 04             cmp word ptr [di + 4], bx
 07027  74 0c                je loc_7035
@@ -13377,7 +13494,7 @@ loc_7078:
 0707c  be d2 00             mov si, 0xd2
 0707f  f6 45 0f 40          test byte ptr [di + 0xf], 0x40
 07083  74 03                je loc_7088
-07085  e9 b2 a9             jmp sub_1a3a
+07085  e9 b2 a9             jmp tous_elimines
 loc_7088:
 07088  8a 1e be 3f          mov bl, byte ptr [0x3fbe]
 0708c  fe 06 be 3f          inc byte ptr [0x3fbe]
@@ -13405,11 +13522,12 @@ loc_7088:
 070cc  be f2 00             mov si, 0xf2
 070cf  e9 86 fe             jmp loc_6f58
 
-; ======== sub_70d2   (routine probable : non appelée directement)
+; ======== prend_lame_esprit
+; « VOUS PRENEZ LA LAME DE L'ESPRIT »
 070d2  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 070d6  80 4d 0d 10          or byte ptr [di + 0xd], 0x10
-070da  bb f0 00             mov bx, 0xf0
-070dd  e8 0d 18             call sub_88ed
+070da  bb f0 00             mov bx, 0xf0    ; message « VOUS PRENEZ LA LAME DE L'ESPRIT »
+070dd  e8 0d 18             call affiche_message
 070e0  c3                   ret
 
 ; ======== sub_70e1   (routine probable : non appelée directement)
@@ -13447,10 +13565,11 @@ loc_7088:
 ; ======== sub_7117   (routine probable : non appelée directement)
 07117  ba 64 00             mov dx, 0x64
 0711a  be 2e 02             mov si, 0x22e
-0711d  eb 1b                jmp loc_713a
+0711d  eb 1b                jmp sub_713a
 ; ---- 1 octets non atteints (711f-711f)
 
-; ======== sub_7120   (routine probable : non appelée directement)
+; ======== coffre_potion
+; « VOUS TROUVEZ UNE POTION CURATIVE DANS LE COFFRE »
 07120  f6 45 10 04          test byte ptr [di + 0x10], 4
 07124  75 07                jne loc_712d
 07126  80 4d 10 04          or byte ptr [di + 0x10], 4
@@ -13459,10 +13578,11 @@ loc_7088:
 loc_712d:
 0712d  80 4d 10 08          or byte ptr [di + 0x10], 8
 loc_7131:
-07131  bb 4a 02             mov bx, 0x24a
-07134  e8 b6 17             call sub_88ed
-07137  e9 00 a9             jmp sub_1a3a
-loc_713a:
+07131  bb 4a 02             mov bx, 0x24a    ; message « VOUS TROUVEZ UNE POTION / CURATIVE DANS LE COFFRE »
+07134  e8 b6 17             call affiche_message
+07137  e9 00 a9             jmp tous_elimines
+
+; ======== sub_713a   (routine probable : non appelée directement)
 0713a  f6 45 10 04          test byte ptr [di + 0x10], 4
 0713e  75 07                jne loc_7147
 07140  80 4d 10 04          or byte ptr [di + 0x10], 4
@@ -13473,16 +13593,17 @@ loc_7147:
 loc_714b:
 0714b  e8 b8 f7             call sub_6906
 0714e  8b de                mov bx, si
-07150  e8 9a 17             call sub_88ed
-07153  e9 e4 a8             jmp sub_1a3a
+07150  e8 9a 17             call affiche_message
+07153  e9 e4 a8             jmp tous_elimines
 
-; ======== sub_7156   (routine probable : non appelée directement)
+; ======== coffre_fleche
+; « LE COFFRE ETAIT PIEGE ! UNE FLECHE PART DU MUR »
 07156  c6 06 bc 4b ff       mov byte ptr [0x4bbc], 0xff
 0715b  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0715f  fe 4d 06             dec byte ptr [di + 6]
-07162  bb 30 02             mov bx, 0x230
-07165  e8 85 17             call sub_88ed
-07168  e8 cf a8             call sub_1a3a
+07162  bb 30 02             mov bx, 0x230    ; message « LE COFFRE ETAIT PIEGE ! UNE / FLECHE PART DU MUR. VOUS / PERDEZ UN POINT DE CORPS »
+07165  e8 85 17             call affiche_message
+07168  e8 cf a8             call tous_elimines
 0716b  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0716f  80 7d 06 00          cmp byte ptr [di + 6], 0
 07173  75 03                jne loc_7178
@@ -13490,13 +13611,14 @@ loc_714b:
 loc_7178:
 07178  c3                   ret
 
-; ======== sub_7179   (routine probable : non appelée directement)
+; ======== coffre_desarme
 07179  c6 06 91 4b ff       mov byte ptr [0x4b91], 0xff
-0717e  bb 96 00             mov bx, 0x96
-07181  e8 69 17             call sub_88ed
-07184  e9 b3 a8             jmp sub_1a3a
+0717e  bb 96 00             mov bx, 0x96    ; message « VOUS DECOUVREZ QUE LE / COFFRE A ETE PIEGE. VOUS / LE DESARMEZ »
+07181  e8 69 17             call affiche_message
+07184  e9 b3 a8             jmp tous_elimines
 
-; ======== sub_7187   (routine probable : non appelée directement)
+; ======== cles_agrain
+; « LES CLES D'AGRAIN SONT SUR LA TABLE »
 07187  56                   push si
 07188  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0718c  f6 45 0f 40          test byte ptr [di + 0xf], 0x40
@@ -13504,9 +13626,9 @@ loc_7178:
 07192  ba 64 00             mov dx, 0x64
 07195  e8 6e f7             call sub_6906
 07198  80 4d 0f 40          or byte ptr [di + 0xf], 0x40
-0719c  bb 36 02             mov bx, 0x236
-0719f  e8 4b 17             call sub_88ed
-071a2  e8 95 a8             call sub_1a3a
+0719c  bb 36 02             mov bx, 0x236    ; message « LES CLES D'AGRAIN SONT SUR / LA TABLE. PRENEZ-EN UNE D'UNE / VALEUR DE 100 PIECES D'OR »
+0719f  e8 4b 17             call affiche_message
+071a2  e8 95 a8             call tous_elimines
 071a5  5e                   pop si
 071a6  fe 06 e8 3f          inc byte ptr [0x3fe8]
 071aa  80 3e e8 3f 04       cmp byte ptr [0x3fe8], 4
@@ -13516,8 +13638,8 @@ loc_71b2:
 071b2  c6 06 95 4b 18       mov byte ptr [0x4b95], 0x18
 071b7  c3                   ret
 loc_71b8:
-071b8  bb 38 02             mov bx, 0x238
-071bb  e8 2f 17             call sub_88ed
+071b8  bb 38 02             mov bx, 0x238    ; message « VOUS NE POUVEZ PORTER QU'UNE / CLE D'AGRAIN SANS RISQUE »
+071bb  e8 2f 17             call affiche_message
 071be  5e                   pop si
 071bf  c3                   ret
 
@@ -13545,11 +13667,12 @@ loc_71e3:
 071f1  be e8 00             mov si, 0xe8
 071f4  e9 3e a8             jmp sub_1a35
 
-; ======== sub_71f7   (routine probable : non appelée directement)
+; ======== coffre_gargouille
+; « LA GARGOUILLE S'ANIME SUBITEMENT »
 071f7  bf 54 4d             mov di, 0x4d54
 071fa  80 4d 06 01          or byte ptr [di + 6], 1
-071fe  bb e6 00             mov bx, 0xe6
-07201  e8 e9 16             call sub_88ed
+071fe  bb e6 00             mov bx, 0xe6    ; message « LE COFFRE ETAIT UN PIEGE. LA / GARGOUILLE SANIME SUBITEMENT. »
+07201  e8 e9 16             call affiche_message
 07204  bf 54 4d             mov di, 0x4d54
 07207  e9 e5 fc             jmp loc_6eef
 
@@ -13574,7 +13697,7 @@ loc_722a:
 07235  24 3f                and al, 0x3f
 07237  3a 06 94 3f          cmp al, byte ptr [0x3f94]
 0723b  75 03                jne loc_7240
-0723d  e8 07 00             call sub_7247
+0723d  e8 07 00             call fouille_pieges
 loc_7240:
 07240  5f                   pop di
 07241  5b                   pop bx
@@ -13583,7 +13706,8 @@ loc_7240:
 07244  e2 e4                loop loc_722a
 07246  c3                   ret
 
-; ======== sub_7247   (appelée depuis 723d)
+; ======== fouille_pieges   (appelée depuis 723d)
+; « VOUS TROUVEZ ET DESARMEZ UN PIEGE A LANCES », « ... L'ENTREE D'UNE TRAPPE »
 07247  81 c3 00 02          add bx, 0x200
 0724b  53                   push bx
 0724c  f6 07 08             test byte ptr [bx], 8
@@ -13618,14 +13742,14 @@ loc_727d:
 0728f  eb 24                jmp loc_72b5
 loc_7291:
 07291  c6 07 00             mov byte ptr [bx], 0
-07294  bb 34 00             mov bx, 0x34
-07297  e8 53 16             call sub_88ed
+07294  bb 34 00             mov bx, 0x34    ; message « VOUS TROUVEZ ET DESARMEZ / UN PIEGE A LANCES CACHE »
+07297  e8 53 16             call affiche_message
 0729a  e8 88 a5             call sub_1825
 0729d  eb 0b                jmp loc_72aa
 loc_729f:
 0729f  fe 07                inc byte ptr [bx]
-072a1  bb 10 01             mov bx, 0x110
-072a4  e8 46 16             call sub_88ed
+072a1  bb 10 01             mov bx, 0x110    ; message « VOUS DECOUVREZ L'ENTREE / D'UNE TRAPPE »
+072a4  e8 46 16             call affiche_message
 072a7  e8 7b a5             call sub_1825
 loc_72aa:
 072aa  c7 06 eb 37 01 00    mov word ptr [0x37eb], 1
@@ -13676,18 +13800,19 @@ loc_72e7:
 07307  c3                   ret
 ; ---- 8 octets non atteints (7308-730f)
 
-; ======== sub_7310   (appelée depuis 0155)
-07310  a0 95 31             mov al, byte ptr [0x3195]
-07313  a2 93 31             mov byte ptr [0x3193], al
+; ======== menu_titre   (appelée depuis 0155)
+; logo et 3 icônes ; clic -> table DS:AA1A (2 plateau, 4 héros, 6 armurerie) ; bit 0x40 = quitter
+07310  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
+07313  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07316  c7 06 f1 47 20 2c    mov word ptr [0x47f1], 0x2c20
 0731c  c6 06 98 3f 00       mov byte ptr [0x3f98], 0
-07321  e8 de ee             call sub_6202
-07324  e8 bd ed             call sub_60e4
-07327  e8 68 df             call sub_5292
+07321  e8 de ee             call efface_tampon
+07324  e8 bd ed             call affiche_tampon
+07327  e8 68 df             call charge_ecran_menus
 loc_732a:
-0732a  e8 f6 f6             call sub_6a23
-0732d  a0 95 31             mov al, byte ptr [0x3195]
-07330  a2 93 31             mov byte ptr [0x3193], al
+0732a  e8 f6 f6             call fond_vers_tampon
+0732d  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
+07330  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07333  c7 06 f1 47 20 2c    mov word ptr [0x47f1], 0x2c20
 07339  be 40 7c             mov si, 0x7c40
 0733c  bf 30 0a             mov di, 0xa30
@@ -13742,31 +13867,32 @@ loc_732a:
 073ad  e8 a3 c7             call copie_image
 073b0  1f                   pop ds
 073b1  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
-073b6  e8 b6 f1             call sub_656f
+073b6  e8 b6 f1             call sauve_tampon
 loc_73b9:
-073b9  e8 40 f0             call sub_63fc
-073bc  e8 55 ea             call sub_5e14
-073bf  e8 22 ed             call sub_60e4
-073c2  e8 12 ea             call sub_5dd7
-073c5  e8 8a c3             call sub_3752
-073c8  f6 06 92 39 40       test byte ptr [0x3992], 0x40
+073b9  e8 40 f0             call curseur_memorise
+073bc  e8 55 ea             call curseur_sauve_fond
+073bf  e8 22 ed             call affiche_tampon
+073c2  e8 12 ea             call curseur_dessine
+073c5  e8 8a c3             call lit_commandes
+073c8  f6 06 92 39 40       test byte ptr [0x3992], 0x40    ; commandes
 073cd  74 03                je loc_73d2
 073cf  eb 1b                jmp loc_73ec
 ; ---- 1 octets non atteints (73d1-73d1)
 loc_73d2:
-073d2  be 00 aa             mov si, 0xaa00
-073d5  e8 2d db             call sub_4f05
+073d2  be 00 aa             mov si, 0xaa00    ; zones_menu_titre
+073d5  e8 2d db             call zone_cliquee
 073d8  83 fb 06             cmp bx, 6
 073db  77 dc                ja loc_73b9
 073dd  83 fb 02             cmp bx, 2
 073e0  72 d7                jb loc_73b9
 073e2  e8 6f c5             call sub_3954
-073e5  e8 60 b6             call sub_2a48
+073e5  e8 60 b6             call son_effet_2
 073e8  ff a7 1a aa          jmp word ptr [bx - 0x55e6]
 loc_73ec:
 073ec  c3                   ret
 
-; ======== sub_73ed   (routine probable : non appelée directement)
+; ======== choix_quete
+; icône plateau : quête, briefing (QUESTB, EQUESTS.BIN) ; « AUCUN PERSONNAGE ACTIF... »
 073ed  bb a0 44             mov bx, 0x44a0
 073f0  32 c0                xor al, al
 073f2  80 3e 69 46 00       cmp byte ptr [0x4669], 0
@@ -13799,16 +13925,16 @@ loc_742b:
 loc_7430:
 07430  0a c0                or al, al
 07432  75 09                jne loc_743d
-07434  bb 06 00             mov bx, 6
-07437  e8 b3 14             call sub_88ed
+07434  bb 06 00             mov bx, 6    ; message « AUCUN PERSONNAGE ACTIF / N'A ETE SELECTIONNE / POUR ENTRER DANS LA QUETE »
+07437  e8 b3 14             call affiche_message
 0743a  e9 ed fe             jmp loc_732a
 loc_743d:
 0743d  e8 34 0b             call sub_7f74
-07440  a0 95 31             mov al, byte ptr [0x3195]
-07443  a2 93 31             mov byte ptr [0x3193], al
+07440  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
+07443  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07446  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
-0744b  e8 b4 ed             call sub_6202
-0744e  e8 93 ec             call sub_60e4
+0744b  e8 b4 ed             call efface_tampon
+0744e  e8 93 ec             call affiche_tampon
 07451  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 07456  74 03                je loc_745b
 07458  e9 ab 00             jmp loc_7506
@@ -13819,24 +13945,24 @@ loc_745b:
 0746a  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_746d:
 0746d  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-07473  e8 7b c2             call souris_cache
-07476  e8 4f c5             call sub_39c8
+07473  e8 7b c2             call clavier_retire
+07476  e8 4f c5             call fichier_ouvre
 07479  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0747e  75 03                jne loc_7483
 07480  eb 0f                jmp loc_7491
 ; ---- 1 octets non atteints (7482-7482)
 loc_7483:
-07483  e8 34 c2             call souris_affiche
-07486  bb 52 02             mov bx, 0x252
-07489  e8 61 14             call sub_88ed
-0748c  e8 62 c2             call souris_cache
+07483  e8 34 c2             call clavier_installe
+07486  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+07489  e8 61 14             call affiche_message
+0748c  e8 62 c2             call clavier_retire
 0748f  eb dc                jmp loc_746d
 loc_7491:
-07491  e8 68 c5             call sub_39fc
+07491  e8 68 c5             call fichier_lit
 07494  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07499  75 e8                jne loc_7483
 0749b  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-0749e  e8 19 c2             call souris_affiche
+0749e  e8 19 c2             call clavier_installe
 074a1  a1 2d 5e             mov ax, word ptr [0x5e2d]    ; seg_odds
 074a4  8e c0                mov es, ax
 074a6  33 f6                xor si, si
@@ -13855,24 +13981,24 @@ loc_7491:
 074cc  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_74cf:
 074cf  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-074d5  e8 19 c2             call souris_cache
-074d8  e8 ed c4             call sub_39c8
+074d5  e8 19 c2             call clavier_retire
+074d8  e8 ed c4             call fichier_ouvre
 074db  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 074e0  75 03                jne loc_74e5
 074e2  eb 0f                jmp loc_74f3
 ; ---- 1 octets non atteints (74e4-74e4)
 loc_74e5:
-074e5  e8 d2 c1             call souris_affiche
-074e8  bb 52 02             mov bx, 0x252
-074eb  e8 ff 13             call sub_88ed
-074ee  e8 00 c2             call souris_cache
+074e5  e8 d2 c1             call clavier_installe
+074e8  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+074eb  e8 ff 13             call affiche_message
+074ee  e8 00 c2             call clavier_retire
 074f1  eb dc                jmp loc_74cf
 loc_74f3:
-074f3  e8 06 c5             call sub_39fc
+074f3  e8 06 c5             call fichier_lit
 074f6  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 074fb  75 e8                jne loc_74e5
 074fd  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-07500  e8 b7 c1             call souris_affiche
+07500  e8 b7 c1             call clavier_installe
 07503  e9 a8 00             jmp loc_75ae
 loc_7506:
 07506  c7 06 07 39 f5 5e    mov word ptr [0x3907], 0x5ef5    ; fichier_nom, "odds&sod.ega"
@@ -13881,24 +14007,24 @@ loc_7506:
 07515  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_7518:
 07518  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-0751e  e8 d0 c1             call souris_cache
-07521  e8 a4 c4             call sub_39c8
+0751e  e8 d0 c1             call clavier_retire
+07521  e8 a4 c4             call fichier_ouvre
 07524  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07529  75 03                jne loc_752e
 0752b  eb 0f                jmp loc_753c
 ; ---- 1 octets non atteints (752d-752d)
 loc_752e:
-0752e  e8 89 c1             call souris_affiche
-07531  bb 52 02             mov bx, 0x252
-07534  e8 b6 13             call sub_88ed
-07537  e8 b7 c1             call souris_cache
+0752e  e8 89 c1             call clavier_installe
+07531  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+07534  e8 b6 13             call affiche_message
+07537  e8 b7 c1             call clavier_retire
 0753a  eb dc                jmp loc_7518
 loc_753c:
-0753c  e8 bd c4             call sub_39fc
+0753c  e8 bd c4             call fichier_lit
 0753f  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07544  75 e8                jne loc_752e
 07546  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-07549  e8 6e c1             call souris_affiche
+07549  e8 6e c1             call clavier_installe
 0754c  a1 2d 5e             mov ax, word ptr [0x5e2d]    ; seg_odds
 0754f  8e c0                mov es, ax
 07551  33 f6                xor si, si
@@ -13917,28 +14043,28 @@ loc_753c:
 07577  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_757a:
 0757a  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-07580  e8 6e c1             call souris_cache
-07583  e8 42 c4             call sub_39c8
+07580  e8 6e c1             call clavier_retire
+07583  e8 42 c4             call fichier_ouvre
 07586  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0758b  75 03                jne loc_7590
 0758d  eb 0f                jmp loc_759e
 ; ---- 1 octets non atteints (758f-758f)
 loc_7590:
-07590  e8 27 c1             call souris_affiche
-07593  bb 52 02             mov bx, 0x252
-07596  e8 54 13             call sub_88ed
-07599  e8 55 c1             call souris_cache
+07590  e8 27 c1             call clavier_installe
+07593  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+07596  e8 54 13             call affiche_message
+07599  e8 55 c1             call clavier_retire
 0759c  eb dc                jmp loc_757a
 loc_759e:
-0759e  e8 5b c4             call sub_39fc
+0759e  e8 5b c4             call fichier_lit
 075a1  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 075a6  75 e8                jne loc_7590
 075a8  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-075ab  e8 0c c1             call souris_affiche
+075ab  e8 0c c1             call clavier_installe
 loc_75ae:
 075ae  c7 06 37 46 00 00    mov word ptr [0x4637], 0    ; fiche_heros_courant
 loc_75b4:
-075b4  e8 6c f4             call sub_6a23
+075b4  e8 6c f4             call fond_vers_tampon
 075b7  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 075bc  c7 06 07 39 f7 ac    mov word ptr [0x3907], 0xacf7    ; fichier_nom, "equests.bin"
 075c2  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
@@ -13946,25 +14072,25 @@ loc_75b4:
 075cb  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_75ce:
 075ce  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-075d4  e8 1a c1             call souris_cache
-075d7  e8 ee c3             call sub_39c8
+075d4  e8 1a c1             call clavier_retire
+075d7  e8 ee c3             call fichier_ouvre
 075da  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 075df  75 03                jne loc_75e4
 075e1  eb 0f                jmp loc_75f2
 ; ---- 1 octets non atteints (75e3-75e3)
 loc_75e4:
-075e4  e8 d3 c0             call souris_affiche
-075e7  bb 50 02             mov bx, 0x250
-075ea  e8 00 13             call sub_88ed
-075ed  e8 01 c1             call souris_cache
+075e4  e8 d3 c0             call clavier_installe
+075e7  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+075ea  e8 00 13             call affiche_message
+075ed  e8 01 c1             call clavier_retire
 075f0  eb dc                jmp loc_75ce
 loc_75f2:
-075f2  e8 07 c4             call sub_39fc
+075f2  e8 07 c4             call fichier_lit
 075f5  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 075f8  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 075fd  75 e5                jne loc_75e4
-075ff  e8 b8 c0             call souris_affiche
-07602  8a 1e 94 31          mov bl, byte ptr [0x3194]
+075ff  e8 b8 c0             call clavier_installe
+07602  8a 1e 94 31          mov bl, byte ptr [0x3194]    ; langue
 07606  32 ff                xor bh, bh
 07608  d1 e3                shl bx, 1
 0760a  d1 e3                shl bx, 1
@@ -13987,11 +14113,11 @@ loc_762a:
 07638  74 44                je loc_767e
 loc_763a:
 0763a  a2 92 3f             mov byte ptr [0x3f92], al    ; numero_quete
-0763d  e8 c2 eb             call sub_6202
-07640  e8 a1 ea             call sub_60e4
+0763d  e8 c2 eb             call efface_tampon
+07640  e8 a1 ea             call affiche_tampon
 07643  e9 aa 0e             jmp loc_84f0
 loc_7646:
-07646  e8 da f3             call sub_6a23
+07646  e8 da f3             call fond_vers_tampon
 07649  8b 1e f7 37          mov bx, word ptr [0x37f7]
 0764d  8b b7 02 00          mov si, word ptr [bx + 2]
 07651  83 3e 90 31 06       cmp word ptr [0x3190], 6    ; mode_video
@@ -14022,24 +14148,24 @@ loc_767e:
 07694  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_7697:
 07697  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-0769d  e8 51 c0             call souris_cache
-076a0  e8 25 c3             call sub_39c8
+0769d  e8 51 c0             call clavier_retire
+076a0  e8 25 c3             call fichier_ouvre
 076a3  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 076a8  75 03                jne loc_76ad
 076aa  eb 0f                jmp loc_76bb
 ; ---- 1 octets non atteints (76ac-76ac)
 loc_76ad:
-076ad  e8 0a c0             call souris_affiche
-076b0  bb 52 02             mov bx, 0x252
-076b3  e8 37 12             call sub_88ed
-076b6  e8 38 c0             call souris_cache
+076ad  e8 0a c0             call clavier_installe
+076b0  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+076b3  e8 37 12             call affiche_message
+076b6  e8 38 c0             call clavier_retire
 076b9  eb dc                jmp loc_7697
 loc_76bb:
-076bb  e8 3e c3             call sub_39fc
+076bb  e8 3e c3             call fichier_lit
 076be  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 076c3  75 e8                jne loc_76ad
 076c5  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-076c8  e8 ef bf             call souris_affiche
+076c8  e8 ef bf             call clavier_installe
 076cb  e9 5c fc             jmp loc_732a
 loc_76ce:
 076ce  c7 06 07 39 37 5f    mov word ptr [0x3907], 0x5f37    ; fichier_nom, "bordered.ega"
@@ -14048,30 +14174,31 @@ loc_76ce:
 076dd  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_76e0:
 076e0  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-076e6  e8 08 c0             call souris_cache
-076e9  e8 dc c2             call sub_39c8
+076e6  e8 08 c0             call clavier_retire
+076e9  e8 dc c2             call fichier_ouvre
 076ec  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 076f1  75 03                jne loc_76f6
 076f3  eb 0f                jmp loc_7704
 ; ---- 1 octets non atteints (76f5-76f5)
 loc_76f6:
-076f6  e8 c1 bf             call souris_affiche
-076f9  bb 52 02             mov bx, 0x252
-076fc  e8 ee 11             call sub_88ed
-076ff  e8 ef bf             call souris_cache
+076f6  e8 c1 bf             call clavier_installe
+076f9  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+076fc  e8 ee 11             call affiche_message
+076ff  e8 ef bf             call clavier_retire
 07702  eb dc                jmp loc_76e0
 loc_7704:
-07704  e8 f5 c2             call sub_39fc
+07704  e8 f5 c2             call fichier_lit
 07707  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 0770c  75 e8                jne loc_76f6
 0770e  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-07711  e8 a6 bf             call souris_affiche
+07711  e8 a6 bf             call clavier_installe
 07714  e9 13 fc             jmp loc_732a
 
-; ======== sub_7717   (routine probable : non appelée directement)
+; ======== ecran_heros
+; icône héros : choix et création des personnages
 07717  c6 06 9e 40 ff       mov byte ptr [0x409e], 0xff
 loc_771c:
-0771c  e8 04 f3             call sub_6a23
+0771c  e8 04 f3             call fond_vers_tampon
 0771f  be 40 7a             mov si, 0x7a40
 07722  bf 10 d5             mov di, 0xd510
 07725  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
@@ -14174,20 +14301,20 @@ loc_780a:
 07836  59                   pop cx
 07837  e2 d1                loop loc_780a
 loc_7839:
-07839  e8 33 ed             call sub_656f
+07839  e8 33 ed             call sauve_tampon
 loc_783c:
-0783c  e8 bd eb             call sub_63fc
-0783f  e8 d2 e5             call sub_5e14
-07842  e8 9f e8             call sub_60e4
-07845  e8 8f e5             call sub_5dd7
-07848  e8 07 bf             call sub_3752
-0784b  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+0783c  e8 bd eb             call curseur_memorise
+0783f  e8 d2 e5             call curseur_sauve_fond
+07842  e8 9f e8             call affiche_tampon
+07845  e8 8f e5             call curseur_dessine
+07848  e8 07 bf             call lit_commandes
+0784b  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 07850  74 03                je loc_7855
 07852  eb 24                jmp loc_7878
 ; ---- 1 octets non atteints (7854-7854)
 loc_7855:
 07855  be 22 aa             mov si, 0xaa22
-07858  e8 aa d6             call sub_4f05
+07858  e8 aa d6             call zone_cliquee
 0785b  83 fb 12             cmp bx, 0x12
 0785e  77 dc                ja loc_783c
 07860  83 fb 02             cmp bx, 2
@@ -14203,32 +14330,32 @@ loc_7878:
 07878  bb 12 00             mov bx, 0x12
 loc_787b:
 0787b  e8 d6 c0             call sub_3954
-0787e  e8 c7 b1             call sub_2a48
+0787e  e8 c7 b1             call son_effet_2
 07881  81 c3 6c aa          add bx, 0xaa6c
 07885  ff 27                jmp word ptr [bx]
 
 ; ======== sub_7887   (routine probable : non appelée directement)
 07887  c6 06 9e 40 00       mov byte ptr [0x409e], 0
-0788c  a0 95 31             mov al, byte ptr [0x3195]
-0788f  a2 93 31             mov byte ptr [0x3193], al
+0788c  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
+0788f  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07892  e9 87 fe             jmp loc_771c
 
 ; ======== sub_7895   (routine probable : non appelée directement)
 07895  c6 06 9e 40 01       mov byte ptr [0x409e], 1
 0789a  a0 96 31             mov al, byte ptr [0x3196]
-0789d  a2 93 31             mov byte ptr [0x3193], al
+0789d  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078a0  e9 79 fe             jmp loc_771c
 
 ; ======== sub_78a3   (routine probable : non appelée directement)
 078a3  c6 06 9e 40 02       mov byte ptr [0x409e], 2
 078a8  a0 97 31             mov al, byte ptr [0x3197]
-078ab  a2 93 31             mov byte ptr [0x3193], al
+078ab  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078ae  e9 6b fe             jmp loc_771c
 
 ; ======== sub_78b1   (routine probable : non appelée directement)
 078b1  c6 06 9e 40 03       mov byte ptr [0x409e], 3
 078b6  a0 98 31             mov al, byte ptr [0x3198]
-078b9  a2 93 31             mov byte ptr [0x3193], al
+078b9  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078bc  e9 5d fe             jmp loc_771c
 
 ; ======== sub_78bf   (routine probable : non appelée directement)
@@ -14237,7 +14364,8 @@ loc_787b:
 078c5  80 b7 a0 44 ff       xor byte ptr [bx + 0x44a0], 0xff
 078ca  e9 4f fe             jmp loc_771c
 
-; ======== sub_78cd   (routine probable : non appelée directement)
+; ======== heros_renouvele
+; « LE PERSONNAGE A ETE RENOUVELE »
 078cd  a0 9e 40             mov al, byte ptr [0x409e]
 078d0  e8 ac e4             call sub_5d7f
 078d3  8a 1e 9e 40          mov bl, byte ptr [0x409e]
@@ -14258,8 +14386,8 @@ loc_787b:
 0790c  75 04                jne loc_7912
 0790e  80 4c 0e 80          or byte ptr [si + 0xe], 0x80
 loc_7912:
-07912  bb 08 00             mov bx, 8
-07915  e8 d5 0f             call sub_88ed
+07912  bb 08 00             mov bx, 8    ; message « LE PERSONNAGE / A ETE RENOUVELE »
+07915  e8 d5 0f             call affiche_message
 07918  e9 01 fe             jmp loc_771c
 
 ; ======== sub_791b   (routine probable : non appelée directement)
@@ -14283,10 +14411,11 @@ loc_7912:
 0794c  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff
 07951  e9 c8 fd             jmp loc_771c
 
-; ======== sub_7954   (routine probable : non appelée directement)
-07954  e8 a3 bf             call sub_38fa
+; ======== sauvegarde_menu
+; charge ou enregistre QUEST.SAV
+07954  e8 a3 bf             call attend_relache
 07957  bb 0c 00             mov bx, 0xc
-0795a  e8 90 0f             call sub_88ed
+0795a  e8 90 0f             call affiche_message
 0795d  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe
 07962  75 03                jne loc_7967
 07964  e9 b5 fd             jmp loc_771c
@@ -14299,9 +14428,9 @@ loc_7971:
 07976  75 03                jne loc_797b
 07978  e9 a2 00             jmp loc_7a1d
 loc_797b:
-0797b  bb 0e 00             mov bx, 0xe
-0797e  e8 6c 0f             call sub_88ed
-07981  e8 6d bd             call souris_cache
+0797b  bb 0e 00             mov bx, 0xe    ; message « INTRODUISEZ VOTRE / DISQUETTE DES DONNEES »
+0797e  e8 6c 0f             call affiche_message
+07981  e8 6d bd             call clavier_retire
 07984  ba b3 5f             mov dx, 0x5fb3    ; "quest.sav"
 07987  32 c0                xor al, al
 07989  b4 3d                mov ah, 0x3d
@@ -14327,7 +14456,7 @@ loc_7992:
 079b4  cd 21                int 0x21
 079b6  72 60                jb loc_7a18
 loc_79b8:
-079b8  e8 ff bc             call souris_affiche
+079b8  e8 ff bc             call clavier_installe
 079bb  e8 bc 01             call sub_7b7a
 079be  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8
 079c3  75 03                jne loc_79c8
@@ -14354,21 +14483,21 @@ loc_79eb:
 079f7  c7 06 05 39 60 05    mov word ptr [0x3905], 0x560    ; fichier_taille
 079fd  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 07a00  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-07a03  e8 9a bf             call sub_39a0
+07a03  e8 9a bf             call sauve_fichier
 07a06  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07a0b  75 03                jne loc_7a10
 07a0d  e9 99 00             jmp loc_7aa9
 loc_7a10:
-07a10  bb 18 00             mov bx, 0x18
-07a13  e8 d7 0e             call sub_88ed
+07a10  bb 18 00             mov bx, 0x18    ; message « IL Y A UNE ERREUR DE DISQUETTE »
+07a13  e8 d7 0e             call affiche_message
 07a16  eb d3                jmp loc_79eb
 loc_7a18:
-07a18  e8 28 0a             call sub_8443
+07a18  e8 28 0a             call sauve_quest_sav
 07a1b  eb 9b                jmp loc_79b8
 loc_7a1d:
-07a1d  bb 0e 00             mov bx, 0xe
-07a20  e8 ca 0e             call sub_88ed
-07a23  e8 cb bc             call souris_cache
+07a1d  bb 0e 00             mov bx, 0xe    ; message « INTRODUISEZ VOTRE / DISQUETTE DES DONNEES »
+07a20  e8 ca 0e             call affiche_message
+07a23  e8 cb bc             call clavier_retire
 07a26  ba b3 5f             mov dx, 0x5fb3    ; "quest.sav"
 07a29  32 c0                xor al, al
 07a2b  b4 3d                mov ah, 0x3d
@@ -14392,12 +14521,12 @@ loc_7a1d:
 07a53  cd 21                int 0x21
 07a55  73 0b                jae loc_7a62
 loc_7a57:
-07a57  e8 60 bc             call souris_affiche
-07a5a  bb 18 00             mov bx, 0x18
-07a5d  e8 8d 0e             call sub_88ed
+07a57  e8 60 bc             call clavier_installe
+07a5a  bb 18 00             mov bx, 0x18    ; message « IL Y A UNE ERREUR DE DISQUETTE »
+07a5d  e8 8d 0e             call affiche_message
 07a60  eb 47                jmp loc_7aa9
 loc_7a62:
-07a62  e8 55 bc             call souris_affiche
+07a62  e8 55 bc             call clavier_installe
 07a65  e8 12 01             call sub_7b7a
 07a68  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8
 07a6d  75 03                jne loc_7a72
@@ -14441,24 +14570,24 @@ loc_7aa9:
 07abf  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_7ac2:
 07ac2  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-07ac8  e8 26 bc             call souris_cache
-07acb  e8 fa be             call sub_39c8
+07ac8  e8 26 bc             call clavier_retire
+07acb  e8 fa be             call fichier_ouvre
 07ace  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07ad3  75 03                jne loc_7ad8
 07ad5  eb 0f                jmp loc_7ae6
 ; ---- 1 octets non atteints (7ad7-7ad7)
 loc_7ad8:
-07ad8  e8 df bb             call souris_affiche
-07adb  bb 50 02             mov bx, 0x250
-07ade  e8 0c 0e             call sub_88ed
-07ae1  e8 0d bc             call souris_cache
+07ad8  e8 df bb             call clavier_installe
+07adb  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+07ade  e8 0c 0e             call affiche_message
+07ae1  e8 0d bc             call clavier_retire
 07ae4  eb dc                jmp loc_7ac2
 loc_7ae6:
-07ae6  e8 13 bf             call sub_39fc
+07ae6  e8 13 bf             call fichier_lit
 07ae9  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07aee  75 e8                jne loc_7ad8
 07af0  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-07af3  e8 c4 bb             call souris_affiche
+07af3  e8 c4 bb             call clavier_installe
 07af6  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 07af9  8e c0                mov es, ax
 07afb  33 f6                xor si, si
@@ -14479,24 +14608,24 @@ loc_7b15:
 07b24  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_7b27:
 07b27  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-07b2d  e8 c1 bb             call souris_cache
-07b30  e8 95 be             call sub_39c8
+07b2d  e8 c1 bb             call clavier_retire
+07b30  e8 95 be             call fichier_ouvre
 07b33  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07b38  75 03                jne loc_7b3d
 07b3a  eb 0f                jmp loc_7b4b
 ; ---- 1 octets non atteints (7b3c-7b3c)
 loc_7b3d:
-07b3d  e8 7a bb             call souris_affiche
-07b40  bb 50 02             mov bx, 0x250
-07b43  e8 a7 0d             call sub_88ed
-07b46  e8 a8 bb             call souris_cache
+07b3d  e8 7a bb             call clavier_installe
+07b40  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+07b43  e8 a7 0d             call affiche_message
+07b46  e8 a8 bb             call clavier_retire
 07b49  eb dc                jmp loc_7b27
 loc_7b4b:
-07b4b  e8 ae be             call sub_39fc
+07b4b  e8 ae be             call fichier_lit
 07b4e  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 07b53  75 e8                jne loc_7b3d
 07b55  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-07b58  e8 5f bb             call souris_affiche
+07b58  e8 5f bb             call clavier_installe
 07b5b  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 07b5e  8e c0                mov es, ax
 07b60  33 f6                xor si, si
@@ -14520,8 +14649,8 @@ loc_7b4b:
 07b85  8b f8                mov di, ax
 07b87  b9 88 00             mov cx, 0x88
 07b8a  bb 72 01             mov bx, 0x172
-07b8d  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-07b91  81 c6 c1 5f          add si, 0x5fc1
+07b8d  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+07b91  81 c6 c1 5f          add si, 0x5fc1    ; textes
 07b95  56                   push si
 07b96  8b f7                mov si, di
 07b98  5f                   pop di
@@ -14545,7 +14674,7 @@ loc_7bae:
 07bb8  e2 f4                loop loc_7bae
 07bba  1f                   pop ds
 07bbb  bb 12 00             mov bx, 0x12
-07bbe  e8 2c 0d             call sub_88ed
+07bbe  e8 2c 0d             call affiche_message
 07bc1  5f                   pop di
 07bc2  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8
 07bc7  75 01                jne loc_7bca
@@ -14770,7 +14899,7 @@ loc_7dda:
 07ddf  75 05                jne loc_7de6
 07de1  3e c6 46 02 07       mov byte ptr ds:[bp + 2], 7
 loc_7de6:
-07de6  e8 93 b3             call sub_317c
+07de6  e8 93 b3             call affiche_texte
 07de9  bd f4 ab             mov bp, 0xabf4
 07dec  83 3e 90 31 06       cmp word ptr [0x3190], 6    ; mode_video
 07df1  75 05                jne loc_7df8
@@ -14780,12 +14909,12 @@ loc_7df8:
 07dfd  75 05                jne loc_7e04
 07dff  3e c6 46 02 07       mov byte ptr ds:[bp + 2], 7
 loc_7e04:
-07e04  e8 75 b3             call sub_317c
-07e07  e8 65 e7             call sub_656f
+07e04  e8 75 b3             call affiche_texte
+07e07  e8 65 e7             call sauve_tampon
 07e0a  e9 c2 00             jmp loc_7ecf
 loc_7e0d:
-07e0d  e8 42 b9             call sub_3752
-07e10  e8 e9 e5             call sub_63fc
+07e0d  e8 42 b9             call lit_commandes
+07e10  e8 e9 e5             call curseur_memorise
 07e13  83 3e e9 47 50       cmp word ptr [0x47e9], 0x50
 07e18  73 03                jae loc_7e1d
 07e1a  e9 a5 00             jmp loc_7ec2
@@ -14807,7 +14936,7 @@ loc_7e27:
 loc_7e44:
 07e44  8a 87 3c ab          mov al, byte ptr [bx - 0x54c4]
 07e48  a2 68 ab             mov byte ptr [0xab68], al
-07e4b  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+07e4b  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 07e50  74 38                je loc_7e8a
 07e52  32 ff                xor bh, bh
 07e54  8a 1e 79 ab          mov bl, byte ptr [0xab79]
@@ -14820,15 +14949,15 @@ loc_7e62:
 07e67  fe 06 79 ab          inc byte ptr [0xab79]
 loc_7e6b:
 07e6b  88 87 fa ab          mov byte ptr [bx - 0x5406], al
-07e6f  e8 d6 ab             call sub_2a48
+07e6f  e8 d6 ab             call son_effet_2
 07e72  e8 df ba             call sub_3954
 07e75  bd f4 ab             mov bp, 0xabf4
 07e78  83 3e 90 31 04       cmp word ptr [0x3190], 4    ; mode_video
 07e7d  75 05                jne loc_7e84
 07e7f  3e c6 46 02 07       mov byte ptr ds:[bp + 2], 7
 loc_7e84:
-07e84  e8 f5 b2             call sub_317c
-07e87  e8 e5 e6             call sub_656f
+07e84  e8 f5 b2             call affiche_texte
+07e87  e8 e5 e6             call sauve_tampon
 loc_7e8a:
 07e8a  bd 62 ab             mov bp, 0xab62
 07e8d  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
@@ -14845,7 +14974,7 @@ loc_7eb1:
 07eb1  75 05                jne loc_7eb8
 07eb3  3e c6 46 04 0c       mov byte ptr ds:[bp + 4], 0xc
 loc_7eb8:
-07eb8  e8 c1 b2             call sub_317c
+07eb8  e8 c1 b2             call affiche_texte
 07ebb  fe 06 7a ab          inc byte ptr [0xab7a]
 07ebf  eb 0e                jmp loc_7ecf
 ; ---- 1 octets non atteints (7ec1-7ec1)
@@ -14853,7 +14982,7 @@ loc_7ec2:
 07ec2  e8 7c e5             call sub_6441
 07ec5  80 3e 7a ab ff       cmp byte ptr [0xab7a], 0xff
 07eca  75 03                jne loc_7ecf
-07ecc  e9 79 ab             jmp sub_2a48
+07ecc  e9 79 ab             jmp son_effet_2
 loc_7ecf:
 07ecf  8b 16 e7 47          mov dx, word ptr [0x47e7]
 07ed3  8b 2e e9 47          mov bp, word ptr [0x47e9]
@@ -14885,10 +15014,10 @@ loc_7f0d:
 07f16  75 05                jne loc_7f1d
 07f18  3e c6 46 02 07       mov byte ptr ds:[bp + 2], 7
 loc_7f1d:
-07f1d  e8 5c b2             call sub_317c
-07f20  e8 f1 de             call sub_5e14
-07f23  e8 be e1             call sub_60e4
-07f26  e8 ae de             call sub_5dd7
+07f1d  e8 5c b2             call affiche_texte
+07f20  e8 f1 de             call curseur_sauve_fond
+07f23  e8 be e1             call affiche_tampon
+07f26  e8 ae de             call curseur_dessine
 07f29  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
 07f2e  75 03                jne loc_7f33
 07f30  e9 da fe             jmp loc_7e0d
@@ -14899,7 +15028,7 @@ loc_7f33:
 loc_7f3d:
 07f3d  fe 0e 7a ab          dec byte ptr [0xab7a]
 07f41  bd 36 ab             mov bp, 0xab36
-07f44  e8 35 b2             call sub_317c
+07f44  e8 35 b2             call affiche_texte
 07f47  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
 07f4c  e9 be fe             jmp loc_7e0d
 
@@ -14909,7 +15038,7 @@ loc_7f3d:
 07f53  c6 00 00             mov byte ptr [bx + si], 0
 07f56  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff
 07f5b  e8 f6 b9             call sub_3954
-07f5e  e8 e7 aa             call sub_2a48
+07f5e  e8 e7 aa             call son_effet_2
 07f61  c3                   ret
 loc_7f62:
 07f62  80 fb 00             cmp bl, 0
@@ -14978,7 +15107,7 @@ loc_7fdb:
 07ff0  74 22                je loc_8014
 07ff2  c6 06 7a ab 02       mov byte ptr [0xab7a], 2
 07ff7  a0 98 31             mov al, byte ptr [0x3198]
-07ffa  a2 93 31             mov byte ptr [0x3193], al
+07ffa  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07ffd  b9 03 00             mov cx, 3
 08000  80 3e a2 44 00       cmp byte ptr [0x44a2], 0
 08005  74 03                je loc_800a
@@ -14997,22 +15126,22 @@ loc_801c:
 0801c  be b4 01             mov si, 0x1b4
 0801f  c6 06 7a ab 01       mov byte ptr [0xab7a], 1
 08024  a0 97 31             mov al, byte ptr [0x3197]
-08027  a2 93 31             mov byte ptr [0x3193], al
+08027  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 
 ; ======== sub_802a   (appelée depuis 800e)
 0802a  56                   push si
 0802b  e8 b2 02             call sub_82e0
 0802e  5e                   pop si
 0802f  e8 77 e0             call sub_60a9
-08032  e8 3a e5             call sub_656f
+08032  e8 3a e5             call sauve_tampon
 loc_8035:
-08035  e8 c4 e3             call sub_63fc
-08038  e8 d9 dd             call sub_5e14
-0803b  e8 a6 e0             call sub_60e4
-0803e  e8 96 dd             call sub_5dd7
-08041  e8 0e b7             call sub_3752
+08035  e8 c4 e3             call curseur_memorise
+08038  e8 d9 dd             call curseur_sauve_fond
+0803b  e8 a6 e0             call affiche_tampon
+0803e  e8 96 dd             call curseur_dessine
+08041  e8 0e b7             call lit_commandes
 08044  be 82 aa             mov si, 0xaa82
-08047  e8 bb ce             call sub_4f05
+08047  e8 bb ce             call zone_cliquee
 0804a  83 fb 02             cmp bx, 2
 0804d  72 e6                jb loc_8035
 0804f  83 fb 08             cmp bx, 8
@@ -15026,14 +15155,15 @@ loc_8035:
 loc_8063:
 08063  a0 7a ab             mov al, byte ptr [0xab7a]
 08066  88 87 13 ac          mov byte ptr [bx - 0x53ed], al
-0806a  e8 db a9             call sub_2a48
+0806a  e8 db a9             call son_effet_2
 0806d  e9 e4 b8             jmp sub_3954
 
-; ======== sub_8070   (routine probable : non appelée directement)
+; ======== armurerie
+; icône armurerie : achats (« VOUS NE POUVEZ PAS VOUS PERMETTRE CELA »)
 08070  c7 06 37 46 00 00    mov word ptr [0x4637], 0    ; fiche_heros_courant
 08076  c7 06 f1 47 20 2e    mov word ptr [0x47f1], 0x2e20
 loc_807c:
-0807c  e8 a4 e9             call sub_6a23
+0807c  e8 a4 e9             call fond_vers_tampon
 0807f  be 40 7a             mov si, 0x7a40
 08082  bf c8 d4             mov di, 0xd4c8
 08085  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
@@ -15103,14 +15233,14 @@ loc_8102:
 0813b  59                   pop cx
 0813c  e2 bc                loop loc_80fa
 0813e  bd 83 ac             mov bp, 0xac83
-08141  e8 38 b0             call sub_317c
+08141  e8 38 b0             call affiche_texte
 08144  8b 1e 37 46          mov bx, word ptr [0x4637]    ; fiche_heros_courant
 08148  d1 e3                shl bx, 1
 0814a  53                   push bx
 0814b  8b b7 4b 43          mov si, word ptr [bx + 0x434b]
 0814f  e8 62 df             call sub_60b4
 08152  bd 93 ac             mov bp, 0xac93
-08155  e8 24 b0             call sub_317c
+08155  e8 24 b0             call affiche_texte
 08158  5b                   pop bx
 08159  8b b7 d7 45          mov si, word ptr [bx + 0x45d7]
 0815d  e8 54 df             call sub_60b4
@@ -15121,31 +15251,31 @@ loc_8102:
 08169  bd 87 ac             mov bp, 0xac87
 0816c  e8 6e e3             call sub_64dd
 0816f  bd 8f ac             mov bp, 0xac8f
-08172  e8 07 b0             call sub_317c
+08172  e8 07 b0             call affiche_texte
 08175  be 52 01             mov si, 0x152
 08178  e8 2e df             call sub_60a9
 0817b  5f                   pop di
 0817c  e8 f1 00             call sub_8270
-0817f  e8 ed e3             call sub_656f
+0817f  e8 ed e3             call sauve_tampon
 08182  e8 cf b7             call sub_3954
 loc_8185:
-08185  e8 74 e2             call sub_63fc
-08188  e8 89 dc             call sub_5e14
-0818b  e8 56 df             call sub_60e4
-0818e  e8 46 dc             call sub_5dd7
-08191  e8 be b5             call sub_3752
-08194  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+08185  e8 74 e2             call curseur_memorise
+08188  e8 89 dc             call curseur_sauve_fond
+0818b  e8 56 df             call affiche_tampon
+0818e  e8 46 dc             call curseur_dessine
+08191  e8 be b5             call lit_commandes
+08194  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 08199  74 03                je loc_819e
 0819b  eb 10                jmp loc_81ad
 ; ---- 1 octets non atteints (819d-819d)
 loc_819e:
 0819e  e8 a4 00             call sub_8245
 081a1  be a4 aa             mov si, 0xaaa4
-081a4  e8 5e cd             call sub_4f05
+081a4  e8 5e cd             call zone_cliquee
 081a7  8b d3                mov dx, bx
 081a9  ff a7 b3 ac          jmp word ptr [bx - 0x534d]
 loc_81ad:
-081ad  e8 98 a8             call sub_2a48
+081ad  e8 98 a8             call son_effet_2
 081b0  e9 77 f1             jmp loc_732a
 loc_81b3:
 081b3  8b da                mov bx, dx
@@ -15163,42 +15293,42 @@ loc_81b3:
 081d4  29 6c 09             sub word ptr [si + 9], bp
 081d7  0b d1                or dx, cx
 081d9  09 4c 0e             or word ptr [si + 0xe], cx
-081dc  e8 69 a8             call sub_2a48
+081dc  e8 69 a8             call son_effet_2
 081df  e8 72 b7             call sub_3954
 081e2  e9 97 fe             jmp loc_807c
 loc_81e5:
-081e5  bb 02 00             mov bx, 2
-081e8  e8 02 07             call sub_88ed
+081e5  bb 02 00             mov bx, 2    ; message « VOUS NE POUVEZ PAS / VOUS PERMETTRE CELA »
+081e8  e8 02 07             call affiche_message
 081eb  e8 66 b7             call sub_3954
 081ee  e9 8b fe             jmp loc_807c
 loc_81f1:
-081f1  bb 00 00             mov bx, 0
-081f4  e8 f6 06             call sub_88ed
+081f1  bb 00 00             mov bx, 0    ; message « VOUS POSSEDEZ DEJA CELA »
+081f4  e8 f6 06             call affiche_message
 081f7  e8 5a b7             call sub_3954
 081fa  e9 7f fe             jmp loc_807c
 loc_81fd:
 081fd  c7 06 37 46 00 00    mov word ptr [0x4637], 0    ; fiche_heros_courant
-08203  a0 95 31             mov al, byte ptr [0x3195]
-08206  a2 93 31             mov byte ptr [0x3193], al
-08209  e8 3c a8             call sub_2a48
+08203  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
+08206  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
+08209  e8 3c a8             call son_effet_2
 0820c  e9 6d fe             jmp loc_807c
 loc_820f:
 0820f  c7 06 37 46 01 00    mov word ptr [0x4637], 1    ; fiche_heros_courant
 08215  a0 96 31             mov al, byte ptr [0x3196]
-08218  a2 93 31             mov byte ptr [0x3193], al
-0821b  e8 2a a8             call sub_2a48
+08218  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
+0821b  e8 2a a8             call son_effet_2
 0821e  e9 5b fe             jmp loc_807c
 loc_8221:
 08221  c7 06 37 46 02 00    mov word ptr [0x4637], 2    ; fiche_heros_courant
 08227  a0 97 31             mov al, byte ptr [0x3197]
-0822a  a2 93 31             mov byte ptr [0x3193], al
-0822d  e8 18 a8             call sub_2a48
+0822a  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
+0822d  e8 18 a8             call son_effet_2
 08230  e9 49 fe             jmp loc_807c
 loc_8233:
 08233  c7 06 37 46 03 00    mov word ptr [0x4637], 3    ; fiche_heros_courant
 08239  a0 98 31             mov al, byte ptr [0x3198]
-0823c  a2 93 31             mov byte ptr [0x3193], al
-0823f  e8 06 a8             call sub_2a48
+0823c  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
+0823f  e8 06 a8             call son_effet_2
 08242  e9 37 fe             jmp loc_807c
 
 ; ======== sub_8245   (appelée depuis 819e)
@@ -15207,9 +15337,9 @@ loc_8233:
 0824b  bd 90 00             mov bp, 0x90
 0824e  e8 fd df             call sub_624e
 08251  bd 97 ac             mov bp, 0xac97
-08254  e8 25 af             call sub_317c
+08254  e8 25 af             call affiche_texte
 08257  be a4 aa             mov si, 0xaaa4
-0825a  e8 bd cc             call sub_4f1a
+0825a  e8 bd cc             call zone_sous_curseur
 0825d  83 fb 02             cmp bx, 2
 08260  73 01                jae loc_8263
 08262  c3                   ret
@@ -15282,7 +15412,7 @@ loc_82da:
 082df  c3                   ret
 
 ; ======== sub_82e0   (appelée depuis 802b)
-082e0  e8 40 e7             call sub_6a23
+082e0  e8 40 e7             call fond_vers_tampon
 082e3  80 3e 13 ac 00       cmp byte ptr [0xac13], 0
 082e8  75 1e                jne loc_8308
 082ea  be 00 00             mov si, 0
@@ -15383,19 +15513,19 @@ loc_83c2:
 083c2  57                   push di
 083c3  51                   push cx
 083c4  89 2d                mov word ptr [di], bp
-083c6  e8 b3 ad             call sub_317c
+083c6  e8 b3 ad             call affiche_texte
 083c9  45                   inc bp
 083ca  59                   pop cx
 083cb  5f                   pop di
 083cc  83 c7 02             add di, 2
 083cf  e2 f1                loop loc_83c2
-083d1  e8 9b e1             call sub_656f
+083d1  e8 9b e1             call sauve_tampon
 loc_83d4:
-083d4  e8 3d da             call sub_5e14
-083d7  e8 0a dd             call sub_60e4
-083da  e8 fa d9             call sub_5dd7
-083dd  e8 72 b3             call sub_3752
-083e0  a1 95 39             mov ax, word ptr [0x3995]
+083d4  e8 3d da             call curseur_sauve_fond
+083d7  e8 0a dd             call affiche_tampon
+083da  e8 fa d9             call curseur_dessine
+083dd  e8 72 b3             call lit_commandes
+083e0  a1 95 39             mov ax, word ptr [0x3995]    ; curseur_y
 083e3  d1 e8                shr ax, 1
 083e5  d1 e8                shr ax, 1
 083e7  d1 e8                shr ax, 1
@@ -15425,7 +15555,7 @@ loc_8410:
 0841b  55                   push bp
 0841c  06                   push es
 0841d  1e                   push ds
-0841e  e8 5b ad             call sub_317c
+0841e  e8 5b ad             call affiche_texte
 08421  1f                   pop ds
 08422  07                   pop es
 08423  5d                   pop bp
@@ -15438,15 +15568,16 @@ loc_8410:
 0842a  9d                   popf
 0842b  83 c7 02             add di, 2
 0842e  e2 c6                loop loc_83f6
-08430  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+08430  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 08435  75 02                jne loc_8439
 08437  eb 9b                jmp loc_83d4
 loc_8439:
 08439  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
 0843e  74 94                je loc_83d4
-08440  e9 05 a6             jmp sub_2a48
+08440  e9 05 a6             jmp son_effet_2
 
-; ======== sub_8443   (appelée depuis 7a18)
+; ======== sauve_quest_sav   (appelée depuis 7a18)
+; écrit QUEST.SAV
 08443  50                   push ax
 08444  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 08447  8e c0                mov es, ax
@@ -15507,13 +15638,13 @@ loc_84c5:
 084d1  c7 06 05 39 60 05    mov word ptr [0x3905], 0x560    ; fichier_taille
 084d7  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 084da  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
-084dd  e8 c0 b4             call sub_39a0
+084dd  e8 c0 b4             call sauve_fichier
 084e0  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 084e5  75 01                jne loc_84e8
 084e7  c3                   ret
 loc_84e8:
-084e8  bb 18 00             mov bx, 0x18
-084eb  e8 ff 03             call sub_88ed
+084e8  bb 18 00             mov bx, 0x18    ; message « IL Y A UNE ERREUR DE DISQUETTE »
+084eb  e8 ff 03             call affiche_message
 084ee  eb d5                jmp loc_84c5
 loc_84f0:
 084f0  50                   push ax
@@ -15534,7 +15665,7 @@ loc_8511:
 08511  c6 05 00             mov byte ptr [di], 0
 08514  83 c7 04             add di, 4
 08517  e2 f8                loop loc_8511
-08519  be 63 46             mov si, 0x4663
+08519  be 63 46             mov si, 0x4663    ; fiches_personnages
 0851c  bf 8f a9             mov di, 0xa98f
 0851f  50                   push ax
 08520  b8 7c 09             mov ax, 0x97c
@@ -15556,25 +15687,25 @@ loc_8511:
 08550  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8553:
 08553  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08559  e8 95 b1             call souris_cache
-0855c  e8 69 b4             call sub_39c8
+08559  e8 95 b1             call clavier_retire
+0855c  e8 69 b4             call fichier_ouvre
 0855f  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08564  75 03                jne loc_8569
 08566  eb 0f                jmp loc_8577
 ; ---- 1 octets non atteints (8568-8568)
 loc_8569:
-08569  e8 4e b1             call souris_affiche
-0856c  bb 50 02             mov bx, 0x250
-0856f  e8 7b 03             call sub_88ed
-08572  e8 7c b1             call souris_cache
+08569  e8 4e b1             call clavier_installe
+0856c  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+0856f  e8 7b 03             call affiche_message
+08572  e8 7c b1             call clavier_retire
 08575  eb dc                jmp loc_8553
 loc_8577:
-08577  e8 82 b4             call sub_39fc
+08577  e8 82 b4             call fichier_lit
 0857a  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 0857d  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08582  75 e5                jne loc_8569
-08584  e8 33 b1             call souris_affiche
-08587  e8 78 dc             call sub_6202
+08584  e8 33 b1             call clavier_installe
+08587  e8 78 dc             call efface_tampon
 0858a  1e                   push ds
 0858b  50                   push ax
 0858c  a1 31 5e             mov ax, word ptr [0x5e31]
@@ -15610,7 +15741,7 @@ loc_85c0:
 085cd  a0 c5 3f             mov al, byte ptr [0x3fc5]
 085d0  0a c1                or al, cl
 085d2  a2 c5 3f             mov byte ptr [0x3fc5], al
-085d5  a2 c6 3f             mov byte ptr [0x3fc6], al
+085d5  a2 c6 3f             mov byte ptr [0x3fc6], al    ; etat_quete
 loc_85d8:
 085d8  d0 e1                shl cl, 1
 085da  c6 07 00             mov byte ptr [bx], 0
@@ -15665,13 +15796,13 @@ loc_85d8:
 08643  55                   push bp
 08644  06                   push es
 08645  1e                   push ds
-08646  e8 da e3             call sub_6a23
+08646  e8 da e3             call fond_vers_tampon
 08649  c6 06 59 37 01       mov byte ptr [0x3759], 1
 0864e  c6 06 50 37 11       mov byte ptr [0x3750], 0x11
 08653  bd 0e 0a             mov bp, 0xa0e
-08656  e8 23 ab             call sub_317c
-08659  e8 88 da             call sub_60e4
-0865c  e8 10 df             call sub_656f
+08656  e8 23 ab             call affiche_texte
+08659  e8 88 da             call affiche_tampon
+0865c  e8 10 df             call sauve_tampon
 0865f  1f                   pop ds
 08660  07                   pop es
 08661  5d                   pop bp
@@ -15686,7 +15817,7 @@ loc_85d8:
 0866a  b8 7c 09             mov ax, 0x97c
 0866d  8e c0                mov es, ax
 0866f  58                   pop ax
-08670  bf 4a 4d             mov di, 0x4d4a
+08670  bf 4a 4d             mov di, 0x4d4a    ; monstres
 08673  b9 40 01             mov cx, 0x140
 08676  49                   dec cx
 08677  32 c0                xor al, al
@@ -15700,7 +15831,7 @@ loc_85d8:
 08686  8b 4c 06             mov cx, word ptr [si + 6]
 08689  56                   push si
 0868a  03 f2                add si, dx
-0868c  bf 4a 4d             mov di, 0x4d4a
+0868c  bf 4a 4d             mov di, 0x4d4a    ; monstres
 0868f  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
 08691  5e                   pop si
 08692  8a 4c 0a             mov cl, byte ptr [si + 0xa]
@@ -15735,17 +15866,17 @@ loc_869a:
 086da  c6 44 08 50          mov byte ptr [si + 8], 0x50
 loc_86de:
 086de  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
-086e3  e8 16 dd             call sub_63fc
+086e3  e8 16 dd             call curseur_memorise
 086e6  e8 3e 01             call sub_8827
-086e9  e8 28 d7             call sub_5e14
-086ec  e8 f5 d9             call sub_60e4
-086ef  e8 e5 d6             call sub_5dd7
-086f2  e8 5d b0             call sub_3752
+086e9  e8 28 d7             call curseur_sauve_fond
+086ec  e8 f5 d9             call affiche_tampon
+086ef  e8 e5 d6             call curseur_dessine
+086f2  e8 5d b0             call lit_commandes
 086f5  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
 086fa  74 e2                je loc_86de
-086fc  e8 03 db             call sub_6202
-086ff  e8 e2 d9             call sub_60e4
-08702  be 4a 4d             mov si, 0x4d4a
+086fc  e8 03 db             call efface_tampon
+086ff  e8 e2 d9             call affiche_tampon
+08702  be 4a 4d             mov si, 0x4d4a    ; monstres
 08705  b5 20                mov ch, 0x20
 loc_8707:
 08707  80 3c 00             cmp byte ptr [si], 0
@@ -15856,8 +15987,8 @@ loc_8826:
 
 ; ======== sub_8827   (appelée depuis 86e6)
 08827  bb 04 00             mov bx, 4
-0882a  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-0882e  81 c6 c1 5f          add si, 0x5fc1
+0882a  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+0882e  81 c6 c1 5f          add si, 0x5fc1    ; textes
 08832  c6 06 50 37 11       mov byte ptr [0x3750], 0x11
 08837  8b ee                mov bp, si
 08839  e8 63 d5             call sub_5d9f
@@ -15867,15 +15998,15 @@ loc_8826:
 08848  75 05                jne loc_884f
 0884a  c6 06 50 37 0c       mov byte ptr [0x3750], 0xc
 loc_884f:
-0884f  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+0884f  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 08854  74 04                je loc_885a
 08856  fe 06 7a ab          inc byte ptr [0xab7a]
 loc_885a:
-0885a  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+0885a  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 0885f  74 04                je loc_8865
 08861  fe 06 7a ab          inc byte ptr [0xab7a]
 loc_8865:
-08865  e9 14 a9             jmp sub_317c
+08865  e9 14 a9             jmp affiche_texte
 ; ---- 8 octets non atteints (8868-886f)
 
 ; ======== sub_8870   (appelée depuis 8a1d, 8b16)
@@ -15895,14 +16026,14 @@ loc_887e:
 ; ======== sub_8898   (appelée depuis 887e)
 08898  c6 06 50 37 11       mov byte ptr [0x3750], 0x11
 0889d  8b 6f 02             mov bp, word ptr [bx + 2]
-088a0  81 c5 c1 5f          add bp, 0x5fc1
+088a0  81 c5 c1 5f          add bp, 0x5fc1    ; textes
 088a4  8a 07                mov al, byte ptr [bx]
 088a6  3e 88 46 02          mov byte ptr ds:[bp + 2], al
 088aa  8a 47 01             mov al, byte ptr [bx + 1]
 088ad  3e 88 46 01          mov byte ptr ds:[bp + 1], al
 088b1  80 3e 3b ad 00       cmp byte ptr [0xad3b], 0
 088b6  74 32                je loc_88ea
-088b8  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+088b8  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 088bd  74 08                je loc_88c7
 088bf  c6 06 7a ab fe       mov byte ptr [0xab7a], 0xfe
 088c4  eb 24                jmp loc_88ea
@@ -15915,22 +16046,23 @@ loc_88c7:
 088d6  75 05                jne loc_88dd
 088d8  c6 06 50 37 0c       mov byte ptr [0x3750], 0xc
 loc_88dd:
-088dd  f6 06 92 39 10       test byte ptr [0x3992], 0x10
+088dd  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 088e2  74 06                je loc_88ea
 088e4  a1 e9 37             mov ax, word ptr [0x37e9]    ; erreur_fichier
 088e7  a2 7a ab             mov byte ptr [0xab7a], al
 loc_88ea:
-088ea  e9 8f a8             jmp sub_317c
+088ea  e9 8f a8             jmp affiche_texte
 
-; ======== sub_88ed   (appelée depuis 092b, 09cf, 0a03, 0c23, 0c68, 0c8b, 0f6d, 1102)
+; ======== affiche_message   (appelée depuis 01ba, 0203, 03f2, 049f, 04de, 074c, 092b, 09cf)
+; boîte de message BX (offset dans la table des textes chargée en DS:5FC1)
 088ed  ff 36 50 37          push word ptr [0x3750]
 088f1  ff 36 35 46          push word ptr [0x4635]
 088f5  c6 06 59 37 01       mov byte ptr [0x3759], 1
 088fa  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff
 088ff  c6 06 3b ad 00       mov byte ptr [0xad3b], 0
 08904  90                   nop
-08905  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-08909  81 c6 c1 5f          add si, 0x5fc1
+08905  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+08909  81 c6 c1 5f          add si, 0x5fc1    ; textes
 0890d  89 36 37 ad          mov word ptr [0xad37], si
 08911  83 06 37 ad 04       add word ptr [0xad37], 4
 08916  33 db                xor bx, bx
@@ -16003,7 +16135,7 @@ loc_897a:
 089be  e8 f7 cd             call sub_57b8
 089c1  e8 54 db             call sub_6518
 loc_89c4:
-089c4  e8 a8 db             call sub_656f
+089c4  e8 a8 db             call sauve_tampon
 089c7  bb 10 00             mov bx, 0x10
 089ca  a1 28 ad             mov ax, word ptr [0xad28]
 089cd  f7 e3                mul bx
@@ -16033,18 +16165,18 @@ loc_89f3:
 08a11  c6 06 3b ad 01       mov byte ptr [0xad3b], 1
 08a16  90                   nop
 loc_8a17:
-08a17  e8 e2 d9             call sub_63fc
+08a17  e8 e2 d9             call curseur_memorise
 08a1a  e8 53 00             call sub_8a70
 08a1d  e8 50 fe             call sub_8870
-08a20  e8 f1 d3             call sub_5e14
-08a23  e8 be d6             call sub_60e4
-08a26  e8 ae d3             call sub_5dd7
-08a29  e8 26 ad             call sub_3752
+08a20  e8 f1 d3             call curseur_sauve_fond
+08a23  e8 be d6             call affiche_tampon
+08a26  e8 ae d3             call curseur_dessine
+08a29  e8 26 ad             call lit_commandes
 08a2c  80 3e 7a ab ff       cmp byte ptr [0xab7a], 0xff
 08a31  75 02                jne loc_8a35
 08a33  eb e2                jmp loc_8a17
 loc_8a35:
-08a35  e8 10 a0             call sub_2a48
+08a35  e8 10 a0             call son_effet_2
 08a38  e8 19 af             call sub_3954
 08a3b  c6 06 3b ad 00       mov byte ptr [0xad3b], 0
 08a40  90                   nop
@@ -16062,7 +16194,7 @@ loc_8a47:
 08a5f  8f 06 50 37          pop word ptr [0x3750]
 08a63  c6 06 59 37 00       mov byte ptr [0x3759], 0
 08a68  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
-08a6d  e9 74 d6             jmp sub_60e4
+08a6d  e9 74 d6             jmp affiche_tampon
 
 ; ======== sub_8a70   (appelée depuis 89ea, 89f4, 8a1a, 8a48)
 08a70  a1 31 ad             mov ax, word ptr [0xad31]
@@ -16133,7 +16265,7 @@ loc_8ade:
 loc_8b0a:
 08b0a  c6 06 50 37 11       mov byte ptr [0x3750], 0x11
 08b0f  8b 2e 39 ad          mov bp, word ptr [0xad39]
-08b13  e8 66 a6             call sub_317c
+08b13  e8 66 a6             call affiche_texte
 08b16  e8 57 fd             call sub_8870
 08b19  a1 20 ad             mov ax, word ptr [0xad20]
 08b1c  e8 76 00             call sub_8b95
@@ -16174,7 +16306,7 @@ loc_8b72:
 08b77  74 01                je loc_8b7a
 08b79  c3                   ret
 loc_8b7a:
-08b7a  e9 67 d5             jmp sub_60e4
+08b7a  e9 67 d5             jmp affiche_tampon
 
 ; ======== sub_8b7d   (appelée depuis 89f7, 8a4b)
 08b7d  8b 0e 2a ad          mov cx, word ptr [0xad2a]
@@ -16244,7 +16376,8 @@ loc_8bc7:
 08c13  c3                   ret
 ; ---- 12 octets non atteints (8c14-8c1f)
 
-; ======== sub_8c20   (appelée depuis 2cbb)
+; ======== inventaire_sorts   (appelée depuis 2cbb)
+; WIZBACK, INVENT, SPELLIT : équipement et sorts pendant la quête (?)
 08c20  a0 a7 3f             mov al, byte ptr [0x3fa7]
 08c23  3c 04                cmp al, 4
 08c25  75 01                jne loc_8c28
@@ -16260,48 +16393,48 @@ loc_8c32:
 08c41  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8c44:
 08c44  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08c4a  e8 a4 aa             call souris_cache
-08c4d  e8 78 ad             call sub_39c8
+08c4a  e8 a4 aa             call clavier_retire
+08c4d  e8 78 ad             call fichier_ouvre
 08c50  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08c55  75 03                jne loc_8c5a
 08c57  eb 0f                jmp loc_8c68
 ; ---- 1 octets non atteints (8c59-8c59)
 loc_8c5a:
-08c5a  e8 5d aa             call souris_affiche
-08c5d  bb 52 02             mov bx, 0x252
-08c60  e8 8a fc             call sub_88ed
-08c63  e8 8b aa             call souris_cache
+08c5a  e8 5d aa             call clavier_installe
+08c5d  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+08c60  e8 8a fc             call affiche_message
+08c63  e8 8b aa             call clavier_retire
 08c66  eb dc                jmp loc_8c44
 loc_8c68:
-08c68  e8 91 ad             call sub_39fc
+08c68  e8 91 ad             call fichier_lit
 08c6b  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08c70  75 e8                jne loc_8c5a
 08c72  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-08c75  e8 42 aa             call souris_affiche
+08c75  e8 42 aa             call clavier_installe
 08c78  c7 06 07 39 b4 5e    mov word ptr [0x3907], 0x5eb4    ; fichier_nom, "invent.vga"
 08c7e  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 08c84  b8 63 14             mov ax, 0x1463
 08c87  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8c8a:
 08c8a  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08c90  e8 5e aa             call souris_cache
-08c93  e8 32 ad             call sub_39c8
+08c90  e8 5e aa             call clavier_retire
+08c93  e8 32 ad             call fichier_ouvre
 08c96  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08c9b  75 03                jne loc_8ca0
 08c9d  eb 0f                jmp loc_8cae
 ; ---- 1 octets non atteints (8c9f-8c9f)
 loc_8ca0:
-08ca0  e8 17 aa             call souris_affiche
-08ca3  bb 52 02             mov bx, 0x252
-08ca6  e8 44 fc             call sub_88ed
-08ca9  e8 45 aa             call souris_cache
+08ca0  e8 17 aa             call clavier_installe
+08ca3  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+08ca6  e8 44 fc             call affiche_message
+08ca9  e8 45 aa             call clavier_retire
 08cac  eb dc                jmp loc_8c8a
 loc_8cae:
-08cae  e8 4b ad             call sub_39fc
+08cae  e8 4b ad             call fichier_lit
 08cb1  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08cb6  75 e8                jne loc_8ca0
 08cb8  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-08cbb  e8 fc a9             call souris_affiche
+08cbb  e8 fc a9             call clavier_installe
 08cbe  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 08cc1  8e c0                mov es, ax
 08cc3  33 f6                xor si, si
@@ -16322,48 +16455,48 @@ loc_8cdd:
 08cec  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8cef:
 08cef  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08cf5  e8 f9 a9             call souris_cache
-08cf8  e8 cd ac             call sub_39c8
+08cf5  e8 f9 a9             call clavier_retire
+08cf8  e8 cd ac             call fichier_ouvre
 08cfb  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08d00  75 03                jne loc_8d05
 08d02  eb 0f                jmp loc_8d13
 ; ---- 1 octets non atteints (8d04-8d04)
 loc_8d05:
-08d05  e8 b2 a9             call souris_affiche
-08d08  bb 52 02             mov bx, 0x252
-08d0b  e8 df fb             call sub_88ed
-08d0e  e8 e0 a9             call souris_cache
+08d05  e8 b2 a9             call clavier_installe
+08d08  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+08d0b  e8 df fb             call affiche_message
+08d0e  e8 e0 a9             call clavier_retire
 08d11  eb dc                jmp loc_8cef
 loc_8d13:
-08d13  e8 e6 ac             call sub_39fc
+08d13  e8 e6 ac             call fichier_lit
 08d16  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08d1b  75 e8                jne loc_8d05
 08d1d  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-08d20  e8 97 a9             call souris_affiche
+08d20  e8 97 a9             call clavier_installe
 08d23  c7 06 07 39 50 5f    mov word ptr [0x3907], 0x5f50    ; fichier_nom, "invent.ega"
 08d29  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 08d2f  b8 63 14             mov ax, 0x1463
 08d32  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8d35:
 08d35  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08d3b  e8 b3 a9             call souris_cache
-08d3e  e8 87 ac             call sub_39c8
+08d3b  e8 b3 a9             call clavier_retire
+08d3e  e8 87 ac             call fichier_ouvre
 08d41  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08d46  75 03                jne loc_8d4b
 08d48  eb 0f                jmp loc_8d59
 ; ---- 1 octets non atteints (8d4a-8d4a)
 loc_8d4b:
-08d4b  e8 6c a9             call souris_affiche
-08d4e  bb 52 02             mov bx, 0x252
-08d51  e8 99 fb             call sub_88ed
-08d54  e8 9a a9             call souris_cache
+08d4b  e8 6c a9             call clavier_installe
+08d4e  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+08d51  e8 99 fb             call affiche_message
+08d54  e8 9a a9             call clavier_retire
 08d57  eb dc                jmp loc_8d35
 loc_8d59:
-08d59  e8 a0 ac             call sub_39fc
+08d59  e8 a0 ac             call fichier_lit
 08d5c  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08d61  75 e8                jne loc_8d4b
 08d63  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-08d66  e8 51 a9             call souris_affiche
+08d66  e8 51 a9             call clavier_installe
 08d69  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 08d6c  8e c0                mov es, ax
 08d6e  33 f6                xor si, si
@@ -16389,24 +16522,24 @@ loc_8d8f:
 08da5  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8da8:
 08da8  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08dae  e8 40 a9             call souris_cache
-08db1  e8 14 ac             call sub_39c8
+08dae  e8 40 a9             call clavier_retire
+08db1  e8 14 ac             call fichier_ouvre
 08db4  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08db9  75 03                jne loc_8dbe
 08dbb  eb 0f                jmp loc_8dcc
 ; ---- 1 octets non atteints (8dbd-8dbd)
 loc_8dbe:
-08dbe  e8 f9 a8             call souris_affiche
-08dc1  bb 52 02             mov bx, 0x252
-08dc4  e8 26 fb             call sub_88ed
-08dc7  e8 27 a9             call souris_cache
+08dbe  e8 f9 a8             call clavier_installe
+08dc1  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+08dc4  e8 26 fb             call affiche_message
+08dc7  e8 27 a9             call clavier_retire
 08dca  eb dc                jmp loc_8da8
 loc_8dcc:
-08dcc  e8 2d ac             call sub_39fc
+08dcc  e8 2d ac             call fichier_lit
 08dcf  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08dd4  75 e8                jne loc_8dbe
 08dd6  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-08dd9  e8 de a8             call souris_affiche
+08dd9  e8 de a8             call clavier_installe
 08ddc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 08ddf  8e c0                mov es, ax
 08de1  33 f6                xor si, si
@@ -16428,24 +16561,24 @@ loc_8dfb:
 08e0a  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8e0d:
 08e0d  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08e13  e8 db a8             call souris_cache
-08e16  e8 af ab             call sub_39c8
+08e13  e8 db a8             call clavier_retire
+08e16  e8 af ab             call fichier_ouvre
 08e19  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08e1e  75 03                jne loc_8e23
 08e20  eb 0f                jmp loc_8e31
 ; ---- 1 octets non atteints (8e22-8e22)
 loc_8e23:
-08e23  e8 94 a8             call souris_affiche
-08e26  bb 52 02             mov bx, 0x252
-08e29  e8 c1 fa             call sub_88ed
-08e2c  e8 c2 a8             call souris_cache
+08e23  e8 94 a8             call clavier_installe
+08e26  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+08e29  e8 c1 fa             call affiche_message
+08e2c  e8 c2 a8             call clavier_retire
 08e2f  eb dc                jmp loc_8e0d
 loc_8e31:
-08e31  e8 c8 ab             call sub_39fc
+08e31  e8 c8 ab             call fichier_lit
 08e34  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08e39  75 e8                jne loc_8e23
 08e3b  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-08e3e  e8 79 a8             call souris_affiche
+08e3e  e8 79 a8             call clavier_installe
 08e41  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 08e44  8e c0                mov es, ax
 08e46  33 f6                xor si, si
@@ -16462,7 +16595,7 @@ loc_8e5d:
 08e5d  c6 06 59 37 00       mov byte ptr [0x3759], 0
 08e62  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 loc_8e67:
-08e67  e8 b9 db             call sub_6a23
+08e67  e8 b9 db             call fond_vers_tampon
 08e6a  80 3e 67 ad 05       cmp byte ptr [0xad67], 5
 08e6f  75 03                jne loc_8e74
 08e71  e9 36 03             jmp loc_91aa
@@ -16506,11 +16639,11 @@ loc_8e74:
 08ec9  1e                   push ds
 08eca  e8 86 ac             call copie_image
 08ecd  1f                   pop ds
-08ece  e8 9e d6             call sub_656f
+08ece  e8 9e d6             call sauve_tampon
 loc_8ed1:
-08ed1  e8 28 d5             call sub_63fc
+08ed1  e8 28 d5             call curseur_memorise
 08ed4  be 9a ad             mov si, 0xad9a
-08ed7  e8 40 c0             call sub_4f1a
+08ed7  e8 40 c0             call zone_sous_curseur
 08eda  83 fb 02             cmp bx, 2
 08edd  75 20                jne loc_8eff
 08edf  be 20 40             mov si, 0x4020
@@ -16542,14 +16675,14 @@ loc_8eff:
 08f19  e8 37 ac             call copie_image
 08f1c  1f                   pop ds
 loc_8f1d:
-08f1d  e8 f4 ce             call sub_5e14
-08f20  e8 c1 d1             call sub_60e4
-08f23  e8 b1 ce             call sub_5dd7
-08f26  e8 29 a8             call sub_3752
-08f29  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+08f1d  e8 f4 ce             call curseur_sauve_fond
+08f20  e8 c1 d1             call affiche_tampon
+08f23  e8 b1 ce             call curseur_dessine
+08f26  e8 29 a8             call lit_commandes
+08f29  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 08f2e  75 2d                jne loc_8f5d
 08f30  be 82 ad             mov si, 0xad82
-08f33  e8 cf bf             call sub_4f05
+08f33  e8 cf bf             call zone_cliquee
 08f36  83 fb 08             cmp bx, 8
 08f39  77 96                ja loc_8ed1
 08f3b  83 fb 02             cmp bx, 2
@@ -16571,8 +16704,8 @@ loc_8f55:
 loc_8f5d:
 08f5d  c6 06 67 ad 00       mov byte ptr [0xad67], 0
 08f62  c6 06 59 37 01       mov byte ptr [0x3759], 1
-08f67  e8 98 d2             call sub_6202
-08f6a  e8 77 d1             call sub_60e4
+08f67  e8 98 d2             call efface_tampon
+08f6a  e8 77 d1             call affiche_tampon
 08f6d  c6 06 e9 42 0b       mov byte ptr [0x42e9], 0xb
 08f72  ff 36 e9 3f          push word ptr [0x3fe9]
 08f76  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
@@ -16586,48 +16719,48 @@ loc_8f85:
 08f94  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8f97:
 08f97  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08f9d  e8 51 a7             call souris_cache
-08fa0  e8 25 aa             call sub_39c8
+08f9d  e8 51 a7             call clavier_retire
+08fa0  e8 25 aa             call fichier_ouvre
 08fa3  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08fa8  75 03                jne loc_8fad
 08faa  eb 0f                jmp loc_8fbb
 ; ---- 1 octets non atteints (8fac-8fac)
 loc_8fad:
-08fad  e8 0a a7             call souris_affiche
-08fb0  bb 50 02             mov bx, 0x250
-08fb3  e8 37 f9             call sub_88ed
-08fb6  e8 38 a7             call souris_cache
+08fad  e8 0a a7             call clavier_installe
+08fb0  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+08fb3  e8 37 f9             call affiche_message
+08fb6  e8 38 a7             call clavier_retire
 08fb9  eb dc                jmp loc_8f97
 loc_8fbb:
-08fbb  e8 3e aa             call sub_39fc
+08fbb  e8 3e aa             call fichier_lit
 08fbe  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 08fc1  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08fc6  75 e5                jne loc_8fad
-08fc8  e8 ef a6             call souris_affiche
+08fc8  e8 ef a6             call clavier_installe
 08fcb  c7 06 07 39 66 5e    mov word ptr [0x3907], 0x5e66    ; fichier_nom, "maps.vga"
 08fd1  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 08fd7  b8 63 14             mov ax, 0x1463
 08fda  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_8fdd:
 08fdd  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-08fe3  e8 0b a7             call souris_cache
-08fe6  e8 df a9             call sub_39c8
+08fe3  e8 0b a7             call clavier_retire
+08fe6  e8 df a9             call fichier_ouvre
 08fe9  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 08fee  75 03                jne loc_8ff3
 08ff0  eb 0f                jmp loc_9001
 ; ---- 1 octets non atteints (8ff2-8ff2)
 loc_8ff3:
-08ff3  e8 c4 a6             call souris_affiche
-08ff6  bb 52 02             mov bx, 0x252
-08ff9  e8 f1 f8             call sub_88ed
-08ffc  e8 f2 a6             call souris_cache
+08ff3  e8 c4 a6             call clavier_installe
+08ff6  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+08ff9  e8 f1 f8             call affiche_message
+08ffc  e8 f2 a6             call clavier_retire
 08fff  eb dc                jmp loc_8fdd
 loc_9001:
-09001  e8 f8 a9             call sub_39fc
+09001  e8 f8 a9             call fichier_lit
 09004  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 09009  75 e8                jne loc_8ff3
 0900b  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-0900e  e8 a9 a6             call souris_affiche
+0900e  e8 a9 a6             call clavier_installe
 09011  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 09014  8e c0                mov es, ax
 09016  33 f6                xor si, si
@@ -16648,48 +16781,48 @@ loc_9030:
 0903f  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_9042:
 09042  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-09048  e8 a6 a6             call souris_cache
-0904b  e8 7a a9             call sub_39c8
+09048  e8 a6 a6             call clavier_retire
+0904b  e8 7a a9             call fichier_ouvre
 0904e  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 09053  75 03                jne loc_9058
 09055  eb 0f                jmp loc_9066
 ; ---- 1 octets non atteints (9057-9057)
 loc_9058:
-09058  e8 5f a6             call souris_affiche
-0905b  bb 50 02             mov bx, 0x250
-0905e  e8 8c f8             call sub_88ed
-09061  e8 8d a6             call souris_cache
+09058  e8 5f a6             call clavier_installe
+0905b  bb 50 02             mov bx, 0x250    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 2 »
+0905e  e8 8c f8             call affiche_message
+09061  e8 8d a6             call clavier_retire
 09064  eb dc                jmp loc_9042
 loc_9066:
-09066  e8 93 a9             call sub_39fc
+09066  e8 93 a9             call fichier_lit
 09069  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 0906c  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 09071  75 e5                jne loc_9058
-09073  e8 44 a6             call souris_affiche
+09073  e8 44 a6             call clavier_installe
 09076  c7 06 07 39 02 5f    mov word ptr [0x3907], 0x5f02    ; fichier_nom, "maps.ega"
 0907c  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 09082  b8 63 14             mov ax, 0x1463
 09085  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 loc_9088:
 09088  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
-0908e  e8 60 a6             call souris_cache
-09091  e8 34 a9             call sub_39c8
+0908e  e8 60 a6             call clavier_retire
+09091  e8 34 a9             call fichier_ouvre
 09094  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 09099  75 03                jne loc_909e
 0909b  eb 0f                jmp loc_90ac
 ; ---- 1 octets non atteints (909d-909d)
 loc_909e:
-0909e  e8 19 a6             call souris_affiche
-090a1  bb 52 02             mov bx, 0x252
-090a4  e8 46 f8             call sub_88ed
-090a7  e8 47 a6             call souris_cache
+0909e  e8 19 a6             call clavier_installe
+090a1  bb 52 02             mov bx, 0x252    ; message « INTRODUISEZ VOTRE / HEROQUEST DISQUETTE 3 »
+090a4  e8 46 f8             call affiche_message
+090a7  e8 47 a6             call clavier_retire
 090aa  eb dc                jmp loc_9088
 loc_90ac:
-090ac  e8 4d a9             call sub_39fc
+090ac  e8 4d a9             call fichier_lit
 090af  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
 090b4  75 e8                jne loc_909e
 090b6  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
-090b9  e8 fe a5             call souris_affiche
+090b9  e8 fe a5             call clavier_installe
 090bc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
 090bf  8e c0                mov es, ax
 090c1  33 f6                xor si, si
@@ -16703,7 +16836,7 @@ loc_90ac:
 090d5  8e d8                mov ds, ax
 090d7  58                   pop ax
 loc_90d8:
-090d8  e8 48 d9             call sub_6a23
+090d8  e8 48 d9             call fond_vers_tampon
 090db  8f 06 e9 3f          pop word ptr [0x3fe9]
 090df  e9 c8 81             jmp loc_12aa
 loc_90e2:
@@ -16806,11 +16939,11 @@ loc_91aa:
 091d9  e8 76 04             call sub_9652
 loc_91dc:
 091dc  e8 48 03             call sub_9527
-091df  e8 8d d3             call sub_656f
+091df  e8 8d d3             call sauve_tampon
 loc_91e2:
-091e2  e8 17 d2             call sub_63fc
+091e2  e8 17 d2             call curseur_memorise
 091e5  be 04 ae             mov si, 0xae04
-091e8  e8 2f bd             call sub_4f1a
+091e8  e8 2f bd             call zone_sous_curseur
 091eb  83 fb 02             cmp bx, 2
 091ee  75 20                jne loc_9210
 091f0  be 20 40             mov si, 0x4020
@@ -16857,11 +16990,11 @@ loc_924b:
 09252  c6 06 45 ad 0c       mov byte ptr [0xad45], 0xc
 09257  90                   nop
 loc_9258:
-09258  e8 21 9f             call sub_317c
+09258  e8 21 9f             call affiche_texte
 0925b  83 3e 6a ad ff       cmp word ptr [0xad6a], -1
 09260  74 25                je loc_9287
 09262  be a4 ad             mov si, 0xada4
-09265  e8 b2 bc             call sub_4f1a
+09265  e8 b2 bc             call zone_sous_curseur
 09268  83 fb 02             cmp bx, 2
 0926b  72 1a                jb loc_9287
 0926d  83 fb 18             cmp bx, 0x18
@@ -16874,16 +17007,16 @@ loc_9258:
 09280  8b b4 fe 44          mov si, word ptr [si + 0x44fe]
 09284  e8 6a d1             call sub_63f1
 loc_9287:
-09287  e8 8a cb             call sub_5e14
-0928a  e8 57 ce             call sub_60e4
-0928d  e8 47 cb             call sub_5dd7
-09290  e8 bf a4             call sub_3752
-09293  f6 06 92 39 20       test byte ptr [0x3992], 0x20
+09287  e8 8a cb             call curseur_sauve_fond
+0928a  e8 57 ce             call affiche_tampon
+0928d  e8 47 cb             call curseur_dessine
+09290  e8 bf a4             call lit_commandes
+09293  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 09298  74 03                je loc_929d
 0929a  e9 c0 fc             jmp loc_8f5d
 loc_929d:
 0929d  be a4 ad             mov si, 0xada4
-092a0  e8 62 bc             call sub_4f05
+092a0  e8 62 bc             call zone_cliquee
 092a3  83 fb 1a             cmp bx, 0x1a
 092a6  76 03                jbe loc_92ab
 092a8  e9 37 ff             jmp loc_91e2
@@ -16960,15 +17093,15 @@ loc_9339:
 09349  eb 0a                jmp loc_9355
 ; ---- 1 octets non atteints (934b-934b)
 loc_934c:
-0934c  bb 2c 00             mov bx, 0x2c
-0934f  e8 9b f5             call sub_88ed
+0934c  bb 2c 00             mov bx, 0x2c    ; message « VOUS NE POUVEZ PAS UTILISER UN / BOUCLIER AVEC LA HACHE D'ARMES »
+0934f  e8 9b f5             call affiche_message
 09352  e9 92 fd             jmp loc_90e7
 loc_9355:
 09355  08 55 13             or byte ptr [di + 0x13], dl
 09358  e9 8c fd             jmp loc_90e7
 loc_935b:
-0935b  bb 2a 00             mov bx, 0x2a
-0935e  e8 8c f5             call sub_88ed
+0935b  bb 2a 00             mov bx, 0x2a    ; message « VOTRE PERSONNAGE / NE PEUT PAS UTILISER CELA »
+0935e  e8 8c f5             call affiche_message
 09361  e9 83 fd             jmp loc_90e7
 loc_9364:
 09364  30 55 13             xor byte ptr [di + 0x13], dl
@@ -17005,7 +17138,8 @@ loc_93a9:
 093a9  c7 45 11 00 00       mov word ptr [di + 0x11], 0
 093ae  e9 36 fd             jmp loc_90e7
 
-; ======== sub_93b1   (routine probable : non appelée directement)
+; ======== boit_potion
+; « LE FLUIDE VOUS RANIME »
 093b1  88 55 11             mov byte ptr [di + 0x11], dl
 093b4  80 65 14 07          and byte ptr [di + 0x14], 7
 093b8  e9 2c fd             jmp loc_90e7
@@ -17046,8 +17180,8 @@ loc_93ff:
 09407  74 4a                je loc_9453
 09409  84 55 17             test byte ptr [di + 0x17], dl
 0940c  74 09                je loc_9417
-0940e  bb 90 00             mov bx, 0x90
-09411  e8 d9 f4             call sub_88ed
+0940e  bb 90 00             mov bx, 0x90    ; message « VOUS AVEZ TOUJOURS CETTE / POTION DANS LE SANG »
+09411  e8 d9 f4             call affiche_message
 09414  e9 d0 fc             jmp loc_90e7
 loc_9417:
 09417  08 55 17             or byte ptr [di + 0x17], dl
@@ -17068,7 +17202,7 @@ loc_943c:
 09445  d1 e3                shl bx, 1
 09447  8b b7 62 ae          mov si, word ptr [bx - 0x519e]
 0944b  8b de                mov bx, si
-0944d  e8 9d f4             call sub_88ed
+0944d  e8 9d f4             call affiche_message
 09450  e9 94 fc             jmp loc_90e7
 loc_9453:
 09453  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
@@ -17089,8 +17223,8 @@ loc_947a:
 0947a  80 75 10 04          xor byte ptr [di + 0x10], 4
 0947e  80 65 17 04          and byte ptr [di + 0x17], 4
 loc_9482:
-09482  bb 82 00             mov bx, 0x82
-09485  e8 65 f4             call sub_88ed
+09482  bb 82 00             mov bx, 0x82    ; message « LE FLUIDE VOUS RANIME »
+09485  e8 65 f4             call affiche_message
 09488  e9 5c fc             jmp loc_90e7
 loc_948b:
 0948b  8b 0e e0 3f          mov cx, word ptr [0x3fe0]
@@ -17125,14 +17259,14 @@ loc_94ba:
 094c9  74 15                je loc_94e0
 094cb  a0 7a ab             mov al, byte ptr [0xab7a]
 094ce  bb ae 01             mov bx, 0x1ae
-094d1  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]
-094d5  81 c6 c1 5f          add si, 0x5fc1
+094d1  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
+094d5  81 c6 c1 5f          add si, 0x5fc1    ; textes
 094d9  04 30                add al, 0x30
 094db  88 04                mov byte ptr [si], al
 094dd  be 84 00             mov si, 0x84
 loc_94e0:
 094e0  8b de                mov bx, si
-094e2  e8 08 f4             call sub_88ed
+094e2  e8 08 f4             call affiche_message
 094e5  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 094e9  80 4d 17 10          or byte ptr [di + 0x17], 0x10
 094ed  80 75 10 10          xor byte ptr [di + 0x10], 0x10
@@ -17149,7 +17283,7 @@ loc_9500:
 09502  72 01                jb loc_9505
 09504  c3                   ret
 loc_9505:
-09505  e8 38 79             call sub_10e40
+09505  e8 38 79             call sub_0e40
 09508  80 7f 08 04          cmp byte ptr [bx + 8], 4
 0950c  74 10                je loc_951e
 0950e  80 7f 08 05          cmp byte ptr [bx + 8], 5
@@ -17166,7 +17300,7 @@ loc_951e:
 09524  e9 f9 8b             jmp sub_2120
 
 ; ======== sub_9527   (appelée depuis 91dc)
-09527  e8 f9 d4             call sub_6a23
+09527  e8 f9 d4             call fond_vers_tampon
 0952a  be 20 34             mov si, 0x3420
 0952d  bf 28 e2             mov di, 0xe228
 09530  a1 2d 5e             mov ax, word ptr [0x5e2d]    ; seg_odds
@@ -17314,14 +17448,15 @@ loc_965b:
 09661  d0 e8                shr al, 1
 09663  50                   push ax
 09664  73 03                jae loc_9669
-09666  e8 07 00             call sub_9670
+09666  e8 07 00             call sort_genie
 loc_9669:
 09669  58                   pop ax
 0966a  83 c6 02             add si, 2
 0966d  e2 f2                loop sub_9661
 0966f  c3                   ret
 
-; ======== sub_9670   (appelée depuis 9666)
+; ======== sort_genie   (appelée depuis 9666)
+; « ORDONNEZ AU GENIE DE ... »
 09670  bf 6a ad             mov di, 0xad6a
 09673  b9 0c 00             mov cx, 0xc
 loc_9676:
@@ -17340,8 +17475,8 @@ loc_9685:
 09691  74 03                je loc_9696
 09693  e9 c7 f8             jmp loc_8f5d
 loc_9696:
-09696  bb 7c 00             mov bx, 0x7c
-09699  e8 51 f2             call sub_88ed
+09696  bb 7c 00             mov bx, 0x7c    ; message « ORDONNEZ AU GENIE DE »
+09699  e8 51 f2             call affiche_message
 0969c  80 3e 7a ab 02       cmp byte ptr [0xab7a], 2
 096a1  75 13                jne loc_96b6
 096a3  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe
@@ -17358,7 +17493,7 @@ loc_96c0:
 096c4  c6 45 16 0d          mov byte ptr [di + 0x16], 0xd
 096c8  e9 92 f8             jmp loc_8f5d
 loc_96cb:
-096cb  e8 4d 7f             call sub_1161b
+096cb  e8 4d 7f             call sub_161b
 096ce  8a 55 03             mov dl, byte ptr [di + 3]
 096d1  be 99 43             mov si, 0x4399
 096d4  c7 06 f7 37 05 00    mov word ptr [0x37f7], 5
@@ -17413,7 +17548,7 @@ loc_9730:
 09730  fe 4d 06             dec byte ptr [di + 6]
 09733  57                   push di
 09734  8b de                mov bx, si
-09736  e8 b4 f1             call sub_88ed
+09736  e8 b4 f1             call affiche_message
 09739  5f                   pop di
 0973a  80 7d 06 00          cmp byte ptr [di + 6], 0
 0973e  74 03                je loc_9743
@@ -17421,7 +17556,7 @@ loc_9730:
 loc_9743:
 09743  a0 a7 3f             mov al, byte ptr [0x3fa7]
 09746  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
-09749  e8 8c 79             call sub_110d8
+09749  e8 8c 79             call mort_heros
 0974c  e9 0e f8             jmp loc_8f5d
 loc_974f:
 0974f  a0 a7 3f             mov al, byte ptr [0x3fa7]
@@ -17459,12 +17594,12 @@ loc_978f:
 0978f  be 48 00             mov si, 0x48
 loc_9792:
 09792  8b de                mov bx, si
-09794  e8 56 f1             call sub_88ed
+09794  e8 56 f1             call affiche_message
 09797  e9 4d f9             jmp loc_90e7
 
 ; ======== sub_979a   (appelée depuis 96f5)
 0979a  52                   push dx
-0979b  e8 64 7e             call sub_11602
+0979b  e8 64 7e             call sub_1602
 0979e  5a                   pop dx
 0979f  53                   push bx
 097a0  3a c2                cmp al, dl
