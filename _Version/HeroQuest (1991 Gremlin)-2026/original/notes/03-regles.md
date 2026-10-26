@@ -63,7 +63,7 @@ Les positions à l'écran ne sont pas dans le fichier : la table est remplie à 
 | 15 | 0x22C « C'EST UNE PIECE TOURNANTE. ATTENTION EN LA QUITTANT » |
 | 16 | 0x234 « LA BRUME DE LA MORT HANTE CES SALLES » |
 
-Les numéros de quête du code (`numero_quete`, DS:3F92) commencent à 0 : la quête 1 du code est la 2e du jeu (Sir Ragnar), la 6 la 7e (Le chasseur de pierres, Karlen), la 9 la 10e (Château des mystères, la mine d'or). Les trois messages le confirment. Les quêtes 15 et 16 du code sont donc les 16e et 17e du jeu (Les salles glacées, Les couloirs silencieux).
+Les numéros de quête du code (`numero_quete`, DS:3F92) commencent à 0 : la quête 1 du code est la 2e du jeu (Sir Ragnar), la 6 la 7e (LE CHASSEUR DE PIERRES, Karlen), la 9 la 10e (CHATEAU DES MYSTERES, la mine d'or). Les trois messages le confirment. Les quêtes 15 et 16 du code sont donc les 16e et 17e du jeu (LES SALLES FROIDES, LES COULOIRS SILENCIEUX).
 
 ## Fouilles scriptées
 
@@ -150,7 +150,7 @@ Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTIL
 1. Rien si le monstre n'existe pas ou porte le bit 0x80.
 2. Octet +6 : bit 1 = réveillé (sinon il ne joue pas) ; bit 4 = endormi, il ne se réveille que sur un 6 ; bit 2 = passe ce tour.
 3. Pour chacun des 5 personnages, dans l'ordre des fiches, `monstre_vise` cherche un chemin jusqu'à lui (ci-dessous). Le premier personnage atteignable est attaqué : le monstre avance (`monstre_avance`), puis frappe (`combat_monstre`). Sinon le monstre reste sur place.
-4. Quête 16 du code (17e du jeu, Les couloirs silencieux) : la brume de la mort se déplace 6 fois par tour, par une table de routines (DS:4657).
+4. Quête 16 du code (17e du jeu, LES COULOIRS SILENCIEUX) : la brume de la mort se déplace 6 fois par tour, par une table de routines (DS:4657).
 
 `monstre_vise` (0x22C3) :
 
@@ -192,6 +192,27 @@ Les types 14 à 26 (extension) sont dans la même table. Une routine de mort est
 
 Les bits hauts de la table (0x80 pour le bâton, l'épée courte, la lance et l'arbalète ; 0x40, 0x20, 0x10) sont sans doute les portées (diagonale, lancer, tir) : à lire. Le poison d'orc donne 2 dés, la lame de l'esprit 3 (4 contre squelettes, zombis et momies). Puis (0x0B44) : contre le Sorcier-Roi, aucun dé sans la lame de l'esprit ; +2 avec la potion de force ou le courage, consommés par cette attaque.
 
+## Pièges
+
+Quand un héros entre sur une case dont le code de `grille_occupants` est entre 0x32 et 0x36, `entre_piege` (0x4DC7) arrête son déplacement, change le code de la case et déclenche un piège (table `pieges`, DS:45A6). Rien ne se passe si un personnage est déjà sur la case (?).
+
+| Code | Devient | Piège | Effet (`declenche_piege`, `piege_des`) |
+| --- | --- | --- | --- |
+| 0x32 fosse cachée | 0x33 | 1 | « LE SOL S'EFFONDRE SOUS VOS PIEDS », 1 point de corps perdu |
+| 0x33 fosse connue | 0x33 | 2 | un dé de combat : sur un crâne, « LE MECANISME DE LA TRAPPE CRAQUE ... MAIS TIENT BON » ; sinon comme la fosse cachée |
+| 0x34 chute de pierre | 0x34 | 4 | un dé à 6 faces : sur un 6, sans casque, « DE LA MAÇONNERIE TOMBE DU TOIT », 1 point de corps perdu ; sinon elle manque. La case passe ensuite à 0x31 |
+| 0x35 | 0x35 | 0 | rien |
+| 0x36 lance | 0 (retirée) | 3 | un dé de combat : sur un crâne, rien ; sinon « PIEGE A LANCES », 1 point de corps perdu |
+
+Le déplacement restant tombe à 0 après le piège. Un héros à 0 point de corps meurt (`mort_heros`).
+
+Chute de pierre, règles propres :
+
+- 5e quête (LABYRINTHE DE MELAR) : « UN ROCHER TOMBE DANS LE COULOIR ET BOUCHE LE PASSAGE » ; un éboulis est posé en (25, 7). Si un héros y est, il perd 1 point de corps (`trois_des_un_point`).
+- 12e quête (BROUETTE DU SORCIER, code 11) : le rocher ne tombe qu'une fois tous les héros passés (`heros_absents` = 0Fh) ; l'éboulis est posé en (0, 0) (?).
+
+La trousse à outils et la fouille des pièges retirent ces codes ([objets](#objets)).
+
 ## Fin de quête
 
 Un héros sort de la quête quand il est sur l'escalier (codes 0x38 à 0x3B de `grille_occupants`) et que le premier octet de son état de tour (DS:4639) vaut 1 (à préciser). C'est `fin_quete` (0x184E), appelée à chaque passage de la boucle du tour :
@@ -201,13 +222,13 @@ Un héros sort de la quête quand il est sur l'escalier (codes 0x38 à 0x3B de `
 
 | Quête du jeu | Routine | Effet |
 | --- | --- | --- |
-| 1 Le labyrinthe | `fin_labyrinthe` | le premier sorti reçoit 100 pièces d'or |
-| 2 Le sauvetage de Sir Ragnar | `fin_ragnar` | quand Sir Ragnar sort : « L'EMPEREUR OFFRE 100 PIECES D'OR AU SAUVEUR », mais le héros qui l'a trouvé (`evenement_a`) reçoit 200 pièces |
-| 4 L'or du prince Magnus | `fin_or_prince` | avec le coffre (+0x0F bit 0x40) : « GARDER LE COFFRE » ou « RENDEZ-LE AU PRINCE » (récompense de 200 annoncée, 50 pièces retirées de l'or). Puis, s'il reste des coffres : « ABANDONNEZ LA QUETE » ou « ALLEZ CHERCHER PLUS D'OR » (le héros revient en (3, 11) ou sur une case voisine libre) |
-| 7 Le chasseur de pierres | `fin_karlen` | 100 pièces si Karlen a été trouvé (`evenement_b` posé) |
-| 8 Le mage du feu | `fin_balur` | 150 pièces au héros qui a tué Balur ; sinon « BALUR EST TOUJOURS VIVANT » |
-| 9 Course contre la montre | `fin_course` | retire l'objet de quête (+0x0F bit 0x40) |
-| 10 Le château des mystères | `fin_or_faux` | si le héros a l'or de la mine (+0x0F bit 0x20) : 5000 pièces retirées, « L'OR TROUVE DANS LA MINE ETAIT FAUX » |
+| 1 LE LABYRINTHE | `fin_labyrinthe` | le premier sorti reçoit 100 pièces d'or |
+| 2 SAUVETAGE DE SIR RAGNARD | `fin_ragnar` | quand Sir Ragnar sort : « L'EMPEREUR OFFRE 100 PIECES D'OR AU SAUVEUR », mais le héros qui l'a trouvé (`evenement_a`) reçoit 200 pièces |
+| 4 L'OR DU PRINCE MAGNUS | `fin_or_prince` | avec le coffre (+0x0F bit 0x40) : « GARDER LE COFFRE » ou « RENDEZ-LE AU PRINCE » (récompense de 200 annoncée, 50 pièces retirées de l'or). Puis, s'il reste des coffres : « ABANDONNEZ LA QUETE » ou « ALLEZ CHERCHER PLUS D'OR » (le héros revient en (3, 11) ou sur une case voisine libre) |
+| 7 LE CHASSEUR DE PIERRES | `fin_karlen` | 100 pièces si Karlen a été trouvé (`evenement_b` posé) |
+| 8 LE MAGE DU FEU | `fin_balur` | 150 pièces au héros qui a tué Balur ; sinon « BALUR EST TOUJOURS VIVANT » |
+| 9 COURSE CONTRE LA MONTRE | `fin_course` | retire l'objet de quête (+0x0F bit 0x40) |
+| 10 CHATEAU DES MYSTERES | `fin_or_faux` | si le héros a l'or de la mine (+0x0F bit 0x20) : 5000 pièces retirées, « L'OR TROUVE DANS LA MINE ETAIT FAUX » |
 
 `ajoute_or` (0x6906) n'ajoute rien si le héros a déjà 9999 pièces ou plus.
 

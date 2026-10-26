@@ -11,7 +11,7 @@
 0x17a5  code  source_mur             source d'un mur selon l'orientation
 0x1e90  code  attaque_contre_heros   le héros compte comme boucliers les faces autres que le bouclier blanc (4 sur 6) ; crânes du monstre moins boucliers = blessures
 0x21b7  code  de_combat              face d'un dé de combat dans BL : 0 crâne, 1 bouclier blanc, 2 bouclier noir
-0x25bf  code  piege_des              jet de dé d'un piège selon AL
+0x25bf  code  piege_des              effet du piège DS:3FC2 : 2 fosse connue, 3 lance, 4 chute de pierre
 0x26af  code  trois_des_un_point     trois dés lancés, un point de corps perdu ; code automodifié en 0x26C9
 0x3174  code  ligne_ecran            BX += AX * 320
 0x3613  code  hasard                 nombre de 1 à BL dans AL (registre à décalage DS:38FD)
@@ -326,3 +326,12 @@
 0x3fbd  var   heros_sortis           nombre de héros sortis (quête 1)
 0x3fbe  var   coffres_rapportes      quête 4 : coffres d'or rapportés (3 en tout) (?)
 0x3fe7  var   fin_du_jeu             posé : écran final après la 15e quête ; qui le pose : à trouver
+
+# ---- Pièges (voir original/notes/03-regles.md#pièges)
+0x45a6  table pieges                 pour les codes 0x32 à 0x36 : nouveau code de la case, type de piège déclenché
+0x4dc7  code  entre_piege            le héros entre sur une case de code < 0x37 : change le code, pose DS:3FC2, arrête le déplacement
+0x2575  etiq  declenche_piege        applique le piège DS:3FC2 au héros courant ; 1 fosse cachée
+0x2666  etiq  chute_maconnerie       un dé : sur un 6 et sans casque, 1 point de corps perdu
+0x1287  code  personnage_en_dx       AL = 1 si un personnage est sur la case DX
+0x3fc2  var   piege_en_cours         type de piège à appliquer (0 aucun)
+0x3fec  var   case_piege             index de la case du piège

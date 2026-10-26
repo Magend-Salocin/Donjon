@@ -685,7 +685,7 @@ loc_06cd:
 
 ; ======== sub_06d0   (appelée depuis 042b)
 006d0  e8 03 00             call sub_06d6
-006d3  e9 9f 1e             jmp loc_2575
+006d3  e9 9f 1e             jmp declenche_piege
 
 ; ======== sub_06d6   (appelée depuis 06d0)
 006d6  a0 92 3f             mov al, byte ptr [0x3f92]    ; numero_quete
@@ -754,7 +754,7 @@ loc_0726:
 0075b  74 01                je loc_075e
 0075d  c3                   ret
 loc_075e:
-0075e  80 3e c2 3f 00       cmp byte ptr [0x3fc2], 0
+0075e  80 3e c2 3f 00       cmp byte ptr [0x3fc2], 0    ; piege_en_cours
 00763  74 01                je loc_0766
 00765  c3                   ret
 loc_0766:
@@ -2089,7 +2089,7 @@ loc_1252:
 loc_126e:
 0126e  8a 36 a6 3f          mov dh, byte ptr [0x3fa6]
 01272  8a 16 a5 3f          mov dl, byte ptr [0x3fa5]
-01276  e8 0e 00             call sub_1287
+01276  e8 0e 00             call personnage_en_dx
 01279  a2 a8 3f             mov byte ptr [0x3fa8], al    ; resultat_vise
 0127c  eb 06                jmp loc_1284
 ; ---- 1 octets non atteints (127e-127e)
@@ -2100,7 +2100,8 @@ loc_1284:
 01285  5b                   pop bx
 01286  c3                   ret
 
-; ======== sub_1287   (appelée depuis 1276, 48b0, 4978, 4a3f, 4b07, 4c24, 4dcc, 6874)
+; ======== personnage_en_dx   (appelée depuis 1276, 48b0, 4978, 4a3f, 4b07, 4c24, 4dcc, 6874)
+; AL = 1 si un personnage est sur la case DX
 01287  51                   push cx
 01288  57                   push di
 01289  b9 05 00             mov cx, 5
@@ -4297,20 +4298,20 @@ loc_2533:
 02570  e8 e0 15             call copie_image
 02573  1f                   pop ds
 02574  c3                   ret
-loc_2575:
+declenche_piege:    ; applique le piège DS:3FC2 au héros courant ; 1 fosse cachée
 02575  8b 36 39 46          mov si, word ptr [0x4639]
 02579  80 3c 02             cmp byte ptr [si], 2
 0257c  75 01                jne loc_257f
 0257e  c3                   ret
 loc_257f:
-0257f  a0 c2 3f             mov al, byte ptr [0x3fc2]
+0257f  a0 c2 3f             mov al, byte ptr [0x3fc2]    ; piege_en_cours
 02582  0a c0                or al, al
 02584  75 01                jne loc_2587
 02586  c3                   ret
 loc_2587:
 02587  3c 01                cmp al, 1
 02589  75 34                jne piege_des
-0258b  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0
+0258b  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0    ; piege_en_cours
 loc_2590:
 02590  be 20 01             mov si, 0x120
 loc_2593:
@@ -4332,10 +4333,10 @@ loc_25be:
 025be  c3                   ret
 
 ; ======== piege_des
-; jet de dé d'un piège selon AL
+; effet du piège DS:3FC2 : 2 fosse connue, 3 lance, 4 chute de pierre
 025bf  3c 02                cmp al, 2
 025c1  75 13                jne loc_25d6
-025c3  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0
+025c3  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0    ; piege_en_cours
 025c8  e8 ec fb             call de_combat
 025cb  0a db                or bl, bl
 025cd  75 c1                jne loc_2590
@@ -4345,7 +4346,7 @@ loc_25be:
 loc_25d6:
 025d6  3c 03                cmp al, 3
 025d8  75 12                jne loc_25ec
-025da  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0
+025da  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0    ; piege_en_cours
 025df  e8 d5 fb             call de_combat
 025e2  0a db                or bl, bl
 025e4  75 01                jne loc_25e7
@@ -4354,11 +4355,11 @@ loc_25e7:
 025e7  be 30 00             mov si, 0x30
 025ea  eb a7                jmp loc_2593
 loc_25ec:
-025ec  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0
+025ec  c6 06 c2 3f 00       mov byte ptr [0x3fc2], 0    ; piege_en_cours
 025f1  80 3e 92 3f 0b       cmp byte ptr [0x3f92], 0xb    ; numero_quete
 025f6  74 34                je loc_262c
 025f8  80 3e 92 3f 04       cmp byte ptr [0x3f92], 4    ; numero_quete
-025fd  75 67                jne loc_2666
+025fd  75 67                jne chute_maconnerie
 025ff  bb 3e 00             mov bx, 0x3e    ; message « UN ROCHER TOMBE / DANS LE COULOIR ET / BOUCHE LE PASSAGE »
 02602  e8 e8 62             call affiche_message
 02605  e8 1d f2             call sub_1825
@@ -4397,7 +4398,7 @@ loc_263a:
 0265e  74 4f                je trois_des_un_point
 02660  c6 06 6f 58 31       mov byte ptr [0x586f], 0x31    ; grille_occupants
 02665  c3                   ret
-loc_2666:
+chute_maconnerie:    ; un dé : sur un 6 et sans casque, 1 point de corps perdu
 02666  e8 ca 39             call de6_moins_un
 02669  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 0266d  56                   push si
@@ -4422,7 +4423,7 @@ loc_2693:
 02698  e8 8a f1             call sub_1825
 0269b  e8 39 00             call sub_26d7
 0269e  5e                   pop si
-0269f  8b 1e ec 3f          mov bx, word ptr [0x3fec]
+0269f  8b 1e ec 3f          mov bx, word ptr [0x3fec]    ; case_piege
 026a3  c6 87 6f 58 31       mov byte ptr [bx + 0x586f], 0x31    ; grille_occupants
 026a8  80 7c 06 00          cmp byte ptr [si + 6], 0
 026ac  74 20                je loc_26ce
@@ -8851,7 +8852,7 @@ loc_4891:
 loc_48ab:
 048ab  8a 75 02             mov dh, byte ptr [di + 2]
 048ae  fe ca                dec dl
-048b0  e8 d4 c9             call sub_1287
+048b0  e8 d4 c9             call personnage_en_dx
 048b3  0a c0                or al, al
 048b5  74 03                je loc_48ba
 048b7  e9 e5 04             jmp loc_4d9f
@@ -8923,7 +8924,7 @@ loc_494f:
 0494f  8a 55 01             mov dl, byte ptr [di + 1]
 04952  8a 75 02             mov dh, byte ptr [di + 2]
 04955  fe ca                dec dl
-04957  e8 6d 04             call sub_4dc7
+04957  e8 6d 04             call entre_piege
 loc_495a:
 0495a  8b 5d 04             mov bx, word ptr [di + 4]
 0495d  08 2f                or byte ptr [bx], ch
@@ -8940,7 +8941,7 @@ loc_495a:
 loc_4973:
 04973  fe c2                inc dl
 04975  8a 75 02             mov dh, byte ptr [di + 2]
-04978  e8 0c c9             call sub_1287
+04978  e8 0c c9             call personnage_en_dx
 0497b  0a c0                or al, al
 0497d  74 03                je loc_4982
 0497f  e9 1d 04             jmp loc_4d9f
@@ -9013,7 +9014,7 @@ loc_4a16:
 04a16  8a 55 01             mov dl, byte ptr [di + 1]
 04a19  8a 75 02             mov dh, byte ptr [di + 2]
 04a1c  fe c2                inc dl
-04a1e  e8 a6 03             call sub_4dc7
+04a1e  e8 a6 03             call entre_piege
 loc_4a21:
 04a21  8b 5d 04             mov bx, word ptr [di + 4]
 04a24  43                   inc bx
@@ -9030,7 +9031,7 @@ loc_4a21:
 04a3a  e9 62 03             jmp loc_4d9f
 loc_4a3d:
 04a3d  fe ce                dec dh
-04a3f  e8 45 c8             call sub_1287
+04a3f  e8 45 c8             call personnage_en_dx
 04a42  0a c0                or al, al
 04a44  74 03                je loc_4a49
 04a46  e9 56 03             jmp loc_4d9f
@@ -9101,7 +9102,7 @@ loc_4adc:
 04adc  8a 55 01             mov dl, byte ptr [di + 1]
 04adf  8a 75 02             mov dh, byte ptr [di + 2]
 04ae2  fe ce                dec dh
-04ae4  e8 e0 02             call sub_4dc7
+04ae4  e8 e0 02             call entre_piege
 loc_4ae7:
 04ae7  8b 5d 04             mov bx, word ptr [di + 4]
 04aea  08 2f                or byte ptr [bx], ch
@@ -9118,7 +9119,7 @@ loc_4ae7:
 04b02  e9 9a 02             jmp loc_4d9f
 loc_4b05:
 04b05  fe c6                inc dh
-04b07  e8 7d c7             call sub_1287
+04b07  e8 7d c7             call personnage_en_dx
 04b0a  0a c0                or al, al
 04b0c  74 03                je loc_4b11
 04b0e  e9 8e 02             jmp loc_4d9f
@@ -9190,7 +9191,7 @@ loc_4ba7:
 04ba7  8a 55 01             mov dl, byte ptr [di + 1]
 04baa  8a 75 02             mov dh, byte ptr [di + 2]
 04bad  fe c6                inc dh
-04baf  e8 15 02             call sub_4dc7
+04baf  e8 15 02             call entre_piege
 loc_4bb2:
 04bb2  8b 5d 04             mov bx, word ptr [di + 4]
 04bb5  83 c3 1a             add bx, 0x1a
@@ -9237,7 +9238,7 @@ loc_4c12:
 04c1d  32 ff                xor bh, bh
 04c1f  8b 97 df 43          mov dx, word ptr [bx + 0x43df]
 04c23  53                   push bx
-04c24  e8 60 c6             call sub_1287
+04c24  e8 60 c6             call personnage_en_dx
 04c27  5b                   pop bx
 04c28  3c 01                cmp al, 1
 04c2a  74 e6                je loc_4c12
@@ -9410,11 +9411,12 @@ loc_4d9f:
 04dc4  74 e4                je sub_4daa
 04dc6  c3                   ret
 
-; ======== sub_4dc7   (appelée depuis 4957, 4a1e, 4ae4, 4baf)
+; ======== entre_piege   (appelée depuis 4957, 4a1e, 4ae4, 4baf)
+; le héros entre sur une case de code < 0x37 : change le code, pose DS:3FC2, arrête le déplacement
 04dc7  3c 37                cmp al, 0x37
 04dc9  73 42                jae loc_4e0d
 04dcb  50                   push ax
-04dcc  e8 b8 c4             call sub_1287
+04dcc  e8 b8 c4             call personnage_en_dx
 04dcf  3c 01                cmp al, 1
 04dd1  74 2c                je loc_4dff
 04dd3  58                   pop ax
@@ -9422,19 +9424,19 @@ loc_4d9f:
 04dd5  2c 32                sub al, 0x32
 04dd7  32 e4                xor ah, ah
 04dd9  d1 e0                shl ax, 1
-04ddb  bd a6 45             mov bp, 0x45a6
+04ddb  bd a6 45             mov bp, 0x45a6    ; pieges
 04dde  03 e8                add bp, ax
 04de0  3e 8a 46 00          mov al, byte ptr ds:[bp]
 04de4  88 07                mov byte ptr [bx], al
 04de6  3e 8a 46 01          mov al, byte ptr ds:[bp + 1]
-04dea  a2 c2 3f             mov byte ptr [0x3fc2], al
+04dea  a2 c2 3f             mov byte ptr [0x3fc2], al    ; piege_en_cours
 04ded  8a 45 02             mov al, byte ptr [di + 2]
 04df0  b2 1a                mov dl, 0x1a
 04df2  f6 e2                mul dl
 04df4  8a 5d 01             mov bl, byte ptr [di + 1]
 04df7  32 ff                xor bh, bh
 04df9  03 d8                add bx, ax
-04dfb  89 1e ec 3f          mov word ptr [0x3fec], bx
+04dfb  89 1e ec 3f          mov word ptr [0x3fec], bx    ; case_piege
 loc_4dff:
 04dff  c6 06 c8 3f 00       mov byte ptr [0x3fc8], 0
 04e04  c7 06 cc 3f 00 00    mov word ptr [0x3fcc], 0
@@ -12062,7 +12064,7 @@ loc_63cf:
 
 ; ======== curseur_memorise   (appelée depuis 0413, 0866, 0cbb, 2cf9, 73b9, 783c, 7e10, 8035)
 ; copie curseur_x et curseur_y dans DS:47E7
-063fc  80 3e c2 3f 00       cmp byte ptr [0x3fc2], 0
+063fc  80 3e c2 3f 00       cmp byte ptr [0x3fc2], 0    ; piege_en_cours
 06401  e8 e1 ff             call sub_63e5
 06404  bb e7 47             mov bx, 0x47e7
 06407  a1 93 39             mov ax, word ptr [0x3993]    ; curseur_x
@@ -12072,7 +12074,7 @@ loc_63cf:
 06412  c3                   ret
 
 ; ======== sub_6413   (appelée depuis 0416)
-06413  80 3e c2 3f 00       cmp byte ptr [0x3fc2], 0
+06413  80 3e c2 3f 00       cmp byte ptr [0x3fc2], 0    ; piege_en_cours
 06418  74 01                je loc_641b
 0641a  c3                   ret
 loc_641b:
@@ -12605,7 +12607,7 @@ loc_6869:
 loc_6871:
 06871  8b d1                mov dx, cx
 06873  51                   push cx
-06874  e8 10 aa             call sub_1287
+06874  e8 10 aa             call personnage_en_dx
 06877  59                   pop cx
 06878  0a c0                or al, al
 0687a  74 01                je loc_687d

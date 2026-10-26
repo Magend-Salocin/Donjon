@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 380, dont 146 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 148 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom fichier_offset  "questb.ega"
@@ -15,7 +15,7 @@
 006b4  quete_continue              28    5  |     46cb etat_quete numero_quete
 006d0  sub_06d0                     6    1  |     
 006d6  sub_06d6                   126    1  |     3fc1 3fc3 evenement_b numero_quete personnage_courant
-00756  sub_0756                    47    1  |     3f9a 3fc2 3fc8 fiche_heros_courant
+00756  sub_0756                    47    1  |     3f9a 3fc8 fiche_heros_courant piege_en_cours
 00788  sub_0788                     8    4  |     
 00790  sub_0790                    48    1  |     fiche_heros_courant numero_quete
 007c0  sub_07c0                   115    0  |     3f97
@@ -59,7 +59,7 @@
 0113e  sub_113e                    10    2  |     cible
 01148  sub_1148                   204    1  |     37eb 3f9f 3fa1 3fa2 3fa5 3fa6 erreur_fichier fiche_heros_courant resultat_vise
 01214  sub_1214                   112    2  |     37eb 3fa5 3fa6 erreur_fichier resultat_vise
-01287  sub_1287                   120    8  |     3f91 3f9d 3fe9 47f1
+01287  personnage_en_dx           120    8  |     3f91 3f9d 3fe9 47f1
 012ff  sub_12ff                    66    5  |     3f94 fiche_heros_courant
 01341  sub_1341                    56    3  |     numero_quete seg_shopsp
 01379  sub_1379                    72    4  |     3f94 40cc fiche_heros_courant personnage_courant
@@ -107,8 +107,8 @@
 0245d  pas_chemin                  27    4  |     3f9f 40ca deplacement_restant longueur_chemin
 02478  case_cible                  19    4  |     3fbc
 0248b  case_libre                 180    3  |     3fbc 40ca cible longueur_chemin
-0253f  marque_case                128    3  |     3fc2 4639 fiche_heros_courant heros_courant personnage_courant seg_odds segment_source  "AND TRY AGAIN"
-025bf  piege_des                  239    0  |     3f97 3fbc 3fc2 3fec 586f 5870 5924 593e fiche_heros_courant heros_courant numero_quete personnage_courant
+0253f  marque_case                128    3  |     4639 fiche_heros_courant heros_courant personnage_courant piege_en_cours seg_odds segment_source  "AND TRY AGAIN"
+025bf  piege_des                  239    0  |     3f97 3fbc 586f 5870 5924 593e case_piege fiche_heros_courant heros_courant numero_quete personnage_courant piege_en_cours
 026af  trois_des_un_point          40    0  |     26c9 heros_courant
 026d7  sub_26d7                    11    3  |     3f9b deplacement_restant
 026e2  heros_hors_quete             6    3  |     
@@ -209,7 +209,7 @@
 04a2f  sub_4a2f                   200    0  |     0e0f 3eb4 3f9b 3fce 40cc deplacement_restant numero_quete
 04af7  sub_4af7                   689    0  |     0e0f 0e11 0e57 3eb4 3f98 3f9b 3fc8 3fce 409b 40cc deplacement_restant message_en_attente
 04daa  sub_4daa                    29    2  |     
-04dc7  sub_4dc7                    72    4  |     3fc2 3fc8 3fcc 3fec
+04dc7  entre_piege                 72    4  |     3fc8 3fcc case_piege piege_en_cours
 04e10  alloue_memoire             245    1  | 21h/48    5e31 mode_video seg_annexe seg_ecran seg_furn seg_furn_brut seg_graphics seg_monsters seg_odds seg_shopsp  "AND TRY AGAIN"
 04f05  zone_cliquee                21    7  |     3f98 commandes
 04f1a  zone_sous_curseur           45    7  |     47e7 47e9
@@ -269,8 +269,8 @@
 06334  sub_6334                   177    2  |     37f9 37fb mode_video seg_furn
 063e5  sub_63e5                    12    2  |     commandes
 063f1  sub_63f1                    11    1  |     
-063fc  curseur_memorise            23   13  |     3fc2 curseur_x curseur_y
-06413  sub_6413                    46    1  |     3f98 3fc2 3fc8 40cc 4639
+063fc  curseur_memorise            23   13  |     curseur_x curseur_y piege_en_cours
+06413  sub_6413                    46    1  |     3f98 3fc8 40cc 4639 piege_en_cours
 06441  sub_6441                    35    1  |     4639 commandes fiche_heros_courant
 06464  sub_6464                    40    1  |     
 0648c  sub_648c                    27    1  |     

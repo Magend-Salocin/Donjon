@@ -95,7 +95,7 @@ Les offsets de « Écrans et interface » viennent des appels à la routine de c
 
 ### GRAPHICS.VGA
 
-- 0x0000 à 0x7E00 : dalles 48 × 24 (0x480 octets chacune). 0x0000, 0x0480, 0x0900, 0x0D80 = quarts de l'escalier ; 0x1200 = éboulis ; 0x1680 = dalle du code 0x33 (pointe de pierre, usage inconnu) ; 0x1F80 = pavés des couloirs ; les autres sont les sols des pièces.
+- 0x0000 à 0x7E00 : dalles 48 × 24 (0x480 octets chacune). 0x0000, 0x0480, 0x0900, 0x0D80 = quarts de l'escalier ; 0x1200 = éboulis ; 0x1680 = dalle du code 0x33 (fosse révélée) ; 0x1F80 = pavés des couloirs ; les autres sont les sols des pièces.
 - 0x7E00, 0x82E0, 0x87C0, 0x8CA0 : murs 24 × 52 (les deux premiers pour le côté gauche « / », les deux autres pour le côté haut « \ »).
 - 0x9180 à 0xC300 : 12 portes 24 × 44, par paires gauche/haut : porte fermée, porte secrète, porte fermée 2, arche ouverte, puis porte et arche violettes.
 - Sol de chaque zone : 43 mots en DS:0xA543 (zone 0 à 42 ; zones 1 à 20 = couloirs, 21 à 42 = pièces, sol fixe par pièce).
@@ -156,7 +156,7 @@ Cases numérotées `y × 26 + x` sur 26 × 19.
 
 Types de monstres : 0 gobelin, 1 orc, 2 fimir, 3 guerrier du chaos, 4 squelette, 5 zombie, 6 momie, 7 gargouille, 8 Ulag, 9 Grak, 10 Balur, 11 et 12 le Sorcier-Roi, 20 à 26 boss de l'extension.
 
-Codes du mobilier : 0x30 éboulis, 0x32 fosse, 0x34 chute de pierre, 0x36 lance, 0x37 portail magique, 0x38-0x3B escalier ; puis par paire d'orientations 0x4B/0x4C table, 0x4D/0x4E chevalet, 0x4F/0x50 établi d'alchimiste, 0x53 tombeau, 0x54/0x5A armoire, 0x55/0x5B râtelier d'armes, 0x56/0x58 bibliothèque, 0x57/0x59 cheminée, 0x5C/0x5D coffre, 0x5E/0x5F trône. Les pièges ont été identifiés en comparant leur nombre par quête avec les quêtes du remake HeroQuest en C# (quêtes 1 à 14).
+Codes du mobilier : 0x30 et 0x31 éboulis, 0x32 fosse cachée, 0x33 fosse révélée, 0x34 chute de pierre, 0x35 chute de pierre sans effet, 0x36 lance (effets : notes du remake, `03-regles.md`, « Pièges »), 0x37 portail magique, 0x38-0x3B escalier ; puis par paire d'orientations 0x4B/0x4C table, 0x4D/0x4E chevalet, 0x4F/0x50 établi d'alchimiste, 0x53 tombeau, 0x54/0x5A armoire, 0x55/0x5B râtelier d'armes, 0x56/0x58 bibliothèque, 0x57/0x59 cheminée, 0x5C/0x5D coffre, 0x5E/0x5F trône. Les pièges ont été identifiés en comparant leur nombre par quête avec les quêtes du remake HeroQuest en C# (quêtes 1 à 14).
 
 ## Autres fichiers
 

@@ -102,8 +102,8 @@ Le choix donne `numero_quete` (0 à 23, + 14 pour la page 2). `lance_quete` (0x8
 7. Attend : « JE COMPRENDS MENTOR » (ligne 22, colonne 10) s'allume sous le curseur ; un clic dessus, ou le bouton droit, ferme le briefing (`attente_briefing`).
 8. Range chaque monstre sur sa case : zone, index de case, et son numéro (1 à 32) dans `grille_occupants`. Le type 0x15 est sauté.
 9. Règles propres à certaines quêtes (numéros du jeu) :
-   - 6e, L'héritage du seigneur de guerre orque : les héros, capturés, perdent sorts et équipement (+0x0B à +0x0F, gardés en DS:4A9F) ;
-   - 8e, Le mage du feu : l'elfe et l'enchanteur perdent leurs sorts de feu (+0x0C &= 38h) ;
+   - 6e, LEGS DU SEIGNEUR ORC : les héros, capturés, perdent sorts et équipement (+0x0B à +0x0F, gardés en DS:4A9F) ;
+   - 8e, LE MAGE DU FEU : l'elfe et l'enchanteur perdent leurs sorts de feu (+0x0C &= 38h) ;
    - 7e et 8e : le drapeau d'événement DS:3FC0 est posé (FFh).
 10. Mélange les 25 cartes trésor (`pioche_tresors`, DS:463B) et place le pointeur de pioche au début.
 
