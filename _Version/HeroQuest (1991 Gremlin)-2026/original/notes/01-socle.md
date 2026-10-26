@@ -2,7 +2,7 @@
 
 Configuration, commandes, fichiers, son et mémoire. Les adresses sont celles de `original/asm/quest.asm` (positions dans l'image décompressée) ; les noms viennent de `original/symboles.txt`.
 
-État : commandes et fichiers lus en détail ; son et vidéo seulement repérés.
+État : commandes, fichiers et interface du son lus en détail ; vidéo seulement repérée ; format des morceaux à décoder.
 
 ## Démarrage
 
@@ -74,9 +74,34 @@ Les fichiers graphiques sont chargés dans un tampon (segment 0x1463) puis déco
 
 ## Son
 
-Le pilote choisi par `son_pilote` (ADLIB.DRV, TANDY.DRV, MT32.DRV, BEEPER.DRV) est chargé en mémoire par `son_charge_pilote` (0x47A6), puis appelé par int 60h, fonction dans AX : 2, 3 et 4 au lancement d'une musique, 0Bh à l'arrêt. Une dizaine de routines d'effets sonores (`son_effet_1`, `son_effet_2` et voisines, de 0x2827 à 0x2B06) suivent le même schéma : rien si DS:3199 ne vaut pas 1, puis un traitement différent selon que `son_pilote` vaut 0 ou non.
+`son_pilote` (QUEST.CFG) choisit le pilote : 0 BEEPER.DRV, 1 ADLIB.DRV, 2 MT32.DRV, 3 TANDY.DRV (noms en DS:31A0, tailles en paragraphes en DS:31F0). `son_charge_pilote` (0x47A6) le charge dans un segment à lui, avec son fichier de données (DS:31D0) : GAME&FX.ALB pour l'AdLib, GAME&FX.RLD pour la MT-32 (Roland), rien pour les deux autres. Il appelle ensuite le pilote à son début (appel lointain segment:0000), qui détourne int 60h. Le jeu ne parle plus au pilote que par int 60h, fonction dans AX :
 
-À faire : la liste des fonctions de int 60h (lire le début de ADLIB.DRV), le contenu de GAME&FX.ALB et .RLD.
+| AX | Paramètres | Rôle |
+| --- | --- | --- |
+| 0 | | arrêt du pilote (en quittant) |
+| 2 | DX segment des données, SI 0 | donne les données au pilote |
+| 3 | DX = CX = numéro du morceau | joue un morceau ; rend une poignée dans DI |
+| 4 | DI poignée | arrête le morceau (?) |
+| 5 | DX numéro | joue un effet (pilote Tandy) |
+| 0Ah | | initialisation |
+| 0Bh | | silence (avec le haut-parleur coupé par le port 61h) |
+
+Morceaux de GAME&FX.ALB : 0 la musique (« ingame », lancée au démarrage par `son_prepare`), puis les effets :
+
+| Morceau | Routine | Quand |
+| --- | --- | --- |
+| 2 | `son_pas` | un pas sur trois |
+| 3 | `son_porte` | une porte s'ouvre |
+| 5 | `son_monstre_touche`, `son_monstre_tue` | gros plan du combat |
+| 6 | `son_des` | dés de déplacement (?) |
+| 8 | `son_clic` | clic sur un bouton |
+| 9 | `son_sort`, `son_piege` | sort lancé, piège déclenché |
+
+Avec le pilote 0, chaque effet est une suite de notes jouées directement sur le haut-parleur (`son_bip`, 0x2B8E).
+
+GAME&FX.ALB (18 008 octets) et .RLD (26 312 octets) ont le même début : un mot (somme de contrôle ?), 1 (un seul morceau nommé ?), le nom « ingame » sur 20 octets, puis 50 (0x32) et une liste de numéros 0, 1, 2, 3, 4, 5, 6, 5, 6, 7… qui ressemble à l'ordre des motifs d'un module. Le .RLD contient aussi les noms des sons MT-32 (« 4matchip3 », « harpsi 1 »…). Le format reste à décoder ; le choix entre décodage, émulation du pilote et capture est la décision D3 de la roadmap.
+
+À faire : `son_musique` (relance de la musique par la lecture des commandes, DS:3956).
 
 ## Mémoire et vidéo
 

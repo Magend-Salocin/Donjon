@@ -56,8 +56,8 @@
 0x476e  code  son_arret              int 60h AX=0Bh, coupe le haut-parleur (port 61h)
 0x4825  code  son_prepare            int 60h AX=2 puis AX=3 (?)
 0x4850  code  son_musique            lance la musique si DS:3956 = 1 (?)
-0x2827  code  son_effet_1            effets sonores : même schéma (DS:3199 actif, DS:3192 pilote), 8 appels
-0x2a48  code  son_effet_2            15 appels
+0x2827  code  son_porte              porte ouverte : morceau 3 (AdLib, MT-32), 8 (Tandy), bip sinon
+0x2a48  code  son_clic               clic d'interface : morceau 8 (AdLib, MT-32), 6 (Tandy)
 
 # ---- Sauvegarde
 0x7954  code  sauvegarde_menu        0 sauvegarder, 1 charger le personnage sélectionné dans QUEST.SAV, 2 annuler
@@ -437,3 +437,18 @@
 0xa1f9  table sequences_monstre_touche_distance
 0xa209  table sequences_monstre_tue_distance
 0x4f38  table images_personnages     4 octets par image : largeur, hauteur, position (SPRITES, MONSTERS)
+
+# ---- Effets sonores (voir original/notes/01-socle.md#son) : morceau AdLib/MT-32, puis Tandy
+0x2886  code  son_monstre_tue        morceau 5 ; Tandy 3
+0x29d0  code  son_monstre_touche     morceau 5 ; Tandy 1
+0x28f9  code  son_pas                un pas sur trois : morceau 2 ; Tandy 0
+0x2964  code  son_sort               morceau 9 ; Tandy 1
+0x2aa7  code  son_piege              morceau 9 ; Tandy 4
+0x2b06  code  son_des                dés de déplacement (?) : morceau 6 ; Tandy 5
+0x2b8e  code  son_bip                haut-parleur (pilote 0) : AH, BH, CX, BP règlent la note et sa durée
+0x3199  var   son_actif
+0x319a  var   seg_son_donnees        GAME&FX.ALB ou .RLD
+0x319c  var   son_musique_poignee    DI rendu par int 60h AX=3 pour la musique
+0x319e  var   son_effet_poignee      DI de l'effet en cours
+0x31a0  table son_pilotes            noms : beeper.drv, adlib.drv, mt32.drv, tandy.drv
+0x31d0  table son_fichiers           données de chaque pilote : -, game&fx.alb, game&fx.rld, -

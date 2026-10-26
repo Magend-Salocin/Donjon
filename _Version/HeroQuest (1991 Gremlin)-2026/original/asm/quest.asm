@@ -766,7 +766,7 @@ loc_0766:
 00774  80 4d 18 20          or byte ptr [di + 0x18], 0x20
 00778  80 65 18 7f          and byte ptr [di + 0x18], 0x7f
 loc_077c:
-0077c  e8 c9 22             call son_effet_2
+0077c  e8 c9 22             call son_clic
 0077f  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1    ; fin_du_tour
 00784  c3                   ret
 ouvre_portes:    ; icône : ouvre les portes de la case du héros (sub_07c0)
@@ -815,7 +815,7 @@ loc_07bd:
 007d6  f6 07 f7             test byte ptr [bx], 0xf7
 007d9  74 18                je loc_07f3
 007db  80 0f 04             or byte ptr [bx], 4
-007de  e8 46 20             call son_effet_1
+007de  e8 46 20             call son_porte
 007e1  53                   push bx
 007e2  bd 01 00             mov bp, 1
 007e5  f6 07 10             test byte ptr [bx], 0x10
@@ -835,7 +835,7 @@ loc_07f3:
 00801  74 0b                je loc_080e
 00803  80 0f 04             or byte ptr [bx], 4
 00806  53                   push bx
-00807  e8 1d 20             call son_effet_1
+00807  e8 1d 20             call son_porte
 0080a  e8 f2 0a             call sub_12ff
 0080d  5b                   pop bx
 loc_080e:
@@ -857,7 +857,7 @@ loc_0824:
 00829  c3                   ret
 loc_082a:
 0082a  80 0f 04             or byte ptr [bx], 4
-0082d  e8 f7 1f             call son_effet_1
+0082d  e8 f7 1f             call son_porte
 00830  e9 cc 0a             jmp sub_12ff
 
 ; ======== mode_attaque
@@ -875,7 +875,7 @@ loc_0843:
 0084b  74 01                je loc_084e
 0084d  c3                   ret
 loc_084e:
-0084e  e8 f7 21             call son_effet_2
+0084e  e8 f7 21             call son_clic
 00851  c6 06 b1 3f 00       mov byte ptr [0x3fb1], 0
 00856  c6 06 ac 3f 00       mov byte ptr [0x3fac], 0
 0085b  c6 06 91 3f 01       mov byte ptr [0x3f91], 1
@@ -1628,7 +1628,7 @@ loc_0e7f:
 00e98  58                   pop ax
 00e99  50                   push ax
 00e9a  e8 e7 1e             call retire_sort
-00e9d  e8 c4 1a             call sub_2964
+00e9d  e8 c4 1a             call son_sort
 00ea0  58                   pop ax
 00ea1  3c 06                cmp al, 6
 00ea3  74 59                je loc_0efe
@@ -2121,7 +2121,7 @@ loc_12aa:
 012af  c6 06 e9 3f 00       mov byte ptr [0x3fe9], 0
 012b4  c6 06 91 3f 00       mov byte ptr [0x3f91], 0
 012b9  c7 06 f1 47 20 2c    mov word ptr [0x47f1], 0x2c20
-012bf  e8 86 17             call son_effet_2
+012bf  e8 86 17             call son_clic
 012c2  e8 5e 57             call fond_vers_tampon
 012c5  e8 54 53             call sub_661c
 012c8  e8 f6 52             call sub_65c1
@@ -4281,7 +4281,7 @@ loc_2587:
 loc_2590:
 02590  be 20 01             mov si, 0x120
 loc_2593:
-02593  e8 11 05             call sub_2aa7
+02593  e8 11 05             call son_piege
 02596  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0259a  fe 4d 06             dec byte ptr [di + 6]
 0259d  8b de                mov bx, si
@@ -4377,7 +4377,7 @@ chute_maconnerie:    ; un dé : sur un 6 et sans casque, 1 point de corps perdu
 0267e  f6 44 13 02          test byte ptr [si + 0x13], 2
 02682  75 0c                jne loc_2690
 02684  fe 4c 06             dec byte ptr [si + 6]
-02687  e8 1d 04             call sub_2aa7
+02687  e8 1d 04             call son_piege
 0268a  be 40 00             mov si, 0x40
 0268d  eb 04                jmp loc_2693
 ; ---- 1 octets non atteints (268f-268f)
@@ -4601,8 +4601,8 @@ loc_281e:
 02825  5b                   pop bx
 02826  c3                   ret
 
-; ======== son_effet_1   (appelée depuis 07de, 0807, 082d, 492a, 49f1, 4ab7, 4b82, 6e40)
-; effets sonores : même schéma (DS:3199 actif, DS:3192 pilote), 8 appels
+; ======== son_porte   (appelée depuis 07de, 0807, 082d, 492a, 49f1, 4ab7, 4b82, 6e40)
+; porte ouverte : morceau 3 (AdLib, MT-32), 8 (Tandy), bip sinon
 02827  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 0282c  74 01                je loc_282f
 0282e  c3                   ret
@@ -4623,7 +4623,7 @@ loc_282f:
 02843  b9 20 00             mov cx, 0x20
 02846  b4 06                mov ah, 6
 02848  b7 05                mov bh, 5
-0284a  e8 41 03             call sub_2b8e
+0284a  e8 41 03             call son_bip
 0284d  1f                   pop ds
 0284e  07                   pop es
 0284f  5d                   pop bp
@@ -4646,20 +4646,21 @@ loc_2868:
 02868  57                   push di
 02869  51                   push cx
 0286a  52                   push dx
-0286b  8b 3e 9e 31          mov di, word ptr [0x319e]
+0286b  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 0286f  b8 04 00             mov ax, 4
 02872  cd 60                int 0x60
 02874  ba 03 00             mov dx, 3
 02877  8b ca                mov cx, dx
 02879  b8 03 00             mov ax, 3
 0287c  cd 60                int 0x60
-0287e  89 3e 9e 31          mov word ptr [0x319e], di
+0287e  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 02882  5a                   pop dx
 02883  59                   pop cx
 02884  5f                   pop di
 02885  c3                   ret
 
-; ======== sub_2886   (appelée depuis 2088)
+; ======== son_monstre_tue   (appelée depuis 2088)
+; morceau 5 ; Tandy 3
 02886  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 0288b  74 01                je loc_288e
 0288d  c3                   ret
@@ -4683,12 +4684,12 @@ loc_28a2:
 028a6  b9 64 00             mov cx, 0x64
 028a9  b4 01                mov ah, 1
 028ab  b7 00                mov bh, 0
-028ad  e8 de 02             call sub_2b8e
+028ad  e8 de 02             call son_bip
 028b0  bd 0a 00             mov bp, 0xa
 028b3  b9 28 00             mov cx, 0x28
 028b6  b4 02                mov ah, 2
 028b8  b7 00                mov bh, 0
-028ba  e8 d1 02             call sub_2b8e
+028ba  e8 d1 02             call son_bip
 028bd  59                   pop cx
 028be  e2 e2                loop loc_28a2
 028c0  1f                   pop ds
@@ -4713,20 +4714,21 @@ loc_28db:
 028db  57                   push di
 028dc  51                   push cx
 028dd  52                   push dx
-028de  8b 3e 9e 31          mov di, word ptr [0x319e]
+028de  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 028e2  b8 04 00             mov ax, 4
 028e5  cd 60                int 0x60
 028e7  ba 05 00             mov dx, 5
 028ea  8b ca                mov cx, dx
 028ec  b8 03 00             mov ax, 3
 028ef  cd 60                int 0x60
-028f1  89 3e 9e 31          mov word ptr [0x319e], di
+028f1  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 028f5  5a                   pop dx
 028f6  59                   pop cx
 028f7  5f                   pop di
 028f8  c3                   ret
 
-; ======== sub_28f9   (appelée depuis 583f)
+; ======== son_pas   (appelée depuis 583f)
+; un pas sur trois : morceau 2 ; Tandy 0
 028f9  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 028fe  74 01                je loc_2901
 02900  c3                   ret
@@ -4752,7 +4754,7 @@ loc_2908:
 02921  b9 0a 00             mov cx, 0xa
 02924  b4 01                mov ah, 1
 02926  b7 18                mov bh, 0x18
-02928  e8 63 02             call sub_2b8e
+02928  e8 63 02             call son_bip
 0292b  1f                   pop ds
 0292c  07                   pop es
 0292d  5d                   pop bp
@@ -4775,20 +4777,21 @@ loc_2946:
 02946  57                   push di
 02947  51                   push cx
 02948  52                   push dx
-02949  8b 3e 9e 31          mov di, word ptr [0x319e]
+02949  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 0294d  b8 04 00             mov ax, 4
 02950  cd 60                int 0x60
 02952  ba 02 00             mov dx, 2
 02955  8b ca                mov cx, dx
 02957  b8 03 00             mov ax, 3
 0295a  cd 60                int 0x60
-0295c  89 3e 9e 31          mov word ptr [0x319e], di
+0295c  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 02960  5a                   pop dx
 02961  59                   pop cx
 02962  5f                   pop di
 02963  c3                   ret
 
-; ======== sub_2964   (appelée depuis 0e9d)
+; ======== son_sort   (appelée depuis 0e9d)
+; morceau 9 ; Tandy 1
 02964  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02969  74 01                je loc_296c
 0296b  c3                   ret
@@ -4809,12 +4812,12 @@ loc_296c:
 02980  b9 e8 03             mov cx, 0x3e8
 02983  b4 64                mov ah, 0x64
 02985  b7 ff                mov bh, 0xff
-02987  e8 04 02             call sub_2b8e
+02987  e8 04 02             call son_bip
 0298a  bd 0a 00             mov bp, 0xa
 0298d  b9 10 27             mov cx, 0x2710
 02990  b4 02                mov ah, 2
 02992  b7 01                mov bh, 1
-02994  e8 f7 01             call sub_2b8e
+02994  e8 f7 01             call son_bip
 02997  1f                   pop ds
 02998  07                   pop es
 02999  5d                   pop bp
@@ -4837,20 +4840,21 @@ loc_29b2:
 029b2  57                   push di
 029b3  51                   push cx
 029b4  52                   push dx
-029b5  8b 3e 9e 31          mov di, word ptr [0x319e]
+029b5  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 029b9  b8 04 00             mov ax, 4
 029bc  cd 60                int 0x60
 029be  ba 09 00             mov dx, 9
 029c1  8b ca                mov cx, dx
 029c3  b8 03 00             mov ax, 3
 029c6  cd 60                int 0x60
-029c8  89 3e 9e 31          mov word ptr [0x319e], di
+029c8  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 029cc  5a                   pop dx
 029cd  59                   pop cx
 029ce  5f                   pop di
 029cf  c3                   ret
 
-; ======== sub_29d0   (appelée depuis 2088)
+; ======== son_monstre_touche   (appelée depuis 2088)
+; morceau 5 ; Tandy 1
 029d0  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 029d5  74 01                je loc_29d8
 029d7  c3                   ret
@@ -4874,7 +4878,7 @@ loc_29ec:
 029f0  b9 64 00             mov cx, 0x64
 029f3  b4 01                mov ah, 1
 029f5  b7 00                mov bh, 0
-029f7  e8 94 01             call sub_2b8e
+029f7  e8 94 01             call son_bip
 029fa  b9 2c 01             mov cx, 0x12c
 loc_29fd:
 029fd  e2 fe                loop loc_29fd
@@ -4882,7 +4886,7 @@ loc_29fd:
 02a02  b9 64 00             mov cx, 0x64
 02a05  b4 14                mov ah, 0x14
 02a07  b7 00                mov bh, 0
-02a09  e8 82 01             call sub_2b8e
+02a09  e8 82 01             call son_bip
 02a0c  59                   pop cx
 02a0d  e2 dd                loop loc_29ec
 02a0f  1f                   pop ds
@@ -4907,21 +4911,21 @@ loc_2a2a:
 02a2a  57                   push di
 02a2b  51                   push cx
 02a2c  52                   push dx
-02a2d  8b 3e 9e 31          mov di, word ptr [0x319e]
+02a2d  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 02a31  b8 04 00             mov ax, 4
 02a34  cd 60                int 0x60
 02a36  ba 05 00             mov dx, 5
 02a39  8b ca                mov cx, dx
 02a3b  b8 03 00             mov ax, 3
 02a3e  cd 60                int 0x60
-02a40  89 3e 9e 31          mov word ptr [0x319e], di
+02a40  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 02a44  5a                   pop dx
 02a45  59                   pop cx
 02a46  5f                   pop di
 02a47  c3                   ret
 
-; ======== son_effet_2   (appelée depuis 077c, 084e, 12bf, 73e5, 787e, 7e6f, 7f5e, 806a)
-; 15 appels
+; ======== son_clic   (appelée depuis 077c, 084e, 12bf, 73e5, 787e, 7e6f, 7f5e, 806a)
+; clic d'interface : morceau 8 (AdLib, MT-32), 6 (Tandy)
 02a48  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02a4d  74 01                je loc_2a50
 02a4f  c3                   ret
@@ -4942,7 +4946,7 @@ loc_2a50:
 02a64  b9 70 17             mov cx, 0x1770
 02a67  b4 19                mov ah, 0x19
 02a69  b7 fe                mov bh, 0xfe
-02a6b  e8 20 01             call sub_2b8e
+02a6b  e8 20 01             call son_bip
 02a6e  1f                   pop ds
 02a6f  07                   pop es
 02a70  5d                   pop bp
@@ -4965,20 +4969,21 @@ loc_2a89:
 02a89  57                   push di
 02a8a  51                   push cx
 02a8b  52                   push dx
-02a8c  8b 3e 9e 31          mov di, word ptr [0x319e]
+02a8c  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 02a90  b8 04 00             mov ax, 4
 02a93  cd 60                int 0x60
 02a95  ba 08 00             mov dx, 8
 02a98  8b ca                mov cx, dx
 02a9a  b8 03 00             mov ax, 3
 02a9d  cd 60                int 0x60
-02a9f  89 3e 9e 31          mov word ptr [0x319e], di
+02a9f  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 02aa3  5a                   pop dx
 02aa4  59                   pop cx
 02aa5  5f                   pop di
 02aa6  c3                   ret
 
-; ======== sub_2aa7   (appelée depuis 2593, 2687, 6f19)
+; ======== son_piege   (appelée depuis 2593, 2687, 6f19)
+; morceau 9 ; Tandy 4
 02aa7  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02aac  74 01                je loc_2aaf
 02aae  c3                   ret
@@ -4999,7 +5004,7 @@ loc_2aaf:
 02ac3  b9 40 1f             mov cx, 0x1f40
 02ac6  b4 01                mov ah, 1
 02ac8  b7 10                mov bh, 0x10
-02aca  e8 c1 00             call sub_2b8e
+02aca  e8 c1 00             call son_bip
 02acd  1f                   pop ds
 02ace  07                   pop es
 02acf  5d                   pop bp
@@ -5022,20 +5027,21 @@ loc_2ae8:
 02ae8  57                   push di
 02ae9  51                   push cx
 02aea  52                   push dx
-02aeb  8b 3e 9e 31          mov di, word ptr [0x319e]
+02aeb  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 02aef  b8 04 00             mov ax, 4
 02af2  cd 60                int 0x60
 02af4  ba 09 00             mov dx, 9
 02af7  8b ca                mov cx, dx
 02af9  b8 03 00             mov ax, 3
 02afc  cd 60                int 0x60
-02afe  89 3e 9e 31          mov word ptr [0x319e], di
+02afe  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 02b02  5a                   pop dx
 02b03  59                   pop cx
 02b04  5f                   pop di
 02b05  c3                   ret
 
-; ======== sub_2b06   (appelée depuis 4f47)
+; ======== son_des   (appelée depuis 4f47)
+; dés de déplacement (?) : morceau 6 ; Tandy 5
 02b06  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02b0b  74 01                je loc_2b0e
 02b0d  c3                   ret
@@ -5059,7 +5065,7 @@ loc_2b0e:
 02b2e  b9 70 17             mov cx, 0x1770
 02b31  b4 04                mov ah, 4
 02b33  b7 00                mov bh, 0
-02b35  e8 56 00             call sub_2b8e
+02b35  e8 56 00             call son_bip
 02b38  1f                   pop ds
 02b39  07                   pop es
 02b3a  5d                   pop bp
@@ -5077,7 +5083,7 @@ loc_2b43:
 02b4b  b9 70 17             mov cx, 0x1770
 02b4e  b4 02                mov ah, 2
 02b50  b7 00                mov bh, 0
-02b52  e8 39 00             call sub_2b8e
+02b52  e8 39 00             call son_bip
 02b55  1f                   pop ds
 02b56  07                   pop es
 02b57  5d                   pop bp
@@ -5100,20 +5106,21 @@ loc_2b70:
 02b70  57                   push di
 02b71  51                   push cx
 02b72  52                   push dx
-02b73  8b 3e 9e 31          mov di, word ptr [0x319e]
+02b73  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 02b77  b8 04 00             mov ax, 4
 02b7a  cd 60                int 0x60
 02b7c  ba 06 00             mov dx, 6
 02b7f  8b ca                mov cx, dx
 02b81  b8 03 00             mov ax, 3
 02b84  cd 60                int 0x60
-02b86  89 3e 9e 31          mov word ptr [0x319e], di
+02b86  89 3e 9e 31          mov word ptr [0x319e], di    ; son_effet_poignee
 02b8a  5a                   pop dx
 02b8b  59                   pop cx
 02b8c  5f                   pop di
 02b8d  c3                   ret
 
-; ======== sub_2b8e   (appelée depuis 284a, 28ad, 28ba, 2928, 2987, 2994, 29f7, 2a09)
+; ======== son_bip   (appelée depuis 284a, 28ad, 28ba, 2928, 2987, 2994, 29f7, 2a09)
+; haut-parleur (pilote 0) : AH, BH, CX, BP règlent la note et sa durée
 02b8e  50                   push ax
 02b8f  53                   push bx
 02b90  51                   push cx
@@ -8583,10 +8590,10 @@ loc_4724:
 loc_4780:
 04780  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 04785  74 14                je loc_479b
-04787  8b 3e 9e 31          mov di, word ptr [0x319e]
+04787  8b 3e 9e 31          mov di, word ptr [0x319e]    ; son_effet_poignee
 0478b  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 04790  74 04                je loc_4796
-04792  8b 3e 9c 31          mov di, word ptr [0x319c]
+04792  8b 3e 9c 31          mov di, word ptr [0x319c]    ; son_musique_poignee
 loc_4796:
 04796  b8 04 00             mov ax, 4
 04799  cd 60                int 0x60
@@ -8612,7 +8619,7 @@ loc_479b:
 loc_47c2:
 047c2  a3 08 32             mov word ptr [0x3208], ax
 047c5  8b 1e f9 37          mov bx, word ptr [0x37f9]
-047c9  8b 8f d0 31          mov cx, word ptr [bx + 0x31d0]
+047c9  8b 8f d0 31          mov cx, word ptr [bx + 0x31d0]    ; son_fichiers
 047cd  83 f9 00             cmp cx, 0
 047d0  74 29                je loc_47fb
 047d2  89 0e e9 37          mov word ptr [0x37e9], cx    ; erreur_fichier
@@ -8622,18 +8629,18 @@ loc_47c2:
 047de  73 01                jae loc_47e1
 047e0  c3                   ret
 loc_47e1:
-047e1  a3 9a 31             mov word ptr [0x319a], ax
+047e1  a3 9a 31             mov word ptr [0x319a], ax    ; seg_son_donnees
 047e4  8b 1e e9 37          mov bx, word ptr [0x37e9]    ; erreur_fichier
 047e8  89 1e 07 39          mov word ptr [0x3907], bx    ; fichier_nom
 047ec  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
-047f2  a1 9a 31             mov ax, word ptr [0x319a]
+047f2  a1 9a 31             mov ax, word ptr [0x319a]    ; seg_son_donnees
 047f5  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 047f8  e8 86 f1             call charge_fichier
 loc_47fb:
 047fb  8a 1e 92 31          mov bl, byte ptr [0x3192]    ; son_pilote
 047ff  d0 e3                shl bl, 1
 04801  32 ff                xor bh, bh
-04803  8b 9f a0 31          mov bx, word ptr [bx + 0x31a0]
+04803  8b 9f a0 31          mov bx, word ptr [bx + 0x31a0]    ; son_pilotes
 04807  89 1e 07 39          mov word ptr [0x3907], bx    ; fichier_nom
 0480b  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 04811  a1 08 32             mov ax, word ptr [0x3208]
@@ -8649,7 +8656,7 @@ loc_47fb:
 ; int 60h AX=2 puis AX=3 (?)
 04825  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 0482a  74 0c                je loc_4838
-0482c  8b 16 9a 31          mov dx, word ptr [0x319a]
+0482c  8b 16 9a 31          mov dx, word ptr [0x319a]    ; seg_son_donnees
 04830  be 00 00             mov si, 0
 04833  b8 02 00             mov ax, 2
 04836  cd 60                int 0x60
@@ -8661,7 +8668,7 @@ loc_4838:
 04844  8b ca                mov cx, dx
 04846  b8 03 00             mov ax, 3
 04849  cd 60                int 0x60
-0484b  89 3e 9c 31          mov word ptr [0x319c], di
+0484b  89 3e 9c 31          mov word ptr [0x319c], di    ; son_musique_poignee
 0484f  c3                   ret
 
 ; ======== son_musique   (appelée depuis 37a5)
@@ -8682,7 +8689,7 @@ loc_4860:
 04872  cd 60                int 0x60
 04874  c3                   ret
 loc_4875:
-04875  8b 3e 9c 31          mov di, word ptr [0x319c]
+04875  8b 3e 9c 31          mov di, word ptr [0x319c]    ; son_musique_poignee
 04879  b8 04 00             mov ax, 4
 0487c  cd 60                int 0x60
 0487e  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
@@ -8761,7 +8768,7 @@ loc_491e:
 04923  73 08                jae loc_492d
 04925  8a 07                mov al, byte ptr [bx]
 04927  e8 5e be             call sub_0788
-0492a  e8 fa de             call son_effet_1
+0492a  e8 fa de             call son_porte
 loc_492d:
 0492d  b5 04                mov ch, 4
 loc_492f:
@@ -8851,7 +8858,7 @@ loc_49e7:
 049e7  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 049ec  73 06                jae loc_49f4
 049ee  e8 97 bd             call sub_0788
-049f1  e8 33 de             call son_effet_1
+049f1  e8 33 de             call son_porte
 loc_49f4:
 049f4  b5 04                mov ch, 4
 loc_49f6:
@@ -8939,7 +8946,7 @@ loc_4aad:
 04aad  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 04ab2  73 06                jae loc_4aba
 04ab4  e8 d1 bc             call sub_0788
-04ab7  e8 6d dd             call son_effet_1
+04ab7  e8 6d dd             call son_porte
 loc_4aba:
 04aba  b5 04                mov ch, 4
 loc_4abc:
@@ -9028,7 +9035,7 @@ loc_4b78:
 04b78  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 04b7d  73 06                jae loc_4b85
 04b7f  e8 06 bc             call sub_0788
-04b82  e8 a2 dc             call son_effet_1
+04b82  e8 a2 dc             call son_porte
 loc_4b85:
 04b85  b5 04                mov ch, 4
 loc_4b87:
@@ -9481,7 +9488,7 @@ loc_4f3f:
 04f45  eb de                jmp loc_4f25
 
 ; ======== sub_4f47   (appelée depuis 4fd1)
-04f47  e8 bc db             call sub_2b06
+04f47  e8 bc db             call son_des
 04f4a  bd 25 da             mov bp, 0xda25
 04f4d  b0 01                mov al, 1
 04f4f  80 3e 9c 3f 13       cmp byte ptr [0x3f9c], 0x13    ; deplacement_restant
@@ -10412,7 +10419,7 @@ loc_582c:
 0583c  eb 62                jmp loc_58a0
 ; ---- 1 octets non atteints (583e-583e)
 loc_583f:
-0583f  e8 b7 d0             call sub_28f9
+0583f  e8 b7 d0             call son_pas
 05842  8b 7c 0a             mov di, word ptr [si + 0xa]
 05845  8a 05                mov al, byte ptr [di]
 05847  8b 5c 12             mov bx, word ptr [si + 0x12]
@@ -13158,7 +13165,7 @@ loc_6e20:
 06e34  83 3e ed 37 00       cmp word ptr [0x37ed], 0
 06e39  74 17                je loc_6e52
 06e3b  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
-06e40  e8 e4 b9             call son_effet_1
+06e40  e8 e4 b9             call son_porte
 06e43  bb 1a 00             mov bx, 0x1a    ; message « UNE PORTE SECRETE S'OUVRE / EN GRINcANT DANS LE MUR »
 06e46  e8 a4 1a             call affiche_message
 06e49  c7 06 ed 37 00 00    mov word ptr [0x37ed], 0
@@ -13245,7 +13252,7 @@ loc_6eef:
 ; ======== fouille_vide
 06f12  80 3e c2 4b ff       cmp byte ptr [0x4bc2], 0xff
 06f17  74 18                je loc_6f31
-06f19  e8 8b bb             call sub_2aa7
+06f19  e8 8b bb             call son_piege
 06f1c  be 98 00             mov si, 0x98
 06f1f  e8 13 ab             call message_puis_sortie
 06f22  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -13813,7 +13820,7 @@ loc_73d2:
 073dd  83 fb 02             cmp bx, 2
 073e0  72 d7                jb loc_73b9
 073e2  e8 6f c5             call sub_3954
-073e5  e8 60 b6             call son_effet_2
+073e5  e8 60 b6             call son_clic
 073e8  ff a7 1a aa          jmp word ptr [bx - 0x55e6]
 loc_73ec:
 073ec  c3                   ret
@@ -14257,7 +14264,7 @@ loc_7878:
 07878  bb 12 00             mov bx, 0x12
 loc_787b:
 0787b  e8 d6 c0             call sub_3954
-0787e  e8 c7 b1             call son_effet_2
+0787e  e8 c7 b1             call son_clic
 07881  81 c3 6c aa          add bx, 0xaa6c    ; saut_heros
 07885  ff 27                jmp word ptr [bx]
 
@@ -14881,7 +14888,7 @@ loc_7e62:
 07e67  fe 06 79 ab          inc byte ptr [0xab79]
 loc_7e6b:
 07e6b  88 87 fa ab          mov byte ptr [bx - 0x5406], al
-07e6f  e8 d6 ab             call son_effet_2
+07e6f  e8 d6 ab             call son_clic
 07e72  e8 df ba             call sub_3954
 07e75  bd f4 ab             mov bp, 0xabf4
 07e78  83 3e 90 31 04       cmp word ptr [0x3190], 4    ; mode_video
@@ -14914,7 +14921,7 @@ loc_7ec2:
 07ec2  e8 7c e5             call sub_6441
 07ec5  80 3e 7a ab ff       cmp byte ptr [0xab7a], 0xff    ; choix_menu
 07eca  75 03                jne loc_7ecf
-07ecc  e9 79 ab             jmp son_effet_2
+07ecc  e9 79 ab             jmp son_clic
 loc_7ecf:
 07ecf  8b 16 e7 47          mov dx, word ptr [0x47e7]
 07ed3  8b 2e e9 47          mov bp, word ptr [0x47e9]
@@ -14970,7 +14977,7 @@ loc_7f3d:
 07f53  c6 00 00             mov byte ptr [bx + si], 0
 07f56  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff    ; choix_menu
 07f5b  e8 f6 b9             call sub_3954
-07f5e  e8 e7 aa             call son_effet_2
+07f5e  e8 e7 aa             call son_clic
 07f61  c3                   ret
 loc_7f62:
 07f62  80 fb 00             cmp bl, 0
@@ -15087,7 +15094,7 @@ loc_8035:
 loc_8063:
 08063  a0 7a ab             mov al, byte ptr [0xab7a]    ; choix_menu
 08066  88 87 13 ac          mov byte ptr [bx - 0x53ed], al
-0806a  e8 db a9             call son_effet_2
+0806a  e8 db a9             call son_clic
 0806d  e9 e4 b8             jmp sub_3954
 
 ; ======== armurerie   (appelée depuis 73e8)
@@ -15207,7 +15214,7 @@ loc_819e:
 081a7  8b d3                mov dx, bx
 081a9  ff a7 b3 ac          jmp word ptr [bx - 0x534d]
 loc_81ad:
-081ad  e8 98 a8             call son_effet_2
+081ad  e8 98 a8             call son_clic
 081b0  e9 77 f1             jmp loc_732a
 achete_objet:    ; refuse si le bit est déjà posé ou si le prix dépasse l'or (+9) ; sinon retire le prix et pose le bit (+0x0E)
 081b3  8b da                mov bx, dx
@@ -15225,7 +15232,7 @@ achete_objet:    ; refuse si le bit est déjà posé ou si le prix dépasse l'or
 081d4  29 6c 09             sub word ptr [si + 9], bp
 081d7  0b d1                or dx, cx
 081d9  09 4c 0e             or word ptr [si + 0xe], cx
-081dc  e8 69 a8             call son_effet_2
+081dc  e8 69 a8             call son_clic
 081df  e8 72 b7             call sub_3954
 081e2  e9 97 fe             jmp loc_807c
 loc_81e5:
@@ -15242,25 +15249,25 @@ loc_81fd:
 081fd  c7 06 37 46 00 00    mov word ptr [0x4637], 0    ; fiche_heros_courant
 08203  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
 08206  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
-08209  e8 3c a8             call son_effet_2
+08209  e8 3c a8             call son_clic
 0820c  e9 6d fe             jmp loc_807c
 loc_820f:
 0820f  c7 06 37 46 01 00    mov word ptr [0x4637], 1    ; fiche_heros_courant
 08215  a0 96 31             mov al, byte ptr [0x3196]
 08218  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
-0821b  e8 2a a8             call son_effet_2
+0821b  e8 2a a8             call son_clic
 0821e  e9 5b fe             jmp loc_807c
 loc_8221:
 08221  c7 06 37 46 02 00    mov word ptr [0x4637], 2    ; fiche_heros_courant
 08227  a0 97 31             mov al, byte ptr [0x3197]
 0822a  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
-0822d  e8 18 a8             call son_effet_2
+0822d  e8 18 a8             call son_clic
 08230  e9 49 fe             jmp loc_807c
 loc_8233:
 08233  c7 06 37 46 03 00    mov word ptr [0x4637], 3    ; fiche_heros_courant
 08239  a0 98 31             mov al, byte ptr [0x3198]
 0823c  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
-0823f  e8 06 a8             call son_effet_2
+0823f  e8 06 a8             call son_clic
 08242  e9 37 fe             jmp loc_807c
 
 ; ======== sub_8245   (appelée depuis 819e)
@@ -15507,7 +15514,7 @@ loc_8410:
 loc_8439:
 08439  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0    ; choix_menu
 0843e  74 94                je loc_83d4
-08440  e9 05 a6             jmp son_effet_2
+08440  e9 05 a6             jmp son_clic
 
 ; ======== sauve_quest_sav   (appelée depuis 7a18)
 ; écrit QUEST.SAV
@@ -16112,7 +16119,7 @@ loc_8a17:
 08a31  75 02                jne loc_8a35
 08a33  eb e2                jmp loc_8a17
 loc_8a35:
-08a35  e8 10 a0             call son_effet_2
+08a35  e8 10 a0             call son_clic
 08a38  e8 19 af             call sub_3954
 08a3b  c6 06 3b ad 00       mov byte ptr [0xad3b], 0
 08a40  90                   nop

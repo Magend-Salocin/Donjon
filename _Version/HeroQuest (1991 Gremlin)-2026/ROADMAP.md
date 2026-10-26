@@ -29,11 +29,11 @@ Ordre proposé, du socle vers le jeu :
 
 Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (installé, voir [DEBOGUER.md](outils/DEBOGUER.md)) : points d'arrêt, lecture du segment de données.
 
-Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (202 sur 380 au 26 octobre). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
+Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (210 sur 380 au 26 octobre). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
 
 | Sous-système | État | Note |
 | --- | --- | --- |
-| Socle | configuration, commandes et fichiers lus ; son et vidéo repérés | [01-socle.md](original/notes/01-socle.md) |
+| Socle | configuration, commandes, fichiers et interface du son lus ; vidéo repérée | [01-socle.md](original/notes/01-socle.md) |
 | Machine d'écrans | boucle principale, menu titre, héros, armurerie, choix de la quête, affichage, messages, boucle des tours, inventaire, briefing et préparation de la quête, sauvegarde des personnages | [02-ecrans.md](original/notes/02-ecrans.md) |
 | Règles | dés, déplacement, attaque du héros, trésors ; tour d'un personnage, panneau d'icônes, événements et fouilles scriptés, sorts et leurs effets, objets (armes, armures, potions, artefacts, trousse à outils), monstres (chemin, attaque, types), dés d'attaque et de défense, fin de quête et récompenses, mort d'un héros, pièges, portée des armes, fouilles et cartes trésor, les 30 événements scriptés, événements de zone et morts des monstres spéciaux, panneau (positions) et déplacement | [03-regles.md](original/notes/03-regles.md) |
 | Textes | index des messages décodé (`french-messages.txt`), annoté dans le listing | [02-ecrans.md](original/notes/02-ecrans.md#messages) |
@@ -43,7 +43,7 @@ Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` d
 1. Index des messages des fichiers de textes : fait (`original/donnees/textes/*-messages.txt`), boutons compris (position, libellé, numéro).
 2. MEN.VGA : fait (31 poses et séquences du gros plan du combat, `original/donnees/combat.json`).
 3. ANIMS.VGA : fait (non compressé, 5 plans de bits ; 47 images des 6 scènes de l'intro, `original/donnees/anims.json`).
-4. Musique et effets : `GAME&FX.ALB` et `.RLD` (AdLib), `ADLIB.DRV`.
+4. Musique et effets : interface du pilote et numéros des morceaux faits ([01-socle.md](original/notes/01-socle.md#son)). Reste le contenu des morceaux (GAME&FX.ALB), selon la décision D3.
 5. `QUEST.SAV` : fait (32 personnages, noms et fiches ; voir FORMATS.md). Les quêtes accomplies ne sont mémorisées nulle part : le fichier fait exactement 32 noms et 32 fiches, et le joueur choisit librement sa quête.
 
 ## Phase 3 : portage JavaScript

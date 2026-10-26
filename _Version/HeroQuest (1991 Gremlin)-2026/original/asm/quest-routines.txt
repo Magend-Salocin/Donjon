@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 380, dont 203 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 210 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 00000  ecran_shields              236    1  |     0962 3759 37ed erreur_fichier fichier_nom fichier_offset fichier_segment mode_video seg_annexe segment_source  "shields.ega"
@@ -122,15 +122,15 @@
 027cf  sub_27cf                    42    0  |     
 027f9  sub_27f9                    23    4  |     
 02810  sub_2810                    23    4  |     
-02827  son_effet_1                 95    8  | 60h    319e son_actif son_pilote
-02886  sub_2886                   115    1  | 60h    319e son_actif son_pilote
-028f9  sub_28f9                   107    1  | 60h    0e57 319e son_actif son_pilote
-02964  sub_2964                   108    1  | 60h    319e son_actif son_pilote
-029d0  sub_29d0                   120    1  | 60h    319e son_actif son_pilote
-02a48  son_effet_2                 95   15  | 60h    319e son_actif son_pilote
-02aa7  sub_2aa7                    95    3  | 60h    319e son_actif son_pilote
-02b06  sub_2b06                   136    1  | 60h    0e57 319e son_actif son_pilote
-02b8e  sub_2b8e                    42   12  |   0x42 0x61  
+02827  son_porte                   95    8  | 60h    son_actif son_effet_poignee son_pilote
+02886  son_monstre_tue            115    1  | 60h    son_actif son_effet_poignee son_pilote
+028f9  son_pas                    107    1  | 60h    0e57 son_actif son_effet_poignee son_pilote
+02964  son_sort                   108    1  | 60h    son_actif son_effet_poignee son_pilote
+029d0  son_monstre_touche         120    1  | 60h    son_actif son_effet_poignee son_pilote
+02a48  son_clic                    95   15  | 60h    son_actif son_effet_poignee son_pilote
+02aa7  son_piege                   95    3  | 60h    son_actif son_effet_poignee son_pilote
+02b06  son_des                    136    1  | 60h    0e57 son_actif son_effet_poignee son_pilote
+02b8e  son_bip                     42   12  |   0x42 0x61  
 02bb8  mort_ouvre_escalier         36    1  |     3f97 5932 5933 5934 594c 594d 594e
 02bdc  mort_sorcier_final           6    1  |     fin_du_jeu
 02be2  brume_gauche                12    1  |     pas_brume
@@ -201,10 +201,10 @@
 046be  etalonne_joystick           78    1  | 10h/? 21h/09  dx  320a 320b 320d
 0470e  sub_470e                    68    2  |   dx  320a
 04755  sub_4755                    25    1  |   dx  
-0476e  son_arret                   56    1  | 60h  0x61  319c 319e son_actif son_pilote
-047a6  son_charge_pilote          127    1  | 21h/48 60h    319a 3206 3208 37f9 erreur_fichier fichier_nom fichier_offset fichier_segment son_actif son_pilote
-04825  son_prepare                 43    1  | 60h    319a 319c son_pilote
-04850  son_musique                283    1  | 10h/? 21h/4c 60h  0x61  0e0f 319c 3956 3eb4 3fce 40cc deplacement_restant etat_action numero_quete son_actif son_pilote
+0476e  son_arret                   56    1  | 60h  0x61  son_actif son_effet_poignee son_musique_poignee son_pilote
+047a6  son_charge_pilote          127    1  | 21h/48 60h    3206 3208 37f9 erreur_fichier fichier_nom fichier_offset fichier_segment seg_son_donnees son_actif son_pilote
+04825  son_prepare                 43    1  | 60h    seg_son_donnees son_musique_poignee son_pilote
+04850  son_musique                283    1  | 10h/? 21h/4c 60h  0x61  0e0f 3956 3eb4 3fce 40cc deplacement_restant etat_action numero_quete son_actif son_musique_poignee son_pilote
 04968  pas_droite                 199    0  |     0e0f 3eb4 3fce 40cc deplacement_restant etat_action numero_quete
 04a2f  pas_haut                   200    0  |     0e0f 3eb4 3fce 40cc deplacement_restant etat_action numero_quete
 04af7  pas_bas                    689    0  |     0e0f 0e11 0e57 3eb4 3f98 3fc8 3fce 409b 40cc deplacement_restant etat_action message_en_attente
