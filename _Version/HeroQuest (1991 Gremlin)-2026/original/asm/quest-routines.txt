@@ -1,10 +1,10 @@
-; Routines de QUEST.EXE : 380, dont 148 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 150 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom fichier_offset  "questb.ega"
 00246  partie                     173    1  | 10h/? 21h/4c    3196 3197 3198 3fe9 4635 commandes commandes_joueurs numero_quete
 002f3  prepare_heros               86    1  |     fiche_heros_courant
-00349  tour_personnage            313    5  |     0e0e 0e0f 0e11 3f97 3f9a 3fb3 3fc8 3fce 402c 40cc 4639 commande_type
+00349  tour_personnage            313    5  |     0e0e 0e0f 0e11 3f97 3f9a 3fc8 3fce 402c 40cc 4639 attaque_repetee commande_type
 00480  evenements_quete           166    1  |     evenement_a evenement_b message_en_attente numero_quete
 00526  sub_0526                    47    2  |     0e58 0e5a 3f97 3f99
 00555  sub_0555                   118    3  |     37f5 37f7 3f94 3f9e 3fe4 fiche_heros_courant index_case_courante
@@ -20,10 +20,10 @@
 00790  sub_0790                    48    1  |     fiche_heros_courant numero_quete
 007c0  sub_07c0                   115    0  |     3f97
 00833  mode_attaque               259    0  |     3f91 3f9d 3fac 3fb1 3fe9 4289 cible commandes fiche_heros_courant numero_quete personnage_courant resultat_vise
-00936  attaque_heros              264    0  |     0e0e 3fb3 attaquant boucliers choix_menu cible cranes des_attaque_heros des_defense_monstre fiche_heros_courant
-00a3e  sub_0a3e                   197    1  |     3fb0 3fb2 3fb7 cible resultat_vise
+00936  attaque_heros              264    0  |     0e0e attaquant attaque_repetee boucliers choix_menu cible cranes des_attaque_heros des_defense_monstre fiche_heros_courant
+00a3e  portee_attaque             197    1  |     3fb0 3fb2 attaque_a_distance cible resultat_vise
 00b03  sub_0b03                     6    0  |     
-00b09  sub_0b09                    19    1  |     3fb7
+00b09  sub_0b09                    19    1  |     attaque_a_distance
 00b1c  sub_0b1c                    12    1  |     3fb2 resultat_vise
 00b28  calcule_des_monstre         28    3  |     cible des_attaque_monstre des_defense_monstre
 00b44  bonus_attaque_heros         71    1  |     cible des_attaque_heros fiche_heros_courant numero_quete
@@ -96,10 +96,10 @@
 01d89  sub_1d89                     6    0  |     
 01d8f  combat_monstre             255    2  |     3fb6 3fbc attaquant erreur_fichier fiche_heros_courant fichier_nom fichier_offset fichier_segment fichier_taille mode_video personnage_courant seg_annexe  "maps.ega"
 01e90  attaque_contre_heros       131    1  |     attaquant boucliers cranes des_attaque_monstre des_defense_heros fiche_heros_courant heros_courant
-01f14  sub_1f14                   446    1  | 4bh  dx  37ed 37f1 37f7 3fb7 3fc8 3fcc 4bcc 4bcd 4bce 4bd2 4bd6 4be5
+01f14  animation_combat           446    1  | 4bh  dx  37ed 37f1 37f7 3fc8 3fcc 4bcc 4bcd 4bce 4bd2 4bd6 4be5 4bed
 020bb  sub_20bb                   100    1  |     3fc8 3fcc attaquant cible erreur_fichier
 02120  retire_monstre              45    4  |     
-0214d  calcule_attaque_heros      106    1  |     3fb7 cible des_attaque_heros fiche_heros_courant
+0214d  calcule_attaque_heros      106    1  |     attaque_a_distance cible des_attaque_heros fiche_heros_courant
 021b7  de_combat                   10   10  |     
 021c1  tour_morcar                 86    1  |     3f9d 3fe9 467b 4695 46af 46c9 46e3 47f1
 02217  tour_monstre               172    1  |     3fbc 3fe6 attaquant numero_quete resultat_vise
@@ -140,7 +140,7 @@
 02c16  sub_2c16                    16    1  |     3fe6
 02c26  sub_2c26                    16    1  |     3fe6
 02c36  brume_de_mort               62    1  |     heros_courant
-02c74  action_sort                272    0  |     3f91 3f9b 3f9d 3fac 3fad 3fae 3fb3 3fb5 3fc9 3fe9 402c 4301
+02c74  action_sort                272    0  |     3f91 3f9b 3f9d 3fac 3fad 3fae 3fb5 3fc9 3fe9 402c 4301 attaque_repetee
 02d84  retire_sort                 40    2  |     
 02dac  sub_2dac                    82    1  |     3fc8 3fcc 3fee 3fef 3ff0 3ff1 3ff3 3ff9 deplacement_restant erreur_fichier fiche_heros_courant resultat_vise
 02dff  sub_2dff                   184    4  |     3fc8 3ff0 3ff1 3ff2 3ff3 3ff5 3ff6 3ff9

@@ -17,7 +17,7 @@ Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes,
 | +9, +0x0A | or, sur 16 bits |
 | +0x0B, +0x0C | sorts connus, un bit par sort : sorts 1 à 6 dans +0x0B, 7 à 12 dans +0x0C |
 | +0x0D | artefacts possédés : 1 armure de Borin, 2 baguette de rappel (lue au début du tour), 4 talisman du savoir, 8 poison d'orc, 0x10 lame de l'esprit |
-| +0x0E, +0x0F | équipement acheté, un bit par objet (voir l'armurerie dans [02-ecrans.md](02-ecrans.md#armurerie)) ; le bit 0x2000 (+0x0F bit 0x20) empêche l'attaque (?) |
+| +0x0E, +0x0F | équipement acheté, un bit par objet (voir l'armurerie dans [02-ecrans.md](02-ecrans.md#armurerie)) ; +0x0F bit 0x20 : l'or de la mine de la 10e quête (`fin_or_faux`) ; le héros qui le porte ne peut ni attaquer ni se défendre (?). +0x0F bit 0x40 : objet de quête porté (coffre de la 4e quête, 9e quête) |
 | +0x10 | potions possédées : 1 force, 2 ténacité, 4 et 8 curatives, 0x10 eau bénite, 0x20 rapidité, 0x40 héroïque |
 | +0x11 | arme en main (un seul bit, dans l'ordre de +0x0E) |
 | +0x12 | artefacts en service (bits de +0x0D) |
@@ -162,7 +162,7 @@ Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTIL
 `combat_monstre` (0x1D8F) charge les images de combat (MEN), calcule les dés, appelle `attaque_contre_heros`, puis recharge MAPS. Les dés :
 
 - Attaque du monstre : deuxième octet de `types_monstres` (DS:4806, 5 octets par type : déplacement, attaque, défense, routine appelée à sa mort).
-- Défense du héros (`calcule_defense_heros`, 0x0B8B) : +0x15, remplacé par 4 avec l'armure de Borin ou l'armure de plates, 3 avec la cotte de mailles ; +1 avec le bouclier, +1 avec le casque ; +2 avec la potion de ténacité ou la peau de pierre, effets consommés par cette défense. Aucun dé si +0x0F bit 0x20 est posé (?).
+- Défense du héros (`calcule_defense_heros`, 0x0B8B) : +0x15, remplacé par 4 avec l'armure de Borin ou l'armure de plates, 3 avec la cotte de mailles ; +1 avec le bouclier, +1 avec le casque ; +2 avec la potion de ténacité ou la peau de pierre, effets consommés par cette défense. Aucun dé si +0x0F bit 0x20 est posé (l'or de la mine ?).
 - `attaque_contre_heros` : le héros compte comme boucliers toutes les faces sauf le bouclier blanc (4 faces sur 6, au lieu des 2 boucliers blancs du jeu de plateau) ; les crânes du monstre moins ces boucliers sont retirés des points de corps. « VOUS AVEZ SURVECU A L'ATTAQUE », ou `mort_heros`.
 
 Types de monstres (`types_monstres`) :
@@ -190,7 +190,19 @@ Les types 14 à 26 (extension) sont dans la même table. Une routine de mort est
 | Glaive (épée large) | 3 | Lance | 2 |
 | Hache d'armes | 4 | | |
 
-Les bits hauts de la table (0x80 pour le bâton, l'épée courte, la lance et l'arbalète ; 0x40, 0x20, 0x10) sont sans doute les portées (diagonale, lancer, tir) : à lire. Le poison d'orc donne 2 dés, la lame de l'esprit 3 (4 contre squelettes, zombis et momies). Puis (0x0B44) : contre le Sorcier-Roi, aucun dé sans la lame de l'esprit ; +2 avec la potion de force ou le courage, consommés par cette attaque.
+Les bits hauts de la table (0x80, 0x40, 0x20, 0x10) ne sont pas lus : la portée est codée dans `portee_attaque`. Le poison d'orc donne 2 dés, la lame de l'esprit 3 (4 contre squelettes, zombis et momies). Puis (`bonus_attaque_heros`, 0x0B44) : contre le Sorcier-Roi, aucun dé sans la lame de l'esprit ; +2 avec la potion de force ou le courage, consommés par cette attaque.
+
+`mode_attaque` (0x0833), quand l'icône d'attaque est enfoncée (pas pour Sir Ragnar, ni avec l'or de la mine, +0x0F bit 0x20) : le joueur clique sur un monstre ; la zone DS:4337 ou le bouton droit annulent. Le monstre doit être actif (+6 bit 1), sinon « ENNEMI HORS DE PORTEE DE VOTRE ARME ». Puis `portee_attaque` (0x0A3E), selon l'arme en main (+0x11) :
+
+| Position du monstre | Armes permises | Refus |
+| --- | --- | --- |
+| case voisine, sans mur entre les deux | toutes sauf l'arbalète | arbalète, ou mur : « VOUS NE POUVEZ PAS TIRER D'ICI » |
+| case en diagonale | bâton, épée courte, lance | les autres : « ENNEMI HORS DE PORTEE » |
+| plus loin | arbalète, hache à main, lance, si la ligne de vue est libre (`sub_113e`) | les autres : « ENNEMI HORS DE PORTEE » ; ligne de vue coupée : « VOUS NE POUVEZ PAS TIRER D'ICI » |
+
+Une hache à main ou une lance lancée est perdue (retirée de +0x11 et de +0x0E), l'arbalète non.
+
+`attaque_heros` (0x0936) : le héros lance ses dés et compte les crânes ; le monstre lance ses dés de défense (`types_monstres`) et compte les boucliers noirs (face 2, 1 sur 6). Plus de crânes que de boucliers : le monstre est tué (+7 = 0, puis `retire_monstre`), quel que soit son type ; il n'a pas de points de corps. « L'ENNEMI EST MORT » ou « L'ENEMI A SURVECU ». Avec le poison d'orc, un orc qui survit peut être attaqué une seconde fois (« VOULEZ-VOUS ATTAQUER A NOUVEAU? », une fois par tour). La potion héroïque est consommée après l'attaque.
 
 ## Pièges
 

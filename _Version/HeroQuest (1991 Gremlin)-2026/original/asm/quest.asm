@@ -341,7 +341,7 @@ loc_0371:
 00379  c3                   ret
 loc_037a:
 0037a  c6 06 cc 40 ff       mov byte ptr [0x40cc], 0xff
-0037f  c6 06 b3 3f 00       mov byte ptr [0x3fb3], 0
+0037f  c6 06 b3 3f 00       mov byte ptr [0x3fb3], 0    ; attaque_repetee
 00384  c6 06 c8 3f 00       mov byte ptr [0x3fc8], 0
 00389  c7 06 ce 3f 00 00    mov word ptr [0x3fce], 0
 0038f  c6 06 c4 3f 00       mov byte ptr [0x3fc4], 0    ; des_deplacement
@@ -904,7 +904,7 @@ loc_0894:
 0089f  e9 08 0a             jmp loc_12aa
 loc_08a2:
 008a2  e8 a8 18             call calcule_attaque_heros
-008a5  e8 96 01             call sub_0a3e
+008a5  e8 96 01             call portee_attaque
 008a8  a2 a8 3f             mov byte ptr [0x3fa8], al    ; resultat_vise
 008ab  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 008af  80 3e b1 3f 00       cmp byte ptr [0x3fb1], 0
@@ -1012,7 +1012,7 @@ loc_0971:
 009a3  76 04                jbe loc_09a9
 009a5  c6 44 07 00          mov byte ptr [si + 7], 0
 loc_09a9:
-009a9  e8 68 15             call sub_1f14
+009a9  e8 68 15             call animation_combat
 009ac  e8 c0 5b             call sauve_tampon
 009af  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 009b3  80 7c 07 00          cmp byte ptr [si + 7], 0
@@ -1042,7 +1042,7 @@ loc_09cd:
 009f3  eb 32                jmp loc_0a27
 ; ---- 1 octets non atteints (09f5-09f5)
 loc_09f6:
-009f6  f6 06 b3 3f 01       test byte ptr [0x3fb3], 1
+009f6  f6 06 b3 3f 01       test byte ptr [0x3fb3], 1    ; attaque_repetee
 009fb  74 03                je loc_0a00
 009fd  eb 28                jmp loc_0a27
 ; ---- 1 octets non atteints (09ff-09ff)
@@ -1066,7 +1066,7 @@ loc_0a13:
 00a17  eb 0e                jmp loc_0a27
 ; ---- 1 octets non atteints (0a19-0a19)
 loc_0a1a:
-00a1a  80 0e b3 3f 01       or byte ptr [0x3fb3], 1
+00a1a  80 0e b3 3f 01       or byte ptr [0x3fb3], 1    ; attaque_repetee
 00a1f  c6 06 0e 0e 01       mov byte ptr [0xe0e], 1
 00a24  e9 1a ff             jmp loc_0941
 loc_0a27:
@@ -1079,7 +1079,8 @@ loc_0a35:
 00a38  e8 1b 5f             call sub_6956
 00a3b  e9 6c 08             jmp loc_12aa
 
-; ======== sub_0a3e   (appelée depuis 08a5)
+; ======== portee_attaque   (appelée depuis 08a5)
+; 0 permis ; FCh hors de portée, FDh arbalète au contact, FEh mur ou ligne de vue coupée
 00a3e  c6 06 b0 3f 00       mov byte ptr [0x3fb0], 0
 00a43  c6 06 b2 3f 00       mov byte ptr [0x3fb2], 0
 00a48  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
@@ -1166,7 +1167,7 @@ loc_0ad4:
 00ae6  b0 fc                mov al, 0xfc
 00ae8  c3                   ret
 loc_0ae9:
-00ae9  c6 06 b7 3f 01       mov byte ptr [0x3fb7], 1
+00ae9  c6 06 b7 3f 01       mov byte ptr [0x3fb7], 1    ; attaque_a_distance
 00aee  e8 2b 00             call sub_0b1c
 00af1  32 c0                xor al, al
 00af3  80 3e a8 3f 01       cmp byte ptr [0x3fa8], 1    ; resultat_vise
@@ -1174,7 +1175,7 @@ loc_0ae9:
 00afa  c3                   ret
 loc_0afb:
 00afb  b0 fe                mov al, 0xfe
-00afd  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0
+00afd  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0    ; attaque_a_distance
 00b02  c3                   ret
 
 ; ======== sub_0b03   (routine probable : non appelée directement)
@@ -1183,7 +1184,7 @@ loc_0afb:
 00b08  c3                   ret
 
 ; ======== sub_0b09   (appelée depuis 0b03)
-00b09  f6 06 b7 3f 20       test byte ptr [0x3fb7], 0x20
+00b09  f6 06 b7 3f 20       test byte ptr [0x3fb7], 0x20    ; attaque_a_distance
 00b0e  75 01                jne loc_0b11
 00b10  c3                   ret
 loc_0b11:
@@ -3557,9 +3558,10 @@ loc_1f0d:
 01f10  e8 da 69             call affiche_message
 01f13  c3                   ret
 
-; ======== sub_1f14   (appelée depuis 09a9)
+; ======== animation_combat   (appelée depuis 09a9)
+; gros plan du combat ; retire la hache à main ou la lance lancée
 01f14  8b 3e d6 3f          mov di, word ptr [0x3fd6]    ; attaquant
-01f18  80 3e b7 3f 00       cmp byte ptr [0x3fb7], 0
+01f18  80 3e b7 3f 00       cmp byte ptr [0x3fb7], 0    ; attaque_a_distance
 01f1d  74 22                je loc_1f41
 01f1f  f6 45 11 20          test byte ptr [di + 0x11], 0x20
 01f23  74 08                je loc_1f2d
@@ -3605,7 +3607,7 @@ loc_1f71:
 01f80  c6 06 c8 3f 03       mov byte ptr [0x3fc8], 3
 01f85  c7 06 cc 3f d0 29    mov word ptr [0x3fcc], 0x29d0
 01f8b  8b 8f d9 a1          mov cx, word ptr [bx - 0x5e27]
-01f8f  80 3e b7 3f 00       cmp byte ptr [0x3fb7], 0
+01f8f  80 3e b7 3f 00       cmp byte ptr [0x3fb7], 0    ; attaque_a_distance
 01f94  74 20                je loc_1fb6
 01f96  8b 8f f9 a1          mov cx, word ptr [bx - 0x5e07]
 01f9a  eb 1a                jmp loc_1fb6
@@ -3613,7 +3615,7 @@ loc_1f9c:
 01f9c  8b 8f e9 a1          mov cx, word ptr [bx - 0x5e17]
 01fa0  c7 06 cc 3f 86 28    mov word ptr [0x3fcc], 0x2886
 01fa6  c6 06 c8 3f 06       mov byte ptr [0x3fc8], 6
-01fab  80 3e b7 3f 00       cmp byte ptr [0x3fb7], 0
+01fab  80 3e b7 3f 00       cmp byte ptr [0x3fb7], 0    ; attaque_a_distance
 ; ---- -1 octets non atteints (1fb0-1fae)
 loc_1faf:
 01faf  00 74 04             add byte ptr [si + 4], dh
@@ -3622,7 +3624,7 @@ loc_1faf:
 01fb2  8b 8f 09 a2          mov cx, word ptr [bx - 0x5df7]
 loc_1fb6:
 01fb6  8b 9f b7 a1          mov bx, word ptr [bx - 0x5e49]
-01fba  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0
+01fba  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0    ; attaque_a_distance
 loc_1fbf:
 01fbf  c7 06 f7 37 f4 01    mov word ptr [0x37f7], 0x1f4
 01fc5  89 0e ed 37          mov word ptr [0x37ed], cx
@@ -3816,7 +3818,7 @@ loc_215d:
 02166  8a 4d 12             mov cl, byte ptr [di + 0x12]
 02169  f6 c1 08             test cl, 8
 0216c  74 0b                je loc_2179
-0216e  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0
+0216e  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0    ; attaque_a_distance
 02173  c6 06 b8 3f 02       mov byte ptr [0x3fb8], 2    ; des_attaque_heros
 02178  c3                   ret
 loc_2179:
@@ -3825,7 +3827,7 @@ loc_2179:
 0217e  c3                   ret
 loc_217f:
 0217f  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
-02183  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0
+02183  c6 06 b7 3f 00       mov byte ptr [0x3fb7], 0    ; attaque_a_distance
 02188  8a 44 08             mov al, byte ptr [si + 8]
 0218b  3c 04                cmp al, 4
 0218d  74 0e                je loc_219d
@@ -5294,11 +5296,11 @@ loc_2c8c:
 02c91  74 16                je loc_2ca9
 02c93  f6 06 9b 3f 00       test byte ptr [0x3f9b], 0
 02c98  74 1c                je loc_2cb6
-02c9a  f6 06 b3 3f 02       test byte ptr [0x3fb3], 2
+02c9a  f6 06 b3 3f 02       test byte ptr [0x3fb3], 2    ; attaque_repetee
 02c9f  74 01                je loc_2ca2
 02ca1  c3                   ret
 loc_2ca2:
-02ca2  80 0e b3 3f 02       or byte ptr [0x3fb3], 2
+02ca2  80 0e b3 3f 02       or byte ptr [0x3fb3], 2    ; attaque_repetee
 02ca7  eb 0d                jmp loc_2cb6
 loc_2ca9:
 02ca9  80 3e 01 43 1c       cmp byte ptr [0x4301], 0x1c

@@ -1049,6 +1049,8 @@ DS:3f90  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
 ; DS:3fa9  longueur_chemin
 ; DS:3faf  objet_choisi
 DS:3fa0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+; DS:3fb3  attaque_repetee
+; DS:3fb7  attaque_a_distance
 ; DS:3fb8  des_attaque_heros
 ; DS:3fb9  des_defense_heros
 ; DS:3fba  des_attaque_monstre

@@ -335,3 +335,9 @@
 0x1287  code  personnage_en_dx       AL = 1 si un personnage est sur la case DX
 0x3fc2  var   piege_en_cours         type de piège à appliquer (0 aucun)
 0x3fec  var   case_piege             index de la case du piège
+
+# ---- Attaque du héros (voir original/notes/03-regles.md#attaque-du-héros)
+0x0a3e  code  portee_attaque         0 permis ; FCh hors de portée, FDh arbalète au contact, FEh mur ou ligne de vue coupée
+0x1f14  code  animation_combat       gros plan du combat ; retire la hache à main ou la lance lancée
+0x3fb7  var   attaque_a_distance     1 : arme lancée ou tirée
+0x3fb3  var   attaque_repetee        bit 1 : seconde attaque du poison d'orc déjà faite
