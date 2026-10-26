@@ -1,0 +1,165 @@
+[
+ {
+  "ecran": "hero1",
+  "debut": 0,
+  "images": 4,
+  "largeur": 16,
+  "hauteur": 16,
+  "sprites": [
+   {
+    "x": 260,
+    "y": 104,
+    "boucle": [
+     0,
+     1,
+     2,
+     3
+    ]
+   }
+  ]
+ },
+ {
+  "ecran": "hero2",
+  "debut": 640,
+  "images": 3,
+  "largeur": 32,
+  "hauteur": 64,
+  "sprites": [
+   {
+    "x": 134,
+    "y": 88,
+    "boucle": [
+     0,
+     1,
+     2
+    ]
+   }
+  ]
+ },
+ {
+  "ecran": "hero4",
+  "debut": 4480,
+  "images": 4,
+  "largeur": 64,
+  "hauteur": 64,
+  "sprites": [
+   {
+    "x": 128,
+    "y": 32,
+    "boucle": [
+     0,
+     1,
+     2,
+     3
+    ]
+   }
+  ]
+ },
+ {
+  "ecran": "hero6",
+  "debut": 14720,
+  "images": 16,
+  "largeur": 16,
+  "hauteur": 16,
+  "sprites": [
+   {
+    "x": 128,
+    "y": 104,
+    "boucle": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "x": 98,
+    "y": 112,
+    "boucle": [
+     8,
+     9,
+     10,
+     11,
+     12
+    ]
+   },
+   {
+    "x": 120,
+    "y": 96,
+    "boucle": [
+     5,
+     6,
+     7
+    ]
+   },
+   {
+    "x": 120,
+    "y": 120,
+    "boucle": [
+     13,
+     14,
+     15
+    ]
+   }
+  ]
+ },
+ {
+  "ecran": "hero3",
+  "debut": 17280,
+  "images": 12,
+  "largeur": 16,
+  "hauteur": 16,
+  "sprites": [
+   {
+    "x": 224,
+    "y": 120,
+    "boucle": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "x": 104,
+    "y": 112,
+    "boucle": [
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   }
+  ]
+ },
+ {
+  "ecran": "hero7",
+  "debut": 19200,
+  "images": 8,
+  "largeur": 16,
+  "hauteur": 16,
+  "sprites": [
+   {
+    "x": 65,
+    "y": 120,
+    "boucle": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     6,
+     7
+    ]
+   }
+  ]
+ }
+]

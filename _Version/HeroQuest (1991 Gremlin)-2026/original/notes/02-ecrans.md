@@ -107,6 +107,23 @@ Le choix donne `numero_quete` (0 à 23, + 14 pour la page 2). `lance_quete` (0x8
    - 7e et 8e : le drapeau d'événement DS:3FC0 est posé (FFh).
 10. Mélange les 25 cartes trésor (`pioche_tresors`, DS:463B) et place le pointeur de pioche au début.
 
+## Intro
+
+INTRO.EXE enchaîne GREMLIN, PIC1, TEXT1, puis 6 scènes (tables DS:0052 texte, DS:005E palette, DS:006A écran ; routine de chaque scène dans la table CS:071E). Dans l'ordre : HERO1, HERO2, HERO4, HERO6, HERO3, HERO7. Chaque écran a sa palette de 32 couleurs ([palettes](../donnees/palettes.json)).
+
+Les sprites animés viennent de ANIMS.VGA, chargé tel quel (pas de compression) en segment 0x2523. Une image est rangée sur 5 plans de bits consécutifs (plan 0 = bit faible, 1 bit par pixel, rangée après rangée) ; trois routines la convertissent en un octet par pixel (0x4D50 pour 16 × 16, 0x4D93 pour 32 × 64, 0x4DDC pour 64 × 64). La couleur 0 est transparente. Les 6 scènes occupent exactement les 20 480 octets du fichier :
+
+| Scène | Écran | Début | Images | Animation |
+| --- | --- | --- | --- | --- |
+| 1 | HERO1 | 0x0000 | 4 de 16 × 16 | une flamme en (260, 104), 24 images |
+| 2 | HERO2 | 0x0280 | 3 de 32 × 64 | feu en (134, 88), 10 tours |
+| 3 | HERO4 | 0x1180 | 4 de 64 × 64 | visage qui parle en (128, 32) |
+| 4 | HERO6 | 0x3980 | 16 de 16 × 16 | 4 sprites sur la table (bougies, parchemin), 30 images |
+| 5 | HERO3 | 0x4380 | 12 de 16 × 16 | 2 sprites, 30 images |
+| 6 | HERO7 | 0x4B00 | 8 de 16 × 16 | un sprite en (65, 120), qui finit en boucle sur ses 2 dernières images |
+
+`extraire.py` les range dans `original/donnees/images/anims/` et `original/donnees/anims.json` (positions et boucles).
+
 ## Gros plan du combat
 
 `animation_combat` (0x1F14) joue deux séquences en parallèle, une image toutes les 50 unités de `sub_4687` (la première attend 500) : celle du héros, dessiné de dos, et celle du monstre. Données extraites par `extraire.py` dans `original/donnees/combat.json` et `original/donnees/images/combat/men-NN.png`.

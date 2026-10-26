@@ -125,6 +125,53 @@ def combat():
     return len(poses)
 
 
+# Scènes animées de l'intro (INTRO.EXE, table CS:071E, routines 0x4A11 à 0x4B80), dans l'ordre du jeu :
+# écran de fond, début dans ANIMS.VGA, nombre d'images, largeur, hauteur, et les sprites posés à l'écran
+# (position, images jouées en boucle). Voir original/notes/02-ecrans.md, « Intro ».
+ANIMS = [
+    ('HERO1', 0x0000, 4, 16, 16, [((260, 104), [0, 1, 2, 3])]),
+    ('HERO2', 0x0280, 3, 32, 64, [((134, 88), [0, 1, 2])]),
+    ('HERO4', 0x1180, 4, 64, 64, [((128, 32), [0, 1, 2, 3])]),
+    ('HERO6', 0x3980, 16, 16, 16, [((128, 104), [0, 1, 2, 3, 4]), ((98, 112), [8, 9, 10, 11, 12]),
+                                   ((120, 96), [5, 6, 7]), ((120, 120), [13, 14, 15])]),
+    ('HERO3', 0x4380, 12, 16, 16, [((224, 120), [0, 1, 2, 3, 4]), ((104, 112), [5, 6, 7, 8, 9, 10, 11])]),
+    ('HERO7', 0x4B00, 8, 16, 16, [((65, 120), [0, 1, 2, 3, 4, 5, 6, 7, 6, 7])]),
+]
+
+
+def planaire(octets, largeur, hauteur):
+    """Image sur 5 plans de bits consécutifs (plan 0 = bit faible), 1 bit par pixel, rangée après rangée."""
+    taille_plan = largeur * hauteur // 8
+    pixels = bytearray(largeur * hauteur)
+    for plan in range(5):
+        for i, octet in enumerate(octets[plan * taille_plan:(plan + 1) * taille_plan]):
+            for bit in range(8):
+                if octet & (0x80 >> bit):
+                    pixels[i * 8 + bit] |= 1 << plan
+    return bytes(pixels)
+
+
+def anims():
+    """ANIMS.VGA : sprites des scènes de l'intro, non compressés, 32 couleurs (palette de l'écran de la scène)."""
+    intro = graphismes.exepack_unpack(JEU / 'INTRO.EXE')
+    brut = (JEU / 'ANIMS.VGA').read_bytes()
+    dossier = SORTIE / 'images' / 'anims'
+    dossier.mkdir(parents=True, exist_ok=True)
+    scenes, total = [], 0
+    for numero, (ecran, debut, nombre, largeur, hauteur, sprites) in enumerate(ANIMS, 1):
+        palette = palette_vga(intro[INTRO_ECRANS[ecran]:INTRO_ECRANS[ecran] + 96])
+        pas = largeur * hauteur * 5 // 8
+        for image in range(nombre):
+            pixels = planaire(brut[debut + image * pas:debut + (image + 1) * pas], largeur, hauteur)
+            ecrire_image(dossier / f'scene{numero}-{image:02d}.png', pixels, (largeur, hauteur), palette)
+        total += nombre
+        scenes.append({'ecran': ecran.lower(), 'debut': debut, 'images': nombre, 'largeur': largeur, 'hauteur': hauteur,
+                       'sprites': [{'x': x, 'y': y, 'boucle': boucle} for (x, y), boucle in sprites]})
+    assert total and debut + nombre * pas == len(brut)
+    (SORTIE / 'anims.json').write_text(json.dumps(scenes, indent=1), encoding='utf-8')
+    return total
+
+
 def textes():
     dossier = SORTIE / 'textes'
     dossier.mkdir(parents=True, exist_ok=True)
@@ -231,6 +278,7 @@ def quetes():
 def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
     print(f'{palettes_et_ecrans()} écrans, {images()} sprites du plateau, {combat()} poses de combat, '
+          f'{anims()} images animées de l\'intro, '
           f'{textes()} langues, {quetes()} quêtes')
 
 

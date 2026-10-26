@@ -62,7 +62,7 @@ Routine 0x45D1. Un octet de commande `b`, puis :
 | `0x80`-`0xBF` | recopier `n + 1` octets déjà écrits, `n` = 2 si `b & 0x20` sinon 1, à partir de `fin − 1 − (b & 0x1F) − n` |
 | `0xC0`-`0xFF` | `n = ((b & 0x3F) >> 2) + 3`, distance `d = (b & 3) × 256 + suivant`, recopier `n + 1` octets depuis `fin − 1 − d − n` |
 
-Format confirmé sur tous les .VGA sauf `ANIMS.VGA` (autre format, non étudié), et sur `ENGLISH.BIN`, `FRENCH.BIN`, `GERMAN.BIN`, `ITALIAN.BIN`, `SPANISH.BIN`.
+Format confirmé sur tous les .VGA sauf `ANIMS.VGA` (non compressé : images sur 5 plans de bits, voir les notes du remake, « Intro »), et sur `ENGLISH.BIN`, `FRENCH.BIN`, `GERMAN.BIN`, `ITALIAN.BIN`, `SPANISH.BIN`.
 
 ## Palette
 
@@ -235,4 +235,3 @@ Effets des pièges, cartes trésor (0x87DD : mélange des 25 cartes) et fouilles
 - Événements scriptés : relier les numéros d'événement par zone (position 1036 des quêtes) aux textes de `FRENCH.BIN` et au code qui les déclenche. C'est ce qui manque pour convertir les quêtes 5 (passage secret) et 10 (portails magiques), et pour les objectifs « délivrer » ou « trouver ».
 - Compléter le découpage des icônes 16 × 16 d'ODDS&SOD, de SHOPSP 0x6000 et d'INVENT 0xA680.
 - Écran de fond : `BOOK.VGA` (le livre et Morcar) n'est pas encore utilisé par la vue isométrique.
-- `ANIMS.VGA` (intro) : autre format de compression.
