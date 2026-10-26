@@ -88,7 +88,7 @@
 0x3907  var   fichier_nom            pointeur vers le nom du fichier
 0x3909  var   fichier_handle
 0x37e9  var   erreur_fichier
-0x3f92  var   numero_quete
+0x3f92  var   numero_quete           commence à 0 : 0 = Le labyrinthe, 1 = Sir Ragnar...
 0x3f93  var   index_case_courante
 0x3f9c  var   deplacement_restant
 0x3fb8  var   des_attaque_heros
@@ -186,3 +186,24 @@
 0x4663  table fiches_personnages     5 fiches de 26 octets : 4 héros, puis un personnage joué par le joueur 1 (escorté ?)
 0x4d4a  table monstres               32 monstres de 10 octets, même format que dans QUESTn.BIN
 0x3fc6  var   etat_quete             0x0F : fin de quête (?)
+
+# ---- Tour d'un personnage et panneau d'icônes (voir original/notes/03-regles.md)
+0x0480  code  evenements_quete       messages scriptés des quêtes 1, 6, 9, 15, 16 selon les drapeaux DS:3FBF et DS:3FC0
+0x0833  code  mode_attaque           actif quand l'icône attaque est enfoncée (état 0x1C) ; clic sur une cible, zone DS:4337 pour annuler
+0x5234  code  dessine_icones         dessine les 11 ou 12 icônes du panneau selon leur état
+0x5a7d  code  icones_actives         toutes les icônes à l'état 1 ; sorts cachés pour barbare, nain et 5e personnage
+0x5abe  code  icones_init
+0x5ae4  code  icones_selon_situation grise les fouilles si un monstre réveillé est dans la zone, etc.
+0x22c3  code  monstre_vise           le monstre DI regarde le personnage SI : même zone, chemin vers lui (DS:40A2, DS:3FA9) ; résultat DS:3FA8
+0x24ce  etiq  monstre_avance         déplace le monstre pas à pas sur le chemin calculé
+0x607e  code  index_case             index de la case (x, y) passée dans DX, dans BX
+0x3fbf  var   evenement_a            drapeau d'événement de quête (0x80 : message à afficher)
+0x3fc0  var   evenement_b
+0x3fea  var   message_en_attente     numéro de message à afficher au prochain tour (quête 9)
+0x3fa8  var   resultat_vise          0 ou 3 : le monstre agit sur ce personnage
+0x3fa9  var   longueur_chemin
+0x40a2  table chemin_monstre         pas (dx, dy) du chemin d'un monstre
+0x4277  table icones_panneau         12 octets par icône : +4 largeur, +5 hauteur, +6 état (FF cachée, 1 normale, 1C enfoncée, sinon grisée), +7 à redessiner, +8 position écran, +A image dans ODDS&SOD
+0x4337  table zone_annuler_attaque   (224, 180)-(240, 196)
+0x546f  table grille_zones           zone de chaque case de la quête en cours (?) ; +0x200 : objets (codes 0x30 à 0x5F)
+0x586f  table grille_occupants       occupant de chaque case (?)

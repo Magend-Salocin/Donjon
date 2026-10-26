@@ -48,21 +48,14 @@ def charger_messages():
     """Texte des messages (BX -> lignes jointes), d'après le fichier de textes décompressé par extraire.py."""
     if not MESSAGES.exists():
         return {}
-    brut, debuts, fin_table = MESSAGES.read_bytes(), [], None
-    fin_table = len(brut)
-    while 2 * len(debuts) < fin_table:
-        offset = struct.unpack('<H', brut[2 * len(debuts):2 * len(debuts) + 2])[0]
-        debuts.append(offset)
-        fin_table = min(fin_table, offset)
+    spec = importlib.util.spec_from_file_location('extraire', ICI / 'extraire.py')
+    extraire = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(extraire)
     messages = {}
-    for index, debut in enumerate(debuts):
-        entree = brut[debut:debut + 400]
-        lignes = [m[2:].split(b'\x00')[0].decode('cp437').strip() for m in entree.split(b'\x00')[0:1][0].split(b'\x11')[1:]]
-        bout = entree.split(b'\xff\xff', 1)
-        if len(bout) == 2:
-            lignes = [m[2:].split(b'\x00')[0].decode('cp437').strip() for m in bout[1].split(b'\x00', 1)[0].split(b'\x11')[1:]]
-        if lignes:
-            messages[2 * index] = ' / '.join(l for l in lignes if l)
+    for numero, entree in extraire.table_messages(MESSAGES.read_bytes()):
+        m = extraire.decoder_message(entree)
+        if m and m['lignes']:
+            messages[numero] = ' / '.join(t.strip() for _, _, t in m['lignes'] if t.strip())
     return messages
 SAUTS = re.compile(r'^(j\w+|loop\w*|jcxz)$')
 

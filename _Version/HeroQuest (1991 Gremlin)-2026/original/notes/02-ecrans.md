@@ -11,7 +11,7 @@ Dans `demarrage`, après la configuration et les chargements :
 1. `menu_titre` (0x7310). Le bit 0x40 de `commandes` fait quitter le jeu : retour au mode texte, puis int 21h AX=4C00h.
 2. `charge_ecran_plateau` : BOOK, MAPS, SPRITES.
 3. `partie` (0x0246) : la quête.
-4. Tant que `numero_quete` (DS:3F92) est inférieur à 15, retour au menu titre. Après la 14e quête, si DS:3FE7 est posé, écran de fin : le parchemin QUESTB et deux textes (DS:A5C4, puis DS:A7C2), affichés par `affiche_texte`.
+4. Tant que `numero_quete` (DS:3F92, compté à partir de 0) est inférieur à 15, retour au menu titre. Ensuite, si DS:3FE7 est posé, écran de fin : le parchemin QUESTB et deux textes (DS:A5C4, puis DS:A7C2), affichés par `affiche_texte`.
 
 ## Menu titre
 

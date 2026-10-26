@@ -99,36 +99,54 @@ def textes():
     return len(LANGUES)
 
 
-def messages(brut):
-    """Messages d'un fichier de textes, tel que le jeu le charge en DS:5FC1 (voir original/notes/02-ecrans.md).
-    Numéro = valeur passée dans BX à affiche_message (offset de l'entrée dans la table du début du fichier)."""
-    # La table d'offsets s'arrête là où commence le premier message : le plus petit offset lu jusque-là.
+def table_messages(brut):
+    """(numéro, octets de l'entrée) pour chaque message d'un fichier de textes décompressé.
+    La table d'offsets du début s'arrête là où commence le premier message : le plus petit offset lu jusque-là.
+    Numéro = valeur passée dans BX à affiche_message (voir original/notes/02-ecrans.md)."""
     debuts, fin_table = [], len(brut)
     while 2 * len(debuts) < fin_table:
         offset = struct.unpack('<H', brut[2 * len(debuts):2 * len(debuts) + 2])[0]
         debuts.append(offset)
         fin_table = min(fin_table, offset)
     bornes = sorted(set(debuts)) + [len(brut)]                 # des entrées partagent le même texte
-    lignes = ['# numéro (BX)  boîte : colonne ligne largeur hauteur  |  mots (boutons ?)  |  lignes : (ligne, colonne) texte', '']
     for index, debut in enumerate(debuts):
-        numero = 2 * index
         fin = next(b for b in bornes if b > debut) if debut < len(brut) else debut
-        entree = brut[debut:fin]
-        if len(entree) < 6:
-            lignes.append(f'{numero:04x}  (entrée vide ou hors du fichier : offset {debut:04x})')
+        yield 2 * index, brut[debut:fin]
+
+
+def decoder_message(entree):
+    """En-tête (6 octets), mots jusqu'à FFFFh, puis lignes « 11h, ligne, colonne, texte » jusqu'à 00h.
+    Lecture séquentielle : la ligne d'écran 17 s'écrit 11h, comme le marqueur. None si l'entrée est trop courte."""
+    if len(entree) < 6:
+        return None
+    mots, i = [], 6
+    while i + 1 < len(entree) and entree[i:i + 2] != b'\xff\xff':
+        mots.append(struct.unpack('<H', entree[i:i + 2])[0])
+        i += 2
+    i += 2
+    lignes = []
+    while i + 2 < len(entree) and entree[i] == 0x11:
+        ligne, colonne, j = entree[i + 1], entree[i + 2], i + 3
+        while j < len(entree) and entree[j] not in (0x00, 0x11):
+            j += 1
+        lignes.append((ligne, colonne, entree[i + 3:j].decode('cp437')))
+        if j >= len(entree) or entree[j] == 0x00:
+            break
+        i = j
+    return {'boite': list(entree[:4]), 'inconnu': list(entree[4:6]), 'mots': mots, 'lignes': lignes}
+
+
+def messages(brut):
+    """Liste lisible des messages d'un fichier de textes."""
+    lignes = ['# numéro (BX)  boîte : colonne ligne largeur hauteur  |  mots (boutons ?)  |  lignes : (ligne, colonne) texte', '']
+    for numero, entree in table_messages(brut):
+        m = decoder_message(entree)
+        if m is None:
+            lignes.append(f'{numero:04x}  (entrée vide ou hors du fichier)')
             continue
-        x, y, largeur, hauteur, a, b = entree[:6]
-        mots, i = [], 6
-        while i + 1 < len(entree) and entree[i:i + 2] != b'\xff\xff':
-            mots.append(struct.unpack('<H', entree[i:i + 2])[0])
-            i += 2
-        texte = []
-        for morceau in entree[i + 2:].split(b'\x11')[1:]:
-            if len(morceau) >= 2:
-                contenu = morceau[2:].split(b'\x00')[0].decode('cp437')
-                texte.append(f'({morceau[0]},{morceau[1]}) {contenu}')
-        lignes.append(f'{numero:04x}  {x} {y} {largeur} {hauteur} ({a} {b})  |  {" ".join(f"{m:04x}" for m in mots)}  |  '
-                      + ' / '.join(texte))
+        texte = ' / '.join(f'({l},{c}) {t}' for l, c, t in m['lignes'])
+        lignes.append(f'{numero:04x}  {" ".join(map(str, m["boite"]))} ({" ".join(map(str, m["inconnu"]))})  |  '
+                      f'{" ".join(f"{v:04x}" for v in m["mots"])}  |  {texte}')
     return '\n'.join(lignes) + '\n'
 
 
