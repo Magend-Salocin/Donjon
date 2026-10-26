@@ -523,7 +523,7 @@ loc_0525:
 0055c  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 0055f  88 45 03             mov byte ptr [di + 3], al
 00562  bd 00 00             mov bp, 0
-00565  e8 ac 0f             call sub_1514
+00565  e8 ac 0f             call revele_zone
 00568  89 1e e4 3f          mov word ptr [0x3fe4], bx
 0056c  c6 06 93 3f 00       mov byte ptr [0x3f93], 0    ; index_case_courante
 00571  bf d6 49             mov di, 0x49d6
@@ -568,7 +568,7 @@ loc_05c3:
 ; ======== sub_05cb   (appelée depuis 0302, 0317, 032c, 0342, 7270, 72ce, 72ef)
 005cb  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 005ce  bd 01 00             mov bp, 1
-005d1  e8 40 0f             call sub_1514
+005d1  e8 40 0f             call revele_zone
 005d4  bf d6 49             mov di, 0x49d6
 005d7  b9 1e 00             mov cx, 0x1e
 005da  32 f6                xor dh, dh
@@ -684,10 +684,11 @@ loc_06cd:
 006cf  c3                   ret
 
 ; ======== sub_06d0   (appelée depuis 042b)
-006d0  e8 03 00             call sub_06d6
+006d0  e8 03 00             call evenements_tour
 006d3  e9 9f 1e             jmp declenche_piege
 
-; ======== sub_06d6   (appelée depuis 06d0)
+; ======== evenements_tour   (appelée depuis 06d0)
+; quête 6 : équipement repris ; quête 12 : le Sorcier se réveille
 006d6  a0 92 3f             mov al, byte ptr [0x3f92]    ; numero_quete
 006d9  3c 05                cmp al, 5
 006db  75 03                jne loc_06e0
@@ -725,16 +726,16 @@ loc_0714:
 0071a  fe c8                dec al
 0071c  eb f6                jmp loc_0714
 loc_071e:
-0071e  a0 c1 3f             mov al, byte ptr [0x3fc1]
+0071e  a0 c1 3f             mov al, byte ptr [0x3fc1]    ; equipement_repris
 00721  22 c2                and al, dl
 00723  74 01                je loc_0726
 00725  c3                   ret
 loc_0726:
-00726  08 16 c1 3f          or byte ptr [0x3fc1], dl
+00726  08 16 c1 3f          or byte ptr [0x3fc1], dl    ; equipement_repris
 0072a  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]    ; personnage_courant
 0072e  32 ff                xor bh, bh
 00730  d1 e3                shl bx, 1
-00732  8b bf 8f 4a          mov di, word ptr [bx + 0x4a8f]
+00732  8b bf 8f 4a          mov di, word ptr [bx + 0x4a8f]    ; equipement_fiches
 00736  8b b7 97 4a          mov si, word ptr [bx + 0x4a97]
 0073a  50                   push ax
 0073b  b8 7c 09             mov ax, 0x97c
@@ -1334,13 +1335,14 @@ loc_0c11:
 00c1f  c3                   ret
 
 ; ======== prime_ulag
-; « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG »
+; « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG », mais ajoute 100
 00c20  bb a8 00             mov bx, 0xa8    ; message « L'EMPEREUR OFFRE 200 / PIECES D'OR A / L'ASSASSIN D'ULAG »
 00c23  e8 c7 7c             call affiche_message
 00c26  ba 64 00             mov dx, 0x64
 00c29  e9 da 5c             jmp ajoute_or
 
-; ======== sub_0c2c   (routine probable : non appelée directement)
+; ======== mort_balur
+; tous les héros reçoivent 150 pièces ; evenement_b = le tueur
 00c2c  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 00c2f  a2 c0 3f             mov byte ptr [0x3fc0], al    ; evenement_b
 00c32  32 c0                xor al, al
@@ -1358,14 +1360,15 @@ loc_0c34:
 00c47  75 eb                jne loc_0c34
 00c49  c3                   ret
 
-; ======== sub_0c4a   (routine probable : non appelée directement)
+; ======== prime_10
+; prime de 10 pièces (type 14)
 00c4a  b0 31                mov al, 0x31
 00c4c  ba 0a 00             mov dx, 0xa
 00c4f  eb 06                jmp loc_0c57
 ; ---- 1 octets non atteints (0c51-0c51)
 
 ; ======== prime_monstre
-; « VOUS RECEVEZ UNE PRIME DE .. PIECE D'OR »
+; prime de 20 pièces (type 15) : « VOUS RECEVEZ UNE PRIME DE 20 PIECE D'OR »
 00c52  b0 32                mov al, 0x32
 00c54  ba 14 00             mov dx, 0x14
 loc_0c57:
@@ -1379,13 +1382,15 @@ loc_0c57:
 00c6b  5a                   pop dx
 00c6c  e9 97 5c             jmp ajoute_or
 
-; ======== sub_0c6f   (routine probable : non appelée directement)
-00c6f  e8 09 00             call sub_0c7b
+; ======== mort_chaos_poison
+; prime de 30 et poison d'orc (type 18) : « LE GUERRIER DU CHAOS LACHE LE POISON DE L'ORC »
+00c6f  e8 09 00             call prime_30
 00c72  80 4d 0d 08          or byte ptr [di + 0xd], 8
 00c76  be ea 00             mov si, 0xea
-00c79  eb 14                jmp sub_0c8f
+00c79  eb 14                jmp loc_0c8f
 
-; ======== sub_0c7b   (appelée depuis 0c6f)
+; ======== prime_30   (appelée depuis 0c6f)
+; prime de 30 pièces (types 16, 17)
 00c7b  b0 33                mov al, 0x33
 00c7d  ba 1e 00             mov dx, 0x1e
 00c80  eb d5                jmp loc_0c57
@@ -1397,9 +1402,8 @@ loc_0c57:
 00c88  bb ec 00             mov bx, 0xec    ; message « LE ZOMBI LACHE / L'ETOILE DE L'OUEST. VOUS / RECEVEZ 200 PIECES D'OR »
 00c8b  e8 5f 7c             call affiche_message
 00c8e  c3                   ret
-
-; ======== sub_0c8f   (routine probable : non appelée directement)
-00c8f  e9 c4 59             jmp sub_6656
+loc_0c8f:
+00c8f  e9 c4 59             jmp loc_6656
 
 ; ======== sub_0c92   (routine probable : non appelée directement)
 00c92  bb fe 34             mov bx, 0x34fe
@@ -2162,7 +2166,7 @@ loc_130c:
 0130c  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 0130f  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01313  bd 01 00             mov bp, 1
-01316  e8 fb 01             call sub_1514
+01316  e8 fb 01             call revele_zone
 01319  bf d6 49             mov di, 0x49d6
 0131c  b9 1e 00             mov cx, 0x1e
 loc_131f:
@@ -2423,12 +2427,13 @@ loc_14bf:
 01510  89 44 0c             mov word ptr [si + 0xc], ax
 01513  c3                   ret
 
-; ======== sub_1514   (appelée depuis 0565, 05d1, 1316, 6da9, 721d)
+; ======== revele_zone   (appelée depuis 0565, 05d1, 1316, 6da9, 721d)
+; première révélation d'une zone (table DS:53C3) : drapeaux propres aux quêtes 2, 6, 7, 10, 12, 16
 01514  8a d8                mov bl, al
 01516  b7 00                mov bh, 0
 01518  03 db                add bx, bx
 0151a  03 db                add bx, bx
-0151c  81 c3 c3 53          add bx, 0x53c3
+0151c  81 c3 c3 53          add bx, 0x53c3    ; zones_revelees
 01520  8a d0                mov dl, al
 01522  8b 0f                mov cx, word ptr [bx]
 01524  89 0e e0 3f          mov word ptr [0x3fe0], cx
@@ -3962,7 +3967,7 @@ loc_2297:
 02297  b9 06 00             mov cx, 6
 loc_229a:
 0229a  51                   push cx
-0229b  8a 1e e6 3f          mov bl, byte ptr [0x3fe6]
+0229b  8a 1e e6 3f          mov bl, byte ptr [0x3fe6]    ; pas_brume
 0229f  d0 e3                shl bl, 1
 022a1  32 ff                xor bh, bh
 022a3  ff 97 57 46          call word ptr [bx + 0x4657]
@@ -5180,7 +5185,8 @@ loc_2b9f:
 02bb6  58                   pop ax
 02bb7  c3                   ret
 
-; ======== sub_2bb8   (routine probable : non appelée directement)
+; ======== mort_ouvre_escalier
+; type 22 : pose l'escalier (codes 0x38 à 0x3B)
 02bb8  c6 06 32 59 00       mov byte ptr [0x5932], 0
 02bbd  c6 06 4c 59 00       mov byte ptr [0x594c], 0
 02bc2  c6 06 33 59 38       mov byte ptr [0x5933], 0x38
@@ -5190,7 +5196,8 @@ loc_2b9f:
 02bd6  c6 06 97 3f 01       mov byte ptr [0x3f97], 1
 02bdb  c3                   ret
 
-; ======== sub_2bdc   (routine probable : non appelée directement)
+; ======== mort_sorcier_final
+; type 26 : fin_du_jeu = 1
 02bdc  c6 06 e7 3f 01       mov byte ptr [0x3fe7], 1    ; fin_du_jeu
 02be1  c3                   ret
 
@@ -5199,7 +5206,7 @@ loc_2b9f:
 02be5  74 01                je loc_2be8
 02be7  c3                   ret
 loc_2be8:
-02be8  c6 06 e6 3f 01       mov byte ptr [0x3fe6], 1
+02be8  c6 06 e6 3f 01       mov byte ptr [0x3fe6], 1    ; pas_brume
 02bed  c3                   ret
 
 ; ======== sub_2bee   (appelée depuis 22a3)
@@ -5207,7 +5214,7 @@ loc_2be8:
 02bf1  74 01                je loc_2bf4
 02bf3  c3                   ret
 loc_2bf4:
-02bf4  c6 06 e6 3f 02       mov byte ptr [0x3fe6], 2
+02bf4  c6 06 e6 3f 02       mov byte ptr [0x3fe6], 2    ; pas_brume
 02bf9  c3                   ret
 
 ; ======== sub_2bfa   (appelée depuis 22a3)
@@ -5216,7 +5223,7 @@ loc_2bf4:
 02c01  73 01                jae loc_2c04
 02c03  c3                   ret
 loc_2c04:
-02c04  c6 06 e6 3f 03       mov byte ptr [0x3fe6], 3
+02c04  c6 06 e6 3f 03       mov byte ptr [0x3fe6], 3    ; pas_brume
 02c09  c3                   ret
 
 ; ======== sub_2c0a   (appelée depuis 22a3)
@@ -5224,7 +5231,7 @@ loc_2c04:
 02c0d  74 01                je loc_2c10
 02c0f  c3                   ret
 loc_2c10:
-02c10  c6 06 e6 3f 04       mov byte ptr [0x3fe6], 4
+02c10  c6 06 e6 3f 04       mov byte ptr [0x3fe6], 4    ; pas_brume
 02c15  c3                   ret
 
 ; ======== sub_2c16   (appelée depuis 22a3)
@@ -5233,7 +5240,7 @@ loc_2c10:
 02c1d  73 01                jae loc_2c20
 02c1f  c3                   ret
 loc_2c20:
-02c20  c6 06 e6 3f 05       mov byte ptr [0x3fe6], 5
+02c20  c6 06 e6 3f 05       mov byte ptr [0x3fe6], 5    ; pas_brume
 02c25  c3                   ret
 
 ; ======== sub_2c26   (appelée depuis 22a3)
@@ -5242,7 +5249,7 @@ loc_2c20:
 02c2d  74 01                je loc_2c30
 02c2f  c3                   ret
 loc_2c30:
-02c30  c6 06 e6 3f 00       mov byte ptr [0x3fe6], 0
+02c30  c6 06 e6 3f 00       mov byte ptr [0x3fe6], 0    ; pas_brume
 02c35  c3                   ret
 
 ; ======== brume_de_mort   (appelée depuis 22b2)
@@ -12358,8 +12365,7 @@ loc_65fc:
 06651  e8 ff d4             call copie_image
 06654  1f                   pop ds
 06655  c3                   ret
-
-; ======== sub_6656   (routine probable : non appelée directement)
+loc_6656:
 06656  8b de                mov bx, si
 06658  e8 92 22             call affiche_message
 
@@ -13225,7 +13231,7 @@ loc_6d85:
 06d9f  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06da3  e8 75 a8             call sub_161b
 06da6  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
-06da9  e8 68 a7             call sub_1514
+06da9  e8 68 a7             call revele_zone
 06dac  89 1e e4 3f          mov word ptr [0x3fe4], bx
 06db0  8b 0e 94 3f          mov cx, word ptr [0x3f94]    ; zone_heros
 06db4  bf d6 49             mov di, 0x49d6
@@ -13749,7 +13755,7 @@ loc_71e3:
 07214  e8 04 a4             call sub_161b
 07217  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 0721a  bd 01 00             mov bp, 1
-0721d  e8 f4 a2             call sub_1514
+0721d  e8 f4 a2             call revele_zone
 07220  89 1e e4 3f          mov word ptr [0x3fe4], bx
 07224  bf d6 49             mov di, 0x49d6
 07227  b9 1e 00             mov cx, 0x1e

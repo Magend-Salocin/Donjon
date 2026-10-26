@@ -53,15 +53,19 @@ Les positions à l'écran ne sont pas dans le fichier : la table est remplie à 
 
 ## Événements de quête
 
-`evenements_quete` (0x0480) affiche, selon la quête, un message quand un drapeau d'événement (DS:3FBF, DS:3FC0) a été posé ailleurs (par l'entrée dans une zone, sans doute à partir des numéros d'événement par zone de QUESTn.BIN) :
+La première fois qu'une zone est révélée (`revele_zone`, 0x1514 ; table DS:53C3, 4 octets par zone, le 4e passe à FFh), certaines quêtes posent un drapeau. `evenements_quete` (0x0480) et `evenements_tour` (0x06D6), appelées à chaque passage de la boucle du tour, en tirent un message ou un effet.
 
-| Quête | Message |
-| --- | --- |
-| 1 | 0x94 « VOUS AVEZ TROUVE SIR RAGNARD. UNE ALARME A AVERTI TOUS LES GARDES... » |
-| 6 | 0xC4 « KARLEN EST LE ZOMBI... » |
-| 9 | 0xDE « L'OR TROUVE DANS LA MINE ETAIT FAUX » ; aussi un message mis en attente (DS:3FEA) |
-| 15 | 0x22C « C'EST UNE PIECE TOURNANTE. ATTENTION EN LA QUITTANT » |
-| 16 | 0x234 « LA BRUME DE LA MORT HANTE CES SALLES » |
+| Quête du jeu (code) | Zone | Effet |
+| --- | --- | --- |
+| 2 SAUVETAGE DE SIR RAGNARD (1) | 22 | Sir Ragnar entre en jeu (5e fiche), `evenement_a` = héros qui l'a trouvé ; tout le plateau est révélé (bits 0xC0 des zones) et le bit 0x80 de chaque monstre est inversé (les monstres en réserve entrent en jeu). « VOUS AVEZ TROUVE SIR RAGNARD. UNE ALARME A AVERTI TOUS LES GARDES » |
+| 6 LEGS DU SEIGNEUR ORC (5) | 29 | `evenement_b` = 1. Chaque héros qui joue ensuite reprend une fois l'équipement confisqué au départ (DS:4A9F) : « CETTE PIECE CONTIENT L'EQUIPEMENT QUE VOUS AVEZ CAPTURE » |
+| 7 LE CHASSEUR DE PIERRES (6) | 25 | `evenement_b` = héros \| 80h : « KARLEN EST LE ZOMBI... » ; sert à la prime de fin (`fin_karlen`) |
+| 10 CHATEAU DES MYSTERES (9) | 24 | `evenement_b` = 2 (sauf s'il vaut 1), puis 1 : « L'OR TROUVE DANS LA MINE ETAIT FAUX » ; affiche aussi un message mis en attente (DS:3FEA) |
+| 12 BROUETTE DU SORCIER (11) | 31 | `evenement_b` = 1, puis une fois : « VOUS AVEZ ROMPU LE CACHET MAGIQUE QUI RETENAIT PRISONNIER LE SORCIER ... SEULE LA LAME DE L'ESPRIT PEUT LUI FAIRE DU MAL » |
+| 16 LES SALLES FROIDES (15) | 31 | « C'EST UNE PIECE TOURNANTE. ATTENTION EN LA QUITTANT » |
+| 17 LES COULOIRS SILENCIEUX (16) | toutes | dès le début : « LA BRUME DE LA MORT HANTE CES SALLES, SOYEZ PRUDENT A CHAQUE PAS » |
+
+Pour LE MAGE DU FEU (8), `evenement_b` reçoit le héros qui tue Balur (routine de mort de Balur), et la prime est versée à la sortie.
 
 Les numéros de quête du code (`numero_quete`, DS:3F92) commencent à 0 : la quête 1 du code est la 2e du jeu (Sir Ragnar), la 6 la 7e (LE CHASSEUR DE PIERRES, Karlen), la 9 la 10e (CHATEAU DES MYSTERES, la mine d'or). Les trois messages le confirment. Les quêtes 15 et 16 du code sont donc les 16e et 17e du jeu (LES SALLES FROIDES, LES COULOIRS SILENCIEUX).
 
@@ -252,7 +256,19 @@ Types de monstres (`types_monstres`) :
 | 5 zombi | 4 | 2 | 3 | 12 Sorcier-Roi | 10 | 5 | 6 |
 | 6 momie | 4 | 3 | 4 | 13 (?) | 6 | 3 | 5 |
 
-Les types 14 à 26 (extension) sont dans la même table. Une routine de mort est donnée pour Ulag (prime de l'empereur), Balur, et les types 14 à 19, 22 et 26 (primes, objets lâchés comme l'étoile de l'ouest) ; `retire_monstre` (0x2120) l'appelle.
+Les types 13 et suivants servent à des quêtes précises (le 13 dans LE CHASSEUR DE PIERRES, 14 à 18 dans BASTION DU CHAOS, 19 et plus dans les dernières quêtes). La 24e quête utilise aussi un type 27, qui lit au-delà de la table. `retire_monstre` (0x2120) appelle la routine de mort du type :
+
+| Type | Routine | Effet |
+| --- | --- | --- |
+| 8 Ulag | `prime_ulag` | « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG », mais 100 pièces ajoutées |
+| 10 Balur | `mort_balur` | 150 pièces à chacun des 4 héros, sans message ; le tueur est noté pour la prime de sortie |
+| 14 | `prime_10` | prime de 10 pièces |
+| 15 | `prime_monstre` | prime de 20 pièces |
+| 16, 17 | `prime_30` | prime de 30 pièces |
+| 18 | `mort_chaos_poison` | prime de 30 pièces et poison d'orc (+0x0D bit 8) |
+| 19 | `etoile_ouest` | « LE ZOMBI LACHE L'ETOILE DE L'OUEST », 200 pièces |
+| 22 | `mort_ouvre_escalier` | l'escalier apparaît (sortie de la quête) |
+| 26 | `mort_sorcier_final` | `fin_du_jeu` : écran final au retour au menu |
 
 ## Attaque du héros
 

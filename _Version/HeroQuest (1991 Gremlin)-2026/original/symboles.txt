@@ -164,8 +164,8 @@
 0x10d8  code  mort_heros             fiche SI : points de corps, or, équipement et artefacts à zéro, sort de la quête ; « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES »
 0x1a3a  code  apres_sortie           « LES JOUEURS SONT TOUS ELIMINES » si plus aucun héros dans la quête
 0x184e  code  fin_quete              héros sur l'escalier (codes 0x38 à 0x3B) : il sort de la quête ; routine de fin de la quête (fins_quetes)
-0x0c20  code  prime_ulag             « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG »
-0x0c52  code  prime_monstre          « VOUS RECEVEZ UNE PRIME DE .. PIECE D'OR »
+0x0c20  code  prime_ulag             « L'EMPEREUR OFFRE 200 PIECES D'OR A L'ASSASSIN D'ULAG », mais ajoute 100
+0x0c52  code  prime_monstre          prime de 20 pièces (type 15) : « VOUS RECEVEZ UNE PRIME DE 20 PIECE D'OR »
 0x0c82  code  etoile_ouest           « LE ZOMBI LACHE L'ETOILE DE L'OUEST »
 0x19c2  code  case_prise_heros       CF posé si un autre héros que DI est en (AL, AH)
 
@@ -324,7 +324,7 @@
 0x690a  code  ajoute_or_di           même chose pour la fiche DI
 0x3fbd  var   heros_sortis           nombre de héros sortis (quête 1)
 0x3fbe  var   coffres_rapportes      quête 4 : coffres d'or rapportés (3 en tout) (?)
-0x3fe7  var   fin_du_jeu             posé : écran final après la 15e quête ; qui le pose : à trouver
+0x3fe7  var   fin_du_jeu             posé : écran final après la 15e quête ; posé par la mort du type 26 (mort_sorcier_final)
 
 # ---- Pièges (voir original/notes/03-regles.md#pièges)
 0x45a6  table pieges                 pour les codes 0x32 à 0x36 : nouveau code de la case, type de piège déclenché
@@ -380,3 +380,18 @@
 0x713a  code  potion_or_message_b    même chose, autre exemplaire
 0x714b  etiq  or_message             DX pièces, message SI
 0x5a89  table evenements_fouille     30 routines, indexées par le numéro d'événement - 1
+
+# ---- Révélation des zones et morts des monstres spéciaux (voir 03-regles.md#événements-de-quête et #monstres)
+0x1514  code  revele_zone            première révélation d'une zone (table DS:53C3) : drapeaux propres aux quêtes 2, 6, 7, 10, 12, 16
+0x53c3  table zones_revelees         4 octets par zone ; le 4e passe à FFh quand la zone est révélée
+0x06d6  code  evenements_tour        quête 6 : équipement repris ; quête 12 : le Sorcier se réveille
+0x4a8f  table equipement_fiches      adresses des octets +0x0B des 4 fiches (quête 6)
+0x3fc1  var   equipement_repris      quête 6 : bit n quand le héros n a repris son équipement
+0x3fea  var   message_en_attente
+0x0c2c  code  mort_balur             tous les héros reçoivent 150 pièces ; evenement_b = le tueur
+0x0c4a  code  prime_10               prime de 10 pièces (type 14)
+0x0c7b  code  prime_30               prime de 30 pièces (types 16, 17)
+0x0c6f  code  mort_chaos_poison      prime de 30 et poison d'orc (type 18) : « LE GUERRIER DU CHAOS LACHE LE POISON DE L'ORC »
+0x2bb8  code  mort_ouvre_escalier    type 22 : pose l'escalier (codes 0x38 à 0x3B)
+0x2bdc  code  mort_sorcier_final     type 26 : fin_du_jeu = 1
+0x3fe6  var   pas_brume              direction de la brume de la mort (table DS:4657)

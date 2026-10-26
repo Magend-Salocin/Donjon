@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 380, dont 178 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 378, dont 186 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom fichier_offset  "questb.ega"
@@ -14,7 +14,7 @@
 0065d  sub_065d                    87    2  |     index_case_courante seg_graphics
 006b4  quete_continue              28    5  |     46cb etat_quete numero_quete
 006d0  sub_06d0                     6    1  |     
-006d6  sub_06d6                   126    1  |     3fc1 3fc3 evenement_b numero_quete personnage_courant
+006d6  evenements_tour            126    1  |     3fc3 equipement_repris evenement_b numero_quete personnage_courant
 00756  sub_0756                    47    1  |     3f9a 3fc8 fiche_heros_courant piege_en_cours
 00788  sub_0788                     8    4  |     
 00790  sub_0790                    48    1  |     fiche_heros_courant numero_quete
@@ -30,13 +30,12 @@
 00b8b  calcule_defense_heros       91    1  |     des_defense_heros fiche_heros_courant
 00be6  affiche_des                 63    4  |     3de8 seg_odds segment_source
 00c20  prime_ulag                  12    0  |     
-00c2c  sub_0c2c                    30    0  |     evenement_b personnage_courant
-00c4a  sub_0c4a                     7    0  |     
+00c2c  mort_balur                  30    0  |     evenement_b personnage_courant
+00c4a  prime_10                     7    0  |     
 00c52  prime_monstre               29    0  |     
-00c6f  sub_0c6f                    12    0  |     
-00c7b  sub_0c7b                     7    1  |     
-00c82  etoile_ouest                13    0  |     
-00c8f  sub_0c8f                     3    0  |     
+00c6f  mort_chaos_poison           12    0  |     
+00c7b  prime_30                     7    1  |     
+00c82  etoile_ouest                16    0  |     
 00c92  sub_0c92                     6    0  |     
 00c98  sub_0c98                    26    1  |     3f9d 3fac commandes
 00cb3  sub_0cb3                    54    0  |     3f91 commandes
@@ -67,7 +66,7 @@
 013f2  sub_13f2                    31    1  |     index_case_courante
 01411  prepare_meuble             233    0  |     0e58 0e5a mode_video seg_furn seg_furn_brut
 014fc  sub_14fc                    24    1  |     
-01514  sub_1514                   237    5  |     3f9e 3fe0 46cb evenement_a evenement_b numero_quete personnage_courant
+01514  revele_zone                237    5  |     3f9e 3fe0 46cb evenement_a evenement_b numero_quete personnage_courant
 01602  sub_1602                    25    8  |     
 0161b  sub_161b                     5   13  |     
 01620  sub_1620                    50    1  |     index_case_courante
@@ -102,7 +101,7 @@
 0214d  calcule_attaque_heros      106    1  |     attaque_a_distance cible des_attaque_heros fiche_heros_courant
 021b7  de_combat                   10   10  |     
 021c1  tour_morcar                 86    1  |     3f9d 3fe9 467b 4695 46af 46c9 46e3 47f1
-02217  tour_monstre               172    1  |     3fbc 3fe6 attaquant numero_quete resultat_vise
+02217  tour_monstre               172    1  |     3fbc attaquant numero_quete pas_brume resultat_vise
 022c3  monstre_vise               404    1  |     3f9f 3fa1 3fa2 3fa3 3fa4 3fa5 3fa6 40ca deplacement_restant longueur_chemin resultat_vise
 0245d  pas_chemin                  27    4  |     3f9f 40ca deplacement_restant longueur_chemin
 02478  case_cible                  19    4  |     3fbc
@@ -131,14 +130,14 @@
 02aa7  sub_2aa7                    95    3  | 60h    319e son_actif son_pilote
 02b06  sub_2b06                   136    1  | 60h    0e57 319e son_actif son_pilote
 02b8e  sub_2b8e                    42   12  |   0x42 0x61  
-02bb8  sub_2bb8                    36    0  |     3f97 5932 5933 5934 594c 594d 594e
-02bdc  sub_2bdc                     6    0  |     fin_du_jeu
-02be2  sub_2be2                    12    1  |     3fe6
-02bee  sub_2bee                    12    1  |     3fe6
-02bfa  sub_2bfa                    16    1  |     3fe6
-02c0a  sub_2c0a                    12    1  |     3fe6
-02c16  sub_2c16                    16    1  |     3fe6
-02c26  sub_2c26                    16    1  |     3fe6
+02bb8  mort_ouvre_escalier         36    0  |     3f97 5932 5933 5934 594c 594d 594e
+02bdc  mort_sorcier_final           6    0  |     fin_du_jeu
+02be2  sub_2be2                    12    1  |     pas_brume
+02bee  sub_2bee                    12    1  |     pas_brume
+02bfa  sub_2bfa                    16    1  |     pas_brume
+02c0a  sub_2c0a                    12    1  |     pas_brume
+02c16  sub_2c16                    16    1  |     pas_brume
+02c26  sub_2c26                    16    1  |     pas_brume
 02c36  brume_de_mort               62    1  |     heros_courant
 02c74  action_sort                272    0  |     3f91 3f9b 3f9d 3fac 3fad 3fae 3fb5 3fc9 3fe9 402c 4301 attaque_repetee
 02d84  retire_sort                 40    2  |     
@@ -283,8 +282,7 @@
 0656f  sauve_tampon                41   21  |     mode_video seg_furn
 06598  sub_6598                    41    1  |     mode_video seg_furn
 065c1  sub_65c1                    91    6  |     seg_shopsp
-0661c  sub_661c                    58    6  |     personnage_courant seg_odds segment_source
-06656  sub_6656                     5    0  |     
+0661c  sub_661c                    63    6  |     personnage_courant seg_odds segment_source
 0665b  sub_665b                     3    1  |     
 0665e  sub_665e                    34    3  |     zone_heros
 06680  sub_6680                   121    5  |     seg_odds segment_source
