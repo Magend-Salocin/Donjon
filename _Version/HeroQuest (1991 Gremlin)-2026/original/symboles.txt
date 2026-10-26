@@ -232,7 +232,6 @@
 
 # ---- Fouilles scriptées, fins de quête, déplacement, sorts (voir original/notes/03-regles.md)
 0x4b9b  table portes_fouillees         octets 1079-1121 de QUESTn.BIN : FFh quand les portes secrètes de la zone ont été cherchées
-0x5a89  table evenements_fouille     30 routines (coffre piégé, potion, clés d'Agrain, Lame de l'esprit...), indexées par le numéro - 1
 0x44a9  table fins_quetes            une routine par quête du code 0 à 14, appelée quand un héros sort
 0x40f9  table deplacements           4 routines, une par direction
 0x2c74  code  action_sort            icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
@@ -352,3 +351,32 @@
 0x4892  table messages_potions_cartes
 0x439b  table voisins                4 pas (dx, dy) : haut, droite, bas, gauche
 0x3f94  var   zone_heros             zone du héros courant
+
+# ---- Événements de fouille (table evenements_fouille ; voir original/notes/03-regles.md#événements-scriptés)
+0x6f0c  code  evt_coffre_desarme_2   1 : « LE COFFRE A ETE PIEGE. VOUS LE DESARMEZ »
+0x6f40  code  evt_armoire            3 : potion curative et 30 pièces
+0x6f63  code  evt_coffre_100         4 : 100 pièces, piège si non trouvé
+0x6fa4  code  evt_lance              5 : une lance, sauf pour l'enchanteur
+0x6f38  code  evt_coffre_potion_50   6 : potion curative et 50 pièces
+0x6fba  code  evt_coffre_magnus      7 : coffre du prince Magnus (250 pièces, porté)
+0x6ffa  code  evt_cle_melar          8 : clé de Melar, le trône glisse
+0x7043  code  evt_talisman           9 : talisman du savoir, +2 points d'esprit
+0x7055  code  evt_armure_borin       10
+0x7063  code  evt_coffre_karlen      11 : 200 pièces
+0x71c0  code  evt_baguette           12 : baguette de rappel et 150 pièces
+0x706c  code  evt_coffre_course      13 : un coffre (100 pièces, porté)
+0x71d1  code  evt_bouclier           14
+0x71f1  code  evt_coffre_piege       15 : « ATTENTION, LE COFFRE EST PIEGE »
+0x70c9  code  evt_coffre_200         18
+0x70e1  code  evt_coffre_200_b       19
+0x70f3  code  evt_coffre_300         20
+0x7117  code  evt_coffre_potion_100  21
+0x710e  code  evt_coffre_400         25 : 400 pièces, le message dit 200
+0x70fc  code  evt_coffre_350         26
+0x70ea  code  evt_coffre_250         27
+0x7105  code  evt_trone_500          28
+0x70ad  code  evt_or_mine            30 : 5000 pièces, plus d'attaque ni de défense
+0x6f48  etiq  potion_or_message      potion curative, DX pièces, message SI
+0x713a  code  potion_or_message_b    même chose, autre exemplaire
+0x714b  etiq  or_message             DX pièces, message SI
+0x5a89  table evenements_fouille     30 routines, indexées par le numéro d'événement - 1

@@ -17,7 +17,7 @@ Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes,
 | +9, +0x0A | or, sur 16 bits |
 | +0x0B, +0x0C | sorts connus, un bit par sort : sorts 1 à 6 dans +0x0B, 7 à 12 dans +0x0C |
 | +0x0D | artefacts possédés : 1 armure de Borin, 2 baguette de rappel (lue au début du tour), 4 talisman du savoir, 8 poison d'orc, 0x10 lame de l'esprit |
-| +0x0E, +0x0F | équipement acheté, un bit par objet (voir l'armurerie dans [02-ecrans.md](02-ecrans.md#armurerie)) ; +0x0F bit 0x20 : l'or de la mine de la 10e quête (`fin_or_faux`) ; le héros qui le porte ne peut ni attaquer ni se défendre (?). +0x0F bit 0x40 : objet de quête porté (coffre de la 4e quête, 9e quête) |
+| +0x0E, +0x0F | équipement acheté, un bit par objet (voir l'armurerie dans [02-ecrans.md](02-ecrans.md#armurerie)) ; +0x0F bit 0x20 : l'or de la mine de la 10e quête (`evt_or_mine`, `fin_or_faux`) ; le héros qui le porte ne peut ni attaquer ni se défendre. +0x0F bit 0x40 : objet de quête porté (coffre de la 4e quête, 9e quête) |
 | +0x10 | potions possédées : 1 force, 2 ténacité, 4 et 8 curatives, 0x10 eau bénite, 0x20 rapidité, 0x40 héroïque |
 | +0x11 | arme en main (un seul bit, dans l'ordre de +0x0E) |
 | +0x12 | artefacts en service (bits de +0x0D) |
@@ -111,7 +111,42 @@ Ensuite, selon l'octet de la zone dans `portes_fouillees` (DS:4B9B, octets 1079 
 
 Un numéro n non nul dans `evenement_par_zone` ou `portes_fouillees` appelle la routine n − 1 de la table `evenements_fouille` (DS:5A89, 30 routines), une seule fois.
 
-Routines identifiées dans la table : `fouille_vide`, `coffre_potion`, `coffre_fleche`, `coffre_desarme`, `coffre_gargouille`, `cles_agrain`, `prend_lame_esprit`. Exemple : dans la 2e quête du jeu, la zone 0x15 a l'événement 6 et la zone 0x27 l'événement 2. C'est ce qui manquait à donjon-v2 pour les objets et passages scriptés (quêtes 5 et 10).
+Chaque événement sert dans une seule quête. « Fouille » indique la table qui le déclenche : T trésor (`evenement_par_zone`), P portes et pièges (`portes_fouillees`). « Réarmé » : la routine remet le numéro dans la table, l'événement peut se reproduire.
+
+| N° | Routine | Quête, zone, fouille | Effet |
+| --- | --- | --- | --- |
+| 1 | `evt_coffre_desarme_2` | 2 (z39, P), 3 (z37, P) | « VOUS DECOUVREZ QUE LE COFFRE A ETE PIEGE. VOUS LE DESARMEZ » |
+| 2 | `fouille_vide` | 2 (z39, T) | coffre piégé si le piège n'a pas été trouvé (P de la zone 39 différent de FFh) : 1 point de corps perdu ; sinon « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN » |
+| 3 | `evt_armoire` | 3 (z33, T) | potion curative et 30 pièces (« L'ARMOIRE DE CHENE ») |
+| 4 | `evt_coffre_100` | 3 (z37, T) | 100 pièces ; coffre piégé (1 point de corps) si le piège n'a pas été trouvé |
+| 5 | `evt_lance` | 3 (z26, T) | une lance (+0x0E bit 0x40), sauf pour l'enchanteur (rien) |
+| 6 | `evt_coffre_potion_50` | 2 (z21, T) | potion curative et 50 pièces |
+| 7 | `evt_coffre_magnus` | 4 (z35, T) | un des 3 coffres du prince (positions DS:44D9) : 250 pièces, coffre porté (+0x0F bit 0x40), « LE POIDS VOUS RALENTIT ». Réarmé tant que les 3 ne sont pas rapportés |
+| 8 | `evt_cle_melar` | 5 (z25, T) | « VOUS DECOUVREZ LA CLE DE MELAR ... LE TRONE GLISSE DE COTE » : le trône est déplacé et un passage s'ouvre |
+| 9 | `evt_talisman` | 5 (z32, T) | talisman du savoir (+0x0D bit 4), +2 points d'esprit |
+| 10 | `evt_armure_borin` | 7 (z21, T) | armure de Borin (+0x0D bit 1) |
+| 11 | `evt_coffre_karlen` | 7 (z25, T) | 200 pièces |
+| 12 | `evt_baguette` | 8 (z35, T) | baguette de rappel (+0x0D bit 2) et 150 pièces |
+| 13 | `evt_coffre_course` | 9 (z25, T) | un coffre (positions DS:44DF) : 100 pièces, coffre porté ; « VOUS NE POUVEZ TRANSPORTER QU'UN SEUL COFFRE ». Réarmé |
+| 14 | `evt_bouclier` | 11 (z41, T) | un bouclier (+0x0F bit 1) ; l'enchanteur ne le prend pas (réarmé) |
+| 15 | `evt_coffre_piege` | 11 (z33, P) | « ATTENTION, LE COFFRE EST PIEGE » |
+| 16 | `coffre_gargouille` | 11 (z33, T) | le monstre 1 de la quête (la gargouille) s'anime et attaque |
+| 17 | `prend_lame_esprit` | 13 (z38, T) | lame de l'esprit (+0x0D bit 0x10) |
+| 18 | `evt_coffre_200` | 13 (z25, T) | 200 pièces |
+| 19 | `evt_coffre_200_b` | 15 (z31, T) | 200 pièces |
+| 20 | `evt_coffre_300` | 16 (z35, T) | 300 pièces |
+| 21 | `evt_coffre_potion_100` | 17 (z15, T) | potion curative et 100 pièces |
+| 22 | `coffre_fleche` | 17 (z33, T) | flèche : 1 point de corps ; P de la zone passe à FFh |
+| 23 | `coffre_desarme` | 17 (z33, P) | piège désarmé ; T de la zone passe à FFh, le coffre ne se fouille plus |
+| 24 | `cles_agrain` | 18 (z37, T) | une clé d'Agrain, 100 pièces, objet porté ; une seule par héros. Réarmé jusqu'à 4 clés |
+| 25 | `evt_coffre_400` | 19 (z40, T) | 400 pièces (le message dit 200) |
+| 26 | `evt_coffre_350` | 22 (z34, T) | 350 pièces |
+| 27 | `evt_coffre_250` | 23 (z40, T) | 250 pièces |
+| 28 | `evt_trone_500` | 24 (z31, T) | 500 pièces sous le trône |
+| 29 | `coffre_potion` | 24 (z32, T) | potion curative |
+| 30 | `evt_or_mine` | 10 (z24, T) | 5000 pièces et l'or de la mine (+0x0F bits 0x20 et 0x10) : « VOUS NE POUVEZ PLUS ATTAQUER OU VOUS DEFENDRE » ; `evenement_b` à 0 |
+
+Une potion curative va dans le premier emplacement libre (+0x10 bit 4, sinon bit 8). C'est ce qui manquait à donjon-v2 pour les objets et passages scriptés (quêtes 5 et 10).
 
 ## Sorts
 
@@ -202,7 +237,7 @@ Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTIL
 `combat_monstre` (0x1D8F) charge les images de combat (MEN), calcule les dés, appelle `attaque_contre_heros`, puis recharge MAPS. Les dés :
 
 - Attaque du monstre : deuxième octet de `types_monstres` (DS:4806, 5 octets par type : déplacement, attaque, défense, routine appelée à sa mort).
-- Défense du héros (`calcule_defense_heros`, 0x0B8B) : +0x15, remplacé par 4 avec l'armure de Borin ou l'armure de plates, 3 avec la cotte de mailles ; +1 avec le bouclier, +1 avec le casque ; +2 avec la potion de ténacité ou la peau de pierre, effets consommés par cette défense. Aucun dé si +0x0F bit 0x20 est posé (l'or de la mine ?).
+- Défense du héros (`calcule_defense_heros`, 0x0B8B) : +0x15, remplacé par 4 avec l'armure de Borin ou l'armure de plates, 3 avec la cotte de mailles ; +1 avec le bouclier, +1 avec le casque ; +2 avec la potion de ténacité ou la peau de pierre, effets consommés par cette défense. Aucun dé si +0x0F bit 0x20 est posé (l'or de la mine).
 - `attaque_contre_heros` : le héros compte comme boucliers toutes les faces sauf le bouclier blanc (4 faces sur 6, au lieu des 2 boucliers blancs du jeu de plateau) ; les crânes du monstre moins ces boucliers sont retirés des points de corps. « VOUS AVEZ SURVECU A L'ATTAQUE », ou `mort_heros`.
 
 Types de monstres (`types_monstres`) :

@@ -13377,7 +13377,8 @@ loc_6eef:
 06f06  e8 86 ae             call combat_monstre
 06f09  e9 9e a3             jmp loc_12aa
 
-; ======== sub_6f0c   (routine probable : non appelée directement)
+; ======== evt_coffre_desarme_2
+; 1 : « LE COFFRE A ETE PIEGE. VOUS LE DESARMEZ »
 06f0c  be 96 00             mov si, 0x96
 06f0f  e9 23 ab             jmp message_puis_sortie
 
@@ -13398,16 +13399,18 @@ loc_6f31:
 06f34  e8 b6 19             call affiche_message
 06f37  c3                   ret
 
-; ======== sub_6f38   (routine probable : non appelée directement)
+; ======== evt_coffre_potion_50
+; 6 : potion curative et 50 pièces
 06f38  ba 32 00             mov dx, 0x32
 06f3b  be 9a 00             mov si, 0x9a
-06f3e  eb 08                jmp loc_6f48
+06f3e  eb 08                jmp potion_or_message
 
-; ======== sub_6f40   (routine probable : non appelée directement)
+; ======== evt_armoire
+; 3 : potion curative et 30 pièces
 06f40  ba 1e 00             mov dx, 0x1e
 06f43  be 9e 00             mov si, 0x9e
-06f46  eb 00                jmp loc_6f48
-loc_6f48:
+06f46  eb 00                jmp potion_or_message
+potion_or_message:    ; potion curative, DX pièces, message SI
 06f48  f6 45 10 04          test byte ptr [di + 0x10], 4
 06f4c  75 06                jne loc_6f54
 06f4e  80 4d 10 04          or byte ptr [di + 0x10], 4
@@ -13420,7 +13423,8 @@ loc_6f58:
 06f5d  e8 8d 19             call affiche_message
 06f60  e9 d7 aa             jmp apres_sortie
 
-; ======== sub_6f63   (routine probable : non appelée directement)
+; ======== evt_coffre_100
+; 4 : 100 pièces, piège si non trouvé
 06f63  ba 64 00             mov dx, 0x64
 06f66  e8 9d f9             call ajoute_or
 06f69  81 3e c0 4b ff 00    cmp word ptr [0x4bc0], 0xff
@@ -13445,7 +13449,8 @@ loc_6f8b:
 06f9e  e8 7b f6             call sub_661c
 06fa1  e9 1d f6             jmp sub_65c1
 
-; ======== sub_6fa4   (routine probable : non appelée directement)
+; ======== evt_lance
+; 5 : une lance, sauf pour l'enchanteur
 06fa4  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3    ; personnage_courant
 06fa9  75 01                jne loc_6fac
 06fab  c3                   ret
@@ -13455,7 +13460,8 @@ loc_6fac:
 06fb4  be a6 00             mov si, 0xa6
 06fb7  e9 7b aa             jmp message_puis_sortie
 
-; ======== sub_6fba   (routine probable : non appelée directement)
+; ======== evt_coffre_magnus
+; 7 : coffre du prince Magnus (250 pièces, porté)
 06fba  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_rapportes
 06fbf  74 05                je loc_6fc6
 06fc1  c6 06 93 4b 07       mov byte ptr [0x4b93], 7
@@ -13477,7 +13483,8 @@ loc_6fd3:
 06ff2  81 45 09 fa 00       add word ptr [di + 9], 0xfa
 06ff7  e9 3b aa             jmp message_puis_sortie
 
-; ======== sub_6ffa   (routine probable : non appelée directement)
+; ======== evt_cle_melar
+; 8 : clé de Melar, le trône glisse
 06ffa  be b6 00             mov si, 0xb6
 06ffd  e8 35 aa             call message_puis_sortie
 07000  c6 06 d1 58 00       mov byte ptr [0x58d1], 0
@@ -13509,25 +13516,29 @@ loc_7035:
 0703d  e8 bf a2             call sub_12ff
 07040  e9 67 fe             jmp loc_6eaa
 
-; ======== sub_7043   (routine probable : non appelée directement)
+; ======== evt_talisman
+; 9 : talisman du savoir, +2 points d'esprit
 07043  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 07047  80 4d 0d 04          or byte ptr [di + 0xd], 4
 0704b  80 45 07 02          add byte ptr [di + 7], 2
 0704f  be ba 00             mov si, 0xba
 07052  e9 e0 a9             jmp message_puis_sortie
 
-; ======== sub_7055   (routine probable : non appelée directement)
+; ======== evt_armure_borin
+; 10
 07055  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 07059  80 4d 0d 01          or byte ptr [di + 0xd], 1
 0705d  be c0 00             mov si, 0xc0
 07060  e9 d2 a9             jmp message_puis_sortie
 
-; ======== sub_7063   (routine probable : non appelée directement)
+; ======== evt_coffre_karlen
+; 11 : 200 pièces
 07063  ba c8 00             mov dx, 0xc8
 07066  be c2 00             mov si, 0xc2
 07069  e9 ec fe             jmp loc_6f58
 
-; ======== sub_706c   (routine probable : non appelée directement)
+; ======== evt_coffre_course
+; 13 : un coffre (100 pièces, porté)
 0706c  80 3e be 3f 01       cmp byte ptr [0x3fbe], 1    ; coffres_rapportes
 07071  74 05                je loc_7078
 07073  c6 06 89 4b 0d       mov byte ptr [0x4b89], 0xd
@@ -13550,7 +13561,8 @@ loc_7088:
 070a7  ba 64 00             mov dx, 0x64
 070aa  e9 ab fe             jmp loc_6f58
 
-; ======== sub_70ad   (routine probable : non appelée directement)
+; ======== evt_or_mine
+; 30 : 5000 pièces, plus d'attaque ni de défense
 070ad  c6 06 c0 3f 00       mov byte ptr [0x3fc0], 0    ; evenement_b
 070b2  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 070b6  81 45 09 88 13       add word ptr [di + 9], 0x1388
@@ -13559,7 +13571,8 @@ loc_7088:
 070c3  be da 00             mov si, 0xda
 070c6  e9 6c a9             jmp message_puis_sortie
 
-; ======== sub_70c9   (routine probable : non appelée directement)
+; ======== evt_coffre_200
+; 18
 070c9  ba c8 00             mov dx, 0xc8
 070cc  be f2 00             mov si, 0xf2
 070cf  e9 86 fe             jmp loc_6f58
@@ -13572,42 +13585,49 @@ loc_7088:
 070dd  e8 0d 18             call affiche_message
 070e0  c3                   ret
 
-; ======== sub_70e1   (routine probable : non appelée directement)
+; ======== evt_coffre_200_b
+; 19
 070e1  ba c8 00             mov dx, 0xc8
 070e4  be 28 02             mov si, 0x228
 070e7  e9 6e fe             jmp loc_6f58
 
-; ======== sub_70ea   (routine probable : non appelée directement)
+; ======== evt_coffre_250
+; 27
 070ea  ba fa 00             mov dx, 0xfa
 070ed  be 46 02             mov si, 0x246
 070f0  e9 65 fe             jmp loc_6f58
 
-; ======== sub_70f3   (routine probable : non appelée directement)
+; ======== evt_coffre_300
+; 20
 070f3  ba 2c 01             mov dx, 0x12c
 070f6  be 2a 02             mov si, 0x22a
 070f9  e9 5c fe             jmp loc_6f58
 
-; ======== sub_70fc   (routine probable : non appelée directement)
+; ======== evt_coffre_350
+; 26
 070fc  ba 5e 01             mov dx, 0x15e
 070ff  be 44 02             mov si, 0x244
 07102  e9 53 fe             jmp loc_6f58
 
-; ======== sub_7105   (routine probable : non appelée directement)
+; ======== evt_trone_500
+; 28
 07105  ba f4 01             mov dx, 0x1f4
 07108  be 48 02             mov si, 0x248
-0710b  eb 3e                jmp loc_714b
+0710b  eb 3e                jmp or_message
 ; ---- 1 octets non atteints (710d-710d)
 
-; ======== sub_710e   (routine probable : non appelée directement)
+; ======== evt_coffre_400
+; 25 : 400 pièces, le message dit 200
 0710e  ba 90 01             mov dx, 0x190
 07111  be 3a 02             mov si, 0x23a
-07114  eb 35                jmp loc_714b
+07114  eb 35                jmp or_message
 ; ---- 1 octets non atteints (7116-7116)
 
-; ======== sub_7117   (routine probable : non appelée directement)
+; ======== evt_coffre_potion_100
+; 21
 07117  ba 64 00             mov dx, 0x64
 0711a  be 2e 02             mov si, 0x22e
-0711d  eb 1b                jmp sub_713a
+0711d  eb 1b                jmp potion_or_message_b
 ; ---- 1 octets non atteints (711f-711f)
 
 ; ======== coffre_potion
@@ -13624,15 +13644,16 @@ loc_7131:
 07134  e8 b6 17             call affiche_message
 07137  e9 00 a9             jmp apres_sortie
 
-; ======== sub_713a   (routine probable : non appelée directement)
+; ======== potion_or_message_b
+; même chose, autre exemplaire
 0713a  f6 45 10 04          test byte ptr [di + 0x10], 4
 0713e  75 07                jne loc_7147
 07140  80 4d 10 04          or byte ptr [di + 0x10], 4
-07144  eb 05                jmp loc_714b
+07144  eb 05                jmp or_message
 ; ---- 1 octets non atteints (7146-7146)
 loc_7147:
 07147  80 4d 10 08          or byte ptr [di + 0x10], 8
-loc_714b:
+or_message:    ; DX pièces, message SI
 0714b  e8 b8 f7             call ajoute_or
 0714e  8b de                mov bx, si
 07150  e8 9a 17             call affiche_message
@@ -13685,14 +13706,16 @@ loc_71b8:
 071be  5e                   pop si
 071bf  c3                   ret
 
-; ======== sub_71c0   (routine probable : non appelée directement)
+; ======== evt_baguette
+; 12 : baguette de rappel et 150 pièces
 071c0  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 071c4  80 4d 0d 02          or byte ptr [di + 0xd], 2
 071c8  ba 96 00             mov dx, 0x96
 071cb  be ca 00             mov si, 0xca
 071ce  e9 87 fd             jmp loc_6f58
 
-; ======== sub_71d1   (routine probable : non appelée directement)
+; ======== evt_bouclier
+; 14
 071d1  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 071d4  3c 03                cmp al, 3
 071d6  75 0b                jne loc_71e3
@@ -13705,7 +13728,8 @@ loc_71e3:
 071eb  be e4 00             mov si, 0xe4
 071ee  e9 44 a8             jmp message_puis_sortie
 
-; ======== sub_71f1   (routine probable : non appelée directement)
+; ======== evt_coffre_piege
+; 15 : « ATTENTION, LE COFFRE EST PIEGE »
 071f1  be e8 00             mov si, 0xe8
 071f4  e9 3e a8             jmp message_puis_sortie
 
