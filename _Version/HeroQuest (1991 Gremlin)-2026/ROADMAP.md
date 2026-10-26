@@ -29,7 +29,7 @@ Ordre proposé, du socle vers le jeu :
 
 Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (installé, voir [DEBOGUER.md](outils/DEBOGUER.md)) : points d'arrêt, lecture du segment de données.
 
-Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (196 sur 380 au 26 octobre). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
+Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (202 sur 380 au 26 octobre). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
 
 | Sous-système | État | Note |
 | --- | --- | --- |

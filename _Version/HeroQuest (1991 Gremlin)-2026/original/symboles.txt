@@ -160,7 +160,7 @@
 0x71f7  code  coffre_gargouille      « LA GARGOUILLE S'ANIME SUBITEMENT »
 0x70d2  code  prend_lame_esprit      « VOUS PRENEZ LA LAME DE L'ESPRIT »
 0x7187  code  cles_agrain            « LES CLES D'AGRAIN SONT SUR LA TABLE »
-0x2c36  code  brume_de_mort          « L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL »
+0x2c36  code  brume_de_mort          un héros sur la case de la brume perd 1 point de corps, ou meurt s'il n'en a qu'un
 0x10d8  code  mort_heros             fiche SI : points de corps, or, équipement et artefacts à zéro, sort de la quête ; « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES »
 0x1a3a  code  apres_sortie           « LES JOUEURS SONT TOUS ELIMINES » si plus aucun héros dans la quête
 0x184e  code  fin_quete              héros sur l'escalier (codes 0x38 à 0x3B) : il sort de la quête ; routine de fin de la quête (fins_quetes)
@@ -416,3 +416,10 @@
 0x43b2  table teleports_chateau      quête 10 : zone, x, y, porte (4 octets)
 0x43de  table teleports_salles_froides quête 16 : 6 positions (5 octets)
 0x68ae  code  des_deplacement_tour   nombre de dés de déplacement du tour (plates, objet porté, rapidité, vent rapide)
+0x4657  table circuit_brume          6 routines de pas de la brume de la mort (quête 17)
+0x2be2  code  brume_gauche           x - 1 ; à 0 : direction suivante
+0x2bee  code  brume_haut             y - 1
+0x2bfa  code  brume_droite_haut      x + 1 jusqu'à (24, 0)
+0x2c0a  code  brume_gauche_2         x - 1
+0x2c16  code  brume_bas              y + 1 jusqu'à 18
+0x2c26  code  brume_droite           x + 1 jusqu'à 24

@@ -269,7 +269,7 @@ Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTIL
 1. Rien si le monstre n'existe pas ou porte le bit 0x80.
 2. Octet +6 : bit 1 = réveillé (sinon il ne joue pas) ; bit 4 = endormi, il ne se réveille que sur un 6 ; bit 2 = passe ce tour.
 3. Pour chacun des 5 personnages, dans l'ordre des fiches, `monstre_vise` cherche un chemin jusqu'à lui (ci-dessous). Le premier personnage atteignable est attaqué : le monstre avance (`monstre_avance`), puis frappe (`combat_monstre`). Sinon le monstre reste sur place.
-4. Quête 16 du code (17e du jeu, LES COULOIRS SILENCIEUX) : la brume de la mort se déplace 6 fois par tour, par une table de routines (DS:4657).
+4. Quête 16 du code (17e du jeu, LES COULOIRS SILENCIEUX) : un monstre en réserve (+6 bit 0x80, non réveillé) est la brume de la mort. Elle avance de 6 cases par tour, sans tenir compte des murs, sur un circuit fixe (table DS:4657, direction en DS:3FE6) : vers la gauche jusqu'à x = 0, vers le haut jusqu'à y = 0, vers la droite jusqu'à (24, 0), vers la gauche jusqu'à x = 0, vers le bas jusqu'à y = 18, vers la droite jusqu'à x = 24, et ainsi de suite. À chaque case, un héros qui s'y trouve perd 1 point de corps (« L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL ») ; à 1 point, il meurt.
 
 `monstre_vise` (0x22C3) :
 

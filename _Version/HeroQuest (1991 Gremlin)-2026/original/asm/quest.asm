@@ -3975,7 +3975,7 @@ loc_229a:
 0229b  8a 1e e6 3f          mov bl, byte ptr [0x3fe6]    ; pas_brume
 0229f  d0 e3                shl bl, 1
 022a1  32 ff                xor bh, bh
-022a3  ff 97 57 46          call word ptr [bx + 0x4657]
+022a3  ff 97 57 46          call word ptr [bx + 0x4657]    ; circuit_brume
 022a7  57                   push di
 022a8  e8 a5 f7             call sub_1a50
 022ab  5f                   pop di
@@ -5206,7 +5206,8 @@ loc_2b9f:
 02bdc  c6 06 e7 3f 01       mov byte ptr [0x3fe7], 1    ; fin_du_jeu
 02be1  c3                   ret
 
-; ======== sub_2be2   (appelée depuis 22a3)
+; ======== brume_gauche   (appelée depuis 22a3)
+; x - 1 ; à 0 : direction suivante
 02be2  fe 4d 01             dec byte ptr [di + 1]
 02be5  74 01                je loc_2be8
 02be7  c3                   ret
@@ -5214,7 +5215,8 @@ loc_2be8:
 02be8  c6 06 e6 3f 01       mov byte ptr [0x3fe6], 1    ; pas_brume
 02bed  c3                   ret
 
-; ======== sub_2bee   (appelée depuis 22a3)
+; ======== brume_haut   (appelée depuis 22a3)
+; y - 1
 02bee  fe 4d 02             dec byte ptr [di + 2]
 02bf1  74 01                je loc_2bf4
 02bf3  c3                   ret
@@ -5222,7 +5224,8 @@ loc_2bf4:
 02bf4  c6 06 e6 3f 02       mov byte ptr [0x3fe6], 2    ; pas_brume
 02bf9  c3                   ret
 
-; ======== sub_2bfa   (appelée depuis 22a3)
+; ======== brume_droite_haut   (appelée depuis 22a3)
+; x + 1 jusqu'à (24, 0)
 02bfa  fe 45 01             inc byte ptr [di + 1]
 02bfd  83 7d 01 18          cmp word ptr [di + 1], 0x18
 02c01  73 01                jae loc_2c04
@@ -5231,7 +5234,8 @@ loc_2c04:
 02c04  c6 06 e6 3f 03       mov byte ptr [0x3fe6], 3    ; pas_brume
 02c09  c3                   ret
 
-; ======== sub_2c0a   (appelée depuis 22a3)
+; ======== brume_gauche_2   (appelée depuis 22a3)
+; x - 1
 02c0a  fe 4d 01             dec byte ptr [di + 1]
 02c0d  74 01                je loc_2c10
 02c0f  c3                   ret
@@ -5239,7 +5243,8 @@ loc_2c10:
 02c10  c6 06 e6 3f 04       mov byte ptr [0x3fe6], 4    ; pas_brume
 02c15  c3                   ret
 
-; ======== sub_2c16   (appelée depuis 22a3)
+; ======== brume_bas   (appelée depuis 22a3)
+; y + 1 jusqu'à 18
 02c16  fe 45 02             inc byte ptr [di + 2]
 02c19  80 7d 02 12          cmp byte ptr [di + 2], 0x12
 02c1d  73 01                jae loc_2c20
@@ -5248,7 +5253,8 @@ loc_2c20:
 02c20  c6 06 e6 3f 05       mov byte ptr [0x3fe6], 5    ; pas_brume
 02c25  c3                   ret
 
-; ======== sub_2c26   (appelée depuis 22a3)
+; ======== brume_droite   (appelée depuis 22a3)
+; x + 1 jusqu'à 24
 02c26  fe 45 01             inc byte ptr [di + 1]
 02c29  80 7d 01 18          cmp byte ptr [di + 1], 0x18
 02c2d  74 01                je loc_2c30
@@ -5258,7 +5264,7 @@ loc_2c30:
 02c35  c3                   ret
 
 ; ======== brume_de_mort   (appelée depuis 22b2)
-; « L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL »
+; un héros sur la case de la brume perd 1 point de corps, ou meurt s'il n'en a qu'un
 02c36  32 c0                xor al, al
 loc_2c38:
 02c38  50                   push ax

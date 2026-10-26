@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 378, dont 196 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 378, dont 202 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom fichier_offset  "questb.ega"
@@ -132,12 +132,12 @@
 02b8e  sub_2b8e                    42   12  |   0x42 0x61  
 02bb8  mort_ouvre_escalier         36    0  |     3f97 5932 5933 5934 594c 594d 594e
 02bdc  mort_sorcier_final           6    0  |     fin_du_jeu
-02be2  sub_2be2                    12    1  |     pas_brume
-02bee  sub_2bee                    12    1  |     pas_brume
-02bfa  sub_2bfa                    16    1  |     pas_brume
-02c0a  sub_2c0a                    12    1  |     pas_brume
-02c16  sub_2c16                    16    1  |     pas_brume
-02c26  sub_2c26                    16    1  |     pas_brume
+02be2  brume_gauche                12    1  |     pas_brume
+02bee  brume_haut                  12    1  |     pas_brume
+02bfa  brume_droite_haut           16    1  |     pas_brume
+02c0a  brume_gauche_2              12    1  |     pas_brume
+02c16  brume_bas                   16    1  |     pas_brume
+02c26  brume_droite                16    1  |     pas_brume
 02c36  brume_de_mort               62    1  |     heros_courant
 02c74  action_sort                272    0  |     3f91 3f9d 3fac 3fad 3fae 3fb5 3fc9 3fe9 402c 4301 attaque_repetee etat_action
 02d84  retire_sort                 40    2  |     
