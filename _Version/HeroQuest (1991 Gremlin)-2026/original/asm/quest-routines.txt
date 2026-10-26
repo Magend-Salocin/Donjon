@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 380, dont 131 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 133 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe7 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom  "questb.ega"
@@ -349,8 +349,8 @@
 078cd  heros_renouvele             78    0  |     heros_selectionne
 0791b  heros_nomme                 57    0  |     3759 heros_selectionne  "________________"
 07954  sauvegarde_menu            547    0  | 21h/3d 21h/3e 21h/3f    37eb choix_menu erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille heros_selectionne mode_video seg_annexe  "quest.sav"
-07b7a  sub_7b7a                   128    2  |     choix_menu heros_selectionne seg_annexe
-07bfa  sub_7bfa                   396    1  |     37eb 37ed 37ef erreur_fichier seg_annexe segment_source
+07b7a  liste_emplacements         128    2  |     choix_menu heros_selectionne seg_annexe
+07bfa  dessine_cadre              396    1  |     37eb 37ed 37ef erreur_fichier seg_annexe segment_source
 07d86  saisie_texte               456    1  |     4635 47e7 47e9 ab64 ab68 ab79 choix_menu commandes mode_video  "________________"
 07f4f  sub_7f4f                    37    0  |     ab79 choix_menu  "________________"
 07f74  sub_7f74                    93    1  |     44a2 44a3 46a2 46a3 46bc 46bd

@@ -115,14 +115,17 @@ def table_messages(brut):
 
 
 def decoder_message(entree):
-    """En-tête (6 octets), mots jusqu'à FFFFh, puis lignes « 11h, ligne, colonne, texte » jusqu'à 00h.
-    Lecture séquentielle : la ligne d'écran 17 s'écrit 11h, comme le marqueur. None si l'entrée est trop courte."""
+    """En-tête : boîte (colonne, ligne, largeur, hauteur). Puis les boutons jusqu'à FFFFh : colonne, ligne,
+    offset du libellé dans le fichier de textes (mot), numéro (mot). Puis les lignes « 11h, ligne, colonne, texte »
+    jusqu'à 00h. Lecture séquentielle : la ligne d'écran 17 s'écrit 11h, comme le marqueur.
+    None si l'entrée est trop courte."""
     if len(entree) < 6:
         return None
-    mots, i = [], 6
-    while i + 1 < len(entree) and entree[i:i + 2] != b'\xff\xff':
-        mots.append(struct.unpack('<H', entree[i:i + 2])[0])
-        i += 2
+    boutons, i = [], 4
+    while i + 5 < len(entree) and entree[i:i + 2] != b'\xff\xff':
+        libelle, numero = struct.unpack('<HH', entree[i + 2:i + 6])
+        boutons.append((entree[i], entree[i + 1], libelle, numero))
+        i += 6
     i += 2
     lignes = []
     while i + 2 < len(entree) and entree[i] == 0x11:
@@ -133,20 +136,28 @@ def decoder_message(entree):
         if j >= len(entree) or entree[j] == 0x00:
             break
         i = j
-    return {'boite': list(entree[:4]), 'inconnu': list(entree[4:6]), 'mots': mots, 'lignes': lignes}
+    return {'boite': list(entree[:4]), 'boutons': boutons, 'lignes': lignes}
+
+
+def libelle(brut, offset):
+    """Texte d'un libellé de bouton : « 11h, 0, 0, texte, 00h » à l'offset donné du fichier de textes."""
+    if offset + 3 >= len(brut) or brut[offset] != 0x11:
+        return f'?{offset:04x}'
+    return brut[offset + 3:brut.index(b'\0', offset + 3)].decode('cp437')
 
 
 def messages(brut):
     """Liste lisible des messages d'un fichier de textes."""
-    lignes = ['# numéro (BX)  boîte : colonne ligne largeur hauteur  |  mots (boutons ?)  |  lignes : (ligne, colonne) texte', '']
+    lignes = ['# numéro (BX)  boîte : colonne ligne largeur hauteur  |  boutons : [numéro (colonne,ligne) libellé]  |  '
+              'lignes : (ligne, colonne) texte', '']
     for numero, entree in table_messages(brut):
         m = decoder_message(entree)
         if m is None:
             lignes.append(f'{numero:04x}  (entrée vide ou hors du fichier)')
             continue
         texte = ' / '.join(f'({l},{c}) {t}' for l, c, t in m['lignes'])
-        lignes.append(f'{numero:04x}  {" ".join(map(str, m["boite"]))} ({" ".join(map(str, m["inconnu"]))})  |  '
-                      f'{" ".join(f"{v:04x}" for v in m["mots"])}  |  {texte}')
+        boutons = ' '.join(f'[{n} ({c},{l}) {libelle(brut, o)}]' for c, l, o, n in m['boutons'])
+        lignes.append(f'{numero:04x}  {" ".join(map(str, m["boite"]))}  |  {boutons}  |  {texte}')
     return '\n'.join(lignes) + '\n'
 
 

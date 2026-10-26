@@ -84,7 +84,7 @@ Les 12 sorts du jeu de plateau, numérotés par élément, trois par trois. Leur
 | 3 | Eau | Sommeil | `sort_sommeil` | un dé ; sauf bouclier blanc, la cible s'endort (« L'ENNEMI S'EFFONDRE ET S'ENDORT SUR PLACE ») |
 | 4 | Air | Tempête | `sort_tempete` | la cible passe son prochain tour |
 | 5 | Air | Vent rapide | `sort_vent` | déplacement doublé au prochain tour |
-| 6 | Air | Génie | `sort_genie` | menu « ORDONNEZ AU GENIE DE » : attaquer quelqu'un (5 dés de combat) ou révéler le contenu de la pièce (effet 13, `sort_genie_revele`) |
+| 6 | Air | Génie | `sort_genie` | menu « ORDONNEZ AU GENIE DE » : attaquer quelqu'un (5 dés de combat) ou révéler le contenu de la pièce (effet 13, `sort_genie_revele`). Bogue : « ANNULEZ » et le bouton droit révèlent aussi la pièce, le test d'annulation (`choix_menu` = 2 et FEh à la fois) ne pouvant jamais réussir |
 | 7 | Feu | Courage | `sort_courage` | deux dés d'attaque de plus |
 | 8 | Feu | Boule de feu | `sort_boule_feu` | deux dés : 2 points de dégâts, moins un par bouclier blanc |
 | 9 | Feu | Feu de colère | `sort_feu_colere` | un dé : 1 point de dégât, sauf bouclier blanc |

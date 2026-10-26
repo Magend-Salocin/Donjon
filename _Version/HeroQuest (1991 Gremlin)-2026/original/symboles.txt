@@ -59,7 +59,7 @@
 0x2a48  code  son_effet_2            15 appels
 
 # ---- Sauvegarde
-0x7954  code  sauvegarde_menu        charge ou enregistre QUEST.SAV
+0x7954  code  sauvegarde_menu        0 sauvegarder, 1 charger le personnage sélectionné dans QUEST.SAV, 2 annuler
 0x5d8c  code  compte_cranes          lance DH dés de combat, renvoie les crânes dans AL
 0x5f82  code  initialise_jeu         graine du hasard (heure DOS), puis chargements
 0x5ff8  etiq  mode_video_palette     mode 13h et palette DS:5B23 (int 10h AX=1012h)
@@ -227,7 +227,6 @@
 # ---- Choix de la quête
 0x8379  code  menu_liste             menu de lignes de texte ; choix (numéro + 1) dans DS:AB7A
 0x84f0  code  lance_quete            prépare la quête (QUESTn.BIN), affiche le briefing et attend « JE COMPRENDS MENTOR » ; règles propres aux quêtes 2, 6 et 8 du jeu
-0xab7a  var   choix_menu
 0xa3fc  table fichiers_quetes        noms des 24 QUESTn.BIN
 0xa98f  table fiches_avant_quete     copie des fiches, restaurée si la partie est abandonnée
 
@@ -259,7 +258,7 @@
 0x4097  var   effet_sort_choisi      routine d'effet du sort en cours, appelée par jmp [0x4097]
 0x45e5  table noms_defaut            SIGMAR, GRUNGI, LADRIL, ZOLTAR, RAGNAR (16 octets chacun)
 0x102d  etiq  sort_genie_revele      13 : révèle le contenu de la pièce (choix 0 du menu du génie)
-0x9696  etiq  menu_genie             « ORDONNEZ AU GENIE DE » : 0 révéler la pièce (sort 13), 1 attaquer (sort 6)
+0x9696  etiq  menu_genie             « ORDONNEZ AU GENIE DE » : 0 révéler la pièce (sort 13), 1 attaquer (sort 6), 2 annuler (révèle aussi : bogue)
 
 # ---- Inventaire (voir original/notes/02-ecrans.md#inventaire et 03-regles.md#objets)
 0x3fa7  var   personnage_courant     numéro du personnage qui joue (0 à 4), posé par tour_personnage
@@ -295,3 +294,6 @@
 0x4a9f  table equipement_confisque   quête 6 du jeu : octets +0x0B à +0x0F des 4 fiches, retirés au départ
 0x8827  code  attente_briefing       « JE COMPRENDS MENTOR » en surbrillance sous le curseur ; clic ou bouton droit
 0x5d9f  code  texte_sous_curseur     ZF posé si le curseur est sur le texte BP
+0x7b7a  code  liste_emplacements     les 8 emplacements de QUEST.SAV du type du héros ; DI nom, SI fiche de l'emplacement choisi
+0x7bfa  code  dessine_cadre          cadre d'une boîte de texte (images SHOPMP 0xB7C0 à 0xBEC0, 16 × 16)
+0xab7a  var   choix_menu             rang du bouton choisi (0, 1...), FEh = bouton droit

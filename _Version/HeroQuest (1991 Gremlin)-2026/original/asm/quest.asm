@@ -14435,7 +14435,7 @@ loc_7912:
 07951  e9 c8 fd             jmp loc_771c
 
 ; ======== sauvegarde_menu
-; charge ou enregistre QUEST.SAV
+; 0 sauvegarder, 1 charger le personnage sélectionné dans QUEST.SAV, 2 annuler
 07954  e8 a3 bf             call attend_relache
 07957  bb 0c 00             mov bx, 0xc
 0795a  e8 90 0f             call affiche_message
@@ -14480,7 +14480,7 @@ loc_7992:
 079b6  72 60                jb loc_7a18
 loc_79b8:
 079b8  e8 ff bc             call clavier_installe
-079bb  e8 bc 01             call sub_7b7a
+079bb  e8 bc 01             call liste_emplacements
 079be  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8    ; choix_menu
 079c3  75 03                jne loc_79c8
 079c5  e9 e1 00             jmp loc_7aa9
@@ -14550,7 +14550,7 @@ loc_7a57:
 07a60  eb 47                jmp loc_7aa9
 loc_7a62:
 07a62  e8 55 bc             call clavier_installe
-07a65  e8 12 01             call sub_7b7a
+07a65  e8 12 01             call liste_emplacements
 07a68  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8    ; choix_menu
 07a6d  75 03                jne loc_7a72
 07a6f  eb 38                jmp loc_7aa9
@@ -14663,7 +14663,8 @@ loc_7b4b:
 07b76  58                   pop ax
 07b77  e9 a2 fb             jmp loc_771c
 
-; ======== sub_7b7a   (appelée depuis 79bb, 7a65)
+; ======== liste_emplacements   (appelée depuis 79bb, 7a65)
+; les 8 emplacements de QUEST.SAV du type du héros ; DI nom, SI fiche de l'emplacement choisi
 07b7a  a0 9e 40             mov al, byte ptr [0x409e]    ; heros_selectionne
 07b7d  32 e4                xor ah, ah
 07b7f  b9 88 00             mov cx, 0x88
@@ -14725,7 +14726,8 @@ loc_7bd2:
 07bf7  03 f0                add si, ax
 07bf9  c3                   ret
 
-; ======== sub_7bfa   (appelée depuis 7dc2)
+; ======== dessine_cadre   (appelée depuis 7dc2)
+; cadre d'une boîte de texte (images SHOPMP 0xB7C0 à 0xBEC0, 16 × 16)
 07bfa  8a 04                mov al, byte ptr [si]
 07bfc  d0 e0                shl al, 1
 07bfe  d0 e0                shl al, 1
@@ -14910,7 +14912,7 @@ loc_7db7:
 07dbc  75 04                jne loc_7dc2
 07dbe  c6 44 07 07          mov byte ptr [si + 7], 7
 loc_7dc2:
-07dc2  e8 35 fe             call sub_7bfa
+07dc2  e8 35 fe             call dessine_cadre
 07dc5  be 2e ab             mov si, 0xab2e
 07dc8  e8 3c c6             call sub_4407
 07dcb  bd 36 ab             mov bp, 0xab36
@@ -17504,7 +17506,7 @@ loc_9685:
 0968d  80 7d 16 06          cmp byte ptr [di + 0x16], 6
 09691  74 03                je menu_genie
 09693  e9 c7 f8             jmp loc_8f5d
-menu_genie:    ; « ORDONNEZ AU GENIE DE » : 0 révéler la pièce (sort 13), 1 attaquer (sort 6)
+menu_genie:    ; « ORDONNEZ AU GENIE DE » : 0 révéler la pièce (sort 13), 1 attaquer (sort 6), 2 annuler (révèle aussi : bogue)
 09696  bb 7c 00             mov bx, 0x7c    ; message « ORDONNEZ AU GENIE DE »
 09699  e8 51 f2             call affiche_message
 0969c  80 3e 7a ab 02       cmp byte ptr [0xab7a], 2    ; choix_menu

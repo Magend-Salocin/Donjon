@@ -2,7 +2,7 @@
 
 Comment le jeu enchaîne ses écrans, affiche, dialogue avec le joueur et fait tourner une quête. Adresses et noms : `original/asm/quest.asm` et `original/symboles.txt`.
 
-État : boucle principale, menu titre, écran des héros, armurerie, choix de la quête, affichage et boucle des tours lus. Le tour lui-même est décrit dans [03-regles.md](03-regles.md). L'inventaire et le briefing aussi. Reste : le menu de sauvegarde.
+État : boucle principale, menu titre, écran des héros, armurerie, choix de la quête, affichage et boucle des tours lus. Le tour lui-même est décrit dans [03-regles.md](03-regles.md). L'inventaire, le briefing et la sauvegarde aussi.
 
 ## Boucle principale
 
@@ -132,9 +132,10 @@ Format d'une entrée :
 | Octets | Contenu |
 | --- | --- |
 | 0-3 | colonne, ligne, largeur, hauteur de la boîte, en caractères de 8 pixels |
-| 4-5 | rôle à trouver (position du bouton ?) |
-| mots jusqu'à FFFFh | souvent `3673 0000` ; pour les menus, des triplets (offset du libellé dans le fichier de textes, numéro, position) ; par exemple le menu du génie pointe sur « REVELER LE CONTENU DE LA PIECE » (0x159F) et « D'ATTAQUER QUELQU'UN » (0x15C1) |
+| boutons, jusqu'à FFFFh | pour chaque bouton : colonne et ligne (2 octets), offset du libellé dans le fichier de textes (mot), numéro du bouton (mot) |
 | texte | lignes `11h, ligne, colonne, texte`, puis 00h |
+
+La plupart des messages ont un seul bouton, « OK » (libellé 0x3673, numéro 0). Un menu en a plusieurs : par exemple le génie (« REVELER LE CONTENU DE LA PIECE » en 0x159F, « D'ATTAQUER QUELQU'UN » en 0x15C1, « ANNULEZ » en 0x3679). Le choix est rendu dans `choix_menu` (DS:AB7A) : le rang du bouton dans le menu (0, 1...), ou FEh pour le bouton droit.
 
 Quelques entrées sont de simples chaînes (par exemple « JE COMPRENDS MENTOR ») ; 5 sont vides.
 
@@ -167,6 +168,16 @@ Une page d'objets montre jusqu'à 12 cases de 32 × 32, en deux rangées de 6 : 
 
 Les 36 objets (table `objets`, DS:44FE : nom et image) et ce qu'un clic fait sur chacun sont décrits dans [03-regles.md](03-regles.md#objets).
 
-## À lire ensuite
+## Sauvegarde des personnages
 
-- `sauvegarde_menu` : le déroulé du menu (le format de QUEST.SAV est dans [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#questsav)).
+`sauvegarde_menu` (0x7954), bouton disquette de l'écran des héros. Le menu (message 0x0C) propose :
+
+| Choix | Effet |
+| --- | --- |
+| 0 SAUVEGARDEZ LE PERSONNAGE | lit QUEST.SAV (le crée par `sauve_quest_sav` s'il manque), montre les 8 emplacements du type du héros sélectionné, copie son nom (16 octets) et sa fiche (26 octets) dans l'emplacement choisi, puis réécrit le fichier (0x560 octets) |
+| 1 CHARGEZ LE PERSONNAGE | lit QUEST.SAV, montre les 8 emplacements, recopie le nom et la fiche choisis dans le héros sélectionné ; « IL Y A UNE ERREUR DE DISQUETTE » si le fichier manque |
+| 2 ANNULEZ, ou bouton droit | retour à l'écran des héros |
+
+La liste des emplacements (`liste_emplacements`, message 0x12) affiche les 8 noms du groupe (17 octets chacun) et « ANNULEZ ». Le fichier est lu dans le segment de SHOPMP, que le jeu recharge ensuite. Format de QUEST.SAV : [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#questsav).
+
+Une erreur d'écriture répète le message d'erreur et l'écriture jusqu'à ce qu'elle réussisse.
