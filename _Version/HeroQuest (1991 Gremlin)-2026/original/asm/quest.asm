@@ -12,7 +12,7 @@ loc_0030:
 00037  b8 63 14             mov ax, 0x1463
 0003a  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 0003d  e8 41 39             call charge_fichier
-00040  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+00040  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 00043  8e c0                mov es, ax
 00045  33 f6                xor si, si
 00047  bf 00 00             mov di, 0
@@ -38,7 +38,7 @@ loc_0065:
 00075  8b 9f 1f 0e          mov bx, word ptr [bx + 0xe1f]
 00079  8b f3                mov si, bx
 0007b  bf 90 28             mov di, 0x2890
-0007e  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+0007e  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 00081  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 00084  50                   push ax
 00085  b8 63 14             mov ax, 0x1463
@@ -120,7 +120,7 @@ loc_012e:
 0012e  e8 d1 60             call efface_tampon
 00131  e8 b0 5f             call affiche_tampon
 00134  e8 8a 64             call sub_65c1
-00137  c6 06 a0 44 ff       mov byte ptr [0x44a0], 0xff
+00137  c6 06 a0 44 ff       mov byte ptr [0x44a0], 0xff    ; heros_en_jeu
 0013c  c6 06 a1 44 00       mov byte ptr [0x44a1], 0
 00141  c6 06 a2 44 00       mov byte ptr [0x44a2], 0
 00146  c6 06 a3 44 00       mov byte ptr [0x44a3], 0
@@ -270,14 +270,14 @@ loc_02bc:
 002cb  cd 21                int 0x21
 loc_02cd:
 002cd  bf 63 46             mov di, 0x4663    ; fiches_personnages
-002d0  be 8f a9             mov si, 0xa98f
+002d0  be 8f a9             mov si, 0xa98f    ; fiches_avant_quete
 002d3  50                   push ax
 002d4  b8 7c 09             mov ax, 0x97c
 002d7  8e c0                mov es, ax
 002d9  58                   pop ax
 002da  b9 34 00             mov cx, 0x34
 002dd  f3 a5                rep movsw word ptr es:[di], word ptr [si]
-002df  bf a0 44             mov di, 0x44a0
+002df  bf a0 44             mov di, 0x44a0    ; heros_en_jeu
 002e2  b9 02 00             mov cx, 2
 002e5  f3 a5                rep movsw word ptr es:[di], word ptr [si]
 002e7  c6 06 92 3f 00       mov byte ptr [0x3f92], 0    ; numero_quete
@@ -1049,12 +1049,12 @@ loc_09f6:
 loc_0a00:
 00a00  bb 22 01             mov bx, 0x122    ; message « VOULEZ-VOUS ATTAQUER / A NOUVEAU? »
 00a03  e8 e7 7e             call affiche_message
-00a06  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1
+00a06  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1    ; choix_menu
 00a0b  75 03                jne loc_0a10
 00a0d  eb 18                jmp loc_0a27
 ; ---- 1 octets non atteints (0a0f-0a0f)
 loc_0a10:
-00a10  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe
+00a10  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe    ; choix_menu
 ; ---- -4 octets non atteints (0a15-0a10)
 loc_0a11:
 00a11  3e 7a ab             jp loc_09bf
@@ -1598,8 +1598,7 @@ loc_0e3a:
 00e49  03 d8                add bx, ax
 00e4b  8b 1f                mov bx, word ptr [bx]
 00e4d  c3                   ret
-
-; ======== sub_0e4e   (routine probable : non appelée directement)
+loc_0e4e:
 00e4e  c6 06 ca 3f 05       mov byte ptr [0x3fca], 5    ; heros_courant
 00e53  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 00e57  8a 44 09             mov al, byte ptr [si + 9]
@@ -1630,7 +1629,7 @@ loc_0e7f:
 00e94  89 16 97 40          mov word ptr [0x4097], dx
 00e98  58                   pop ax
 00e99  50                   push ax
-00e9a  e8 e7 1e             call sub_2d84
+00e9a  e8 e7 1e             call retire_sort
 00e9d  e8 c4 1a             call sub_2964
 00ea0  58                   pop ax
 00ea1  3c 06                cmp al, 6
@@ -1682,9 +1681,9 @@ loc_0efe:
 00f0d  b7 00                mov bh, 0
 00f0f  8a 44 06             mov al, byte ptr [si + 6]
 00f12  04 04                add al, 4
-00f14  3a 87 94 43          cmp al, byte ptr [bx + 0x4394]
+00f14  3a 87 94 43          cmp al, byte ptr [bx + 0x4394]    ; corps_depart
 00f18  76 04                jbe loc_0f1e
-00f1a  8a 87 94 43          mov al, byte ptr [bx + 0x4394]
+00f1a  8a 87 94 43          mov al, byte ptr [bx + 0x4394]    ; corps_depart
 loc_0f1e:
 00f1e  88 44 06             mov byte ptr [si + 6], al
 00f21  bb 58 00             mov bx, 0x58
@@ -2808,7 +2807,7 @@ loc_186f:
 01884  e8 5b 0e             call sub_26e2
 01887  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
 0188b  32 ff                xor bh, bh
-0188d  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff
+0188d  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 01892  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01896  c6 05 00             mov byte ptr [di], 0
 loc_1899:
@@ -2820,7 +2819,7 @@ loc_1899:
 018ab  8a 1e 92 3f          mov bl, byte ptr [0x3f92]    ; numero_quete
 018af  32 ff                xor bh, bh
 018b1  d0 e3                shl bl, 1
-018b3  ff a7 a9 44          jmp word ptr [bx + 0x44a9]
+018b3  ff a7 a9 44          jmp word ptr [bx + 0x44a9]    ; fins_quetes
 loc_18b7:
 018b7  bb 4c 02             mov bx, 0x24c    ; message « VOUS AVEZ ECHAPPE INDEMNE / A LA QUETE »
 018ba  e8 30 70             call affiche_message
@@ -2878,7 +2877,7 @@ loc_192a:
 01937  bb b2 00             mov bx, 0xb2    ; message « VOUS DEVEZ DECIDER DE CE QUE / VOUS VOULEZ FAIRE AVEC LE / COFFRE QUE VOUS AVEZ RECUPERE »
 0193a  e8 b0 6f             call affiche_message
 0193d  e8 e5 fe             call sub_1825
-01940  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1
+01940  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1    ; choix_menu
 01945  74 0c                je loc_1953
 01947  bb ae 00             mov bx, 0xae    ; message « VOUS DEVENEZ PLUS RICHE MAIS NE / SEREZ PEUT-ETRE JAMAIS CHAMPION »
 0194a  e8 a0 6f             call affiche_message
@@ -2897,12 +2896,12 @@ loc_1964:
 0196b  bb b4 00             mov bx, 0xb4    ; message « IL Y A ENCORE DE L'OR A / RECUPERER. VOULEZ-VOUS / RETOURNER LE CHERCHER »
 0196e  e8 7c 6f             call affiche_message
 01971  e8 b1 fe             call sub_1825
-01974  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
+01974  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0    ; choix_menu
 01979  74 66                je loc_19e1
 0197b  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
 0197f  b7 00                mov bh, 0
 01981  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
-01985  c6 87 a0 44 00       mov byte ptr [bx + 0x44a0], 0
+01985  c6 87 a0 44 00       mov byte ptr [bx + 0x44a0], 0    ; heros_en_jeu
 0198a  c6 05 ff             mov byte ptr [di], 0xff
 0198d  b0 03                mov al, 3
 0198f  b4 0b                mov ah, 0xb
@@ -2951,7 +2950,7 @@ loc_19e1:
 019e7  e8 f8 0c             call sub_26e2
 019ea  8a 1e a7 3f          mov bl, byte ptr [0x3fa7]
 019ee  32 ff                xor bh, bh
-019f0  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff
+019f0  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 019f5  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 019f9  c6 05 00             mov byte ptr [di], 0
 019fc  c6 06 9a 3f 01       mov byte ptr [0x3f9a], 1
@@ -2995,7 +2994,7 @@ loc_1a4a:
 01a50  56                   push si
 01a51  be 00 00             mov si, 0
 01a54  bf a0 02             mov di, 0x2a0
-01a57  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+01a57  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 01a5a  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 01a5d  50                   push ax
 01a5e  b8 63 14             mov ax, 0x1463
@@ -3303,7 +3302,7 @@ loc_1cdd:
 01ce4  55                   push bp
 01ce5  8b f5                mov si, bp
 01ce7  8b f8                mov di, ax
-01ce9  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+01ce9  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 01cec  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 01cef  50                   push ax
 01cf0  b8 63 14             mov ax, 0x1463
@@ -3335,7 +3334,7 @@ loc_1d12:
 01d1c  05 00 c5             add ax, 0xc500
 01d1f  8b f0                mov si, ax
 01d21  8b 3e eb 37          mov di, word ptr [0x37eb]
-01d25  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+01d25  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 01d28  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 01d2b  50                   push ax
 01d2c  b8 63 14             mov ax, 0x1463
@@ -3351,7 +3350,7 @@ loc_1d12:
 ; ======== sub_1d3e   (appelée depuis 1ba9)
 01d3e  8b f5                mov si, bp
 01d40  8b 3e eb 37          mov di, word ptr [0x37eb]
-01d44  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+01d44  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 01d47  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 01d4a  50                   push ax
 01d4b  b8 63 14             mov ax, 0x1463
@@ -3432,7 +3431,7 @@ loc_1e00:
 01e08  75 e8                jne loc_1df2
 01e0a  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 01e0d  e8 aa 18             call clavier_installe
-01e10  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+01e10  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 01e13  8e c0                mov es, ax
 01e15  33 f6                xor si, si
 01e17  bf 00 00             mov di, 0
@@ -3470,7 +3469,7 @@ loc_1e63:
 01e6b  75 e8                jne loc_1e55
 01e6d  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 01e70  e8 47 18             call clavier_installe
-01e73  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+01e73  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 01e76  8e c0                mov es, ax
 01e78  33 f6                xor si, si
 01e7a  bf 00 00             mov di, 0
@@ -3617,7 +3616,7 @@ loc_1fbf:
 01fd2  89 1e ed 4b          mov word ptr [0x4bed], bx
 01fd6  a1 29 5e             mov ax, word ptr [0x5e29]    ; seg_monsters
 01fd9  a3 e5 4b             mov word ptr [0x4be5], ax
-01fdc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+01fdc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 01fdf  81 3e f1 37 a4 a3    cmp word ptr [0x37f1], 0xa3a4
 01fe5  75 19                jne loc_2000
 01fe7  c7 06 d6 4b e6 8e    mov word ptr [0x4bd6], 0x8ee6
@@ -5253,7 +5252,8 @@ loc_2c6c:
 02c70  e8 65 e4             call mort_heros
 02c73  c3                   ret
 
-; ======== sub_2c74   (routine probable : non appelée directement)
+; ======== action_sort
+; icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
 02c74  80 3e a7 3f 02       cmp byte ptr [0x3fa7], 2
 02c79  73 01                jae loc_2c7c
 02c7b  c3                   ret
@@ -5283,9 +5283,9 @@ loc_2ca9:
 loc_2cb1:
 02cb1  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 loc_2cb6:
-02cb6  c6 06 67 ad 05       mov byte ptr [0xad67], 5
+02cb6  c6 06 67 ad 05       mov byte ptr [0xad67], 5    ; mode_inventaire
 02cbb  e8 62 5f             call inventaire_sorts
-02cbe  80 3e af 3f 00       cmp byte ptr [0x3faf], 0
+02cbe  80 3e af 3f 00       cmp byte ptr [0x3faf], 0    ; objet_choisi
 02cc3  75 01                jne loc_2cc6
 02cc5  c3                   ret
 loc_2cc6:
@@ -5293,7 +5293,7 @@ loc_2cc6:
 02cca  8a 5d 16             mov bl, byte ptr [di + 0x16]
 02ccd  fe cb                dec bl
 02ccf  32 ff                xor bh, bh
-02cd1  8a 87 87 43          mov al, byte ptr [bx + 0x4387]
+02cd1  8a 87 87 43          mov al, byte ptr [bx + 0x4387]    ; proprietes_sorts
 02cd5  a2 c9 3f             mov byte ptr [0x3fc9], al
 02cd8  c6 06 ae 3f 01       mov byte ptr [0x3fae], 1
 02cdd  c6 06 91 3f 01       mov byte ptr [0x3f91], 1
@@ -5321,7 +5321,7 @@ loc_2d16:
 02d24  c6 06 2c 40 00       mov byte ptr [0x402c], 0
 loc_2d29:
 02d29  e8 1d 33             call sub_6049
-02d2c  c6 06 af 3f 00       mov byte ptr [0x3faf], 0
+02d2c  c6 06 af 3f 00       mov byte ptr [0x3faf], 0    ; objet_choisi
 02d31  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 02d35  8a 0e c9 3f          mov cl, byte ptr [0x3fc9]
 02d39  f6 06 c9 3f 01       test byte ptr [0x3fc9], 1
@@ -5336,7 +5336,7 @@ loc_2d4a:
 02d51  a0 ac 3f             mov al, byte ptr [0x3fac]
 02d54  80 3e ac 3f 00       cmp byte ptr [0x3fac], 0
 02d59  74 03                je loc_2d5e
-02d5b  e9 f0 e0             jmp sub_0e4e
+02d5b  e9 f0 e0             jmp loc_0e4e
 loc_2d5e:
 02d5e  f6 06 c9 3f 04       test byte ptr [0x3fc9], 4
 02d63  74 0f                je loc_2d74
@@ -5348,10 +5348,11 @@ loc_2d74:
 02d74  bb 56 00             mov bx, 0x56    ; message « CE SORT N'A AUCUN / EFFET SUR UN ENNEMI. / IL A ETE GASPILLE »
 02d77  e8 73 5b             call affiche_message
 02d7a  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
-02d7e  e8 03 00             call sub_2d84
+02d7e  e8 03 00             call retire_sort
 02d81  e9 26 e5             jmp loc_12aa
 
-; ======== sub_2d84   (appelée depuis 0e9a, 2d7e)
+; ======== retire_sort   (appelée depuis 0e9a, 2d7e)
+; efface le bit du sort lancé (+0x0B / +0x0C de la fiche) et le sort choisi (+0x16)
 02d84  bb 00 00             mov bx, 0
 02d87  8a 45 16             mov al, byte ptr [di + 0x16]
 02d8a  0a c0                or al, al
@@ -9454,7 +9455,7 @@ loc_4e3d:
 04e47  73 01                jae loc_4e4a
 04e49  c3                   ret
 loc_4e4a:
-04e4a  a3 27 5e             mov word ptr [0x5e27], ax    ; seg_maps
+04e4a  a3 27 5e             mov word ptr [0x5e27], ax    ; seg_annexe
 04e4d  bb fa 0c             mov bx, 0xcfa
 04e50  b4 48                mov ah, 0x48
 04e52  cd 21                int 0x21
@@ -9519,7 +9520,7 @@ loc_4eb3:
 04ebd  73 01                jae loc_4ec0
 04ebf  c3                   ret
 loc_4ec0:
-04ec0  a3 27 5e             mov word ptr [0x5e27], ax    ; seg_maps
+04ec0  a3 27 5e             mov word ptr [0x5e27], ax    ; seg_annexe
 04ec3  bb 7e 06             mov bx, 0x67e
 04ec6  b4 48                mov ah, 0x48
 04ec8  cd 21                int 0x21
@@ -10034,7 +10035,7 @@ loc_5379:
 05381  75 e8                jne loc_536b
 05383  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 05386  e8 31 e3             call clavier_installe
-05389  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+05389  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 0538c  8e c0                mov es, ax
 0538e  33 f6                xor si, si
 05390  bf 00 00             mov di, 0
@@ -10132,7 +10133,7 @@ loc_5484:
 0548c  75 e8                jne loc_5476
 0548e  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 05491  e8 26 e2             call clavier_installe
-05494  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+05494  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 05497  8e c0                mov es, ax
 05499  33 f6                xor si, si
 0549b  bf 00 00             mov di, 0
@@ -10200,7 +10201,7 @@ loc_5536:
 0553e  75 e8                jne loc_5528
 05540  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 05543  e8 74 e1             call clavier_installe
-05546  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+05546  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 05549  8e c0                mov es, ax
 0554b  33 f6                xor si, si
 0554d  bf 00 00             mov di, 0
@@ -10298,7 +10299,7 @@ loc_5641:
 05649  75 e8                jne loc_5633
 0564b  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 0564e  e8 69 e0             call clavier_installe
-05651  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+05651  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 05654  8e c0                mov es, ax
 05656  33 f6                xor si, si
 05658  bf 00 00             mov di, 0
@@ -11054,7 +11055,7 @@ loc_5cc3:
 05ccb  75 e8                jne loc_5cb5
 05ccd  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 05cd0  e8 e7 d9             call clavier_installe
-05cd3  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+05cd3  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 05cd6  8e c0                mov es, ax
 05cd8  33 f6                xor si, si
 05cda  bf 00 00             mov di, 0
@@ -11093,7 +11094,7 @@ loc_5d28:
 05d30  75 e8                jne loc_5d1a
 05d32  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 05d35  e8 82 d9             call clavier_installe
-05d38  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+05d38  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 05d3b  8e c0                mov es, ax
 05d3d  33 f6                xor si, si
 05d3f  bf 00 00             mov di, 0
@@ -12307,7 +12308,7 @@ loc_65fc:
 0661f  e8 82 fa             call sub_60a4
 06622  a0 a7 3f             mov al, byte ptr [0x3fa7]
 06625  50                   push ax
-06626  bb d7 45             mov bx, 0x45d7
+06626  bb d7 45             mov bx, 0x45d7    ; noms_heros
 06629  e8 af fa             call sub_60db
 0662c  8b 37                mov si, word ptr [bx]
 0662e  e8 83 fa             call sub_60b4
@@ -12484,7 +12485,7 @@ loc_6797:
 067a8  d1 e3                shl bx, 1
 067aa  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 067ae  8b 36 39 46          mov si, word ptr [0x4639]
-067b2  ff a7 f9 40          jmp word ptr [bx + 0x40f9]
+067b2  ff a7 f9 40          jmp word ptr [bx + 0x40f9]    ; deplacements
 loc_67b6:
 067b6  8b 16 e7 47          mov dx, word ptr [0x47e7]
 067ba  8b 2e e9 47          mov bp, word ptr [0x47e9]
@@ -12705,7 +12706,7 @@ loc_6993:
 0699b  75 e8                jne loc_6985
 0699d  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 069a0  e8 17 cd             call clavier_installe
-069a3  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+069a3  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 069a6  8e c0                mov es, ax
 069a8  33 f6                xor si, si
 069aa  bf 00 00             mov di, 0
@@ -12743,7 +12744,7 @@ loc_69f6:
 069fe  75 e8                jne loc_69e8
 06a00  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 06a03  e8 b4 cc             call clavier_installe
-06a06  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+06a06  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 06a09  8e c0                mov es, ax
 06a0b  33 f6                xor si, si
 06a0d  bf 00 00             mov di, 0
@@ -13250,7 +13251,7 @@ loc_6e0a:
 06e0d  e8 39 f2             call sub_6049
 06e10  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
 06e14  b7 00                mov bh, 0
-06e16  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff
+06e16  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
 06e1b  75 03                jne loc_6e20
 06e1d  e9 3f ff             jmp loc_6d5f
 loc_6e20:
@@ -13262,7 +13263,7 @@ loc_6e20:
 06e32  32 ff                xor bh, bh
 06e34  83 3e ed 37 00       cmp word ptr [0x37ed], 0
 06e39  74 17                je loc_6e52
-06e3b  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff
+06e3b  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
 06e40  e8 e4 b9             call son_effet_1
 06e43  bb 1a 00             mov bx, 0x1a    ; message « UNE PORTE SECRETE S'OUVRE / EN GRINcANT DANS LE MUR »
 06e46  e8 a4 1a             call affiche_message
@@ -13275,10 +13276,10 @@ loc_6e52:
 06e59  eb 4f                jmp loc_6eaa
 ; ---- 1 octets non atteints (6e5b-6e5b)
 loc_6e5c:
-06e5c  80 bf 9b 4b 00       cmp byte ptr [bx + 0x4b9b], 0
+06e5c  80 bf 9b 4b 00       cmp byte ptr [bx + 0x4b9b], 0    ; evenement_par_zone
 06e61  75 1e                jne loc_6e81
 06e63  c7 06 ed 37 01 00    mov word ptr [0x37ed], 1
-06e69  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff
+06e69  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
 06e6e  83 3e ed 37 00       cmp word ptr [0x37ed], 0
 06e73  75 03                jne loc_6e78
 06e75  eb 33                jmp loc_6eaa
@@ -13289,12 +13290,12 @@ loc_6e78:
 06e7e  eb 2a                jmp loc_6eaa
 ; ---- 1 octets non atteints (6e80-6e80)
 loc_6e81:
-06e81  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff
+06e81  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
 06e86  75 03                jne loc_6e8b
 06e88  e9 d4 fe             jmp loc_6d5f
 loc_6e8b:
-06e8b  8a 87 9b 4b          mov al, byte ptr [bx + 0x4b9b]
-06e8f  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff
+06e8b  8a 87 9b 4b          mov al, byte ptr [bx + 0x4b9b]    ; evenement_par_zone
+06e8f  c6 87 9b 4b ff       mov byte ptr [bx + 0x4b9b], 0xff    ; evenement_par_zone
 loc_6e94:
 06e94  fe c8                dec al
 06e96  32 e4                xor ah, ah
@@ -13302,7 +13303,7 @@ loc_6e94:
 06e9a  8b f3                mov si, bx
 06e9c  03 f0                add si, ax
 06e9e  46                   inc si
-06e9f  bb 89 5a             mov bx, 0x5a89
+06e9f  bb 89 5a             mov bx, 0x5a89    ; evenements_fouille
 06ea2  03 d8                add bx, ax
 06ea4  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06ea8  ff 17                call word ptr [bx]
@@ -13823,7 +13824,7 @@ loc_732a:
 07333  c7 06 f1 47 20 2c    mov word ptr [0x47f1], 0x2c20
 07339  be 40 7c             mov si, 0x7c40
 0733c  bf 30 0a             mov di, 0xa30
-0733f  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+0733f  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07342  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07345  50                   push ax
 07346  b8 63 14             mov ax, 0x1463
@@ -13836,7 +13837,7 @@ loc_732a:
 07356  1f                   pop ds
 07357  be 00 30             mov si, 0x3000
 0735a  bf ac 75             mov di, 0x75ac
-0735d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+0735d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07360  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07363  50                   push ax
 07364  b8 63 14             mov ax, 0x1463
@@ -13849,7 +13850,7 @@ loc_732a:
 07374  1f                   pop ds
 07375  be 00 3c             mov si, 0x3c00
 07378  bf 08 76             mov di, 0x7608
-0737b  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+0737b  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 0737e  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07381  50                   push ax
 07382  b8 63 14             mov ax, 0x1463
@@ -13862,7 +13863,7 @@ loc_732a:
 07392  1f                   pop ds
 07393  be 00 48             mov si, 0x4800
 07396  bf 64 76             mov di, 0x7664
-07399  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07399  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 0739c  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 0739f  50                   push ax
 073a0  b8 63 14             mov ax, 0x1463
@@ -13900,7 +13901,7 @@ loc_73ec:
 
 ; ======== choix_quete
 ; icône plateau : quête, briefing (QUESTB, EQUESTS.BIN) ; « AUCUN PERSONNAGE ACTIF... »
-073ed  bb a0 44             mov bx, 0x44a0
+073ed  bb a0 44             mov bx, 0x44a0    ; heros_en_jeu
 073f0  32 c0                xor al, al
 073f2  80 3e 69 46 00       cmp byte ptr [0x4669], 0
 073f7  75 03                jne loc_73fc
@@ -14111,8 +14112,8 @@ loc_761f:
 07624  75 04                jne loc_762a
 07626  c6 44 07 07          mov byte ptr [si + 7], 7
 loc_762a:
-0762a  e8 4c 0d             call sub_8379
-0762d  a0 7a ab             mov al, byte ptr [0xab7a]
+0762a  e8 4c 0d             call menu_liste
+0762d  a0 7a ab             mov al, byte ptr [0xab7a]    ; choix_menu
 07630  fe c8                dec al
 07632  3c 0e                cmp al, 0xe
 07634  74 10                je loc_7646
@@ -14122,7 +14123,7 @@ loc_763a:
 0763a  a2 92 3f             mov byte ptr [0x3f92], al    ; numero_quete
 0763d  e8 c2 eb             call efface_tampon
 07640  e8 a1 ea             call affiche_tampon
-07643  e9 aa 0e             jmp loc_84f0
+07643  e9 aa 0e             jmp lance_quete
 loc_7646:
 07646  e8 da f3             call fond_vers_tampon
 07649  8b 1e f7 37          mov bx, word ptr [0x37f7]
@@ -14135,8 +14136,8 @@ loc_765c:
 07661  75 04                jne loc_7667
 07663  c6 44 07 07          mov byte ptr [si + 7], 7
 loc_7667:
-07667  e8 0f 0d             call sub_8379
-0766a  a0 7a ab             mov al, byte ptr [0xab7a]
+07667  e8 0f 0d             call menu_liste
+0766a  a0 7a ab             mov al, byte ptr [0xab7a]    ; choix_menu
 0766d  fe c8                dec al
 0766f  3c 0a                cmp al, 0xa
 07671  75 03                jne loc_7676
@@ -14203,12 +14204,12 @@ loc_7704:
 
 ; ======== ecran_heros
 ; icône héros : choix et création des personnages
-07717  c6 06 9e 40 ff       mov byte ptr [0x409e], 0xff
+07717  c6 06 9e 40 ff       mov byte ptr [0x409e], 0xff    ; heros_selectionne
 loc_771c:
 0771c  e8 04 f3             call fond_vers_tampon
 0771f  be 40 7a             mov si, 0x7a40
 07722  bf 10 d5             mov di, 0xd510
-07725  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07725  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07728  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 0772b  50                   push ax
 0772c  b8 63 14             mov ax, 0x1463
@@ -14226,11 +14227,11 @@ loc_771c:
 07755  c7 06 f1 37 00 80    mov word ptr [0x37f1], 0x8000
 loc_775b:
 0775b  8b 1e e9 37          mov bx, word ptr [0x37e9]    ; erreur_fichier
-0775f  80 bf a0 44 00       cmp byte ptr [bx + 0x44a0], 0
+0775f  80 bf a0 44 00       cmp byte ptr [bx + 0x44a0], 0    ; heros_en_jeu
 07764  74 1f                je loc_7785
 07766  be 00 78             mov si, 0x7800
 07769  8b 3e eb 37          mov di, word ptr [0x37eb]
-0776d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+0776d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07770  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07773  50                   push ax
 07774  b8 63 14             mov ax, 0x1463
@@ -14243,7 +14244,7 @@ loc_775b:
 07784  1f                   pop ds
 loc_7785:
 07785  a1 e9 37             mov ax, word ptr [0x37e9]    ; erreur_fichier
-07788  3a 06 9e 40          cmp al, byte ptr [0x409e]
+07788  3a 06 9e 40          cmp al, byte ptr [0x409e]    ; heros_selectionne
 0778c  74 22                je loc_77b0
 0778e  8b 36 ed 37          mov si, word ptr [0x37ed]
 07792  8b 3e ef 37          mov di, word ptr [0x37ef]
@@ -14283,7 +14284,7 @@ loc_77d0:
 077ef  74 03                je loc_77f4
 077f1  e9 67 ff             jmp loc_775b
 loc_77f4:
-077f4  80 3e 9e 40 03       cmp byte ptr [0x409e], 3
+077f4  80 3e 9e 40 03       cmp byte ptr [0x409e], 3    ; heros_selectionne
 077f9  77 3e                ja loc_7839
 077fb  c7 06 e9 37 00 60    mov word ptr [0x37e9], 0x6000    ; erreur_fichier
 07801  c7 06 eb 37 48 91    mov word ptr [0x37eb], 0x9148
@@ -14292,7 +14293,7 @@ loc_780a:
 0780a  51                   push cx
 0780b  8b 36 e9 37          mov si, word ptr [0x37e9]    ; erreur_fichier
 0780f  8b 3e eb 37          mov di, word ptr [0x37eb]
-07813  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07813  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07816  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07819  50                   push ax
 0781a  b8 63 14             mov ax, 0x1463
@@ -14320,13 +14321,13 @@ loc_783c:
 07852  eb 24                jmp loc_7878
 ; ---- 1 octets non atteints (7854-7854)
 loc_7855:
-07855  be 22 aa             mov si, 0xaa22
+07855  be 22 aa             mov si, 0xaa22    ; zones_heros
 07858  e8 aa d6             call zone_cliquee
 0785b  83 fb 12             cmp bx, 0x12
 0785e  77 dc                ja loc_783c
 07860  83 fb 02             cmp bx, 2
 07863  72 d7                jb loc_783c
-07865  80 3e 9e 40 04       cmp byte ptr [0x409e], 4
+07865  80 3e 9e 40 04       cmp byte ptr [0x409e], 4    ; heros_selectionne
 0786a  72 0f                jb loc_787b
 0786c  83 fb 0a             cmp bx, 0xa
 0786f  72 0a                jb loc_787b
@@ -14338,46 +14339,48 @@ loc_7878:
 loc_787b:
 0787b  e8 d6 c0             call sub_3954
 0787e  e8 c7 b1             call son_effet_2
-07881  81 c3 6c aa          add bx, 0xaa6c
+07881  81 c3 6c aa          add bx, 0xaa6c    ; saut_heros
 07885  ff 27                jmp word ptr [bx]
 
-; ======== sub_7887   (routine probable : non appelée directement)
-07887  c6 06 9e 40 00       mov byte ptr [0x409e], 0
+; ======== choisit_heros_1
+; sélectionne le héros 1 (DS:409E) et passe aux commandes de son joueur ; 0x7895, 0x78A3, 0x78B1 pour 2 à 4
+07887  c6 06 9e 40 00       mov byte ptr [0x409e], 0    ; heros_selectionne
 0788c  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
 0788f  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07892  e9 87 fe             jmp loc_771c
 
 ; ======== sub_7895   (routine probable : non appelée directement)
-07895  c6 06 9e 40 01       mov byte ptr [0x409e], 1
+07895  c6 06 9e 40 01       mov byte ptr [0x409e], 1    ; heros_selectionne
 0789a  a0 96 31             mov al, byte ptr [0x3196]
 0789d  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078a0  e9 79 fe             jmp loc_771c
 
 ; ======== sub_78a3   (routine probable : non appelée directement)
-078a3  c6 06 9e 40 02       mov byte ptr [0x409e], 2
+078a3  c6 06 9e 40 02       mov byte ptr [0x409e], 2    ; heros_selectionne
 078a8  a0 97 31             mov al, byte ptr [0x3197]
 078ab  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078ae  e9 6b fe             jmp loc_771c
 
 ; ======== sub_78b1   (routine probable : non appelée directement)
-078b1  c6 06 9e 40 03       mov byte ptr [0x409e], 3
+078b1  c6 06 9e 40 03       mov byte ptr [0x409e], 3    ; heros_selectionne
 078b6  a0 98 31             mov al, byte ptr [0x3198]
 078b9  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078bc  e9 5d fe             jmp loc_771c
 
-; ======== sub_78bf   (routine probable : non appelée directement)
-078bf  8a 1e 9e 40          mov bl, byte ptr [0x409e]
+; ======== heros_en_jeu
+; bouton portrait : met le héros en jeu ou l'en retire (DS:44A0 + n)
+078bf  8a 1e 9e 40          mov bl, byte ptr [0x409e]    ; heros_selectionne
 078c3  32 ff                xor bh, bh
-078c5  80 b7 a0 44 ff       xor byte ptr [bx + 0x44a0], 0xff
+078c5  80 b7 a0 44 ff       xor byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 078ca  e9 4f fe             jmp loc_771c
 
 ; ======== heros_renouvele
 ; « LE PERSONNAGE A ETE RENOUVELE »
-078cd  a0 9e 40             mov al, byte ptr [0x409e]
+078cd  a0 9e 40             mov al, byte ptr [0x409e]    ; heros_selectionne
 078d0  e8 ac e4             call sub_5d7f
-078d3  8a 1e 9e 40          mov bl, byte ptr [0x409e]
+078d3  8a 1e 9e 40          mov bl, byte ptr [0x409e]    ; heros_selectionne
 078d7  b7 00                mov bh, 0
-078d9  8b 87 94 43          mov ax, word ptr [bx + 0x4394]
+078d9  8b 87 94 43          mov ax, word ptr [bx + 0x4394]    ; corps_depart
 078dd  88 44 06             mov byte ptr [si + 6], al
 078e0  8a 87 1b ad          mov al, byte ptr [bx - 0x52e5]
 078e4  88 44 07             mov byte ptr [si + 7], al
@@ -14389,7 +14392,7 @@ loc_787b:
 078fc  c6 44 12 00          mov byte ptr [si + 0x12], 0
 07900  c6 44 13 00          mov byte ptr [si + 0x13], 0
 07904  88 5c 19             mov byte ptr [si + 0x19], bl
-07907  80 3e 9e 40 01       cmp byte ptr [0x409e], 1
+07907  80 3e 9e 40 01       cmp byte ptr [0x409e], 1    ; heros_selectionne
 0790c  75 04                jne loc_7912
 0790e  80 4c 0e 80          or byte ptr [si + 0xe], 0x80
 loc_7912:
@@ -14397,15 +14400,16 @@ loc_7912:
 07915  e8 d5 0f             call affiche_message
 07918  e9 01 fe             jmp loc_771c
 
-; ======== sub_791b   (routine probable : non appelée directement)
+; ======== heros_nomme
+; bouton plume : saisie du nom (15 caractères) puis mise en jeu
 0791b  ff 36 59 37          push word ptr [0x3759]
 0791f  c6 06 59 37 00       mov byte ptr [0x3759], 0
-07924  e8 5f 04             call sub_7d86
+07924  e8 5f 04             call saisie_texte
 07927  8f 06 59 37          pop word ptr [0x3759]
-0792b  8a 1e 9e 40          mov bl, byte ptr [0x409e]
+0792b  8a 1e 9e 40          mov bl, byte ptr [0x409e]    ; heros_selectionne
 0792f  b7 00                mov bh, 0
 07931  d0 e3                shl bl, 1
-07933  8b bf d7 45          mov di, word ptr [bx + 0x45d7]
+07933  8b bf d7 45          mov di, word ptr [bx + 0x45d7]    ; noms_heros
 07937  50                   push ax
 07938  b8 7c 09             mov ax, 0x97c
 0793b  8e c0                mov es, ax
@@ -14413,9 +14417,9 @@ loc_7912:
 0793e  be fa ab             mov si, 0xabfa    ; "________________"
 07941  b9 0f 00             mov cx, 0xf
 07944  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
-07946  8a 1e 9e 40          mov bl, byte ptr [0x409e]
+07946  8a 1e 9e 40          mov bl, byte ptr [0x409e]    ; heros_selectionne
 0794a  32 ff                xor bh, bh
-0794c  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff
+0794c  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 07951  e9 c8 fd             jmp loc_771c
 
 ; ======== sauvegarde_menu
@@ -14423,15 +14427,15 @@ loc_7912:
 07954  e8 a3 bf             call attend_relache
 07957  bb 0c 00             mov bx, 0xc
 0795a  e8 90 0f             call affiche_message
-0795d  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe
+0795d  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe    ; choix_menu
 07962  75 03                jne loc_7967
 07964  e9 b5 fd             jmp loc_771c
 loc_7967:
-07967  80 3e 7a ab 02       cmp byte ptr [0xab7a], 2
+07967  80 3e 7a ab 02       cmp byte ptr [0xab7a], 2    ; choix_menu
 0796c  75 03                jne loc_7971
 0796e  e9 ab fd             jmp loc_771c
 loc_7971:
-07971  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1
+07971  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1    ; choix_menu
 07976  75 03                jne loc_797b
 07978  e9 a2 00             jmp loc_7a1d
 loc_797b:
@@ -14451,7 +14455,7 @@ loc_7992:
 0799c  ba 00 00             mov dx, 0
 0799f  1e                   push ds
 079a0  50                   push ax
-079a1  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+079a1  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 079a4  8e d8                mov ds, ax
 079a6  58                   pop ax
 079a7  b4 3f                mov ah, 0x3f
@@ -14465,18 +14469,18 @@ loc_7992:
 loc_79b8:
 079b8  e8 ff bc             call clavier_installe
 079bb  e8 bc 01             call sub_7b7a
-079be  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8
+079be  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8    ; choix_menu
 079c3  75 03                jne loc_79c8
 079c5  e9 e1 00             jmp loc_7aa9
 loc_79c8:
-079c8  8a 1e 9e 40          mov bl, byte ptr [0x409e]
+079c8  8a 1e 9e 40          mov bl, byte ptr [0x409e]    ; heros_selectionne
 079cc  32 ff                xor bh, bh
 079ce  d1 e3                shl bx, 1
 079d0  56                   push si
-079d1  8b b7 d7 45          mov si, word ptr [bx + 0x45d7]
+079d1  8b b7 d7 45          mov si, word ptr [bx + 0x45d7]    ; noms_heros
 079d5  b9 10 00             mov cx, 0x10
 079d8  50                   push ax
-079d9  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+079d9  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 079dc  8e c0                mov es, ax
 079de  58                   pop ax
 079df  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
@@ -14488,7 +14492,7 @@ loc_79eb:
 079eb  c7 06 07 39 b3 5f    mov word ptr [0x3907], 0x5fb3    ; fichier_nom, "quest.sav"
 079f1  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 079f7  c7 06 05 39 60 05    mov word ptr [0x3905], 0x560    ; fichier_taille
-079fd  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+079fd  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07a00  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 07a03  e8 9a bf             call sauve_fichier
 07a06  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
@@ -14516,7 +14520,7 @@ loc_7a1d:
 07a3b  ba 00 00             mov dx, 0
 07a3e  1e                   push ds
 07a3f  50                   push ax
-07a40  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07a40  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07a43  8e d8                mov ds, ax
 07a45  58                   pop ax
 07a46  b4 3f                mov ah, 0x3f
@@ -14535,17 +14539,17 @@ loc_7a57:
 loc_7a62:
 07a62  e8 55 bc             call clavier_installe
 07a65  e8 12 01             call sub_7b7a
-07a68  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8
+07a68  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8    ; choix_menu
 07a6d  75 03                jne loc_7a72
 07a6f  eb 38                jmp loc_7aa9
 ; ---- 1 octets non atteints (7a71-7a71)
 loc_7a72:
-07a72  8a 1e 9e 40          mov bl, byte ptr [0x409e]
+07a72  8a 1e 9e 40          mov bl, byte ptr [0x409e]    ; heros_selectionne
 07a76  32 ff                xor bh, bh
 07a78  d1 e3                shl bx, 1
 07a7a  56                   push si
 07a7b  8b f7                mov si, di
-07a7d  8b bf d7 45          mov di, word ptr [bx + 0x45d7]
+07a7d  8b bf d7 45          mov di, word ptr [bx + 0x45d7]    ; noms_heros
 07a81  b9 10 00             mov cx, 0x10
 07a84  50                   push ax
 07a85  b8 7c 09             mov ax, 0x97c
@@ -14553,7 +14557,7 @@ loc_7a72:
 07a8a  58                   pop ax
 07a8b  1e                   push ds
 07a8c  50                   push ax
-07a8d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07a8d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07a90  8e d8                mov ds, ax
 07a92  58                   pop ax
 07a93  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
@@ -14562,7 +14566,7 @@ loc_7a72:
 07a97  8b bf 41 43          mov di, word ptr [bx + 0x4341]
 07a9b  1e                   push ds
 07a9c  50                   push ax
-07a9d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07a9d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07aa0  8e d8                mov ds, ax
 07aa2  58                   pop ax
 07aa3  b9 1a 00             mov cx, 0x1a
@@ -14595,7 +14599,7 @@ loc_7ae6:
 07aee  75 e8                jne loc_7ad8
 07af0  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 07af3  e8 c4 bb             call clavier_installe
-07af6  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07af6  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07af9  8e c0                mov es, ax
 07afb  33 f6                xor si, si
 07afd  bf 00 00             mov di, 0
@@ -14633,7 +14637,7 @@ loc_7b4b:
 07b53  75 e8                jne loc_7b3d
 07b55  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 07b58  e8 5f bb             call clavier_installe
-07b5b  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07b5b  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07b5e  8e c0                mov es, ax
 07b60  33 f6                xor si, si
 07b62  bf 00 00             mov di, 0
@@ -14648,7 +14652,7 @@ loc_7b4b:
 07b77  e9 a2 fb             jmp loc_771c
 
 ; ======== sub_7b7a   (appelée depuis 79bb, 7a65)
-07b7a  a0 9e 40             mov al, byte ptr [0x409e]
+07b7a  a0 9e 40             mov al, byte ptr [0x409e]    ; heros_selectionne
 07b7d  32 e4                xor ah, ah
 07b7f  b9 88 00             mov cx, 0x88
 07b82  f7 e1                mul cx
@@ -14668,7 +14672,7 @@ loc_7b4b:
 07ba2  58                   pop ax
 07ba3  1e                   push ds
 07ba4  50                   push ax
-07ba5  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07ba5  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07ba8  8e d8                mov ds, ax
 07baa  58                   pop ax
 07bab  b9 08 00             mov cx, 8
@@ -14683,26 +14687,26 @@ loc_7bae:
 07bbb  bb 12 00             mov bx, 0x12
 07bbe  e8 2c 0d             call affiche_message
 07bc1  5f                   pop di
-07bc2  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8
+07bc2  80 3e 7a ab 08       cmp byte ptr [0xab7a], 8    ; choix_menu
 07bc7  75 01                jne loc_7bca
 07bc9  c3                   ret
 loc_7bca:
-07bca  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe
+07bca  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe    ; choix_menu
 07bcf  75 01                jne loc_7bd2
 07bd1  c3                   ret
 loc_7bd2:
-07bd2  a0 7a ab             mov al, byte ptr [0xab7a]
+07bd2  a0 7a ab             mov al, byte ptr [0xab7a]    ; choix_menu
 07bd5  32 e4                xor ah, ah
 07bd7  b9 11 00             mov cx, 0x11
 07bda  f7 e1                mul cx
 07bdc  03 f8                add di, ax
-07bde  a0 9e 40             mov al, byte ptr [0x409e]
+07bde  a0 9e 40             mov al, byte ptr [0x409e]    ; heros_selectionne
 07be1  32 e4                xor ah, ah
 07be3  b9 d0 00             mov cx, 0xd0
 07be6  f7 e1                mul cx
 07be8  be 20 02             mov si, 0x220
 07beb  03 f0                add si, ax
-07bed  a0 7a ab             mov al, byte ptr [0xab7a]
+07bed  a0 7a ab             mov al, byte ptr [0xab7a]    ; choix_menu
 07bf0  32 e4                xor ah, ah
 07bf2  b9 1a 00             mov cx, 0x1a
 07bf5  f7 e1                mul cx
@@ -14740,7 +14744,7 @@ loc_7bd2:
 07c3d  a3 ef 37             mov word ptr [0x37ef], ax
 07c40  be c0 b7             mov si, 0xb7c0
 07c43  8b 3e e9 37          mov di, word ptr [0x37e9]    ; erreur_fichier
-07c47  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07c47  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07c4a  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07c4d  50                   push ax
 07c4e  b8 63 14             mov ax, 0x1463
@@ -14758,7 +14762,7 @@ loc_7c67:
 07c6c  51                   push cx
 07c6d  be c0 bb             mov si, 0xbbc0
 07c70  8b 3e e9 37          mov di, word ptr [0x37e9]    ; erreur_fichier
-07c74  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07c74  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07c77  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07c7a  50                   push ax
 07c7b  b8 63 14             mov ax, 0x1463
@@ -14774,7 +14778,7 @@ loc_7c67:
 07c8f  83 06 e9 37 10       add word ptr [0x37e9], 0x10    ; erreur_fichier
 07c94  be c0 b8             mov si, 0xb8c0
 07c97  8b 3e e9 37          mov di, word ptr [0x37e9]    ; erreur_fichier
-07c9b  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07c9b  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07c9e  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07ca1  50                   push ax
 07ca2  b8 63 14             mov ax, 0x1463
@@ -14793,7 +14797,7 @@ loc_7cc1:
 07cc2  ff 36 e9 37          push word ptr [0x37e9]    ; erreur_fichier
 07cc6  be c0 be             mov si, 0xbec0
 07cc9  8b 3e e9 37          mov di, word ptr [0x37e9]    ; erreur_fichier
-07ccd  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07ccd  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07cd0  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07cd3  50                   push ax
 07cd4  b8 63 14             mov ax, 0x1463
@@ -14808,7 +14812,7 @@ loc_7cc1:
 07ce8  03 06 ef 37          add ax, word ptr [0x37ef]
 07cec  be c0 bc             mov si, 0xbcc0
 07cef  8b f8                mov di, ax
-07cf1  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07cf1  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07cf4  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07cf7  50                   push ax
 07cf8  b8 63 14             mov ax, 0x1463
@@ -14825,7 +14829,7 @@ loc_7cc1:
 07d14  e2 ab                loop loc_7cc1
 07d16  be c0 ba             mov si, 0xbac0
 07d19  8b 3e e9 37          mov di, word ptr [0x37e9]    ; erreur_fichier
-07d1d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07d1d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07d20  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07d23  50                   push ax
 07d24  b8 63 14             mov ax, 0x1463
@@ -14842,7 +14846,7 @@ loc_7d39:
 07d3e  51                   push cx
 07d3f  be c0 bd             mov si, 0xbdc0
 07d42  8b 3e e9 37          mov di, word ptr [0x37e9]    ; erreur_fichier
-07d46  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07d46  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07d49  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07d4c  50                   push ax
 07d4d  b8 63 14             mov ax, 0x1463
@@ -14858,7 +14862,7 @@ loc_7d39:
 07d61  83 06 e9 37 10       add word ptr [0x37e9], 0x10    ; erreur_fichier
 07d66  be c0 b9             mov si, 0xb9c0
 07d69  8b 3e e9 37          mov di, word ptr [0x37e9]    ; erreur_fichier
-07d6d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+07d6d  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 07d70  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 07d73  50                   push ax
 07d74  b8 63 14             mov ax, 0x1463
@@ -14871,8 +14875,8 @@ loc_7d39:
 07d84  1f                   pop ds
 07d85  c3                   ret
 
-; ======== sub_7d86   (appelée depuis 7924)
-07d86  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
+; ======== saisie_texte   (appelée depuis 7924)
+07d86  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 07d8b  c6 06 79 ab 00       mov byte ptr [0xab79], 0
 07d90  90                   nop
 07d91  bb 6d ab             mov bx, 0xab6d
@@ -14936,7 +14940,7 @@ loc_7e27:
 07e2f  d1 eb                shr bx, 1
 07e31  88 1e 64 ab          mov byte ptr [0xab64], bl
 07e35  80 eb 06             sub bl, 6
-07e38  88 1e 7a ab          mov byte ptr [0xab7a], bl
+07e38  88 1e 7a ab          mov byte ptr [0xab7a], bl    ; choix_menu
 07e3c  80 fb 1b             cmp bl, 0x1b
 07e3f  76 03                jbe loc_7e44
 07e41  e9 8b 00             jmp loc_7ecf
@@ -14947,7 +14951,7 @@ loc_7e44:
 07e50  74 38                je loc_7e8a
 07e52  32 ff                xor bh, bh
 07e54  8a 1e 79 ab          mov bl, byte ptr [0xab79]
-07e58  80 3e 7a ab 1b       cmp byte ptr [0xab7a], 0x1b
+07e58  80 3e 7a ab 1b       cmp byte ptr [0xab7a], 0x1b    ; choix_menu
 07e5d  75 03                jne loc_7e62
 07e5f  e9 00 01             jmp loc_7f62
 loc_7e62:
@@ -14982,12 +14986,12 @@ loc_7eb1:
 07eb3  3e c6 46 04 0c       mov byte ptr ds:[bp + 4], 0xc
 loc_7eb8:
 07eb8  e8 c1 b2             call affiche_texte
-07ebb  fe 06 7a ab          inc byte ptr [0xab7a]
+07ebb  fe 06 7a ab          inc byte ptr [0xab7a]    ; choix_menu
 07ebf  eb 0e                jmp loc_7ecf
 ; ---- 1 octets non atteints (7ec1-7ec1)
 loc_7ec2:
 07ec2  e8 7c e5             call sub_6441
-07ec5  80 3e 7a ab ff       cmp byte ptr [0xab7a], 0xff
+07ec5  80 3e 7a ab ff       cmp byte ptr [0xab7a], 0xff    ; choix_menu
 07eca  75 03                jne loc_7ecf
 07ecc  e9 79 ab             jmp son_effet_2
 loc_7ecf:
@@ -15025,25 +15029,25 @@ loc_7f1d:
 07f20  e8 f1 de             call curseur_sauve_fond
 07f23  e8 be e1             call affiche_tampon
 07f26  e8 ae de             call curseur_dessine
-07f29  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
+07f29  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0    ; choix_menu
 07f2e  75 03                jne loc_7f33
 07f30  e9 da fe             jmp loc_7e0d
 loc_7f33:
-07f33  80 3e 7a ab 1c       cmp byte ptr [0xab7a], 0x1c
+07f33  80 3e 7a ab 1c       cmp byte ptr [0xab7a], 0x1c    ; choix_menu
 07f38  76 03                jbe loc_7f3d
 07f3a  e9 d0 fe             jmp loc_7e0d
 loc_7f3d:
-07f3d  fe 0e 7a ab          dec byte ptr [0xab7a]
+07f3d  fe 0e 7a ab          dec byte ptr [0xab7a]    ; choix_menu
 07f41  bd 36 ab             mov bp, 0xab36
 07f44  e8 35 b2             call affiche_texte
-07f47  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
+07f47  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 07f4c  e9 be fe             jmp loc_7e0d
 
 ; ======== sub_7f4f   (routine probable : non appelée directement)
 07f4f  be fa ab             mov si, 0xabfa    ; "________________"
 07f52  43                   inc bx
 07f53  c6 00 00             mov byte ptr [bx + si], 0
-07f56  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff
+07f56  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff    ; choix_menu
 07f5b  e8 f6 b9             call sub_3954
 07f5e  e8 e7 aa             call son_effet_2
 07f61  c3                   ret
@@ -15106,13 +15110,13 @@ loc_7fcc:
 07fd8  75 01                jne loc_7fdb
 07fda  c3                   ret
 loc_7fdb:
-07fdb  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
+07fdb  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 07fe0  bb 00 00             mov bx, 0
 07fe3  89 1e 13 ac          mov word ptr [0xac13], bx
 07fe7  89 1e 15 ac          mov word ptr [0xac15], bx
 07feb  80 3e a3 44 00       cmp byte ptr [0x44a3], 0
 07ff0  74 22                je loc_8014
-07ff2  c6 06 7a ab 02       mov byte ptr [0xab7a], 2
+07ff2  c6 06 7a ab 02       mov byte ptr [0xab7a], 2    ; choix_menu
 07ff7  a0 98 31             mov al, byte ptr [0x3198]
 07ffa  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07ffd  b9 03 00             mov cx, 3
@@ -15131,7 +15135,7 @@ loc_8014:
 0801b  c3                   ret
 loc_801c:
 0801c  be b4 01             mov si, 0x1b4
-0801f  c6 06 7a ab 01       mov byte ptr [0xab7a], 1
+0801f  c6 06 7a ab 01       mov byte ptr [0xab7a], 1    ; choix_menu
 08024  a0 97 31             mov al, byte ptr [0x3197]
 08027  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 
@@ -15160,7 +15164,7 @@ loc_8035:
 0805f  74 02                je loc_8063
 08061  eb d2                jmp loc_8035
 loc_8063:
-08063  a0 7a ab             mov al, byte ptr [0xab7a]
+08063  a0 7a ab             mov al, byte ptr [0xab7a]    ; choix_menu
 08066  88 87 13 ac          mov byte ptr [bx - 0x53ed], al
 0806a  e8 db a9             call son_effet_2
 0806d  e9 e4 b8             jmp sub_3954
@@ -15173,7 +15177,7 @@ loc_807c:
 0807c  e8 a4 e9             call fond_vers_tampon
 0807f  be 40 7a             mov si, 0x7a40
 08082  bf c8 d4             mov di, 0xd4c8
-08085  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08085  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08088  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 0808b  50                   push ax
 0808c  b8 63 14             mov ax, 0x1463
@@ -15244,12 +15248,12 @@ loc_8102:
 08144  8b 1e 37 46          mov bx, word ptr [0x4637]    ; fiche_heros_courant
 08148  d1 e3                shl bx, 1
 0814a  53                   push bx
-0814b  8b b7 4b 43          mov si, word ptr [bx + 0x434b]
+0814b  8b b7 4b 43          mov si, word ptr [bx + 0x434b]    ; noms_types
 0814f  e8 62 df             call sub_60b4
 08152  bd 93 ac             mov bp, 0xac93
 08155  e8 24 b0             call affiche_texte
 08158  5b                   pop bx
-08159  8b b7 d7 45          mov si, word ptr [bx + 0x45d7]
+08159  8b b7 d7 45          mov si, word ptr [bx + 0x45d7]    ; noms_heros
 0815d  e8 54 df             call sub_60b4
 08160  a1 37 46             mov ax, word ptr [0x4637]    ; fiche_heros_courant
 08163  e8 19 dc             call sub_5d7f
@@ -15277,14 +15281,14 @@ loc_8185:
 ; ---- 1 octets non atteints (819d-819d)
 loc_819e:
 0819e  e8 a4 00             call sub_8245
-081a1  be a4 aa             mov si, 0xaaa4
+081a1  be a4 aa             mov si, 0xaaa4    ; zones_armurerie
 081a4  e8 5e cd             call zone_cliquee
 081a7  8b d3                mov dx, bx
 081a9  ff a7 b3 ac          jmp word ptr [bx - 0x534d]
 loc_81ad:
 081ad  e8 98 a8             call son_effet_2
 081b0  e9 77 f1             jmp loc_732a
-loc_81b3:
+achete_objet:    ; refuse si le bit est déjà posé ou si le prix dépasse l'or (+9) ; sinon retire le prix et pose le bit (+0x0E)
 081b3  8b da                mov bx, dx
 081b5  03 db                add bx, bx
 081b7  8b 8f 13 ac          mov cx, word ptr [bx - 0x53ed]
@@ -15345,7 +15349,7 @@ loc_8233:
 0824e  e8 fd df             call sub_624e
 08251  bd 97 ac             mov bp, 0xac97
 08254  e8 25 af             call affiche_texte
-08257  be a4 aa             mov si, 0xaaa4
+08257  be a4 aa             mov si, 0xaaa4    ; zones_armurerie
 0825a  e8 bd cc             call zone_sous_curseur
 0825d  83 fb 02             cmp bx, 2
 08260  73 01                jae loc_8263
@@ -15424,7 +15428,7 @@ loc_82da:
 082e8  75 1e                jne loc_8308
 082ea  be 00 00             mov si, 0
 082ed  bf 38 32             mov di, 0x3238
-082f0  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+082f0  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 082f3  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 082f6  50                   push ax
 082f7  b8 63 14             mov ax, 0x1463
@@ -15440,7 +15444,7 @@ loc_8308:
 0830d  75 1e                jne loc_832d
 0830f  be 00 0c             mov si, 0xc00
 08312  bf c8 32             mov di, 0x32c8
-08315  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08315  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08318  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 0831b  50                   push ax
 0831c  b8 63 14             mov ax, 0x1463
@@ -15456,7 +15460,7 @@ loc_832d:
 08332  75 1e                jne loc_8352
 08334  be 00 18             mov si, 0x1800
 08337  bf 38 96             mov di, 0x9638
-0833a  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+0833a  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 0833d  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 08340  50                   push ax
 08341  b8 63 14             mov ax, 0x1463
@@ -15474,7 +15478,7 @@ loc_8352:
 loc_835a:
 0835a  be 00 24             mov si, 0x2400
 0835d  bf c8 96             mov di, 0x96c8
-08360  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08360  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08363  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 08366  50                   push ax
 08367  b8 63 14             mov ax, 0x1463
@@ -15487,11 +15491,12 @@ loc_835a:
 08377  1f                   pop ds
 08378  c3                   ret
 
-; ======== sub_8379   (appelée depuis 762a, 7667)
+; ======== menu_liste   (appelée depuis 762a, 7667)
+; menu de lignes de texte ; choix (numéro + 1) dans DS:AB7A
 08379  89 36 bd ab          mov word ptr [0xabbd], si
 0837d  8a 44 08             mov al, byte ptr [si + 8]
 08380  a2 ba ab             mov byte ptr [0xabba], al
-08383  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
+08383  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 08388  8a 44 06             mov al, byte ptr [si + 6]
 0838b  a2 bb ab             mov byte ptr [0xabbb], al
 0838e  8a 44 09             mov al, byte ptr [si + 9]
@@ -15549,7 +15554,7 @@ loc_83f6:
 08406  a0 ba ab             mov al, byte ptr [0xabba]
 08409  2a c1                sub al, cl
 0840b  fe c0                inc al
-0840d  a2 7a ab             mov byte ptr [0xab7a], al
+0840d  a2 7a ab             mov byte ptr [0xab7a], al    ; choix_menu
 loc_8410:
 08410  88 26 50 37          mov byte ptr [0x3750], ah
 08414  9c                   pushf
@@ -15579,14 +15584,14 @@ loc_8410:
 08435  75 02                jne loc_8439
 08437  eb 9b                jmp loc_83d4
 loc_8439:
-08439  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
+08439  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0    ; choix_menu
 0843e  74 94                je loc_83d4
 08440  e9 05 a6             jmp son_effet_2
 
 ; ======== sauve_quest_sav   (appelée depuis 7a18)
 ; écrit QUEST.SAV
 08443  50                   push ax
-08444  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08444  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08447  8e c0                mov es, ax
 08449  58                   pop ax
 0844a  b9 04 00             mov cx, 4
@@ -15643,7 +15648,7 @@ loc_84c5:
 084c5  c7 06 07 39 b3 5f    mov word ptr [0x3907], 0x5fb3    ; fichier_nom, "quest.sav"
 084cb  c7 06 03 39 00 00    mov word ptr [0x3903], 0    ; fichier_offset
 084d1  c7 06 05 39 60 05    mov word ptr [0x3905], 0x560    ; fichier_taille
-084d7  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+084d7  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 084da  a3 01 39             mov word ptr [0x3901], ax    ; fichier_segment
 084dd  e8 c0 b4             call sauve_fichier
 084e0  83 3e e9 37 00       cmp word ptr [0x37e9], 0    ; erreur_fichier
@@ -15653,7 +15658,9 @@ loc_84e8:
 084e8  bb 18 00             mov bx, 0x18    ; message « IL Y A UNE ERREUR DE DISQUETTE »
 084eb  e8 ff 03             call affiche_message
 084ee  eb d5                jmp loc_84c5
-loc_84f0:
+
+; ======== lance_quete
+; remet l'état à zéro, garde les fiches en DS:A98F, charge QUESTn.BIN (noms en DS:A3FC)
 084f0  50                   push ax
 084f1  b8 7c 09             mov ax, 0x97c
 084f4  8e c0                mov es, ax
@@ -15673,19 +15680,19 @@ loc_8511:
 08514  83 c7 04             add di, 4
 08517  e2 f8                loop loc_8511
 08519  be 63 46             mov si, 0x4663    ; fiches_personnages
-0851c  bf 8f a9             mov di, 0xa98f
+0851c  bf 8f a9             mov di, 0xa98f    ; fiches_avant_quete
 0851f  50                   push ax
 08520  b8 7c 09             mov ax, 0x97c
 08523  8e c0                mov es, ax
 08525  58                   pop ax
 08526  b9 34 00             mov cx, 0x34
 08529  f3 a5                rep movsw word ptr es:[di], word ptr [si]
-0852b  be a0 44             mov si, 0x44a0
+0852b  be a0 44             mov si, 0x44a0    ; heros_en_jeu
 0852e  b9 02 00             mov cx, 2
 08531  f3 a5                rep movsw word ptr es:[di], word ptr [si]
 08533  a0 92 3f             mov al, byte ptr [0x3f92]    ; numero_quete
 08536  02 c0                add al, al
-08538  bb fc a3             mov bx, 0xa3fc
+08538  bb fc a3             mov bx, 0xa3fc    ; fichiers_quetes
 0853b  e8 9f db             call sub_60dd
 0853e  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 08543  89 16 07 39          mov word ptr [0x3907], dx    ; fichier_nom
@@ -15735,7 +15742,7 @@ loc_8577:
 085b3  33 c0                xor ax, ax
 085b5  f3 ab                rep stosw word ptr es:[di], ax
 085b7  b9 01 04             mov cx, 0x401
-085ba  bb a0 44             mov bx, 0x44a0
+085ba  bb a0 44             mov bx, 0x44a0    ; heros_en_jeu
 085bd  bf 00 00             mov di, 0
 loc_85c0:
 085c0  50                   push ax
@@ -15872,14 +15879,14 @@ loc_869a:
 086d6  c6 44 06 02          mov byte ptr [si + 6], 2
 086da  c6 44 08 50          mov byte ptr [si + 8], 0x50
 loc_86de:
-086de  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
+086de  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 086e3  e8 16 dd             call curseur_memorise
 086e6  e8 3e 01             call sub_8827
 086e9  e8 28 d7             call curseur_sauve_fond
 086ec  e8 f5 d9             call affiche_tampon
 086ef  e8 e5 d6             call curseur_dessine
 086f2  e8 5d b0             call lit_commandes
-086f5  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
+086f5  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0    ; choix_menu
 086fa  74 e2                je loc_86de
 086fc  e8 03 db             call efface_tampon
 086ff  e8 e2 d9             call affiche_tampon
@@ -16007,11 +16014,11 @@ loc_8826:
 loc_884f:
 0884f  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 08854  74 04                je loc_885a
-08856  fe 06 7a ab          inc byte ptr [0xab7a]
+08856  fe 06 7a ab          inc byte ptr [0xab7a]    ; choix_menu
 loc_885a:
 0885a  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 0885f  74 04                je loc_8865
-08861  fe 06 7a ab          inc byte ptr [0xab7a]
+08861  fe 06 7a ab          inc byte ptr [0xab7a]    ; choix_menu
 loc_8865:
 08865  e9 14 a9             jmp affiche_texte
 ; ---- 8 octets non atteints (8868-886f)
@@ -16042,7 +16049,7 @@ loc_887e:
 088b6  74 32                je loc_88ea
 088b8  f6 06 92 39 20       test byte ptr [0x3992], 0x20    ; commandes
 088bd  74 08                je loc_88c7
-088bf  c6 06 7a ab fe       mov byte ptr [0xab7a], 0xfe
+088bf  c6 06 7a ab fe       mov byte ptr [0xab7a], 0xfe    ; choix_menu
 088c4  eb 24                jmp loc_88ea
 ; ---- 1 octets non atteints (88c6-88c6)
 loc_88c7:
@@ -16056,7 +16063,7 @@ loc_88dd:
 088dd  f6 06 92 39 10       test byte ptr [0x3992], 0x10    ; commandes
 088e2  74 06                je loc_88ea
 088e4  a1 e9 37             mov ax, word ptr [0x37e9]    ; erreur_fichier
-088e7  a2 7a ab             mov byte ptr [0xab7a], al
+088e7  a2 7a ab             mov byte ptr [0xab7a], al    ; choix_menu
 loc_88ea:
 088ea  e9 8f a8             jmp affiche_texte
 
@@ -16065,7 +16072,7 @@ loc_88ea:
 088ed  ff 36 50 37          push word ptr [0x3750]
 088f1  ff 36 35 46          push word ptr [0x4635]
 088f5  c6 06 59 37 01       mov byte ptr [0x3759], 1
-088fa  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff
+088fa  c6 06 7a ab ff       mov byte ptr [0xab7a], 0xff    ; choix_menu
 088ff  c6 06 3b ad 00       mov byte ptr [0xad3b], 0
 08904  90                   nop
 08905  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
@@ -16179,7 +16186,7 @@ loc_8a17:
 08a23  e8 be d6             call affiche_tampon
 08a26  e8 ae d3             call curseur_dessine
 08a29  e8 26 ad             call lit_commandes
-08a2c  80 3e 7a ab ff       cmp byte ptr [0xab7a], 0xff
+08a2c  80 3e 7a ab ff       cmp byte ptr [0xab7a], 0xff    ; choix_menu
 08a31  75 02                jne loc_8a35
 08a33  eb e2                jmp loc_8a17
 loc_8a35:
@@ -16442,7 +16449,7 @@ loc_8cae:
 08cb6  75 e8                jne loc_8ca0
 08cb8  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 08cbb  e8 fc a9             call clavier_installe
-08cbe  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08cbe  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08cc1  8e c0                mov es, ax
 08cc3  33 f6                xor si, si
 08cc5  bf 00 00             mov di, 0
@@ -16504,7 +16511,7 @@ loc_8d59:
 08d61  75 e8                jne loc_8d4b
 08d63  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 08d66  e8 51 a9             call clavier_installe
-08d69  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08d69  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08d6c  8e c0                mov es, ax
 08d6e  33 f6                xor si, si
 08d70  bf 00 00             mov di, 0
@@ -16517,7 +16524,7 @@ loc_8d59:
 08d82  8e d8                mov ds, ax
 08d84  58                   pop ax
 loc_8d85:
-08d85  80 3e 67 ad 05       cmp byte ptr [0xad67], 5
+08d85  80 3e 67 ad 05       cmp byte ptr [0xad67], 5    ; mode_inventaire
 08d8a  74 03                je loc_8d8f
 08d8c  e9 ce 00             jmp loc_8e5d
 loc_8d8f:
@@ -16547,7 +16554,7 @@ loc_8dcc:
 08dd4  75 e8                jne loc_8dbe
 08dd6  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 08dd9  e8 de a8             call clavier_installe
-08ddc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08ddc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08ddf  8e c0                mov es, ax
 08de1  33 f6                xor si, si
 08de3  bf 80 46             mov di, 0x4680
@@ -16586,7 +16593,7 @@ loc_8e31:
 08e39  75 e8                jne loc_8e23
 08e3b  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 08e3e  e8 79 a8             call clavier_installe
-08e41  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08e41  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08e44  8e c0                mov es, ax
 08e46  33 f6                xor si, si
 08e48  bf 40 23             mov di, 0x2340
@@ -16603,13 +16610,13 @@ loc_8e5d:
 08e62  c6 06 e9 3f 01       mov byte ptr [0x3fe9], 1
 loc_8e67:
 08e67  e8 b9 db             call fond_vers_tampon
-08e6a  80 3e 67 ad 05       cmp byte ptr [0xad67], 5
+08e6a  80 3e 67 ad 05       cmp byte ptr [0xad67], 5    ; mode_inventaire
 08e6f  75 03                jne loc_8e74
 08e71  e9 36 03             jmp loc_91aa
 loc_8e74:
 08e74  be 80 17             mov si, 0x1780
 08e77  bf 88 50             mov di, 0x5088
-08e7a  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08e7a  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08e7d  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 08e80  50                   push ax
 08e81  b8 63 14             mov ax, 0x1463
@@ -16622,7 +16629,7 @@ loc_8e74:
 08e91  1f                   pop ds
 08e92  be 00 2f             mov si, 0x2f00
 08e95  bf d0 50             mov di, 0x50d0    ; sols_speciaux
-08e98  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08e98  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08e9b  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 08e9e  50                   push ax
 08e9f  b8 63 14             mov ax, 0x1463
@@ -16635,7 +16642,7 @@ loc_8e74:
 08eaf  1f                   pop ds
 08eb0  be 00 00             mov si, 0
 08eb3  bf 40 50             mov di, 0x5040
-08eb6  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+08eb6  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 08eb9  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 08ebc  50                   push ax
 08ebd  b8 63 14             mov ax, 0x1463
@@ -16709,7 +16716,7 @@ loc_8f55:
 08f58  75 03                jne loc_8f5d
 08f5a  e9 71 06             jmp loc_95ce
 loc_8f5d:
-08f5d  c6 06 67 ad 00       mov byte ptr [0xad67], 0
+08f5d  c6 06 67 ad 00       mov byte ptr [0xad67], 0    ; mode_inventaire
 08f62  c6 06 59 37 01       mov byte ptr [0x3759], 1
 08f67  e8 98 d2             call efface_tampon
 08f6a  e8 77 d1             call affiche_tampon
@@ -16768,7 +16775,7 @@ loc_9001:
 09009  75 e8                jne loc_8ff3
 0900b  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 0900e  e8 a9 a6             call clavier_installe
-09011  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+09011  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 09014  8e c0                mov es, ax
 09016  33 f6                xor si, si
 09018  bf 00 00             mov di, 0
@@ -16830,7 +16837,7 @@ loc_90ac:
 090b4  75 e8                jne loc_909e
 090b6  a3 05 39             mov word ptr [0x3905], ax    ; fichier_taille
 090b9  e8 fe a5             call clavier_installe
-090bc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+090bc  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 090bf  8e c0                mov es, ax
 090c1  33 f6                xor si, si
 090c3  bf 00 00             mov di, 0
@@ -16847,7 +16854,7 @@ loc_90d8:
 090db  8f 06 e9 3f          pop word ptr [0x3fe9]
 090df  e9 c8 81             jmp loc_12aa
 loc_90e2:
-090e2  c6 06 67 ad 01       mov byte ptr [0xad67], 1
+090e2  c6 06 67 ad 01       mov byte ptr [0xad67], 1    ; mode_inventaire
 loc_90e7:
 090e7  50                   push ax
 090e8  b8 7c 09             mov ax, 0x97c
@@ -16859,7 +16866,7 @@ loc_90e7:
 090f7  f3 ab                rep stosw word ptr es:[di], ax
 090f9  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 090fd  be 6a ad             mov si, 0xad6a
-09100  80 3e 67 ad 01       cmp byte ptr [0xad67], 1
+09100  80 3e 67 ad 01       cmp byte ptr [0xad67], 1    ; mode_inventaire
 09105  75 4f                jne loc_9156
 09107  b9 08 00             mov cx, 8
 0910a  8a 45 0e             mov al, byte ptr [di + 0xe]
@@ -16892,7 +16899,7 @@ loc_912f:
 loc_9153:
 09153  e9 86 00             jmp loc_91dc
 loc_9156:
-09156  80 3e 67 ad 02       cmp byte ptr [0xad67], 2
+09156  80 3e 67 ad 02       cmp byte ptr [0xad67], 2    ; mode_inventaire
 0915b  75 23                jne loc_9180
 0915d  b9 07 00             mov cx, 7
 09160  8a 45 10             mov al, byte ptr [di + 0x10]
@@ -16909,7 +16916,7 @@ loc_917d:
 0917d  eb 5d                jmp loc_91dc
 ; ---- 1 octets non atteints (917f-917f)
 loc_9180:
-09180  80 3e 67 ad 03       cmp byte ptr [0xad67], 3
+09180  80 3e 67 ad 03       cmp byte ptr [0xad67], 3    ; mode_inventaire
 09185  75 55                jne loc_91dc
 09187  b9 05 00             mov cx, 5
 0918a  8a 45 0d             mov al, byte ptr [di + 0xd]
@@ -17035,7 +17042,7 @@ loc_92b3:
 092b3  83 fb 1a             cmp bx, 0x1a
 092b6  75 10                jne loc_92c8
 092b8  e8 99 a6             call sub_3954
-092bb  80 3e 67 ad 05       cmp byte ptr [0xad67], 5
+092bb  80 3e 67 ad 05       cmp byte ptr [0xad67], 5    ; mode_inventaire
 092c0  75 03                jne loc_92c5
 092c2  e9 98 fc             jmp loc_8f5d
 loc_92c5:
@@ -17216,9 +17223,9 @@ loc_9453:
 09457  b7 00                mov bh, 0
 09459  8a 45 06             mov al, byte ptr [di + 6]
 0945c  04 04                add al, 4
-0945e  3a 87 94 43          cmp al, byte ptr [bx + 0x4394]
+0945e  3a 87 94 43          cmp al, byte ptr [bx + 0x4394]    ; corps_depart
 09462  72 04                jb loc_9468
-09464  8a 87 94 43          mov al, byte ptr [bx + 0x4394]
+09464  8a 87 94 43          mov al, byte ptr [bx + 0x4394]    ; corps_depart
 loc_9468:
 09468  88 45 06             mov byte ptr [di + 6], al
 0946b  f6 c2 04             test dl, 4
@@ -17236,7 +17243,7 @@ loc_9482:
 loc_948b:
 0948b  8b 0e e0 3f          mov cx, word ptr [0x3fe0]
 0948f  e8 70 81             call sub_1602
-09492  c6 06 7a ab 00       mov byte ptr [0xab7a], 0
+09492  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 09497  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 0949b  8a 45 03             mov al, byte ptr [di + 3]
 0949e  bf d6 49             mov di, 0x49d6
@@ -17262,9 +17269,9 @@ loc_94ba:
 094be  47                   inc di
 094bf  e2 e3                loop loc_94a4
 094c1  be 86 00             mov si, 0x86
-094c4  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0
+094c4  80 3e 7a ab 00       cmp byte ptr [0xab7a], 0    ; choix_menu
 094c9  74 15                je loc_94e0
-094cb  a0 7a ab             mov al, byte ptr [0xab7a]
+094cb  a0 7a ab             mov al, byte ptr [0xab7a]    ; choix_menu
 094ce  bb ae 01             mov bx, 0x1ae
 094d1  8b b7 c1 5f          mov si, word ptr [bx + 0x5fc1]    ; textes
 094d5  81 c6 c1 5f          add si, 0x5fc1    ; textes
@@ -17302,7 +17309,7 @@ loc_9517:
 0951b  74 01                je loc_951e
 0951d  c3                   ret
 loc_951e:
-0951e  fe 06 7a ab          inc byte ptr [0xab7a]
+0951e  fe 06 7a ab          inc byte ptr [0xab7a]    ; choix_menu
 09522  8b f3                mov si, bx
 09524  e9 f9 8b             jmp sub_2120
 
@@ -17344,7 +17351,7 @@ loc_9554:
 09577  50                   push ax
 09578  8b f1                mov si, cx
 0957a  8b f8                mov di, ax
-0957c  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+0957c  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 0957f  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 09582  50                   push ax
 09583  b8 63 14             mov ax, 0x1463
@@ -17360,7 +17367,7 @@ loc_9554:
 0959b  72 1d                jb loc_95ba
 0959d  be 80 a2             mov si, 0xa280
 095a0  8b f8                mov di, ax
-095a2  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+095a2  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 095a5  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 095a8  50                   push ax
 095a9  b8 63 14             mov ax, 0x1463
@@ -17382,10 +17389,10 @@ loc_95ba:
 loc_95c5:
 095c5  c3                   ret
 loc_95c6:
-095c6  c6 06 67 ad 02       mov byte ptr [0xad67], 2
+095c6  c6 06 67 ad 02       mov byte ptr [0xad67], 2    ; mode_inventaire
 095cb  e9 19 fb             jmp loc_90e7
 loc_95ce:
-095ce  c6 06 67 ad 03       mov byte ptr [0xad67], 3
+095ce  c6 06 67 ad 03       mov byte ptr [0xad67], 3    ; mode_inventaire
 095d3  e9 11 fb             jmp loc_90e7
 
 ; ======== sub_95d6   (appelée depuis 9548)
@@ -17395,7 +17402,7 @@ loc_95ce:
 095df  89 1e f3 37          mov word ptr [0x37f3], bx
 095e3  be 80 c6             mov si, 0xc680
 095e6  8b 3e f3 37          mov di, word ptr [0x37f3]
-095ea  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+095ea  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 095ed  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 095f0  50                   push ax
 095f1  b8 63 14             mov ax, 0x1463
@@ -17412,7 +17419,7 @@ loc_9605:
 09606  83 06 f3 37 10       add word ptr [0x37f3], 0x10
 0960b  be c0 c7             mov si, 0xc7c0
 0960e  8b 3e f3 37          mov di, word ptr [0x37f3]
-09612  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+09612  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 09615  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 09618  50                   push ax
 09619  b8 63 14             mov ax, 0x1463
@@ -17428,7 +17435,7 @@ loc_9605:
 0962d  83 06 f3 37 10       add word ptr [0x37f3], 0x10
 09632  be 00 c9             mov si, 0xc900
 09635  8b 3e f3 37          mov di, word ptr [0x37f3]
-09639  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_maps
+09639  a1 27 5e             mov ax, word ptr [0x5e27]    ; seg_annexe
 0963c  a3 4e 37             mov word ptr [0x374e], ax    ; segment_source
 0963f  50                   push ax
 09640  b8 63 14             mov ax, 0x1463
@@ -17477,22 +17484,22 @@ loc_9680:
 09684  c3                   ret
 loc_9685:
 09685  88 45 16             mov byte ptr [di + 0x16], al
-09688  c6 06 af 3f 01       mov byte ptr [0x3faf], 1
+09688  c6 06 af 3f 01       mov byte ptr [0x3faf], 1    ; objet_choisi
 0968d  80 7d 16 06          cmp byte ptr [di + 0x16], 6
 09691  74 03                je loc_9696
 09693  e9 c7 f8             jmp loc_8f5d
 loc_9696:
 09696  bb 7c 00             mov bx, 0x7c    ; message « ORDONNEZ AU GENIE DE »
 09699  e8 51 f2             call affiche_message
-0969c  80 3e 7a ab 02       cmp byte ptr [0xab7a], 2
+0969c  80 3e 7a ab 02       cmp byte ptr [0xab7a], 2    ; choix_menu
 096a1  75 13                jne loc_96b6
-096a3  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe
+096a3  80 3e 7a ab fe       cmp byte ptr [0xab7a], 0xfe    ; choix_menu
 096a8  75 0c                jne loc_96b6
-096aa  c6 06 af 3f 00       mov byte ptr [0x3faf], 0
+096aa  c6 06 af 3f 00       mov byte ptr [0x3faf], 0    ; objet_choisi
 096af  c6 45 16 00          mov byte ptr [di + 0x16], 0
 096b3  e9 a7 f8             jmp loc_8f5d
 loc_96b6:
-096b6  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1
+096b6  80 3e 7a ab 01       cmp byte ptr [0xab7a], 1    ; choix_menu
 096bb  75 03                jne loc_96c0
 096bd  e9 9d f8             jmp loc_8f5d
 loc_96c0:

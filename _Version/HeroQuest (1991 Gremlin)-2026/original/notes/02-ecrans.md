@@ -2,7 +2,7 @@
 
 Comment le jeu enchaîne ses écrans, affiche, dialogue avec le joueur et fait tourner une quête. Adresses et noms : `original/asm/quest.asm` et `original/symboles.txt`.
 
-État : la boucle principale, le menu titre, l'affichage et la boucle des tours sont lus ; le contenu de chaque écran (héros, armurerie, briefing) et de chaque tour reste à lire.
+État : boucle principale, menu titre, écran des héros, armurerie, choix de la quête, affichage et boucle des tours lus. Le tour lui-même est décrit dans [03-regles.md](03-regles.md). Reste : le briefing (texte de QUESTn.BIN sur le parchemin) et l'écran d'inventaire.
 
 ## Boucle principale
 
@@ -31,6 +31,63 @@ Il boucle ensuite : curseur, envoi du tampon à l'écran, lecture des commandes.
 | 2 | `choix_quete` (0x73ED) | choix de la quête et briefing ; refuse si aucun personnage n'est actif |
 | 4 | `ecran_heros` (0x7717) | choix et création des personnages |
 | 6 | `armurerie` (0x8070) | achats |
+
+Positions des écrans suivants : relevées par `outils/ecran.py ADRESSE`, qui liste les images dessinées par une routine, et dans les tables de zones (format : x1, y1, x2, y2 sur 16 bits, terminé par FFFFh ; `zone_cliquee` renvoie le numéro de la zone × 2, à partir de 2).
+
+## Écran des héros
+
+`ecran_heros` (0x7717), sur le fond BORDERED ; images de SHOPSP et SHOPMP :
+
+| Élément | Image | Position |
+| --- | --- | --- |
+| Portrait du héros n (0-3), 48 × 64 | SHOPSP 0xB000 + 0xC00 × n s'il est sélectionné, 0x8000 + 0xC00 × n (gris) sinon | (40 + 64n, 40) |
+| « IN PLAY », 48 × 12, si le héros est en jeu (DS:44A0 + n) | SHOPMP 0x7800 | (40 + 64n, 26) |
+| 4 boutons, 32 × 48, si un héros est sélectionné (DS:409E) | SHOPMP 0x6000 + 0x600 × k | (72 + 48k, 116) |
+| Flèche de retour, 32 × 16 | SHOPMP 0x7A40 | (144, 170) |
+
+Zones (DS:AA22) et routines (DS:AA6C) :
+
+| Zone | Action |
+| --- | --- |
+| Portrait n | sélectionne le héros et passe aux commandes de son joueur (`choisit_heros_1` et suivantes) |
+| Bouton 1 (portrait encadré) | `heros_en_jeu` : met le héros en jeu ou l'en retire |
+| Bouton 2 (plume) | `heros_nomme` : saisie du nom (15 caractères), puis mise en jeu |
+| Bouton 3 (silhouette) | `heros_renouvele` : fiche remise à neuf (points de corps de départ DS:4394, équipement et or à zéro) |
+| Bouton 4 (disquette) | `sauvegarde_menu` : charger ou enregistrer QUEST.SAV |
+| Flèche | retour au menu titre |
+
+## Armurerie
+
+`armurerie` (0x8070) :
+
+| Élément | Image | Position |
+| --- | --- | --- |
+| Portrait du héros n, 32 × 45 | ODDS&SOD 0x5A0 × n | (48 + 64n, 10) |
+| 12 objets, 32 × 32, 3 rangées de 4 | SHOPSP 0x400 × i | (136 + 40c, 66 + 40r) |
+| Flèche de retour | SHOPMP 0x7A40 | (72, 170) |
+| Nom, type, or du héros choisi | `affiche_texte` | lignes 8 à 10 |
+
+Les 12 objets (table DS:AC17 : masque de bit dans le mot d'équipement de la fiche, prix en pièces d'or), dans l'ordre des images :
+
+| Objet | Bit | Prix | Objet | Bit | Prix |
+| --- | --- | --- | --- | --- | --- |
+| Bâton | 0001 | 100 | Lance | 0040 | 150 |
+| Épée courte | 0002 | 150 | Bouclier | 0100 | 100 |
+| Épée large | 0004 | 250 | Casque | 0200 | 120 |
+| Hache de bataille | 0008 | 400 | Cotte de mailles | 0400 | 450 |
+| Arbalète | 0010 | 350 | Armure de plates | 0800 | 850 |
+| Hachette | 0020 | 150 | Trousse à outils | 0080 | 250 |
+
+Ce sont les prix du jeu de plateau. `achete_objet` refuse si le héros possède déjà l'objet (« VOUS POSSEDEZ DEJA CELA ») ou si le prix dépasse son or (« VOUS NE POUVEZ PAS VOUS PERMETTRE CELA ») ; sinon il retire le prix de l'or (fiche +9) et pose le bit (fiche +0x0E).
+
+## Choix de la quête
+
+`choix_quete` (0x73ED) compte les héros en jeu encore vivants (points de corps non nuls) ; s'il n'y en a pas, message « AUCUN PERSONNAGE ACTIF N'A ETE SELECTIONNE POUR ENTRER DANS LA QUETE ». Sinon il charge EQUESTS.BIN, qui donne pour chaque langue deux menus affichés par `menu_liste` (0x8379) sur le parchemin :
+
+- page 1 : les 14 quêtes de base, « page suivante », « menu principal » ;
+- page 2 : les 10 quêtes de l'extension, « page précédente », « menu principal ».
+
+Le choix donne `numero_quete` (0 à 23, + 14 pour la page 2). `lance_quete` (0x84F0) remet l'état de la partie à zéro, garde une copie des fiches (DS:A98F) pour les restaurer si la partie est abandonnée, et charge le QUESTn.BIN de la quête (noms en DS:A3FC).
 
 ## Affichage
 
@@ -78,7 +135,6 @@ Pendant un tour, les actions identifiées par leurs messages : `fouille_tresor`,
 
 ## À lire ensuite
 
-- `tour_personnage` : choix de l'action, déplacement case par case, révélation des pièces.
-- `tour_monstre` : intelligence des monstres (bits de l'octet 6 de l'enregistrement).
-- `ecran_heros`, `armurerie`, `choix_quete` : contenu des écrans.
-- Le format des fiches de 26 octets (DS:4663) : points de corps (+6), esprit, équipement.
+- Le briefing : affichage du texte de QUESTn.BIN sur le parchemin, après `lance_quete`.
+- `inventaire_sorts` (0x8C20) : écran d'inventaire sur le fond WIZBACK (cartes de catégorie INVENT en (64, 64), (136, 64), (208, 64)), et ses modes (DS:AD67, 5 = choix d'un sort).
+- `sauvegarde_menu` et le format de QUEST.SAV.

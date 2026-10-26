@@ -104,7 +104,7 @@
 0x4637  var   fiche_heros_courant    pointeur vers l'enregistrement du héros courant
 0x5e23  var   seg_ecran
 0x5e25  var   seg_shopsp
-0x5e27  var   seg_maps
+0x5e27  var   seg_annexe             segment de l'image annexe de l'écran : MAPS, SHOPMP, MEN, INVENT ou SPELLIT selon l'écran
 0x5e29  var   seg_monsters
 0x5e2b  var   seg_graphics
 0x5e2d  var   seg_odds
@@ -207,3 +207,40 @@
 0x4337  table zone_annuler_attaque   (224, 180)-(240, 196)
 0x546f  table grille_zones           zone de chaque case de la quête en cours (?) ; +0x200 : objets (codes 0x30 à 0x5F)
 0x586f  table grille_occupants       occupant de chaque case (?)
+
+# ---- Écran des héros (voir original/notes/02-ecrans.md)
+0x7887  code  choisit_heros_1        sélectionne le héros 1 (DS:409E) et passe aux commandes de son joueur ; 0x7895, 0x78A3, 0x78B1 pour 2 à 4
+0x78bf  code  heros_en_jeu           bouton portrait : met le héros en jeu ou l'en retire (DS:44A0 + n)
+0x791b  code  heros_nomme            bouton plume : saisie du nom (15 caractères) puis mise en jeu
+0x7d86  code  saisie_texte
+0x409e  var   heros_selectionne      0 à 3 ; FF = aucun
+0x44a0  table heros_en_jeu           4 octets, FF = en jeu
+0x45d7  table noms_heros             pointeurs vers les noms des 4 héros
+0x434b  table noms_types             pointeurs vers les noms des types de héros (barbare, nain...) (?)
+0x4394  table corps_depart           points de corps de départ de chaque héros
+0xaa22  table zones_heros            9 zones : 4 portraits, 4 boutons, flèche de retour
+0xaa6c  table saut_heros             routines des zones de l'écran des héros
+
+# ---- Armurerie
+0x81b3  etiq  achete_objet           refuse si le bit est déjà posé ou si le prix dépasse l'or (+9) ; sinon retire le prix et pose le bit (+0x0E)
+0xaaa4  table zones_armurerie        12 objets, 4 portraits, flèche de retour
+0xacb3  table saut_armurerie
+0xac17  table objets_armurerie       4 octets par objet : masque de bit, prix (bâton 100 ... armure de plates 850)
+
+# ---- Choix de la quête
+0x8379  code  menu_liste             menu de lignes de texte ; choix (numéro + 1) dans DS:AB7A
+0x84f0  code  lance_quete            remet l'état à zéro, garde les fiches en DS:A98F, charge QUESTn.BIN (noms en DS:A3FC)
+0xab7a  var   choix_menu
+0xa3fc  table fichiers_quetes        noms des 24 QUESTn.BIN
+0xa98f  table fiches_avant_quete     copie des fiches, restaurée si la partie est abandonnée
+
+# ---- Fouilles scriptées, fins de quête, déplacement, sorts (voir original/notes/03-regles.md)
+0x4b9b  table evenement_par_zone     numéro d'événement de fouille de chaque zone (octets 1036-1078 de QUESTn.BIN) ; effacé une fois utilisé
+0x5a89  table evenements_fouille     30 routines (coffre piégé, potion, clés d'Agrain, Lame de l'esprit...), indexées par le numéro - 1
+0x44a9  table fins_quetes            une routine de fin par quête, appelée par fin_quete
+0x40f9  table deplacements           4 routines, une par direction
+0x2c74  code  action_sort            icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
+0x2d84  code  retire_sort            efface le bit du sort lancé (+0x0B / +0x0C de la fiche) et le sort choisi (+0x16)
+0x4387  table proprietes_sorts       un octet par sort (1 à 12) : bit 1 cible un personnage, bit 2 un ennemi (?)
+0xad67  var   mode_inventaire        5 = choix d'un sort
+0x3faf  var   objet_choisi
