@@ -520,7 +520,7 @@ loc_0525:
 ; ======== sub_0555   (appelée depuis 0542, 12cb, 1830)
 00555  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 00559  e8 bf 10             call sub_161b
-0055c  a2 94 3f             mov byte ptr [0x3f94], al
+0055c  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 0055f  88 45 03             mov byte ptr [di + 3], al
 00562  bd 00 00             mov bp, 0
 00565  e8 ac 0f             call sub_1514
@@ -539,7 +539,7 @@ loc_0583:
 0058a  03 da                add bx, dx
 0058c  8a 07                mov al, byte ptr [bx]
 0058e  24 3f                and al, 0x3f
-00590  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+00590  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 00594  75 03                jne loc_0599
 00596  e8 5a 00             call sub_05f3
 loc_0599:
@@ -566,7 +566,7 @@ loc_05c3:
 005c8  e9 99 60             jmp loc_6664
 
 ; ======== sub_05cb   (appelée depuis 0302, 0317, 032c, 0342, 7270, 72ce, 72ef)
-005cb  a2 94 3f             mov byte ptr [0x3f94], al
+005cb  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 005ce  bd 01 00             mov bp, 1
 005d1  e8 40 0f             call sub_1514
 005d4  bf d6 49             mov di, 0x49d6
@@ -578,7 +578,7 @@ loc_05dc:
 005df  03 da                add bx, dx
 005e1  8a 07                mov al, byte ptr [bx]
 005e3  24 3f                and al, 0x3f
-005e5  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+005e5  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 005e9  75 03                jne loc_05ee
 005eb  e8 77 17             call sub_1d65
 loc_05ee:
@@ -1374,7 +1374,7 @@ loc_0c57:
 00c5e  81 c6 c1 5f          add si, 0x5fc1    ; textes
 00c62  88 04                mov byte ptr [si], al
 00c64  52                   push dx
-00c65  bb e0 00             mov bx, 0xe0    ; message « VOUS RECEVEZ UNE PRIME / DE »
+00c65  bb e0 00             mov bx, 0xe0    ; message « VOUS RECEVEZ UNE PRIME / DE00 PIECE D'OR »
 00c68  e8 82 7c             call affiche_message
 00c6b  5a                   pop dx
 00c6c  e9 97 5c             jmp ajoute_or
@@ -2159,7 +2159,7 @@ loc_12e8:
 01309  75 01                jne loc_130c
 0130b  c3                   ret
 loc_130c:
-0130c  a2 94 3f             mov byte ptr [0x3f94], al
+0130c  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 0130f  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01313  bd 01 00             mov bp, 1
 01316  e8 fb 01             call sub_1514
@@ -2174,7 +2174,7 @@ loc_131f:
 01326  03 da                add bx, dx
 01328  8a 07                mov al, byte ptr [bx]
 0132a  24 3f                and al, 0x3f
-0132c  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+0132c  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 01330  75 03                jne loc_1335
 01332  e8 30 0a             call sub_1d65
 loc_1335:
@@ -2217,7 +2217,7 @@ loc_137f:
 01382  88 45 03             mov byte ptr [di + 3], al
 01385  80 c7 02             add bh, 2
 01388  89 5d 04             mov word ptr [di + 4], bx
-0138b  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+0138b  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 0138f  74 01                je loc_1392
 01391  c3                   ret
 loc_1392:
@@ -2734,7 +2734,7 @@ loc_177f:
 017b8  c3                   ret
 
 ; ======== sub_17b9   (appelée depuis 05fe)
-017b9  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
+017b9  8a 1e 94 3f          mov bl, byte ptr [0x3f94]    ; zone_heros
 017bd  32 ff                xor bh, bh
 017bf  d1 e3                shl bx, 1
 017c1  8b 97 43 a5          mov dx, word ptr [bx - 0x5abd]
@@ -10928,7 +10928,7 @@ loc_5b39:
 05b43  bb 4a 4d             mov bx, 0x4d4a    ; monstres
 05b46  b1 20                mov cl, 0x20
 05b48  32 ed                xor ch, ch
-05b4a  a0 94 3f             mov al, byte ptr [0x3f94]
+05b4a  a0 94 3f             mov al, byte ptr [0x3f94]    ; zone_heros
 loc_5b4d:
 05b4d  38 47 03             cmp byte ptr [bx + 3], al
 05b50  75 10                jne loc_5b62
@@ -10960,7 +10960,7 @@ loc_5b8c:
 05b9c  75 1a                jne loc_5bb8
 05b9e  8a 87 e6 fd          mov al, byte ptr [bx - 0x21a]
 05ba2  24 3f                and al, 0x3f
-05ba4  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+05ba4  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 05ba8  74 0e                je loc_5bb8
 05baa  0a c0                or al, al
 05bac  74 0a                je loc_5bb8
@@ -10972,7 +10972,7 @@ loc_5bb8:
 05bbb  75 1a                jne loc_5bd7
 05bbd  8a 87 ff fd          mov al, byte ptr [bx - 0x201]
 05bc1  24 3f                and al, 0x3f
-05bc3  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+05bc3  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 05bc7  74 0e                je loc_5bd7
 05bc9  0a c0                or al, al
 05bcb  74 0a                je loc_5bd7
@@ -10987,7 +10987,7 @@ loc_5bd7:
 05be2  75 1a                jne loc_5bfe
 05be4  8a 87 01 fe          mov al, byte ptr [bx - 0x1ff]
 05be8  24 3f                and al, 0x3f
-05bea  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+05bea  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 05bee  74 0e                je loc_5bfe
 05bf0  0a c0                or al, al
 05bf2  74 0a                je loc_5bfe
@@ -11001,7 +11001,7 @@ loc_5bfe:
 05c08  75 1a                jne loc_5c24
 05c0a  8a 87 1a fe          mov al, byte ptr [bx - 0x1e6]
 05c0e  24 3f                and al, 0x3f
-05c10  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+05c10  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 05c14  74 0e                je loc_5c24
 05c16  0a c0                or al, al
 05c18  74 0a                je loc_5c24
@@ -12375,7 +12375,7 @@ loc_6664:
 loc_666a:
 0666a  80 3c 00             cmp byte ptr [si], 0
 0666d  74 0b                je loc_667a
-0666f  a0 94 3f             mov al, byte ptr [0x3f94]
+0666f  a0 94 3f             mov al, byte ptr [0x3f94]    ; zone_heros
 06672  3a 44 03             cmp al, byte ptr [si + 3]
 06675  75 03                jne loc_667a
 06677  80 24 7f             and byte ptr [si], 0x7f
@@ -13002,7 +13002,7 @@ loc_6bd8:
 06bdf  c3                   ret
 
 ; ======== fouille_tresor
-; « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN », « CETTE PIECE A DEJA ETE FOUILLEE »
+; carte trésor ou événement de la zone ; « CETTE PIECE A DEJA ETE FOUILLEE »
 06be0  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 06be5  75 01                jne loc_6be8
 06be7  c3                   ret
@@ -13014,13 +13014,13 @@ loc_6bf0:
 06bf0  a0 9b 3f             mov al, byte ptr [0x3f9b]
 06bf3  e8 53 f4             call sub_6049
 loc_6bf6:
-06bf6  e8 a1 01             call sub_6d9a
+06bf6  e8 a1 01             call monstre_dans_zone
 06bf9  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06bfd  80 3e c7 3f 00       cmp byte ptr [0x3fc7], 0
 06c02  74 03                je loc_6c07
 06c04  e9 a3 02             jmp loc_6eaa
 loc_6c07:
-06c07  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
+06c07  8a 1e 94 3f          mov bl, byte ptr [0x3f94]    ; zone_heros
 06c0b  b7 00                mov bh, 0
 06c0d  8a 87 70 4b          mov al, byte ptr [bx + 0x4b70]    ; evenement_par_zone
 06c11  c6 87 70 4b ff       mov byte ptr [bx + 0x4b70], 0xff    ; evenement_par_zone
@@ -13032,7 +13032,7 @@ loc_6c1d:
 06c1f  74 03                je loc_6c24
 06c21  e9 70 02             jmp loc_6e94
 loc_6c24:
-06c24  e8 3f 01             call sub_6d66
+06c24  e8 3f 01             call tire_carte
 06c27  3c 09                cmp al, 9
 06c29  73 03                jae loc_6c2e
 06c2b  e9 a7 00             jmp loc_6cd5
@@ -13054,7 +13054,7 @@ loc_6c41:
 06c45  eb 6f                jmp loc_6cb6
 ; ---- 1 octets non atteints (6c47-6c47)
 loc_6c48:
-06c48  e8 40 01             call sub_6d8b
+06c48  e8 40 01             call remet_carte
 06c4b  8b 36 37 46          mov si, word ptr [0x4637]    ; fiche_heros_courant
 06c4f  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 06c52  a2 bc 3f             mov byte ptr [0x3fbc], al
@@ -13062,7 +13062,7 @@ loc_6c48:
 06c58  8a 44 03             mov al, byte ptr [si + 3]
 06c5b  88 45 03             mov byte ptr [di + 3], al
 06c5e  b9 04 00             mov cx, 4
-06c61  bb 9b 43             mov bx, 0x439b
+06c61  bb 9b 43             mov bx, 0x439b    ; voisins
 loc_6c64:
 06c64  51                   push cx
 06c65  53                   push bx
@@ -13089,7 +13089,7 @@ loc_6c89:
 06c8b  59                   pop cx
 06c8c  83 c3 02             add bx, 2
 06c8f  e2 d3                loop loc_6c64
-06c91  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
+06c91  8a 1e 94 3f          mov bl, byte ptr [0x3f94]    ; zone_heros
 06c95  b7 00                mov bh, 0
 06c97  c6 87 70 4b 00       mov byte ptr [bx + 0x4b70], 0    ; evenement_par_zone
 06c9c  e9 57 ff             jmp loc_6bf6
@@ -13109,7 +13109,7 @@ loc_6ca6:
 06cb2  5f                   pop di
 06cb3  e9 00 02             jmp loc_6eb6
 loc_6cb6:
-06cb6  e8 d2 00             call sub_6d8b
+06cb6  e8 d2 00             call remet_carte
 06cb9  bb 0a 01             mov bx, 0x10a    ; message « VOUS SENTEZ LA PRESSION D'UN / FIL DE DETENTE SUR VOTRE JAMBE. / AVANT DE POUVOIR REAGIR VOUS ETES / ATTEINT PAR UN COUP D'ARBALETE / ET PERDEZ 1 POINT DE CORPS »
 06cbc  e8 2e 1c             call affiche_message
 06cbf  e8 63 ab             call sub_1825
@@ -13122,7 +13122,7 @@ loc_6ccc:
 06ccf  a2 ca 3f             mov byte ptr [0x3fca], al    ; heros_courant
 06cd2  e9 03 a4             jmp mort_heros
 loc_6cd5:
-06cd5  e8 b3 00             call sub_6d8b
+06cd5  e8 b3 00             call remet_carte
 06cd8  3c 08                cmp al, 8
 06cda  75 2e                jne loc_6d0a
 06cdc  50                   push ax
@@ -13147,7 +13147,7 @@ loc_6cd5:
 loc_6d0a:
 06d0a  8a d8                mov bl, al
 06d0c  32 ff                xor bh, bh
-06d0e  8a 97 cd 49          mov dl, byte ptr [bx + 0x49cd]
+06d0e  8a 97 cd 49          mov dl, byte ptr [bx + 0x49cd]    ; or_cartes
 loc_6d12:
 06d12  50                   push ax
 06d13  32 f6                xor dh, dh
@@ -13163,7 +13163,7 @@ loc_6d29:
 06d29  2c 09                sub al, 9
 06d2b  b4 00                mov ah, 0
 06d2d  8a c8                mov cl, al
-06d2f  bb ad 43             mov bx, 0x43ad
+06d2f  bb ad 43             mov bx, 0x43ad    ; potions_cartes
 06d32  03 d8                add bx, ax
 06d34  8a 45 10             mov al, byte ptr [di + 0x10]
 06d37  0a 07                or al, byte ptr [bx]
@@ -13171,7 +13171,7 @@ loc_6d29:
 06d3c  8a d9                mov bl, cl
 06d3e  02 db                add bl, bl
 06d40  b7 00                mov bh, 0
-06d42  81 c3 92 48          add bx, 0x4892
+06d42  81 c3 92 48          add bx, 0x4892    ; messages_potions_cartes
 06d46  8b 1f                mov bx, word ptr [bx]
 06d48  e9 a2 1b             jmp affiche_message
 loc_6d4b:
@@ -13189,7 +13189,8 @@ loc_6d5f:
 06d62  e8 88 1b             call affiche_message
 06d65  c3                   ret
 
-; ======== sub_6d66   (appelée depuis 6c24)
+; ======== tire_carte   (appelée depuis 6c24)
+; retire la carte du dessus de pioche_tresors
 06d66  a0 3b 46             mov al, byte ptr [0x463b]    ; pioche_tresors
 06d69  50                   push ax
 06d6a  bd 3b 46             mov bp, 0x463b    ; pioche_tresors
@@ -13209,7 +13210,8 @@ loc_6d85:
 06d86  89 2e 55 46          mov word ptr [0x4655], bp    ; carte_tresor
 06d8a  c3                   ret
 
-; ======== sub_6d8b   (appelée depuis 6c48, 6cb6, 6cd5)
+; ======== remet_carte   (appelée depuis 6c48, 6cb6, 6cd5)
+; remet la carte AL sous la pioche
 06d8b  8b 1e 55 46          mov bx, word ptr [0x4655]    ; carte_tresor
 06d8f  88 07                mov byte ptr [bx], al
 06d91  43                   inc bx
@@ -13217,14 +13219,15 @@ loc_6d85:
 06d95  89 1e 55 46          mov word ptr [0x4655], bx    ; carte_tresor
 06d99  c3                   ret
 
-; ======== sub_6d9a   (appelée depuis 6bf6)
+; ======== monstre_dans_zone   (appelée depuis 6bf6)
+; DS:3FC7 = 1 si un monstre actif est dans la zone du héros
 06d9a  c6 06 c7 3f 00       mov byte ptr [0x3fc7], 0
 06d9f  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06da3  e8 75 a8             call sub_161b
-06da6  a2 94 3f             mov byte ptr [0x3f94], al
+06da6  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 06da9  e8 68 a7             call sub_1514
 06dac  89 1e e4 3f          mov word ptr [0x3fe4], bx
-06db0  8b 0e 94 3f          mov cx, word ptr [0x3f94]
+06db0  8b 0e 94 3f          mov cx, word ptr [0x3f94]    ; zone_heros
 06db4  bf d6 49             mov di, 0x49d6
 06db7  b9 1e 00             mov cx, 0x1e
 loc_6dba:
@@ -13236,7 +13239,7 @@ loc_6dba:
 06dc1  03 da                add bx, dx
 06dc3  8a 07                mov al, byte ptr [bx]
 06dc5  24 3f                and al, 0x3f
-06dc7  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+06dc7  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 06dcb  75 03                jne loc_6dd0
 06dcd  e8 07 00             call sub_6dd7
 loc_6dd0:
@@ -13269,7 +13272,7 @@ loc_6df4:
 06df9  c3                   ret
 
 ; ======== fouille_portes
-; « UNE PORTE SECRETE S'OUVRE »
+; icône de fouille des portes secrètes et des pièges ; « UNE PORTE SECRETE S'OUVRE »
 06dfa  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 06dff  75 01                jne loc_6e02
 06e01  c3                   ret
@@ -13280,14 +13283,14 @@ loc_6e02:
 loc_6e0a:
 06e0a  a0 9b 3f             mov al, byte ptr [0x3f9b]
 06e0d  e8 39 f2             call sub_6049
-06e10  8a 1e 94 3f          mov bl, byte ptr [0x3f94]
+06e10  8a 1e 94 3f          mov bl, byte ptr [0x3f94]    ; zone_heros
 06e14  b7 00                mov bh, 0
 06e16  80 bf 9b 4b ff       cmp byte ptr [bx + 0x4b9b], 0xff    ; portes_fouillees
 06e1b  75 03                jne loc_6e20
 06e1d  e9 3f ff             jmp loc_6d5f
 loc_6e20:
 06e20  c7 06 ed 37 00 00    mov word ptr [0x37ed], 0
-06e26  e8 e1 03             call sub_720a
+06e26  e8 e1 03             call cherche_portes_pieges
 06e29  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 06e2d  e8 eb a7             call sub_161b
 06e30  8a d8                mov bl, al
@@ -13715,11 +13718,12 @@ loc_71e3:
 07204  bf 54 4d             mov di, 0x4d54
 07207  e9 e5 fc             jmp loc_6eef
 
-; ======== sub_720a   (appelée depuis 6e26)
+; ======== cherche_portes_pieges   (appelée depuis 6e26)
+; fouille_case sur chaque case de la zone du héros
 0720a  c7 06 e9 37 00 00    mov word ptr [0x37e9], 0    ; erreur_fichier
 07210  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 07214  e8 04 a4             call sub_161b
-07217  a2 94 3f             mov byte ptr [0x3f94], al
+07217  a2 94 3f             mov byte ptr [0x3f94], al    ; zone_heros
 0721a  bd 01 00             mov bp, 1
 0721d  e8 f4 a2             call sub_1514
 07220  89 1e e4 3f          mov word ptr [0x3fe4], bx
@@ -13734,9 +13738,9 @@ loc_722a:
 07231  03 da                add bx, dx
 07233  8a 07                mov al, byte ptr [bx]
 07235  24 3f                and al, 0x3f
-07237  3a 06 94 3f          cmp al, byte ptr [0x3f94]
+07237  3a 06 94 3f          cmp al, byte ptr [0x3f94]    ; zone_heros
 0723b  75 03                jne loc_7240
-0723d  e8 07 00             call fouille_pieges
+0723d  e8 07 00             call fouille_case
 loc_7240:
 07240  5f                   pop di
 07241  5b                   pop bx
@@ -13745,8 +13749,8 @@ loc_7240:
 07244  e2 e4                loop loc_722a
 07246  c3                   ret
 
-; ======== fouille_pieges   (appelée depuis 723d)
-; « VOUS TROUVEZ ET DESARMEZ UN PIEGE A LANCES », « ... L'ENTREE D'UNE TRAPPE »
+; ======== fouille_case   (appelée depuis 723d)
+; une case : porte secrète (murs bit 0x08), fosse 0x32, lance 0x36, chute de pierre 0x34
 07247  81 c3 00 02          add bx, 0x200
 0724b  53                   push bx
 0724c  f6 07 08             test byte ptr [bx], 8

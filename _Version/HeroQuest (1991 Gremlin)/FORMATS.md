@@ -146,7 +146,7 @@ Cases numérotées `y × 26 + x` sur 26 × 19.
 | Position | Contenu |
 |---|---|
 | 0 | 494 octets : zone de chaque case (0 = hors quête, 1-20 couloirs, 21-42 pièces) |
-| 512 | 494 octets : murs et portes. 0x80 mur en haut, 0x40 mur à gauche, 0x20 porte en haut, 0x10 porte à gauche ; 0x08 et 0x04 accompagnent certaines portes (portes secrètes ou verrouillées, non vérifié) ; 0x01 est un détail de rendu du plateau standard |
+| 512 | 494 octets : murs et portes. 0x80 mur en haut, 0x40 mur à gauche, 0x20 porte en haut, 0x10 porte à gauche ; 0x08 porte secrète, 0x04 posé par le jeu quand elle est révélée ; 0x01 est un détail de rendu du plateau standard |
 | 1024 | 4 × 3 octets : départ des héros (x, y, image du personnage : 29 + 12n, plus 0, 3, 6 ou 9 selon l'orientation) |
 | 1036 | 43 octets : événement de fouille de trésor par zone (0 = carte trésor, n = routine scriptée n), puis 43 octets pour la fouille des portes secrètes ; le jeu y écrit FFh quand la zone a été fouillée |
 | 1122 | 6 mots : position du texte, longueur du texte, position des monstres, taille des monstres, position du mobilier, nombre d'objets (positions depuis 1122) |
@@ -213,10 +213,7 @@ Le héros lance DS:0x3FB9 dés en comptant les faces **différentes** du bouclie
 
 ### Pièges et cartes
 
-- 0x0F76 : deux dés, compte des boucliers blancs, perte de `2 − boucliers` points de corps (piège ou sort, à confirmer).
-- 0x25BF : selon le type de piège (AL = 2 ou 3), un dé de combat ; un crâne déclenche le message 0x11E et la perte de points de corps.
-- 0x26AF : trois dés de combat lancés, perte d'un point de corps.
-- 0x87DD : mélange d'un paquet de 25 cartes (0 à 0x18) : la pioche des cartes trésor.
+Effets des pièges, cartes trésor (0x87DD : mélange des 25 cartes) et fouilles : notes du remake (`HeroQuest (1991 Gremlin)-2026/original/notes/03-regles.md`, « Fouilles » et « Pièges »).
 
 ### Variables repérées (DS)
 

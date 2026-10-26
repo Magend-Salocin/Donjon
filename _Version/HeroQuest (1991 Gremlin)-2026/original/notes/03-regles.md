@@ -65,11 +65,51 @@ Les positions à l'écran ne sont pas dans le fichier : la table est remplie à 
 
 Les numéros de quête du code (`numero_quete`, DS:3F92) commencent à 0 : la quête 1 du code est la 2e du jeu (Sir Ragnar), la 6 la 7e (LE CHASSEUR DE PIERRES, Karlen), la 9 la 10e (CHATEAU DES MYSTERES, la mine d'or). Les trois messages le confirment. Les quêtes 15 et 16 du code sont donc les 16e et 17e du jeu (LES SALLES FROIDES, LES COULOIRS SILENCIEUX).
 
-## Fouilles scriptées
+## Fouilles
 
-Chaque zone de la quête a un numéro d'événement de fouille : les octets 1036 à 1078 de QUESTn.BIN, recopiés en DS:4B70 (`evenement_par_zone`). Quand un héros cherche un trésor dans la zone, le jeu met l'octet à FFh (« CETTE PIECE A DEJA ETE FOUILLEE » la fois suivante). S'il valait 0, le héros tire une carte trésor ; sinon, le jeu appelle la routine numéro − 1 de la table `evenements_fouille` (DS:5A89, 30 routines). L'événement ne se produit donc qu'une fois.
+### Trésor
 
-Les octets 1079 à 1121 (DS:4B9B, `portes_fouillees`) jouent le même rôle pour la recherche des portes secrètes : FFh une fois la zone fouillée.
+`fouille_tresor` (0x6BE0), icône de fouille du trésor enfoncée (pas pour Sir Ragnar) :
+
+1. Si un monstre actif est dans la zone, rien ne se passe.
+2. Octet de la zone dans `evenement_par_zone` (DS:4B70, octets 1036 à 1078 de QUESTn.BIN), mis à FFh : FFh = « CETTE PIECE A DEJA ETE FOUILLEE » ; n non nul = événement scripté n (ci-dessous) ; 0 = carte trésor.
+3. La carte du dessus de `pioche_tresors` est retirée. Certaines sont remises sous la pioche (`remet_carte`) :
+
+| Carte | Effet | Remise |
+| --- | --- | --- |
+| 0 à 7 | or : 50, 50, 100, 10, 25, 25, 50, 20 pièces (table DS:49CD), messages 0xF4 à 0x102 | oui |
+| 8 | 10 × un dé de pièces d'or, et le héros passe son prochain tour (+0x18 bit 4) : « ... VOUS PERDEZ LA NOTION DU TEMPS ET MANQUEZ VOTRE PROCHAIN TOUR » | oui |
+| 9 à 13 | potion (+0x10) : rapidité, curative, curative, force, ténacité (tables DS:43AD et DS:4892) | non |
+| 14 | potion héroïque | non |
+| 15 | eau bénite | non |
+| 16 | « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN » | non |
+| 17 à 19 | fil de détente, coup d'arbalète : 1 point de corps perdu | oui |
+| 20 à 24 | monstre errant : le monstre 0 de la quête est posé sur la première case libre à côté du héros (haut, droite, bas, gauche) et l'attaque aussitôt. Sans case libre, la zone redevient fouillable et le jeu tire une autre carte | oui |
+
+Une pioche de 25 cartes mélangée à chaque quête (`lance_quete`) ; les cartes non remises sortent du jeu jusqu'à la quête suivante.
+
+### Portes secrètes et pièges
+
+`fouille_portes` (0x6DFA), l'autre icône de fouille, cherche à la fois les portes secrètes et les pièges de la zone (`cherche_portes_pieges`, 0x720A, puis `fouille_case` pour chaque case) :
+
+- Porte secrète : bit 0x08 de l'octet de murs de la case (QUESTn.BIN, +0x200), avec 0x10 (porte à gauche) ou 0x20 (porte en haut). Le jeu pose le bit 0x04 (révélée) et révèle la zone de l'autre côté. « UNE PORTE SECRETE S'OUVRE EN GRINÇANT DANS LE MUR ».
+- Fosse cachée (0x32) : devient 0x33, « VOUS DECOUVREZ L'ENTREE D'UNE TRAPPE ».
+- Lance (0x36) : retirée, « VOUS TROUVEZ ET DESARMEZ UN PIEGE A LANCES CACHE ».
+- Chute de pierre (0x34) : repérée (DS:3FCB), sans message.
+
+Ensuite, selon l'octet de la zone dans `portes_fouillees` (DS:4B9B, octets 1079 à 1121 de QUESTn.BIN) :
+
+| Cas | Effet |
+| --- | --- |
+| déjà FFh | « CETTE PIECE A DEJA ETE FOUILLEE » (avant la recherche) |
+| porte trouvée | la zone passe à FFh |
+| fosse ou lance trouvée | rien de plus ; la zone n'est pas marquée et peut être fouillée de nouveau |
+| rien trouvé, octet 0 | « MALGRE UNE RECHERCHE MINUTIEUSE VOUS NE DECOUVREZ RIEN », la zone passe à FFh |
+| rien trouvé, octet n | événement scripté n (même table que pour le trésor), la zone passe à FFh |
+
+### Événements scriptés
+
+Un numéro n non nul dans `evenement_par_zone` ou `portes_fouillees` appelle la routine n − 1 de la table `evenements_fouille` (DS:5A89, 30 routines), une seule fois.
 
 Routines identifiées dans la table : `fouille_vide`, `coffre_potion`, `coffre_fleche`, `coffre_desarme`, `coffre_gargouille`, `cles_agrain`, `prend_lame_esprit`. Exemple : dans la 2e quête du jeu, la zone 0x15 a l'événement 6 et la zone 0x27 l'événement 2. C'est ce qui manquait à donjon-v2 pour les objets et passages scriptés (quêtes 5 et 10).
 

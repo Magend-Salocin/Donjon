@@ -137,7 +137,7 @@ Format d'une entrée :
 
 La plupart des messages ont un seul bouton, « OK » (libellé 0x3673, numéro 0). Un menu en a plusieurs : par exemple le génie (« REVELER LE CONTENU DE LA PIECE » en 0x159F, « D'ATTAQUER QUELQU'UN » en 0x15C1, « ANNULEZ » en 0x3679). Le choix est rendu dans `choix_menu` (DS:AB7A) : le rang du bouton dans le menu (0, 1...), ou FEh pour le bouton droit.
 
-Quelques entrées sont de simples chaînes (par exemple « JE COMPRENDS MENTOR ») ; 5 sont vides.
+133 entrées sont de simples chaînes : noms des objets et du mobilier, libellés, « JE COMPRENDS MENTOR ». Une entrée peut continuer dans la suivante : le message s'arrête au 00h final, pas au début de l'entrée suivante (par exemple la carte trésor 8, dont le jeu écrit le montant au début de l'entrée 0x1B2).
 
 `affiche_texte` (0x317C) écrit un texte pointé par BP, avec les mêmes codes de contrôle (11h ligne et colonne, 01h position en pixels, 10h et 12h à identifier).
 

@@ -108,10 +108,8 @@ def table_messages(brut):
         offset = struct.unpack('<H', brut[2 * len(debuts):2 * len(debuts) + 2])[0]
         debuts.append(offset)
         fin_table = min(fin_table, offset)
-    bornes = sorted(set(debuts)) + [len(brut)]                 # des entrées partagent le même texte
-    for index, debut in enumerate(debuts):
-        fin = next(b for b in bornes if b > debut) if debut < len(brut) else debut
-        yield 2 * index, brut[debut:fin]
+    for index, debut in enumerate(debuts):                     # une entrée peut déborder sur la suivante :
+        yield 2 * index, brut[debut:]                           # le décodage s'arrête au 00h final
 
 
 def decoder_message(entree):
@@ -156,7 +154,13 @@ def messages(brut):
             lignes.append(f'{numero:04x}  (entrée vide ou hors du fichier)')
             continue
         texte = ' / '.join(f'({l},{c}) {t}' for l, c, t in m['lignes'])
-        boutons = ' '.join(f'[{n} ({c},{l}) {libelle(brut, o)}]' for c, l, o, n in m['boutons'])
+        libelles = [libelle(brut, o) for _, _, o, _ in m['boutons']]
+        if any(t.startswith('?') for t in libelles):               # pas une boîte : une simple chaîne
+            chaine = (entree[3:] if entree[0] == 0x11 else entree).split(b'\0')[0].decode('cp437')
+            chaine = ''.join(c if c >= ' ' else ' ' for c in chaine)
+            lignes.append(f'{numero:04x}  chaîne : {chaine}')
+            continue
+        boutons = ' '.join(f'[{n} ({c},{l}) {t}]' for (c, l, _, n), t in zip(m['boutons'], libelles))
         lignes.append(f'{numero:04x}  {" ".join(map(str, m["boite"]))}  |  {boutons}  |  {texte}')
     return '\n'.join(lignes) + '\n'
 

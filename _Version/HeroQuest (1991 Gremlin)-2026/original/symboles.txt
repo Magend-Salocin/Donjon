@@ -150,10 +150,10 @@
 0x8c20  code  inventaire_sorts       inventaire pendant la quête (WIZBACK, INVENT, SPELLIT) : armes et armures, potions, artefacts, sorts ; rien pour le personnage 4
 
 # ---- Actions et événements pendant une quête
-0x6be0  code  fouille_tresor         « VOUS FOUILLEZ MAIS NE DECOUVREZ RIEN », « CETTE PIECE A DEJA ETE FOUILLEE »
-0x6dfa  code  fouille_portes         « UNE PORTE SECRETE S'OUVRE »
+0x6be0  code  fouille_tresor         carte trésor ou événement de la zone ; « CETTE PIECE A DEJA ETE FOUILLEE »
+0x6dfa  code  fouille_portes         icône de fouille des portes secrètes et des pièges ; « UNE PORTE SECRETE S'OUVRE »
 0x6f12  code  fouille_vide
-0x7247  code  fouille_pieges         « VOUS TROUVEZ ET DESARMEZ UN PIEGE A LANCES », « ... L'ENTREE D'UNE TRAPPE »
+0x7247  code  fouille_case           une case : porte secrète (murs bit 0x08), fosse 0x32, lance 0x36, chute de pierre 0x34
 0x7120  code  coffre_potion          « VOUS TROUVEZ UNE POTION CURATIVE DANS LE COFFRE »
 0x7156  code  coffre_fleche          « LE COFFRE ETAIT PIEGE ! UNE FLECHE PART DU MUR »
 0x7179  code  coffre_desarme
@@ -341,3 +341,14 @@
 0x1f14  code  animation_combat       gros plan du combat ; retire la hache à main ou la lance lancée
 0x3fb7  var   attaque_a_distance     1 : arme lancée ou tirée
 0x3fb3  var   attaque_repetee        bit 1 : seconde attaque du poison d'orc déjà faite
+
+# ---- Fouilles (voir original/notes/03-regles.md#fouilles)
+0x720a  code  cherche_portes_pieges  fouille_case sur chaque case de la zone du héros
+0x6d66  code  tire_carte             retire la carte du dessus de pioche_tresors
+0x6d8b  code  remet_carte            remet la carte AL sous la pioche
+0x6d9a  code  monstre_dans_zone      DS:3FC7 = 1 si un monstre actif est dans la zone du héros
+0x49cd  table or_cartes              pièces d'or des cartes trésor 0 à 8
+0x43ad  table potions_cartes         bit de potion des cartes 9 à 13
+0x4892  table messages_potions_cartes
+0x439b  table voisins                4 pas (dx, dy) : haut, droite, bas, gauche
+0x3f94  var   zone_heros             zone du héros courant
