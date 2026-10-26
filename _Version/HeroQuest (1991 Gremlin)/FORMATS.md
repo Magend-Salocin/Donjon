@@ -35,7 +35,7 @@ Toutes les adresses ci-dessous sont des positions dans cette image.
 
 | Élément | Où |
 |---|---|
-| Segment de code | point d'entrée 0x0ED0 (CS = 0x00ED dans l'en-tête EXEPACK), mais le code tourne avec IP = position dans l'image : les tables de saut (par exemple DS:0x3726) contiennent directement des positions |
+| Segment de code | CS = début de l'image, IP = position : point d'entrée 0x00ED ; les tables de saut (par exemple DS:0x3726) contiennent directement des positions. INTRO.EXE est organisé à l'inverse : données en tête (DS = 0), code à partir de 0x44B0 (CS = 0x044B) |
 | Segment de données | DS = ES = 0x097C, donc **DS:x = position 0x97C0 + x** |
 | Routine d'ouverture, lecture, écriture des fichiers | paramètres en DS:0x3901 (segment), 0x3903 (offset), 0x3905 (taille), 0x3907 (nom) |
 | Chargement des graphismes (noms et segments de destination) | autour de 0x5175 (furn.vga) |

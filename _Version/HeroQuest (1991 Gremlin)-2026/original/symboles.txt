@@ -1,0 +1,70 @@
+# Symboles de QUEST.EXE (image mémoire décompressée, IP = position, DS = 0x97C0).
+# Une ligne par symbole : adresse  type  nom  commentaire
+#   type : code (routine), etiq (étiquette dans une routine), var (variable en DS), table (table en DS)
+#   adresse : hexadécimal ; pour var et table, offset dans DS.
+# Enrichir ce fichier au fil de l'étude, puis relancer outils/desassembler.py.
+
+0x00ed  code  demarrage              point d'entrée : DS = 0x097C, réduit la mémoire (int 21h AH=4Ah)
+0x0936  code  attaque_heros          le héros attaque : crânes (DS:3FB8 dés) contre boucliers noirs du monstre (DS:3FBB dés)
+0x0be6  code  affiche_des            affiche un résultat de dés (icône BX, position BP)
+0x1411  code  prepare_meuble         sprite d'un meuble : (code - 0x4B) * 6 + DS:43FC
+0x17a5  code  source_mur             source d'un mur selon l'orientation
+0x1e90  code  combat_genie           combat à comptage inversé (sort Génie ?), dégâts sur le champ +6 de la cible
+0x21b7  code  de_combat              face d'un dé de combat dans BL : 0 crâne, 1 bouclier blanc, 2 bouclier noir
+0x25bf  code  piege_des              jet de dé d'un piège selon AL
+0x26af  code  trois_des_un_point     trois dés lancés, un point de corps perdu ; code automodifié en 0x26C9
+0x3174  code  ligne_ecran            BX += AX * 320
+0x36ba  code  souris_affiche         (supposé) réaffiche la souris
+0x36f1  code  souris_cache           (supposé) cache la souris
+0x3613  code  hasard                 nombre de 1 à BL dans AL (registre à décalage DS:38FD)
+0x3981  code  charge_fichier_b       variante du chargement
+0x3b53  code  copie_image            copie une image : BP largeur, CX hauteur, SI source, DI écran, segment source DS:374E
+0x45d1  code  lz_decompresse         décompression LZ : DS:SI vers ES:DI
+0x5d8c  code  compte_cranes          lance DH dés de combat, renvoie les crânes dans AL
+0x5f82  code  initialise_jeu         graine du hasard (heure DOS), puis chargements
+0x5ff8  etiq  mode_video_palette     mode 13h et palette DS:5B23 (int 10h AX=1012h)
+0x6033  code  de6_moins_un           hasard(6) - 1 dans BL
+0x672a  etiq  lancer_deplacement     somme de DS:3FC4 dés à 6 faces dans DS:3F9C
+0x87dd  etiq  melange_tresors        mélange les 25 cartes trésor
+
+0x3190  var   mode_video             index des tables de saut d'affichage (8 = VGA)
+0x374e  var   segment_source         segment source de copie_image
+0x38fd  var   graine                 4 octets du générateur de hasard
+0x3901  var   fichier_segment        destination du chargement
+0x3903  var   fichier_offset
+0x3905  var   fichier_taille
+0x3907  var   fichier_nom            pointeur vers le nom du fichier
+0x3909  var   fichier_handle
+0x37e9  var   erreur_fichier
+0x3f92  var   numero_quete
+0x3f93  var   index_case_courante
+0x3f9c  var   deplacement_restant
+0x3fb8  var   des_attaque_heros
+0x3fb9  var   des_defense_b
+0x3fba  var   des_attaque_b
+0x3fbb  var   des_defense_monstre
+0x3fc4  var   des_deplacement
+0x3fca  var   heros_courant
+0x3fd2  var   cranes
+0x3fd3  var   boucliers
+0x3fd4  var   cible
+0x3fd6  var   attaquant
+0x4637  var   fiche_heros_courant    pointeur vers l'enregistrement du héros courant
+0x5e23  var   seg_ecran
+0x5e25  var   seg_shopsp
+0x5e27  var   seg_maps
+0x5e29  var   seg_monsters
+0x5e2b  var   seg_graphics
+0x5e2d  var   seg_odds
+0x5e2f  var   seg_furn_brut
+0x5e35  var   seg_furn
+
+0x3726  table saut_copie_image       routines de copie selon le mode vidéo
+0x4119  table position_cases         position écran de chaque case (4 octets)
+0x41e8  table portraits              offsets des portraits dans ODDS&SOD
+0x43fc  table meubles                6 octets par meuble (codes 0x4B à 0x5F)
+0x47f9  table faces_de               faces du dé de combat
+0x4f80  table sprites_personnages    4 octets par image (largeur, hauteur, offset)
+0x50d0  table sols_speciaux          sol des codes 0x30 à 0x3B
+0x5b23  table palette                768 octets VGA
+0xa543  table sols_zones             sol de chaque zone

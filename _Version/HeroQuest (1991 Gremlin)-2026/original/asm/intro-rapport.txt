@@ -1,0 +1,11 @@
+INTRO.EXE : image de 33104 octets, code de 0x44b0 à 0x8150, segment de données à 0x0000.
+Instructions atteintes : 6693 (14879 octets, 95.9 % de la zone de code).
+Routines : 85 (dont 26 probables), étiquettes : 307, tables de saut lues : 5.
+Sauts ou appels indirects non résolus : 1
+  4a0c
+
+Zones de code non atteintes (plus de 16 octets) :
+  0689f-06a3b  413 octets
+  06fc9-07011  73 octets
+  07f7a-07fc9  80 octets
+  08136-0814f  26 octets
