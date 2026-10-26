@@ -163,7 +163,22 @@ Codes du mobilier : 0x30 éboulis, 0x32 fosse, 0x34 chute de pierre, 0x36 lance,
 - `EQUESTS.BIN` : titres des 24 quêtes en 5 langues, en clair (non compressé).
 - `FRENCH.BIN` et les autres langues : textes du jeu compressés en LZ. On y trouve les messages des événements scriptés (« VOUS AVEZ TROUVE SIR RAGNARD », coffres piégés, récompenses…).
 - `GAME&FX.ALB` et `.RLD` : musique et effets AdLib, non étudiés.
-- `QUEST.SAV` : sauvegarde, non étudiée.
+- `QUEST.CFG` : configuration écrite par l'intro (mode vidéo, son, commandes, langue) ; format dans les notes du remake (`HeroQuest (1991 Gremlin)-2026/original/notes/01-socle.md`).
+
+### QUEST.SAV
+
+1 376 octets (0x560), sans compression : 32 personnages sauvegardés, 8 par type de héros (groupe 0 barbare, 1 nain, 2 elfe, 3 enchanteur).
+
+| Position | Contenu |
+| --- | --- |
+| 0 | 32 noms de 17 octets (16 caractères, puis 00h) : groupe × 8 + emplacement |
+| 0x220 | 32 fiches de 26 octets, dans le même ordre |
+
+Une fiche a le format de celles du jeu en mémoire (DS:4663) : +6 points de corps, +7 points d'esprit, +9 or sur 16 bits, +0x0B et +0x0C sorts connus, +0x0E équipement, +0x14 dés d'attaque, +0x15 dés de défense, +0x19 type de héros (le numéro du groupe). Un emplacement vide a une fiche à zéro, mais peut garder un ancien nom. Détail des champs : notes du remake (`original/notes/03-regles.md`).
+
+Exemple du fichier d'origine : groupe 0, emplacement 0, « BLACKHAWK », 7 points de corps, 4 d'esprit, 3 815 pièces d'or, 3 dés d'attaque, 2 de défense.
+
+Si le fichier manque, le jeu en crée un : `sauve_quest_sav` (0x8443) écrit les 32 noms par défaut et des fiches à zéro.
 
 ## Code du jeu (règles)
 

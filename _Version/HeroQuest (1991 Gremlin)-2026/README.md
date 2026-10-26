@@ -38,5 +38,5 @@ Couverture actuelle (voir `original/asm/*-rapport.txt`) :
 
 | Programme | Code atteint | Routines | Sauts indirects non résolus |
 | --- | --- | --- | --- |
-| QUEST.EXE | 99,2 % | 378, dont 113 probables | 6 |
+| QUEST.EXE | 99,3 % | 380, dont 62 probables | 6 |
 | INTRO.EXE | 95,9 % | 85, dont 26 probables | 1 |

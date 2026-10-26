@@ -161,9 +161,7 @@
 0x70d2  code  prend_lame_esprit      « VOUS PRENEZ LA LAME DE L'ESPRIT »
 0x7187  code  cles_agrain            « LES CLES D'AGRAIN SONT SUR LA TABLE »
 0x93b1  code  boit_potion            « LE FLUIDE VOUS RANIME »
-0x9670  code  sort_genie             « ORDONNEZ AU GENIE DE ... »
 0x2c36  code  brume_de_mort          « L'AIR GLACIAL DE LA BRUME DE LA MORT VOUS FAIT DU MAL »
-0x0f45  code  sort_sans_effet        « CE SORT N'A AUCUN EFFET SUR UN ENNEMI »
 0x10d8  code  mort_heros             « VOUS AVEZ ESSUYE DES BLESSURES MORTELLES », « LES JOUEURS SONT TOUS ELIMINES »
 0x1a3a  code  tous_elimines
 0x184e  code  fin_quete              récompenses de fin de quête (Sir Ragnar, or du prince...)
@@ -244,3 +242,22 @@
 0x4387  table proprietes_sorts       un octet par sort (1 à 12) : bit 1 cible un personnage, bit 2 un ennemi (?)
 0xad67  var   mode_inventaire        5 = choix d'un sort
 0x3faf  var   objet_choisi
+
+# ---- Effets des sorts (table effets_sorts, indexée par le numéro du sort - 1 ; voir original/notes/03-regles.md)
+0x101c  code  sort_brume             1 voile de brume : fiche +0x18 bit 1 (invisible aux monstres)
+0x0f06  code  sort_guerison          2 eau de guérison et 12 guérison du corps : +4 points de corps, sans dépasser DS:4394
+0x0fe1  code  sort_sommeil           3 : un dé ; sauf bouclier blanc, la cible s'endort (héros +0x18 bit 2, monstre +6 bit 4)
+0x0f45  code  sort_tempete           4 : la cible passe son prochain tour (héros +0x18 bit 4, monstre +6 bit 2)
+0x0f27  code  sort_vent              5 vent rapide : +0x18 bit 8, déplacement doublé au prochain tour
+0x1026  code  sort_genie             6 génie : attaque à 5 dés de combat ; si la cible vaut 6, révèle la pièce (0x102d)
+0x0f31  code  sort_courage           7 : +0x18 bit 0x10, deux dés d'attaque de plus
+0x0f76  code  sort_boule_feu         8 : deux dés, 2 points de dégâts moins un par bouclier blanc
+0x0fbc  code  sort_feu_colere        9 : un dé, 1 point de dégât sauf bouclier blanc
+0x10b3  code  sort_traverse_roche    10 : +0x18 bit 0x20 (ou 0x80), passer à travers un mur au prochain déplacement
+0x0f3b  code  sort_peau_pierre       11 : +0x18 bit 0x40, deux dés de défense de plus
+0x0f6d  etiq  sort_message           affiche le message BX du sort, puis fin de l'action
+0x5a6f  table effets_sorts           12 routines d'effet
+0x4097  var   effet_sort_choisi      routine d'effet du sort en cours, appelée par jmp [0x4097]
+0x45e5  table noms_defaut            SIGMAR, GRUNGI, LADRIL, ZOLTAR, RAGNAR (16 octets chacun)
+0x102d  etiq  sort_genie_revele      13 : révèle le contenu de la pièce (choix 0 du menu du génie)
+0x9696  etiq  menu_genie             « ORDONNEZ AU GENIE DE » : 0 révéler la pièce (sort 13), 1 attaquer (sort 6)

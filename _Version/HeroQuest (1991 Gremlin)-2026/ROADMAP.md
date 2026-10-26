@@ -29,13 +29,13 @@ Ordre proposé, du socle vers le jeu :
 
 Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (installé, voir [DEBOGUER.md](outils/DEBOGUER.md)) : points d'arrêt, lecture du segment de données.
 
-Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (114 sur 381 au 26 octobre). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
+Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (123 sur 380 au 26 octobre). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
 
 | Sous-système | État | Note |
 | --- | --- | --- |
 | Socle | configuration, commandes et fichiers lus ; son et vidéo repérés | [01-socle.md](original/notes/01-socle.md) |
 | Machine d'écrans | boucle principale, menu titre, héros, armurerie, choix de la quête, affichage, messages, boucle des tours ; briefing et inventaire à lire | [02-ecrans.md](original/notes/02-ecrans.md) |
-| Règles | dés, déplacement, attaque du héros, trésors ; tour d'un personnage, panneau d'icônes, événements et fouilles scriptés, sorts (structure), tour d'un monstre (structure) ; effets des sorts à lire | [03-regles.md](original/notes/03-regles.md) |
+| Règles | dés, déplacement, attaque du héros, trésors ; tour d'un personnage, panneau d'icônes, événements et fouilles scriptés, sorts et leurs effets, tour d'un monstre (structure) | [03-regles.md](original/notes/03-regles.md) |
 | Textes | index des messages décodé (`french-messages.txt`), annoté dans le listing | [02-ecrans.md](original/notes/02-ecrans.md#messages) |
 
 ## Phase 2 : compléter les données
@@ -44,7 +44,7 @@ Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` d
 2. MEN.VGA : table des poses (hauteurs), pour les animations de combat.
 3. ANIMS.VGA (intro) : autre format de compression.
 4. Musique et effets : `GAME&FX.ALB` et `.RLD` (AdLib), `ADLIB.DRV`.
-5. `QUEST.SAV` : format de sauvegarde (héros, équipement, quêtes faites).
+5. `QUEST.SAV` : fait (32 personnages, noms et fiches ; voir FORMATS.md). Reste à savoir où sont mémorisées les quêtes accomplies.
 
 ## Phase 3 : portage JavaScript
 

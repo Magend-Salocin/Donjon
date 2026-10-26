@@ -1624,9 +1624,9 @@ loc_0e7f:
 00e88  8a 45 16             mov al, byte ptr [di + 0x16]
 00e8b  50                   push ax
 00e8c  fe c8                dec al
-00e8e  bb 6f 5a             mov bx, 0x5a6f
+00e8e  bb 6f 5a             mov bx, 0x5a6f    ; effets_sorts
 00e91  e8 47 52             call sub_60db
-00e94  89 16 97 40          mov word ptr [0x4097], dx
+00e94  89 16 97 40          mov word ptr [0x4097], dx    ; effet_sort_choisi
 00e98  58                   pop ax
 00e99  50                   push ax
 00e9a  e8 e7 1e             call retire_sort
@@ -1668,14 +1668,15 @@ loc_0ee2:
 00ef1  bb 24 00             mov bx, 0x24
 00ef4  80 3e a8 3f 00       cmp byte ptr [0x3fa8], 0    ; resultat_vise
 00ef9  74 03                je loc_0efe
-00efb  eb 70                jmp loc_0f6d
+00efb  eb 70                jmp sort_message
 ; ---- 1 octets non atteints (0efd-0efd)
 loc_0efe:
 00efe  a0 ca 3f             mov al, byte ptr [0x3fca]    ; heros_courant
 00f01  bb 97 40             mov bx, 0x4097
 00f04  ff 27                jmp word ptr [bx]
 
-; ======== sub_0f06   (routine probable : non appelée directement)
+; ======== sort_guerison
+; 2 eau de guérison et 12 guérison du corps : +4 points de corps, sans dépasser DS:4394
 00f06  8a 44 06             mov al, byte ptr [si + 6]
 00f09  8a 1e ca 3f          mov bl, byte ptr [0x3fca]    ; heros_courant
 00f0d  b7 00                mov bh, 0
@@ -1687,29 +1688,32 @@ loc_0efe:
 loc_0f1e:
 00f1e  88 44 06             mov byte ptr [si + 6], al
 00f21  bb 58 00             mov bx, 0x58
-00f24  eb 47                jmp loc_0f6d
+00f24  eb 47                jmp sort_message
 ; ---- 1 octets non atteints (0f26-0f26)
 
-; ======== sub_0f27   (routine probable : non appelée directement)
+; ======== sort_vent
+; 5 vent rapide : +0x18 bit 8, déplacement doublé au prochain tour
 00f27  80 4c 18 08          or byte ptr [si + 0x18], 8
 00f2b  bb 5c 00             mov bx, 0x5c
-00f2e  eb 3d                jmp loc_0f6d
+00f2e  eb 3d                jmp sort_message
 ; ---- 1 octets non atteints (0f30-0f30)
 
-; ======== sub_0f31   (routine probable : non appelée directement)
+; ======== sort_courage
+; 7 : +0x18 bit 0x10, deux dés d'attaque de plus
 00f31  80 4c 18 10          or byte ptr [si + 0x18], 0x10
 00f35  bb 8c 00             mov bx, 0x8c
-00f38  eb 33                jmp loc_0f6d
+00f38  eb 33                jmp sort_message
 ; ---- 1 octets non atteints (0f3a-0f3a)
 
-; ======== sub_0f3b   (routine probable : non appelée directement)
+; ======== sort_peau_pierre
+; 11 : +0x18 bit 0x40, deux dés de défense de plus
 00f3b  80 4c 18 40          or byte ptr [si + 0x18], 0x40
 00f3f  bb 8e 00             mov bx, 0x8e
-00f42  eb 29                jmp loc_0f6d
+00f42  eb 29                jmp sort_message
 ; ---- 1 octets non atteints (0f44-0f44)
 
-; ======== sort_sans_effet
-; « CE SORT N'A AUCUN EFFET SUR UN ENNEMI »
+; ======== sort_tempete
+; 4 : la cible passe son prochain tour (héros +0x18 bit 4, monstre +6 bit 2)
 00f45  3c 05                cmp al, 5
 00f47  75 03                jne loc_0f4c
 00f49  eb 0b                jmp loc_0f56
@@ -1717,27 +1721,27 @@ loc_0f1e:
 loc_0f4c:
 00f4c  80 4c 18 04          or byte ptr [si + 0x18], 4
 00f50  bb 5e 00             mov bx, 0x5e
-00f53  eb 18                jmp loc_0f6d
+00f53  eb 18                jmp sort_message
 ; ---- 1 octets non atteints (0f55-0f55)
 loc_0f56:
 00f56  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 00f5a  80 4c 06 02          or byte ptr [si + 6], 2
 00f5e  bb 62 00             mov bx, 0x62
-00f61  eb 0a                jmp loc_0f6d
+00f61  eb 0a                jmp sort_message
 ; ---- 1 octets non atteints (0f63-0f63)
-
-; ======== sub_0f64   (routine probable : non appelée directement)
+loc_0f64:
 00f64  bb 78 00             mov bx, 0x78
-00f67  eb 04                jmp loc_0f6d
+00f67  eb 04                jmp sort_message
 ; ---- 1 octets non atteints (0f69-0f69)
 loc_0f6a:
 00f6a  bb 56 00             mov bx, 0x56    ; message « CE SORT N'A AUCUN / EFFET SUR UN ENNEMI. / IL A ETE GASPILLE »
-loc_0f6d:
+sort_message:    ; affiche le message BX du sort, puis fin de l'action
 00f6d  e8 7d 79             call affiche_message
 00f70  e8 b1 01             call sub_1124
 00f73  e9 34 03             jmp loc_12aa
 
-; ======== sub_0f76   (routine probable : non appelée directement)
+; ======== sort_boule_feu
+; 8 : deux dés, 2 points de dégâts moins un par bouclier blanc
 00f76  e8 3e 12             call de_combat
 00f79  b2 00                mov dl, 0
 00f7b  80 fb 01             cmp bl, 1
@@ -1765,14 +1769,15 @@ loc_0fa6:
 00fa8  e9 27 01             jmp loc_10d2
 loc_0fab:
 00fab  88 54 06             mov byte ptr [si + 6], dl
-00fae  eb b4                jmp sub_0f64
+00fae  eb b4                jmp loc_0f64
 loc_0fb0:
 00fb0  80 3e ca 3f 05       cmp byte ptr [0x3fca], 5    ; heros_courant
-00fb5  75 ad                jne sub_0f64
+00fb5  75 ad                jne loc_0f64
 00fb7  bb 72 00             mov bx, 0x72
-00fba  eb b1                jmp loc_0f6d
+00fba  eb b1                jmp sort_message
 
-; ======== sub_0fbc   (routine probable : non appelée directement)
+; ======== sort_feu_colere
+; 9 : un dé, 1 point de dégât sauf bouclier blanc
 00fbc  e8 f8 11             call de_combat
 00fbf  80 fb 01             cmp bl, 1
 00fc2  75 02                jne loc_0fc6
@@ -1788,9 +1793,10 @@ loc_0fd0:
 loc_0fd9:
 00fd9  fe 4c 06             dec byte ptr [si + 6]
 00fdc  bb 74 00             mov bx, 0x74
-00fdf  eb 8c                jmp loc_0f6d
+00fdf  eb 8c                jmp sort_message
 
-; ======== sub_0fe1   (routine probable : non appelée directement)
+; ======== sort_sommeil
+; 3 : un dé ; sauf bouclier blanc, la cible s'endort (héros +0x18 bit 2, monstre +6 bit 4)
 00fe1  e8 d3 11             call de_combat
 00fe4  80 3e ca 3f 05       cmp byte ptr [0x3fca], 5    ; heros_courant
 00fe9  75 03                jne loc_0fee
@@ -1801,30 +1807,33 @@ loc_0fee:
 00ff1  74 0a                je loc_0ffd
 00ff3  80 4c 18 02          or byte ptr [si + 0x18], 2
 00ff7  bb 64 00             mov bx, 0x64
-00ffa  e9 70 ff             jmp loc_0f6d
+00ffa  e9 70 ff             jmp sort_message
 loc_0ffd:
 00ffd  bb 6a 00             mov bx, 0x6a
-01000  e9 6a ff             jmp loc_0f6d
+01000  e9 6a ff             jmp sort_message
 loc_1003:
 01003  80 fb 01             cmp bl, 1
 01006  74 0e                je loc_1016
 01008  8b 36 d4 3f          mov si, word ptr [0x3fd4]    ; cible
 0100c  80 4c 06 04          or byte ptr [si + 6], 4
 01010  bb 68 00             mov bx, 0x68
-01013  e9 57 ff             jmp loc_0f6d
+01013  e9 57 ff             jmp sort_message
 loc_1016:
 01016  bb 6c 00             mov bx, 0x6c
-01019  e9 51 ff             jmp loc_0f6d
+01019  e9 51 ff             jmp sort_message
 
-; ======== sub_101c   (routine probable : non appelée directement)
+; ======== sort_brume
+; 1 voile de brume : fiche +0x18 bit 1 (invisible aux monstres)
 0101c  80 4c 18 01          or byte ptr [si + 0x18], 1
 01020  bb 80 00             mov bx, 0x80
-01023  e9 47 ff             jmp loc_0f6d
+01023  e9 47 ff             jmp sort_message
 
-; ======== sub_1026   (routine probable : non appelée directement)
+; ======== sort_genie
+; 6 génie : attaque à 5 dés de combat ; si la cible vaut 6, révèle la pièce (0x102d)
 01026  a0 ca 3f             mov al, byte ptr [0x3fca]    ; heros_courant
 01029  3c 06                cmp al, 6
 0102b  75 35                jne loc_1062
+sort_genie_revele:    ; 13 : révèle le contenu de la pièce (choix 0 du menu du génie)
 0102d  8b 1e d0 3f          mov bx, word ptr [0x3fd0]
 01031  81 eb 00 02          sub bx, 0x200
 01035  e8 c7 02             call sub_12ff
@@ -1874,13 +1883,14 @@ loc_1084:
 0109d  81 c6 c1 5f          add si, 0x5fc1    ; textes
 010a1  c6 04 30             mov byte ptr [si], 0x30
 010a4  bb 54 00             mov bx, 0x54
-010a7  e9 c3 fe             jmp loc_0f6d
+010a7  e9 c3 fe             jmp sort_message
 loc_10aa:
 010aa  e8 73 10             call sub_2120
 010ad  bb 4e 00             mov bx, 0x4e
-010b0  e9 ba fe             jmp loc_0f6d
+010b0  e9 ba fe             jmp sort_message
 
-; ======== sub_10b3   (routine probable : non appelée directement)
+; ======== sort_traverse_roche
+; 10 : +0x18 bit 0x20 (ou 0x80), passer à travers un mur au prochain déplacement
 010b3  bb 5a 00             mov bx, 0x5a
 010b6  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3
 010bb  75 0e                jne loc_10cb
@@ -1888,10 +1898,10 @@ loc_10aa:
 010c0  a8 01                test al, 1
 010c2  74 07                je loc_10cb
 010c4  80 4c 18 80          or byte ptr [si + 0x18], 0x80
-010c8  e9 a2 fe             jmp loc_0f6d
+010c8  e9 a2 fe             jmp sort_message
 loc_10cb:
 010cb  80 4c 18 20          or byte ptr [si + 0x18], 0x20
-010cf  e9 9b fe             jmp loc_0f6d
+010cf  e9 9b fe             jmp sort_message
 loc_10d2:
 010d2  e8 03 00             call mort_heros
 010d5  e9 d2 01             jmp loc_12aa
@@ -17462,15 +17472,14 @@ loc_965b:
 09661  d0 e8                shr al, 1
 09663  50                   push ax
 09664  73 03                jae loc_9669
-09666  e8 07 00             call sort_genie
+09666  e8 07 00             call sub_9670
 loc_9669:
 09669  58                   pop ax
 0966a  83 c6 02             add si, 2
 0966d  e2 f2                loop sub_9661
 0966f  c3                   ret
 
-; ======== sort_genie   (appelée depuis 9666)
-; « ORDONNEZ AU GENIE DE ... »
+; ======== sub_9670   (appelée depuis 9666)
 09670  bf 6a ad             mov di, 0xad6a
 09673  b9 0c 00             mov cx, 0xc
 loc_9676:
@@ -17486,9 +17495,9 @@ loc_9685:
 09685  88 45 16             mov byte ptr [di + 0x16], al
 09688  c6 06 af 3f 01       mov byte ptr [0x3faf], 1    ; objet_choisi
 0968d  80 7d 16 06          cmp byte ptr [di + 0x16], 6
-09691  74 03                je loc_9696
+09691  74 03                je menu_genie
 09693  e9 c7 f8             jmp loc_8f5d
-loc_9696:
+menu_genie:    ; « ORDONNEZ AU GENIE DE » : 0 révéler la pièce (sort 13), 1 attaquer (sort 6)
 09696  bb 7c 00             mov bx, 0x7c    ; message « ORDONNEZ AU GENIE DE »
 09699  e8 51 f2             call affiche_message
 0969c  80 3e 7a ab 02       cmp byte ptr [0xab7a], 2    ; choix_menu

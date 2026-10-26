@@ -1,4 +1,4 @@
-; Routines de QUEST.EXE : 381, dont 114 nommées dans symboles.txt.
+; Routines de QUEST.EXE : 380, dont 123 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 000ed  demarrage                  343    0  | 21h/09 21h/4a    3750 3759 3fe7 3fe9 44a0 44a1 44a2 44a3 468b commandes erreur_fichier fichier_nom  "questb.ega"
@@ -41,19 +41,18 @@
 00c98  sub_0c98                    26    1  |     3f9d 3fac commandes
 00cb3  sub_0cb3                    54    0  |     3f91 commandes
 00ce9  sub_0ce9                   343    2  |     3f9d 3fac 3fad 3fae 3fb5 3fd0 4095 4096 47e9 cible commandes curseur_x  "UC_CiCsC}CBARBARIAN"
-00e40  sub_0e40                   197    6  |     3fae 3fd0 4097 cible fiche_heros_courant heros_courant numero_quete resultat_vise
-00f06  sub_0f06                    32    0  |     heros_courant
-00f27  sub_0f27                     9    0  |     
-00f31  sub_0f31                     9    0  |     
-00f3b  sub_0f3b                     9    0  |     
-00f45  sort_sans_effet             28    0  |     cible
-00f64  sub_0f64                    17    0  |     
-00f76  sub_0f76                    70    0  |     heros_courant
-00fbc  sub_0fbc                    37    0  |     heros_courant
-00fe1  sub_0fe1                    58    0  |     cible heros_courant
-0101c  sub_101c                    10    0  |     
-01026  sub_1026                   139    0  |     3fd0 heros_courant seg_odds segment_source
-010b3  sub_10b3                    37    0  |     3f9b 3fa7
+00e40  sub_0e40                   197    6  |     3fae 3fd0 cible effet_sort_choisi fiche_heros_courant heros_courant numero_quete resultat_vise
+00f06  sort_guerison               32    0  |     heros_courant
+00f27  sort_vent                    9    0  |     
+00f31  sort_courage                 9    0  |     
+00f3b  sort_peau_pierre             9    0  |     
+00f45  sort_tempete                45    0  |     cible
+00f76  sort_boule_feu              70    0  |     heros_courant
+00fbc  sort_feu_colere             37    0  |     heros_courant
+00fe1  sort_sommeil                58    0  |     cible heros_courant
+0101c  sort_brume                  10    0  |     
+01026  sort_genie                 139    0  |     3fd0 heros_courant seg_odds segment_source
+010b3  sort_traverse_roche         37    0  |     3f9b 3fa7
 010d8  mort_heros                  76    4  |     3f9a 3fa7 heros_courant
 01124  sub_1124                     6    1  |     
 0112a  sub_112a                    20    0  |     numero_quete
@@ -380,5 +379,5 @@
 095d6  sub_95d6                   124    1  |     37f3 seg_annexe segment_source
 09652  sub_9652                    15    6  |     
 09661  sub_9661                    15    4  |     
-09670  sort_genie                 305    1  |     37f7 3fa7 choix_menu fiche_heros_courant heros_courant objet_choisi
+09670  sub_9670                   305    1  |     37f7 3fa7 choix_menu fiche_heros_courant heros_courant objet_choisi
 0979a  sub_979a                    33    1  |     

@@ -2,7 +2,7 @@
 
 Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes, événements de quête, monstres. Les dés, le déplacement, l'attaque du héros et la pioche des trésors sont décrits dans [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#code-du-jeu-règles) ; la boucle des tours dans [02-ecrans.md](02-ecrans.md#une-partie).
 
-État : structure du tour, panneau, événements, fouilles scriptées, sorts et monstres lus ; effets des sorts à lire ; plusieurs champs et résultats restent à confirmer au débogueur (marqués « ? »).
+État : structure du tour, panneau, événements, fouilles scriptées, sorts et monstres lus ; plusieurs champs et résultats restent à confirmer au débogueur (marqués « ? »).
 
 ## Fiche d'un personnage (26 octets, DS:4663 + 26 × n)
 
@@ -12,14 +12,18 @@ Ce que fait le jeu pendant une quête : tour d'un personnage, panneau d'icônes,
 | +1, +2 | x, y sur le plateau |
 | +3 | zone (pièce ou couloir) où il se trouve |
 | +6 | points de corps (0 : mort ; remis à la valeur de DS:4394 par `heros_renouvele`) |
-| +7 | points d'esprit (?) |
+| +7 | points d'esprit (confirmé par QUEST.SAV : elfe neuf 6 et 4, enchanteur 4 et 6) |
+| +8 | rôle à trouver |
 | +9, +0x0A | or, sur 16 bits |
 | +0x0B, +0x0C | sorts connus, un bit par sort : sorts 1 à 6 dans +0x0B, 7 à 12 dans +0x0C |
 | +0x0D | bit 2 : rôle à trouver (lu au début du tour) |
 | +0x0E, +0x0F | équipement acheté, un bit par objet (voir l'armurerie dans [02-ecrans.md](02-ecrans.md#armurerie)) ; le bit 0x2000 (+0x0F bit 0x20) empêche l'attaque (?) |
+| +0x14, +0x15 | dés d'attaque et de défense (barbare 3 et 2, nain et elfe 2 et 2, enchanteur 1 et 2) |
 | +0x16 | sort choisi (1 à 12, 0 = aucun) |
-| +0x18 | bit 1 : ignoré par les monstres (?) ; bit 2 : endormi ; bit 4 : ? |
-| +0x19 | numéro du personnage |
+| +0x18 | effets de sorts : 1 voile de brume (ignoré par les monstres), 2 endormi, 4 passe son tour (tempête), 8 déplacement doublé (vent rapide), 0x10 deux dés d'attaque de plus (courage), 0x20 ou 0x80 passe à travers un mur (traversée de la roche), 0x40 deux dés de défense de plus (peau de pierre) |
+| +0x19 | type de héros : 0 barbare, 1 nain, 2 elfe, 3 enchanteur (4 : Sir Ragnar, 5e fiche) |
+
+Noms par défaut (DS:45E5, 16 octets chacun) : SIGMAR, GRUNGI, LADRIL, ZOLTAR, RAGNAR. La 5e fiche est donc bien Sir Ragnar, le chevalier escorté. Les fiches sont sauvegardées dans QUEST.SAV ([format](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#questsav)).
 
 ## Tour d'un personnage
 
@@ -64,17 +68,34 @@ Routines identifiées dans la table : `fouille_vide`, `coffre_potion`, `coffre_f
 
 ## Sorts
 
-Les 12 sorts du jeu de plateau, par élément : Air (génie, vent rapide, tempête), Feu (feu de colère, boule de feu, courage), Eau (eau de guérison, voile de brume, sommeil), Terre (peau de pierre, traversée de la roche, guérison du corps). Leurs messages sont les numéros 0x24 à 0x8E de `french-messages.txt`.
+Les 12 sorts du jeu de plateau, numérotés par élément, trois par trois. Leurs messages sont les numéros 0x24 à 0x8E de `french-messages.txt`.
+
+| N° | Élément | Sort | Routine | Effet |
+| --- | --- | --- | --- | --- |
+| 1 | Eau | Voile de brume | `sort_brume` | fiche +0x18 bit 1 : les monstres ignorent le héros |
+| 2 | Eau | Eau de guérison | `sort_guerison` | +4 points de corps, sans dépasser le départ (DS:4394) |
+| 3 | Eau | Sommeil | `sort_sommeil` | un dé ; sauf bouclier blanc, la cible s'endort (« L'ENNEMI S'EFFONDRE ET S'ENDORT SUR PLACE ») |
+| 4 | Air | Tempête | `sort_tempete` | la cible passe son prochain tour |
+| 5 | Air | Vent rapide | `sort_vent` | déplacement doublé au prochain tour |
+| 6 | Air | Génie | `sort_genie` | menu « ORDONNEZ AU GENIE DE » : attaquer quelqu'un (5 dés de combat) ou révéler le contenu de la pièce (effet 13, `sort_genie_revele`) |
+| 7 | Feu | Courage | `sort_courage` | deux dés d'attaque de plus |
+| 8 | Feu | Boule de feu | `sort_boule_feu` | deux dés : 2 points de dégâts, moins un par bouclier blanc |
+| 9 | Feu | Feu de colère | `sort_feu_colere` | un dé : 1 point de dégât, sauf bouclier blanc |
+| 10 | Terre | Traversée de la roche | `sort_traverse_roche` | passer à travers un mur au prochain déplacement |
+| 11 | Terre | Peau de pierre | `sort_peau_pierre` | deux dés de défense de plus |
+| 12 | Terre | Guérison du corps | `sort_guerison` | comme l'eau de guérison |
+
+Écart avec le jeu de plateau : la résistance au sommeil et aux sorts de feu se joue sur un ou deux dés de combat (bouclier blanc), et non sur les points d'esprit de la cible.
+
+Les sorts sont sans effet sur le Sorcier-Roi : avant l'effet, le jeu teste le type de la cible (champ +9 du monstre : 0x0C ou 0x0D avant la quête 15 du code, 0x0E ensuite) et affiche « CE SORT N'A AUCUN EFFET SUR UN ENNEMI ».
 
 `action_sort` (0x2C74), quand l'icône des sorts (icône 11) est enfoncée :
 
 1. Ouvre `inventaire_sorts` en mode 5 (DS:AD67) : le joueur choisit un sort, rangé dans la fiche (+0x16).
 2. Lit les propriétés du sort dans `proprietes_sorts` (DS:4387, un octet par sort : 1, 1, 3, 3, 1, 3, 1, 3, 3, 1, 1, 3) : bit 1 = peut viser un personnage, bit 2 = peut viser un ennemi (?).
 3. Attend un clic sur la cible ; la zone (224, 180)-(240, 196) annule.
-4. Applique l'effet (à partir de 0x0E4E et 0x0E79, à lire). Sans cible valide : « CE SORT N'A AUCUN EFFET SUR UN ENNEMI. IL A ETE GASPILLE ».
+4. Range la routine d'effet du sort (table `effets_sorts`, DS:5A6F, 13 entrées : les 12 sorts, puis le génie qui révèle la pièce ; le menu du génie, dans l'inventaire, remplace le sort 6 par 13) dans DS:4097, puis l'appelle (`jmp [0x4097]`, en 0x0F01) ; l'effet affiche son message par `sort_message`. Sans cible valide : « CE SORT N'A AUCUN EFFET SUR UN ENNEMI. IL A ETE GASPILLE ».
 5. `retire_sort` efface le bit du sort dans la fiche : chaque sort ne sert qu'une fois par quête, comme dans le jeu de plateau.
-
-L'ordre des 12 sorts dans les bits (1 à 12) reste à relier aux noms.
 
 ## Monstres
 

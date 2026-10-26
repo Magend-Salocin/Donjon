@@ -115,7 +115,7 @@ Format d'une entrée :
 | --- | --- |
 | 0-3 | colonne, ligne, largeur, hauteur de la boîte, en caractères de 8 pixels |
 | 4-5 | rôle à trouver (position du bouton ?) |
-| mots jusqu'à FFFFh | souvent `3673 0000` ; pour les menus, des triplets (pointeur vers un libellé en DS, numéro, position) |
+| mots jusqu'à FFFFh | souvent `3673 0000` ; pour les menus, des triplets (offset du libellé dans le fichier de textes, numéro, position) ; par exemple le menu du génie pointe sur « REVELER LE CONTENU DE LA PIECE » (0x159F) et « D'ATTAQUER QUELQU'UN » (0x15C1) |
 | texte | lignes `11h, ligne, colonne, texte`, puis 00h |
 
 Quelques entrées sont de simples chaînes (par exemple « JE COMPRENDS MENTOR ») ; 5 sont vides.
@@ -126,15 +126,15 @@ Quelques entrées sont de simples chaînes (par exemple « JE COMPRENDS MENTOR �
 
 `partie` (0x0246) prépare les héros (`prepare_heros`), puis répète un tour :
 
-1. `tour_personnage` pour chacune des 5 fiches de `fiches_personnages` (DS:4663, 26 octets chacune) : les 4 héros, avec le type de commande de leur joueur (DS:3195 à 3198), puis une 5e fiche jouée avec les commandes du joueur 1. Une fiche vide (premier octet à 0) passe son tour. La 5e est sans doute le personnage escorté de certaines quêtes (Sir Ragnar, Karlen) ; le 5e portrait d'ODDS&SOD irait avec.
+1. `tour_personnage` pour chacune des 5 fiches de `fiches_personnages` (DS:4663, 26 octets chacune) : les 4 héros, avec le type de commande de leur joueur (DS:3195 à 3198), puis une 5e fiche jouée avec les commandes du joueur 1. Une fiche vide (premier octet à 0) passe son tour. La 5e est Sir Ragnar, le chevalier escorté (nom par défaut RAGNAR, type 4) ; le 5e portrait d'ODDS&SOD est le sien.
 2. `quete_continue` : fin de la quête ?
 3. `tour_morcar` : les 32 monstres de `monstres` (DS:4D4A, 10 octets chacun, même format que dans QUESTn.BIN), joués par `tour_monstre`, avec un test de fin après chacun.
 4. Le bit 0x40 de `commandes` ramène au menu titre.
 
-Pendant un tour, les actions identifiées par leurs messages : `fouille_tresor`, `fouille_portes`, `fouille_pieges`, coffres (`coffre_potion`, `coffre_fleche`, `coffre_gargouille`...), objets de quête (`prend_lame_esprit`, `cles_agrain`), `boit_potion`, sorts (`sort_genie`, `sort_sans_effet`), `attaque_heros`, `attaque_contre_heros`, et en fin de quête `fin_quete`, `mort_heros`, `tous_elimines`, primes (`prime_ulag`, `prime_balur`...).
+Pendant un tour, les actions identifiées par leurs messages : `fouille_tresor`, `fouille_portes`, `fouille_pieges`, coffres (`coffre_potion`, `coffre_fleche`, `coffre_gargouille`...), objets de quête (`prend_lame_esprit`, `cles_agrain`), `boit_potion`, sorts (voir [03-regles.md](03-regles.md#sorts)), `attaque_heros`, `attaque_contre_heros`, et en fin de quête `fin_quete`, `mort_heros`, `tous_elimines`, primes (`prime_ulag`, `prime_balur`...).
 
 ## À lire ensuite
 
 - Le briefing : affichage du texte de QUESTn.BIN sur le parchemin, après `lance_quete`.
 - `inventaire_sorts` (0x8C20) : écran d'inventaire sur le fond WIZBACK (cartes de catégorie INVENT en (64, 64), (136, 64), (208, 64)), et ses modes (DS:AD67, 5 = choix d'un sort).
-- `sauvegarde_menu` et le format de QUEST.SAV.
+- `sauvegarde_menu` : le déroulé du menu (le format de QUEST.SAV est dans [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#questsav)).
