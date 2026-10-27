@@ -56,7 +56,9 @@ Tout passe par un octet, `commandes` (DS:3992), remis à zéro et recalculé à 
 
 Le clavier est lu par un gestionnaire d'interruption propre au jeu : `clavier_installe` détourne int 9 vers `clavier_interruption` (0x3709), qui lit le port 60h et met à 1 (appui) ou 0 (relâchement) l'octet de la touche dans `etat_touches`. `clavier_retire` remet le gestionnaire du BIOS ; le jeu l'appelle avant chaque accès disque, puis réinstalle le sien.
 
-Attentes : `attend_commande` (une commande quelconque), `attend_relache` (plus aucune), `attend_bouton_droit` (le bouton droit seul, puis son relâchement).
+Attentes : `attend_commande` (une commande quelconque), `attend_relache` (plus aucune), `attend_bouton_droit` (le bouton droit seul, puis son relâchement), `attend_clic` (bit 0x10), `attend_relache_boutons` (bits 0x10 et 0x20 à 0), `attend_touche` (une touche, puis son relâchement).
+
+Bogue probable du joystick B : `etalonne_joystick` met `masque_joystick` (DS:320A) à C0h, qui ne garde que les bits des boutons et pas ceux des axes (0Ch). `joystick_position` boucle alors, interruptions coupées, jusqu'à l'appui des deux boutons B. À vérifier au débogueur.
 
 ## Fichiers
 
@@ -107,4 +109,6 @@ GAME&FX.ALB (18 008 octets) et .RLD (26 312 octets) ont le même début : un mot
 
 `alloue_memoire` (0x4E10) réserve, selon le mode vidéo, les segments rangés en DS:5E23 à 5E35 (écran, SHOPSP, MAPS, MONSTERS, GRAPHICS, ODDS&SOD, FURN). En cas d'échec, le jeu affiche un message qui se termine par « AND TRY AGAIN ».
 
-`mode_vga` (0x5FE3) passe en mode 13h et charge la palette ; `mode_tandy` (0x359E) passe en mode 8. Les routines d'affichage existent en plusieurs versions, choisies par `mode_video` à travers des tables de saut (par exemple `saut_copie_image`, DS:3726) ; seule la version VGA (index 8) est utile au portage.
+`mode_vga` (0x5FE3) passe en mode 13h et charge la palette ; `mode_tandy` (0x359E) passe en mode 8. Les routines d'affichage existent en plusieurs versions, choisies par `mode_video` à travers des tables de saut (par exemple `saut_copie_image`, DS:3726) ; seule la version VGA (index 8) est utile au portage. Seuls les modes 4 (Tandy), 6 (EGA, `mode_ega`) et 8 (VGA) ont des routines : les entrées 0 et 2 des tables sont à 0. En EGA, une ligne du tampon fait 4 plans de 40 octets.
+
+Outils de mise au point restés dans l'exécutable, jamais appelés : `affiche_registres` (AX à DS en hexadécimal), `point_arret` (bordure blanche, registres, attente d'un clic), `boite_texte`, `image_cible`, `image_personnage`.

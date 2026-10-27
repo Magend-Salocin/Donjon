@@ -8,6 +8,8 @@ Comment le jeu enchaîne ses écrans, affiche, dialogue avec le joueur et fait t
 
 Dans `demarrage`, après la configuration et les chargements :
 
+`ecran_shields` (0x0000), jamais appelée, est une protection contre la copie restée d'une version EGA : un bouclier tiré au hasard (1 à 29), un code saisi (`saisie_nombre`), et `erreur_fichier` = FFFFh si la réponse est fausse.
+
 1. `menu_titre` (0x7310). Le bit 0x40 de `commandes` fait quitter le jeu : retour au mode texte, puis int 21h AX=4C00h.
 2. `charge_ecran_plateau` : BOOK, MAPS, SPRITES.
 3. `partie` (0x0246) : la quête.
@@ -89,6 +91,8 @@ Ce sont les prix du jeu de plateau. `achete_objet` refuse si le héros possède 
 
 Le choix donne `numero_quete` (0 à 23, + 14 pour la page 2). `lance_quete` (0x84F0) remet l'état de la partie à zéro, garde une copie des fiches (DS:A98F) pour les restaurer si la partie est abandonnée, et charge le QUESTn.BIN de la quête (noms en DS:A3FC).
 
+Choix des sorts (`attribue_sorts`, 0x7F74) : l'enchanteur choisit 3 éléments, ou 1 seul si l'elfe joue, puis l'elfe en choisit 1 (« ENCHANTEUR CHOISIT TES SORTS », « ELFE CHOISIT TES SORTS »). Si les deux jouent, les 2 éléments restants vont à l'enchanteur. Chaque élément donne 3 sorts (`sorts_elements`, DS:ACD9 : 07h ou 38h dans +0x0B ou +0x0C).
+
 ## Briefing
 
 `lance_quete` (0x84F0), dans l'ordre :
@@ -157,11 +161,13 @@ Le jeu dessine dans un tampon hors écran (segment 0x1463), puis l'envoie à l'�
 | `fond_vers_tampon` | recopie l'écran de fond (segment DS:5E23 : BOOK, BORDERED...) dans le tampon |
 | `copie_image` | dessine une image dans le tampon (BP largeur, CX hauteur, SI source, DI = y × 320 + x) |
 | `affiche_tampon` | envoie le tampon à l'écran |
-| `sauve_tampon` | garde une copie du tampon |
+| `sauve_tampon` | garde une copie du tampon (segment DS:5E35, nommé `seg_furn` car il sert d'abord à FURN) |
+| `restaure_tampon`, `restaure_rect` | recopie la copie dans le tampon, en entier ou un rectangle (BP largeur, CX lignes, DI) |
+| `affiche_tampon_rideau` | envoie le tampon en 50 étapes de 4 lignes, de haut en bas |
 
 Chacune existe en plusieurs versions selon `mode_video`, par une table de saut ; la version VGA est l'entrée d'index 8 (par exemple 0x6148 pour `affiche_tampon`).
 
-Le curseur est un sprite de 16 × 16 décrit en DS:47E5 : `curseur_sauve_fond` garde ce qu'il recouvre, `curseur_dessine` le dessine.
+Le curseur est un sprite de 16 × 16 décrit en DS:47E5 : `curseur_dessine` le dessine dans le tampon, `curseur_efface` remet le fond depuis la copie DS:5E35 après `affiche_tampon`. L'image est en DS:47F1 : 2C20h pour la flèche, 2D20h pour le viseur.
 
 ## Messages
 
@@ -179,7 +185,24 @@ La plupart des messages ont un seul bouton, « OK » (libellé 0x3673, numéro 0
 
 133 entrées sont de simples chaînes : noms des objets et du mobilier, libellés, « JE COMPRENDS MENTOR ». Une entrée peut continuer dans la suivante : le message s'arrête au 00h final, pas au début de l'entrée suivante (par exemple la carte trésor 8, dont le jeu écrit le montant au début de l'entrée 0x1B2).
 
-`affiche_texte` (0x317C) écrit un texte pointé par BP, avec les mêmes codes de contrôle (11h ligne et colonne, 01h position en pixels, 10h et 12h à identifier).
+La boîte s'ouvre comme un parchemin : deux barres (`rouleau_haut`, `rouleau_bas`, DS:AD20 et DS:AD22) s'écartent de 4 pixels par étape, et ce qui est hors des barres reste caché. La fermeture refait le mouvement en sens inverse. Ensuite `vue_a_refaire` (DS:3F97) vaut 1.
+
+`affiche_texte` (0x317C) écrit un texte pointé par BP, caractère par caractère (`affiche_caractere`, police 8 × 8 en DS:3113, grille de 40 × 25). Codes de contrôle : 01h segment de destination (DS:3756), 10h encre et fond (DS:3750, DS:3751), 11h ligne puis colonne, 12h colonne puis ligne + 4. `texte_transparent` (DS:3759) à 1 ne dessine pas le fond.
+
+## Vue de la zone
+
+La vue isométrique montre une fenêtre de 6 × 5 cases dont l'origine est le coin de la zone du héros (`coin_zone`, DS:3FE0, tiré de `zones_revelees`). `redessine_vue` (0x0526) refait tout : fond, `affiche_zone_heros`, portrait, icônes, puis les personnages (`place_personnages`).
+
+1. `affiche_zone_heros` parcourt les 30 cases dans l'ordre de `ordre_cases_vue` (DS:49D6), du fond vers l'avant, et ne dessine que celles de la zone (`dessine_case_vue`) : dalle (`dessine_sol_case`), murs du haut et de gauche copiés dans le fond (`murs_case_vue`), occupant en sprite (`sprite_occupant`), liseré vers les zones voisines (`bords_zone`), portes du côté droit et du bas en sprites.
+2. Murs : 24 × 52, le mur gauche en (x, y − 39), le mur haut en (x + 24, y − 40) ; deux variantes par côté (`variante_mur`, DS:4482). Portes : 24 × 44. Une porte secrète non trouvée est dessinée en mur.
+3. Les sprites (`sprites`, DS:4BC6, 14 de 23 octets, les 4 héros d'abord) sont triés par profondeur (`ordonne_sprites`) : 3 × rang de la case (`rang_cases_vue`, DS:4A11), + 1 pour un occupant, + 2 pour une porte. Un sprite animé suit un script (+0Ah) : FCh fige, FDh éteint, FEh saut, FFh déplacement x, y.
+4. Meubles : l'image est décompressée en DS:0E5C et son code gardé en `meuble_cache` (DS:0E58). Le second cache (DS:0E5A, image en DS:1FF0) n'est jamais renseigné : tout autre meuble fait décompresser FURN à chaque dessin. Hypothèse à vérifier : deux meubles de types différents (hors le premier) montreraient la même image.
+
+## Carte et désignation d'une cible
+
+`dessine_carte` (0x1A50) affiche le parchemin MAPS (256 × 197 en (32, 2)), puis la grille 26 × 19 en tuiles 8 × 8 depuis (56, 16) : sols, murs, occupants, puis les personnages. Seules les cases vues (bit 0x40 de `grille_zones`) sont montrées. La carte sert au génie, au tour de Morcar et à la désignation d'une cible.
+
+Pour l'attaque, les sorts et le regard, `plateau_ciblage` ouvre la carte avec le viseur pour curseur, et l'icône d'annulation en (224, 180) quand `carte_cible` (DS:3F91) vaut 1. `designe_case` nomme ce qui est sous le curseur (monstre, mobilier ou héros) ; les pièges et le portail (0x32 à 0x37) s'affichent comme une case vide. Un clic pose `cible_validee` (DS:3F9D).
 
 ## Une partie
 

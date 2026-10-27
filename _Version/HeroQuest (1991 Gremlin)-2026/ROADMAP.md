@@ -1,6 +1,6 @@
 # Roadmap
 
-État au 26 octobre 2026. Objectif : rejouer HeroQuest PC (Gremlin, 1991) dans un navigateur, à l'identique, à partir du code original. Chaque phase produit un livrable utilisable seul.
+État au 27 octobre 2026. Objectif : rejouer HeroQuest PC (Gremlin, 1991) dans un navigateur, à l'identique, à partir du code original. Chaque phase produit un livrable utilisable seul.
 
 ## Phase 0 : récupérer l'original (faite)
 
@@ -29,13 +29,15 @@ Ordre proposé, du socle vers le jeu :
 
 Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (installé, voir [DEBOGUER.md](outils/DEBOGUER.md)) : points d'arrêt, lecture du segment de données.
 
-Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (210 sur 380 au 26 octobre). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
+Reste de la phase 1 : confirmer au débogueur les lignes marquées (?) de `symboles.txt` et les bogues supposés, notés « à vérifier » dans les notes (ligne de vue vers le haut et blocage des tirs, cache des meubles, `monstre_actif_case`, joystick B, chemin des monstres).
+
+Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (379 sur 379 au 27 octobre : toutes ont un nom, une partie reste marquée (?) ; 0x5EB0 n'est plus comptée, c'est un fragment mort de `curseur_dessine`). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
 
 | Sous-système | État | Note |
 | --- | --- | --- |
-| Socle | configuration, commandes, fichiers et interface du son lus ; vidéo repérée | [01-socle.md](original/notes/01-socle.md) |
-| Machine d'écrans | boucle principale, menu titre, héros, armurerie, choix de la quête, affichage, messages, boucle des tours, inventaire, briefing et préparation de la quête, sauvegarde des personnages | [02-ecrans.md](original/notes/02-ecrans.md) |
-| Règles | dés, déplacement, attaque du héros, trésors ; tour d'un personnage, panneau d'icônes, événements et fouilles scriptés, sorts et leurs effets, objets (armes, armures, potions, artefacts, trousse à outils), monstres (chemin, attaque, types), dés d'attaque et de défense, fin de quête et récompenses, mort d'un héros, pièges, portée des armes, fouilles et cartes trésor, les 30 événements scriptés, événements de zone et morts des monstres spéciaux, panneau (positions) et déplacement | [03-regles.md](original/notes/03-regles.md) |
+| Socle | configuration, commandes, fichiers et interface du son lus ; vidéo, saisie, joystick et outils de mise au point nommés | [01-socle.md](original/notes/01-socle.md) |
+| Machine d'écrans | vue de la zone, carte et désignation d'une cible, ouverture des messages ; boucle principale, menu titre, héros, armurerie, choix de la quête, affichage, messages, boucle des tours, inventaire, briefing et préparation de la quête, sauvegarde des personnages | [02-ecrans.md](original/notes/02-ecrans.md) |
+| Règles | ligne de vue (tir, sorts, cases alignées), chemin du héros vers la case cliquée, choix des sorts au départ ; dés, déplacement, attaque du héros, trésors ; tour d'un personnage, panneau d'icônes, événements et fouilles scriptés, sorts et leurs effets, objets (armes, armures, potions, artefacts, trousse à outils), monstres (chemin, attaque, types), dés d'attaque et de défense, fin de quête et récompenses, mort d'un héros, pièges, portée des armes, fouilles et cartes trésor, les 30 événements scriptés, événements de zone et morts des monstres spéciaux, panneau (positions) et déplacement | [03-regles.md](original/notes/03-regles.md) |
 | Textes | index des messages décodé (`french-messages.txt`), annoté dans le listing | [02-ecrans.md](original/notes/02-ecrans.md#messages) |
 
 ## Phase 2 : compléter les données

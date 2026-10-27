@@ -40,7 +40,7 @@ Noms par défaut (DS:45E5, 16 octets chacun) : SIGMAR, GRUNGI, LADRIL, ZOLTAR, R
 
 ## Panneau d'icônes
 
-12 icônes, décrites en DS:4277 (12 octets chacune) : taille, état, position à l'écran, image dans ODDS&SOD. L'état choisit l'image : normale (+0x1800 dans ODDS&SOD), enfoncée (état 0x1C, +0x0C00) ou grisée ; 0xFF cache l'icône.
+12 icônes, décrites en DS:4277 (12 octets chacune) : taille, état, position à l'écran, image dans ODDS&SOD. L'état choisit l'image : 0x0B normale (image de base), 0x1C survolée (+0x0C00 : `survol_icones` y met l'icône sous le curseur, sans clic), 1 grisée (+0x1800) ; 0xFF cache l'icône.
 
 | Icône | Identification | Règle d'état |
 | --- | --- | --- |
@@ -81,6 +81,8 @@ Un pas (routines des 4 flèches) est refusé :
 - devant une porte secrète non révélée (bits 0x08 sans 0x04) ;
 - si la case d'arrivée contient un monstre (1 à 32), un éboulis (0x30, 0x31) ou un meuble (0x40 et plus).
 
+Un clic sur une case du plateau (`clic_plateau`) fait marcher le héros tout seul. Le jeu prend la case la plus proche du curseur parmi les positions de `position_cases`, puis `chemin_heros` (0x2DAC) cherche le plus court chemin en profondeur, borné par `deplacement_restant`. La coupe teste |dx| et |dy| séparément, pas leur somme. Une case est permise (`pas_permis`) si elle est dans une zone, vide ou de code 0x32 à 0x40, sans mur (sauf traversée de la roche) ni porte secrète non trouvée. La grille des profondeurs écrase `texte_briefing` (DS:0A0E). Les directions vont dans `chemin_trouve` (DS:4013), et `pas_automatique` joue un pas à chaque passage de la boucle.
+
 Une porte fermée (bit 0x10 ou 0x20 sans 0x04) s'ouvre au passage (bit 0x04, son) et révèle la zone de l'autre côté. Une case de piège ou d'escalier (0x32 à 0x3F) se traverse ; les pièges se déclenchent ([pièges](#pièges)). Chaque pas retire 1 à `deplacement_restant` et pose DS:3F9B bit 1 (le héros a bougé).
 
 Agir (fouille, attaque, sort : `fin_deplacement`, 0x6049) après avoir bougé met le déplacement restant à 0 ; la potion héroïque l'évite. Agir avant de bouger laisse le déplacement.
@@ -88,7 +90,7 @@ Agir (fouille, attaque, sort : `fin_deplacement`, 0x6049) après avoir bougé me
 Déplacements propres à certaines quêtes :
 
 - 5e LABYRINTHE DE MELAR et 16e LES SALLES FROIDES : passer la porte en (5, 3) ou (5, 4) réveille le monstre 1.
-- 10e CHATEAU DES MYSTERES : un pas sur une case hors zone (0) téléporte le héros au hasard (table DS:43B2 : zone, x, y, porte) dans une autre zone ; il perd l'or de la mine (+0x0F bit 0x10). Un monstre sur la case d'arrivée est tué : « VOUS AVEZ TUE UN ENNEMI EN VOUS TELEPORTANT SUR LUI ».
+- 10e CHATEAU DES MYSTERES : un pas sur une case hors zone (0) téléporte le héros au hasard (table DS:43B2 : zone, x, y, porte) dans une autre zone ; il perd l'or de la mine (+0x0F bit 0x10). Un monstre sur la case d'arrivée est tué : « VOUS AVEZ TUE UN ENNEMI EN VOUS TELEPORTANT SUR LUI ». La destination (`tire_teleport`) est la somme de deux tirages de 0 à 5 : les 11 destinations ne sont pas équiprobables.
 - 16e LES SALLES FROIDES : entrer dans la zone 31 (la pièce tournante) envoie le héros sur une des 6 positions de la table DS:43DE, tirée au dé, libre de tout personnage.
 
 ## Événements de quête
@@ -222,6 +224,19 @@ Les sorts sont sans effet sur le Sorcier-Roi : avant l'effet, le jeu teste le ty
 3. Attend un clic sur la cible ; la zone (224, 180)-(240, 196) annule.
 4. Range la routine d'effet du sort (table `effets_sorts`, DS:5A6F, 13 entrées : les 12 sorts, puis le génie qui révèle la pièce ; le menu du génie, dans l'inventaire, remplace le sort 6 par 13) dans DS:4097, puis l'appelle (`jmp [0x4097]`, en 0x0F01) ; l'effet affiche son message par `sort_message`. Sans cible valide : « CE SORT N'A AUCUN EFFET SUR UN ENNEMI. IL A ETE GASPILLE ».
 5. `retire_sort` efface le bit du sort dans la fiche : chaque sort ne sert qu'une fois par quête, comme dans le jeu de plateau.
+
+Il faut voir la cible ([ligne de vue](#ligne-de-vue)), sauf pour les sorts 6, 9 et 13, un sort sur soi-même, ou une cible dans la même pièce (zone 21 et plus). Sinon le sort est gaspillé : « VOUS NE POUVEZ PAS JETER CE SORT A QUELQU'UN QUE VOUS NE VOYEZ PAS » pour un héros, message 0x56 pour un monstre.
+
+## Ligne de vue
+
+Deux mécanismes distincts.
+
+**Vers une cible** (tir et sorts) : `ligne_de_vue` (0x1148) trace une ligne de type Bresenham du héros à la case visée, une case à la fois sur l'axe le plus long. `case_coupe_vue` teste le mur du haut (masque 0xAC) ou de gauche (0x5C) de chaque case ; une porte ne laisse voir que si elle est ouverte (bit 0x04). `resultat_vise` vaut 0 si la ligne est libre ; `portee_attaque` ne refuse le tir que s'il vaut 1 (mur, porte fermée ou personnage). L'occupant de la dernière case n'est pas testé. Points à vérifier au débogueur :
+
+- en montant ou vers la gauche, c'est le mauvais mur qui serait testé, et le dernier pas sauté ;
+- l'occupant passe par la table DS:4946 + code, cohérente (0 ou 1) seulement pour les meubles 0x40 à 0x5F : armoires, râteliers et cheminées bloquent, tables et coffres non. Les monstres lisent les données voisines : seuls les monstres 13, 15, 16 et 17 bloqueraient un tir (bogue d'indexation probable).
+
+**Cases alignées** : `vue_alignee` (0x2702), appelée à chaque redessin, marque vues sur la carte les cases alignées avec le héros dans les 4 directions, jusqu'au premier mur ou porte fermée, et réveille les monstres croisés. Rien dans la quête de code 9 (château des mystères). En colonne 12 ou 13, les deux colonnes sont balayées. Bogue probable : vers le haut, le balayage s'arrête sur x = 0 au lieu de y = 0.
 
 ## Objets
 
@@ -384,3 +399,7 @@ Abandon de la partie (`commandes` = 40h pendant un tour) : les fiches et `heros_
 ## Plateau en mémoire
 
 `lance_quete` recopie les 1024 premiers octets de QUESTn.BIN en DS:546F (`grille_zones`) : zone de chaque case (bits 0 à 5), puis (+0x200) murs et portes. La grille des occupants suit, en DS:586F (= `grille_zones` + 0x400) : pour chaque case, le numéro du monstre qui l'occupe (1 à 32) ou le code du mobilier et des pièges (0x30 et plus, voir [FORMATS.md](../../../HeroQuest%20(1991%20Gremlin)/FORMATS.md#quêtes--questnbin)). `index_case` (0x607E) donne l'index d'une case à partir de (x, y).
+
+Octet de zone : bits 0 à 5 la zone, bit 0x40 case vue sur la carte, bit 0x80 bord vu (une voisine de gauche ou du haut est vue, ses murs sont tracés). Fiche d'un personnage : +4 et +5 pointent sa case dans la grille des murs (`place_personnage`). Monstre : +8 l'image (sprite, nom, carte), +9 le type (`types_monstres`), +0 bit 0x80 « pas encore vu », effacé quand un héros voit la zone.
+
+Bogue possible : `monstre_actif_case` (0x6DD7) retire 1 au numéro du monstre avant `adresse_monstre`, qui le retire déjà. `monstre_dans_zone` lit donc le monstre n − 1 (et un mot nul pour le monstre 1). `eau_benite_case` n'a pas ce décalage. À vérifier au débogueur.

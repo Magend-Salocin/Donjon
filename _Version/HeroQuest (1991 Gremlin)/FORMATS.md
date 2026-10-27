@@ -114,7 +114,7 @@ Positions en hexadécimal dans le fichier décompressé ; les images d'une séri
 |---|---|---|---|
 | MAPS | 0x0000 | 256 × 197 | parchemin de la carte de quête |
 | MAPS | 0xC500 | 8 × 8, 169 tuiles | couleurs des sols pour dessiner la carte |
-| ODDS&SOD | 0x0000 | 32 × 45, pas 0x5A0 | portraits du panneau de jeu : barbare, nain, elfe, magicien, guerrier (table DS:0x41E8) |
+| ODDS&SOD | 0x0000 | 32 × 45, pas 0x5A0 | portraits du panneau de jeu : barbare, nain, elfe, magicien, guerrier (table DS:0x41E9) |
 | ODDS&SOD | 0x1C20 | 32 × 32, 6 | bouclier, lame, épée… |
 | ODDS&SOD | 0x3420 à 0x6020 | 16 × 16 | icônes des actions et des objets, avec leurs états allumé et éteint (découpage par endroits imparfait) |
 | ODDS&SOD | 0x58A0 | 8 × 8 | petits symboles ; chiffres 8 × 12 dessinés en 0x4F96 |
