@@ -2,7 +2,7 @@
 
 
 ; ======== ecran_shields   (appelée depuis 2088)
-; non appelée : écran SHIELDS (EGA) ; reste d'une version antérieure (?)
+; non appelée : protection contre la copie (écran SHIELDS, EGA) : bouclier tiré au hasard, code saisi par saisie_nombre, erreur_fichier = FFFFh si faux
 00000  ff 36 90 31          push word ptr [0x3190]    ; mode_video
 00004  83 3e 90 31 08       cmp word ptr [0x3190], 8    ; mode_video
 00009  75 0e                jne loc_0019
@@ -331,8 +331,8 @@ loc_033f:
 00349  88 26 93 31          mov byte ptr [0x3193], ah    ; commande_type
 0034d  89 16 39 46          mov word ptr [0x4639], dx    ; sprite_courant
 00351  89 1e 37 46          mov word ptr [0x4637], bx    ; fiche_heros_courant
-00355  c7 06 0f 0e ff ff    mov word ptr [0xe0f], 0xffff
-0035b  c7 06 11 0e ff ff    mov word ptr [0xe11], 0xffff    ; case_exclue
+00355  c7 06 0f 0e ff ff    mov word ptr [0xe0f], 0xffff    ; case_apres_porte
+0035b  c7 06 11 0e ff ff    mov word ptr [0xe11], 0xffff    ; case_avant_porte
 00361  c6 06 2c 40 00       mov byte ptr [0x402c], 0
 00366  f6 47 0d 02          test byte ptr [bx + 0xd], 2
 0036a  74 05                je loc_0371
@@ -1183,13 +1183,13 @@ loc_0afb:
 00b02  c3                   ret
 
 ; ======== fin_tir
-; (?) non appelée : perd_arme_lancee, puis AL = 0
+; non appelée : perd_arme_lancee, puis AL = 0
 00b03  e8 03 00             call perd_arme_lancee
 00b06  32 c0                xor al, al
 00b08  c3                   ret
 
 ; ======== perd_arme_lancee   (appelée depuis 0b03)
-; (?) retire l'arme en main de +0x0E et +0x11 si attaque_a_distance a le bit 0x20, jamais posé : code mort
+; code mort : retire l'arme en main de +0x0E et +0x11 si attaque_a_distance a le bit 0x20, qui ne vaut que 0 ou 1 ; seule fin_tir (morte) l'appelle
 00b09  f6 06 b7 3f 20       test byte ptr [0x3fb7], 0x20    ; attaque_a_distance
 00b0e  75 01                jne loc_0b11
 00b10  c3                   ret
@@ -1406,7 +1406,7 @@ loc_0c8f:
 00c8f  e9 c4 59             jmp loc_6656
 
 ; ======== image_par_table
-; (?) non appelée : BX = DS:34FE, puis fin de image_personnage (image d'un personnage par xlat)
+; non appelée : BX = DS:34FE, puis fin de image_personnage (image d'un personnage par xlat)
 00c92  bb fe 34             mov bx, 0x34fe
 00c95  e9 b4 4a             jmp loc_574c
 
@@ -1426,7 +1426,7 @@ loc_0caa:
 00cb2  c3                   ret
 
 ; ======== mode_regarder
-; informations sous le curseur, jusqu'à un clic sur la zone d'annulation (?)
+; carte avec viseur : nomme ce qui est sous le curseur, jusqu'au bouton droit ou à un clic sur l'icône d'annulation
 00cb3  c6 06 91 3f 01       mov byte ptr [0x3f91], 1    ; carte_cible
 00cb8  e8 15 4a             call plateau_ciblage
 loc_0cbb:
@@ -1951,7 +1951,7 @@ loc_1116:
 01127  e9 5d 35             jmp temporise
 
 ; ======== retire_or_mine
-; (?) non appelée : avant la quête code 15, retire l'or de la mine (+0x0F bit 0x20) de la fiche DI
+; non appelée : avant la quête code 15, retire l'or de la mine (+0x0F bit 0x20) de la fiche DI
 0112a  80 3e 92 3f 0f       cmp byte ptr [0x3f92], 0xf    ; numero_quete
 0112f  72 01                jb loc_1132
 01131  c3                   ret
@@ -2586,7 +2586,7 @@ loc_15fd:
 01651  c3                   ret
 
 ; ======== sprite_porte_case
-; non appelée : sprite 24 × 44 de GRAPHICS (source DX) sur la case courante, décalage (CH, CL) et ordre AL écrits dans son propre code ; doublon de sprite_porte (?)
+; non appelée : sprite 24 × 44 de GRAPHICS (source DX) sur la case courante, décalage (CH, CL) et ordre AL écrits dans son propre code ; doublon de sprite_porte
 01652  53                   push bx
 01653  2e a2 9f 16          mov byte ptr cs:[0x169f], al
 01657  2e 88 2e 75 16       mov byte ptr cs:[0x1675], ch
@@ -2938,7 +2938,7 @@ loc_1953:
 0195c  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 01960  83 6d 09 32          sub word ptr [di + 9], 0x32
 loc_1964:
-01964  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_rapportes
+01964  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_ramasses
 01969  74 76                je loc_19e1
 0196b  bb b4 00             mov bx, 0xb4    ; message « IL Y A ENCORE DE L'OR A / RECUPERER. VOULEZ-VOUS / RETOURNER LE CHERCHER »
 0196e  e8 7c 6f             call affiche_message
@@ -3277,7 +3277,7 @@ loc_1c4e:
 01c4e  e9 be 00             jmp tuile_murs
 
 ; ======== porte_en_mur_carte
-; non appelée : bits de porte 0x30 recopiés en bits de mur 0xC0, puis tuile_murs (?)
+; non appelée : bits de porte 0x30 recopiés en bits de mur 0xC0, puis tuile_murs
 01c51  8a c8                mov cl, al
 01c53  80 e1 c3             and cl, 0xc3
 01c56  02 c0                add al, al
@@ -5100,7 +5100,7 @@ loc_2ae8:
 02b05  c3                   ret
 
 ; ======== son_des   (appelée depuis 4f47)
-; dés de déplacement (?) : morceau 6 ; Tandy 5
+; dés de déplacement (appelée par affiche_deplacement) : morceau 6 ; Tandy 5 ; haut-parleur : deux notes en alternance
 02b06  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 02b0b  74 01                je loc_2b0e
 02b0d  c3                   ret
@@ -5560,7 +5560,7 @@ loc_2eb2:
 02ee5  38 0e f3 3f          cmp byte ptr [0x3ff3], cl    ; chemin_profondeur
 02ee9  73 46                jae loc_2f31
 02eeb  05 6f 56             add ax, 0x566f
-02eee  3b 06 11 0e          cmp ax, word ptr [0xe11]    ; case_exclue
+02eee  3b 06 11 0e          cmp ax, word ptr [0xe11]    ; case_avant_porte
 02ef2  75 03                jne loc_2ef7
 02ef4  eb 3b                jmp loc_2f31
 ; ---- 1 octets non atteints (2ef6-2ef6)
@@ -6393,7 +6393,7 @@ loc_363f:
 0363f  c3                   ret
 
 ; ======== efface_ecran   (appelée depuis 602d)
-; remet la position du texte (DS:3752, DS:3754) à 0 et remplit A000 ; 3 versions (table DS:3744) : VGA et EGA avec la couleur DS:3751, Tandy avec AX = mode_video (?)
+; remet la position du texte à 0 et remplit A000 ; table DS:3744 : VGA avec couleur_fond, EGA avec couleur_fond mais 200 mots seulement, Tandy avec AX = mode_video (4)
 03640  c7 06 52 37 00 00    mov word ptr [0x3752], 0    ; texte_colonne
 03646  c7 06 54 37 00 00    mov word ptr [0x3754], 0    ; texte_ligne
 0364c  fc                   cld
@@ -7006,7 +7006,7 @@ loc_3acd:
 03adb  c3                   ret
 
 ; ======== adresse_ega   (appelée depuis 3b5c, 62c2, 6345)
-; DI (y × 320 + x) -> DS:37FB = y × 160 + x / 8, DS:37F9 = x & 7 ; ligne du tampon EGA = 4 plans × 40 octets (?)
+; DI (y × 320 + x) -> DS:37FB = y × 160 + x / 8, DS:37F9 = x & 7 : 160 octets par ligne, soit 4 plans de 40 octets
 03adc  9c                   pushf
 03add  50                   push ax
 03ade  53                   push bx
@@ -8742,7 +8742,7 @@ loc_47fb:
 04824  c3                   ret
 
 ; ======== son_prepare   (appelée depuis 5fd7)
-; int 60h AX=2 puis AX=3 (?)
+; au démarrage : int 60h AX=2 donne les données au pilote (sauf haut-parleur), puis AX=3 lance la musique (morceau DS:31FE : 0, 1 pour Tandy) ; poignée en DS:319C
 04825  80 3e 92 31 00       cmp byte ptr [0x3192], 0    ; son_pilote
 0482a  74 0c                je loc_4838
 0482c  8b 16 9a 31          mov dx, word ptr [0x319a]    ; seg_son_donnees
@@ -8761,7 +8761,7 @@ loc_4838:
 0484f  c3                   ret
 
 ; ======== son_musique   (appelée depuis 37a5)
-; lance la musique si DS:3956 = 1 (?)
+; une fois la touche F10 enfoncée (DS:3956 = etat_touches + 44h) : coupe la musique (int 60h AX=4) et active les effets (son_actif = 1), une seule fois
 04850  80 3e 99 31 01       cmp byte ptr [0x3199], 1    ; son_actif
 04855  75 01                jne loc_4858
 04857  c3                   ret
@@ -8841,11 +8841,11 @@ loc_48f3:
 048fa  f6 07 10             test byte ptr [bx], 0x10
 048fd  74 38                je loc_4937
 048ff  8b 45 04             mov ax, word ptr [di + 4]
-04902  3b 06 0f 0e          cmp ax, word ptr [0xe0f]
+04902  3b 06 0f 0e          cmp ax, word ptr [0xe0f]    ; case_apres_porte
 04906  75 03                jne loc_490b
 04908  e9 94 04             jmp loc_4d9f
 loc_490b:
-0490b  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1
+0490b  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1    ; porte_franchie
 04910  90                   nop
 04911  f6 07 04             test byte ptr [bx], 4
 04914  75 19                jne loc_492f
@@ -8932,11 +8932,11 @@ loc_49bc:
 049c3  f6 07 10             test byte ptr [bx], 0x10
 049c6  74 36                je loc_49fe
 049c8  8b 45 04             mov ax, word ptr [di + 4]
-049cb  3b 06 0f 0e          cmp ax, word ptr [0xe0f]
+049cb  3b 06 0f 0e          cmp ax, word ptr [0xe0f]    ; case_apres_porte
 049cf  75 03                jne loc_49d4
 049d1  e9 cb 03             jmp loc_4d9f
 loc_49d4:
-049d4  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1
+049d4  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1    ; porte_franchie
 049d9  90                   nop
 049da  f6 07 04             test byte ptr [bx], 4
 049dd  75 17                jne loc_49f6
@@ -9020,11 +9020,11 @@ loc_4a82:
 04a89  f6 07 20             test byte ptr [bx], 0x20
 04a8c  74 36                je loc_4ac4
 04a8e  8b 45 04             mov ax, word ptr [di + 4]
-04a91  3b 06 0f 0e          cmp ax, word ptr [0xe0f]
+04a91  3b 06 0f 0e          cmp ax, word ptr [0xe0f]    ; case_apres_porte
 04a95  75 03                jne loc_4a9a
 04a97  e9 05 03             jmp loc_4d9f
 loc_4a9a:
-04a9a  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1
+04a9a  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1    ; porte_franchie
 04a9f  90                   nop
 04aa0  f6 07 04             test byte ptr [bx], 4
 04aa3  75 17                jne loc_4abc
@@ -9109,11 +9109,11 @@ loc_4b4d:
 04b54  f6 07 20             test byte ptr [bx], 0x20
 04b57  74 36                je loc_4b8f
 04b59  8b 45 04             mov ax, word ptr [di + 4]
-04b5c  3b 06 0f 0e          cmp ax, word ptr [0xe0f]
+04b5c  3b 06 0f 0e          cmp ax, word ptr [0xe0f]    ; case_apres_porte
 04b60  75 03                jne loc_4b65
 04b62  e9 3a 02             jmp loc_4d9f
 loc_4b65:
-04b65  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1
+04b65  c6 06 b4 3e 01       mov byte ptr [0x3eb4], 1    ; porte_franchie
 04b6a  90                   nop
 04b6b  f6 07 04             test byte ptr [bx], 4
 04b6e  75 17                jne loc_4b87
@@ -9154,14 +9154,14 @@ loc_4bb2:
 04bba  fe 45 02             inc byte ptr [di + 2]
 04bbd  32 c0                xor al, al
 pas_fait:    ; commun aux 4 pas : déplacement - 1, zone, téléports des quêtes 10 et 16
-04bbf  80 3e b4 3e 01       cmp byte ptr [0x3eb4], 1
+04bbf  80 3e b4 3e 01       cmp byte ptr [0x3eb4], 1    ; porte_franchie
 04bc4  75 13                jne loc_4bd9
 04bc6  56                   push si
 04bc7  8b 75 04             mov si, word ptr [di + 4]
-04bca  89 36 11 0e          mov word ptr [0xe11], si    ; case_exclue
+04bca  89 36 11 0e          mov word ptr [0xe11], si    ; case_avant_porte
 04bce  5e                   pop si
-04bcf  89 1e 0f 0e          mov word ptr [0xe0f], bx
-04bd3  c6 06 b4 3e 00       mov byte ptr [0x3eb4], 0
+04bcf  89 1e 0f 0e          mov word ptr [0xe0f], bx    ; case_apres_porte
+04bd3  c6 06 b4 3e 00       mov byte ptr [0x3eb4], 0    ; porte_franchie
 04bd8  90                   nop
 loc_4bd9:
 04bd9  89 5d 04             mov word ptr [di + 4], bx
@@ -9207,7 +9207,7 @@ loc_4c12:
 04c42  5a                   pop dx
 04c43  80 c7 02             add bh, 2
 04c46  89 5d 04             mov word ptr [di + 4], bx
-04c49  89 1e 0f 0e          mov word ptr [0xe0f], bx
+04c49  89 1e 0f 0e          mov word ptr [0xe0f], bx    ; case_apres_porte
 04c4d  89 16 ce 3f          mov word ptr [0x3fce], dx
 04c51  e9 5c 22             jmp redessin_plateau
 loc_4c54:
@@ -9232,7 +9232,7 @@ loc_4c65:
 04c7f  5a                   pop dx
 04c80  81 c3 00 02          add bx, 0x200
 04c84  89 5d 04             mov word ptr [di + 4], bx
-04c87  89 1e 0f 0e          mov word ptr [0xe0f], bx
+04c87  89 1e 0f 0e          mov word ptr [0xe0f], bx    ; case_apres_porte
 04c8b  b6 00                mov dh, 0
 04c8d  03 da                add bx, dx
 04c8f  80 0f 04             or byte ptr [bx], 4
@@ -9296,7 +9296,7 @@ loc_4d04:
 04d1e  e8 e1 c8             call adresse_case
 04d21  81 c3 00 02          add bx, 0x200
 04d25  89 5d 04             mov word ptr [di + 4], bx
-04d28  89 1e 0f 0e          mov word ptr [0xe0f], bx
+04d28  89 1e 0f 0e          mov word ptr [0xe0f], bx    ; case_apres_porte
 04d2c  5a                   pop dx
 04d2d  b6 00                mov dh, 0
 04d2f  03 da                add bx, dx
@@ -10364,7 +10364,7 @@ loc_570b:
 0570e  e9 d3 09             jmp affiche_tampon
 
 ; ======== image_cible
-; image du monstre DS:3FD4 (type +8, table DS:45BA, MONSTERS) ; non appelée (?)
+; non appelée : image du monstre DS:3FD4 (type +8, table DS:45BA, MONSTERS)
 05711  8b 1e d4 3f          mov bx, word ptr [0x3fd4]    ; cible
 05715  bd fe 34             mov bp, 0x34fe
 05718  8b 0e 29 5e          mov cx, word ptr [0x5e29]    ; seg_monsters
@@ -10379,7 +10379,7 @@ loc_570b:
 ; ---- 1 octets non atteints (5736-5736)
 
 ; ======== image_personnage
-; image du personnage courant (table DS:45B5, SHOPSP) ; non appelée (?)
+; non appelée (sa fin sert à image_par_table, morte aussi) : image du personnage courant (table DS:45B5, SHOPSP)
 05737  8b 0e 25 5e          mov cx, word ptr [0x5e25]    ; seg_shopsp
 0573b  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 0573e  32 e4                xor ah, ah
@@ -10925,7 +10925,7 @@ loc_5b8c:
 05b8c  c3                   ret
 
 ; ======== bords_zone   (appelée depuis 0607)
-; case DS:3FDE en cours de dessin : liseré 16 × 6 (ODDS&SOD, table DS:4101) sur chaque côté sans mur ni porte qui donne sur une autre zone non nulle, sauf vers l'occupant 30h (?)
+; case DS:3FDE en cours de dessin : liseré 16 × 6 (ODDS&SOD, table DS:4101) sur chaque côté sans mur ni porte qui donne sur une autre zone non nulle, sauf si la voisine porte un éboulis (30h)
 05b8d  33 ed                xor bp, bp
 05b8f  8b 1e de 3f          mov bx, word ptr [0x3fde]    ; case_dessinee
 05b93  81 fb 89 56          cmp bx, 0x5689
@@ -12392,7 +12392,7 @@ loc_667a:
 0667f  c3                   ret
 
 ; ======== dessine_icones_fiche   (appelée depuis 040a, 0548, 12d1, 1839, 5d7b)
-; 4 images 16 × 16 d'ODDS&SOD : 0x5F20 en (40, 11), 0x5D20 en (40, 30), 0x5E20 en (96, 11), 0x6020 en (96, 30), à côté de l'or, du déplacement, du corps et de l'esprit (?)
+; 4 icônes 16 × 16 d'ODDS&SOD à gauche des valeurs du panneau : 0x5F20 or (40, 11), 0x5D20 déplacement (40, 30), 0x5E20 corps (96, 11), 0x6020 esprit (96, 30)
 06680  be 20 5f             mov si, 0x5f20
 06683  bf e8 0d             mov di, 0xde8
 06686  a1 2d 5e             mov ax, word ptr [0x5e2d]    ; seg_odds
@@ -12585,7 +12585,7 @@ loc_6827:
 0682c  2d 6f 54             sub ax, 0x546f    ; grille_zones
 0682f  8b d8                mov bx, ax
 06831  81 c3 6f 56          add bx, 0x566f
-06835  3b 1e 11 0e          cmp bx, word ptr [0xe11]    ; case_exclue
+06835  3b 1e 11 0e          cmp bx, word ptr [0xe11]    ; case_avant_porte
 06839  75 01                jne loc_683c
 0683b  c3                   ret
 loc_683c:
@@ -13478,7 +13478,7 @@ loc_6fac:
 
 ; ======== evt_coffre_magnus
 ; 7 : coffre du prince Magnus (250 pièces, porté)
-06fba  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_rapportes
+06fba  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_ramasses
 06fbf  74 05                je loc_6fc6
 06fc1  c6 06 93 4b 07       mov byte ptr [0x4b93], 7
 loc_6fc6:
@@ -13487,8 +13487,8 @@ loc_6fc6:
 06fce  74 03                je loc_6fd3
 06fd0  e9 d7 fe             jmp loc_6eaa
 loc_6fd3:
-06fd3  8a 1e be 3f          mov bl, byte ptr [0x3fbe]    ; coffres_rapportes
-06fd7  fe 06 be 3f          inc byte ptr [0x3fbe]    ; coffres_rapportes
+06fd3  8a 1e be 3f          mov bl, byte ptr [0x3fbe]    ; coffres_ramasses
+06fd7  fe 06 be 3f          inc byte ptr [0x3fbe]    ; coffres_ramasses
 06fdb  b7 00                mov bh, 0
 06fdd  d0 e3                shl bl, 1
 06fdf  8b 8f d9 44          mov cx, word ptr [bx + 0x44d9]
@@ -13555,7 +13555,7 @@ loc_7035:
 
 ; ======== evt_coffre_course
 ; 13 : un coffre (100 pièces, porté)
-0706c  80 3e be 3f 01       cmp byte ptr [0x3fbe], 1    ; coffres_rapportes
+0706c  80 3e be 3f 01       cmp byte ptr [0x3fbe], 1    ; coffres_ramasses
 07071  74 05                je loc_7078
 07073  c6 06 89 4b 0d       mov byte ptr [0x4b89], 0xd
 loc_7078:
@@ -13565,8 +13565,8 @@ loc_7078:
 07083  74 03                je loc_7088
 07085  e9 b2 a9             jmp apres_sortie
 loc_7088:
-07088  8a 1e be 3f          mov bl, byte ptr [0x3fbe]    ; coffres_rapportes
-0708c  fe 06 be 3f          inc byte ptr [0x3fbe]    ; coffres_rapportes
+07088  8a 1e be 3f          mov bl, byte ptr [0x3fbe]    ; coffres_ramasses
+0708c  fe 06 be 3f          inc byte ptr [0x3fbe]    ; coffres_ramasses
 07090  b7 00                mov bh, 0
 07092  d0 e3                shl bl, 1
 07094  8b 8f df 44          mov cx, word ptr [bx + 0x44df]
@@ -16431,7 +16431,7 @@ loc_8b7a:
 08b92  e9 de d6             jmp loc_6273
 
 ; ======== dessine_rouleau   (appelée depuis 8b1c, 8b22)
-; barre horizontale à la ligne AX : bouts ODDS&SOD 0x55A0 et 0x57A0, milieu 0x56A0 (16 × 16) ; rouleau du parchemin qui s'ouvre (?)
+; barre du parchemin à la ligne AX (rouleau_haut ou rouleau_bas) : bouts ODDS&SOD 0x55A0 et 0x57A0, milieu 0x56A0 (16 × 16)
 08b95  8b 1e 24 ad          mov bx, word ptr [0xad24]
 08b99  e8 d8 a5             call ligne_ecran
 08b9c  89 1e f3 37          mov word ptr [0x37f3], bx    ; saisie_chiffres_lus
@@ -17249,7 +17249,7 @@ loc_93a9:
 093ae  e9 36 fd             jmp loc_90e7
 
 ; ======== choix_arme_mort
-; code mort entre choix_arme et choix_artefact : arme DL en +0x11 et +0x14 masqué à 7 (?)
+; code mort entre choix_arme et choix_artefact : arme DL en +0x11 et +0x14 masqué à 7
 093b1  88 55 11             mov byte ptr [di + 0x11], dl
 093b4  80 65 14 07          and byte ptr [di + 0x14], 7
 093b8  e9 2c fd             jmp loc_90e7

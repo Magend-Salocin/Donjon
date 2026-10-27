@@ -83,6 +83,8 @@ Un pas (routines des 4 flèches) est refusé :
 
 Un clic sur une case du plateau (`clic_plateau`) fait marcher le héros tout seul. Le jeu prend la case la plus proche du curseur parmi les positions de `position_cases`, puis `chemin_heros` (0x2DAC) cherche le plus court chemin en profondeur, borné par `deplacement_restant`. La coupe teste |dx| et |dy| séparément, pas leur somme. Une case est permise (`pas_permis`) si elle est dans une zone, vide ou de code 0x32 à 0x40, sans mur (sauf traversée de la roche) ni porte secrète non trouvée. La grille des profondeurs écrase `texte_briefing` (DS:0A0E). Les directions vont dans `chemin_trouve` (DS:4013), et `pas_automatique` joue un pas à chaque passage de la boucle.
 
+Après avoir franchi une porte, le héros ne peut plus repasser une porte depuis la case où il est entré (`case_apres_porte`, DS:0E0F), et la case qu'il a quittée (`case_avant_porte`, DS:0E11) est exclue du chemin automatique et des cases cliquables, jusqu'au tour suivant.
+
 Une porte fermée (bit 0x10 ou 0x20 sans 0x04) s'ouvre au passage (bit 0x04, son) et révèle la zone de l'autre côté. Une case de piège ou d'escalier (0x32 à 0x3F) se traverse ; les pièges se déclenchent ([pièges](#pièges)). Chaque pas retire 1 à `deplacement_restant` et pose DS:3F9B bit 1 (le héros a bougé).
 
 Agir (fouille, attaque, sort : `fin_deplacement`, 0x6049) après avoir bougé met le déplacement restant à 0 ; la potion héroïque l'évite. Agir avant de bouger laisse le déplacement.
@@ -220,7 +222,7 @@ Les sorts sont sans effet sur le Sorcier-Roi : avant l'effet, le jeu teste le ty
 `action_sort` (0x2C74), quand l'icône des sorts (icône 11) est enfoncée :
 
 1. Ouvre `inventaire_sorts` en mode 5 (DS:AD67) : le joueur choisit un sort, rangé dans la fiche (+0x16).
-2. Lit les propriétés du sort dans `proprietes_sorts` (DS:4387, un octet par sort : 1, 1, 3, 3, 1, 3, 1, 3, 3, 1, 1, 3) : bit 1 = peut viser un personnage, bit 2 = peut viser un ennemi (?).
+2. Lit les propriétés du sort dans `proprietes_sorts` (DS:4387, un octet par sort : 1, 1, 3, 3, 1, 3, 1, 3, 3, 1, 1, 3) : bit 0 = peut viser un personnage, bit 1 = un monstre, bit 2 = une case vide (aucun sort ne l'a). La guérison du corps (12) peut donc viser un monstre, pas l'eau de guérison (2).
 3. Attend un clic sur la cible ; la zone (224, 180)-(240, 196) annule.
 4. Range la routine d'effet du sort (table `effets_sorts`, DS:5A6F, 13 entrées : les 12 sorts, puis le génie qui révèle la pièce ; le menu du génie, dans l'inventaire, remplace le sort 6 par 13) dans DS:4097, puis l'appelle (`jmp [0x4097]`, en 0x0F01) ; l'effet affiche son message par `sort_message`. Sans cible valide : « CE SORT N'A AUCUN EFFET SUR UN ENNEMI. IL A ETE GASPILLE ».
 5. `retire_sort` efface le bit du sort dans la fiche : chaque sort ne sert qu'une fois par quête, comme dans le jeu de plateau.

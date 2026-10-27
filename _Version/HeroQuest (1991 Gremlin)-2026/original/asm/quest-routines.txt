@@ -5,7 +5,7 @@
 000ed  demarrage                  339    0  | 21h/09 21h/4a    44a0 44a1 44a2 44a3 468b commandes couleur_texte erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille  "questb.ega"
 00246  partie                     173    1  | 10h/? 21h/4c    3196 3197 3198 commandes commandes_joueurs numero_quete sans_sprites zones_actives
 002f3  prepare_heros               86    1  |     fiche_heros_courant
-00349  tour_personnage            311    5  |     0e0e 0e0f 3fce 402c attaque_repetee case_exclue commande_type commandes deplacement_restant des_deplacement direction_pas fiche_heros_courant
+00349  tour_personnage            311    5  |     0e0e 3fce 402c attaque_repetee case_apres_porte case_avant_porte commande_type commandes deplacement_restant des_deplacement direction_pas fiche_heros_courant
 00480  evenements_quete           166    1  |     evenement_a evenement_b message_en_attente numero_quete
 00526  redessine_vue               47    2  |     meuble_cache meuble_cache_2 sprites_figes vue_a_refaire
 00555  affiche_zone_heros         118    3  |     37f5 37f7 case_coin_zone fiche_heros_courant index_case_courante zone_heros zone_nouvelle
@@ -80,7 +80,7 @@
 017b9  dessine_sol_case            49    1  |     586f case_dessinee zone_heros
 017ea  copie_sol                   59    2  |     ecran_case_courante index_case_courante seg_graphics segment_source
 01825  redessine_plateau           41   16  |     sprites_figes
-0184e  fin_quete                  371    1  |     choix_menu coffres_rapportes deplacement_restant evenement_a evenement_b fiche_heros_courant fin_du_tour heros_courant heros_sortis numero_quete pas_en_file personnage_courant
+0184e  fin_quete                  371    1  |     choix_menu coffres_ramasses deplacement_restant evenement_a evenement_b fiche_heros_courant fin_du_tour heros_courant heros_sortis numero_quete pas_en_file personnage_courant
 019c2  case_prise_heros           112    3  |     evenement_b fiche_heros_courant fin_du_tour heros_courant personnage_courant
 01a35  message_puis_sortie          5    3  |     
 01a3a  apres_sortie                22    4  |     
@@ -144,7 +144,7 @@
 02d84  retire_sort                 40    2  |     
 02dac  chemin_heros                82    1  |     3fef 3ff1 chemin_cible_x chemin_depart_x chemin_longueur_max chemin_profondeur deplacement_restant erreur_fichier fiche_heros_courant pas_en_file prochain_pas resultat_vise
 02dff  chemin_essaie              184    4  |     3ff1 3ff6 chemin_case_x chemin_cible_x chemin_direction chemin_longueur_max chemin_profondeur pas_en_file
-02eb7  pas_permis                 304    1  | 16h 21h/09 21h/4c    3ff6 case_exclue chemin_case_x chemin_direction chemin_profondeur
+02eb7  pas_permis                 304    1  | 16h 21h/09 21h/4c    3ff6 case_avant_porte chemin_case_x chemin_direction chemin_profondeur
 030f6  lit_configuration          125    1  | 10h/? 21h/09 21h/35 33h/?    erreur_fichier fichier_nom fichier_offset fichier_segment souris_presente  "quest.cfg"
 03174  ligne_ecran                  8   12  |     
 0317c  affiche_texte               15   33  |     
@@ -204,10 +204,10 @@
 0476e  son_arret                   56    1  | 60h  0x61  son_actif son_effet_poignee son_musique_poignee son_pilote
 047a6  son_charge_pilote          127    1  | 21h/48 60h    3206 3208 erreur_fichier fichier_nom fichier_offset fichier_segment rang_pixel seg_son_donnees son_actif son_pilote
 04825  son_prepare                 43    1  | 60h    seg_son_donnees son_musique_poignee son_pilote
-04850  son_musique                283    1  | 10h/? 21h/4c 60h  0x61  0e0f 3956 3eb4 3fce deplacement_restant direction_pas etat_action numero_quete son_actif son_musique_poignee son_pilote
-04968  pas_droite                 199    0  |     0e0f 3eb4 3fce deplacement_restant direction_pas etat_action numero_quete
-04a2f  pas_haut                   200    0  |     0e0f 3eb4 3fce deplacement_restant direction_pas etat_action numero_quete
-04af7  pas_bas                    689    0  |     0e0f 0e57 3eb4 3fce 409b case_exclue deplacement_restant direction_pas etat_action message_en_attente numero_quete pas_en_cours
+04850  son_musique                283    1  | 10h/? 21h/4c 60h  0x61  3956 3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie son_actif son_musique_poignee son_pilote
+04968  pas_droite                 199    0  |     3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie
+04a2f  pas_haut                   200    0  |     3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie
+04af7  pas_bas                    689    0  |     0e57 3fce 409b case_apres_porte case_avant_porte deplacement_restant direction_pas etat_action message_en_attente numero_quete pas_en_cours pas_en_file
 04daa  tire_teleport               29    2  |     
 04dc7  entre_piege                 72    4  |     case_piege pas_en_file piege_en_cours prochain_pas
 04e10  alloue_memoire             245    1  | 21h/48    5e31 mode_video seg_annexe seg_ecran seg_furn seg_furn_brut seg_graphics seg_monsters seg_odds seg_shopsp  "AND TRY AGAIN"
@@ -288,7 +288,7 @@
 0665e  pause_150                   34    3  |     zone_heros
 06680  dessine_icones_fiche       121    5  |     seg_odds segment_source
 066f9  tirage_deplacement         139    2  |     3f90 commandes deplacement_restant des_deplacement image_des_courante sprite_courant
-06784  pas_automatique            297    1  |     3fef 3ff1 3ff6 47e7 47e9 case_coin_zone case_exclue chemin_case_x chemin_cible_x chemin_depart_x fiche_heros_courant pas_en_file
+06784  pas_automatique            297    1  |     3fef 3ff1 3ff6 47e7 47e9 case_avant_porte case_coin_zone chemin_case_x chemin_cible_x chemin_depart_x fiche_heros_courant pas_en_file
 068ae  des_deplacement_tour        88    1  |     des_deplacement etat_action fiche_heros_courant fin_du_tour personnage_courant
 06906  ajoute_or                    4    8  |     fiche_heros_courant
 0690a  ajoute_or_di                12    2  |     
@@ -309,12 +309,12 @@
 06f40  evt_armoire                 35    0  |     
 06f63  evt_coffre_100              65    0  |     4bc0 fiche_heros_courant heros_courant personnage_courant
 06fa4  evt_lance                   22    0  |     fiche_heros_courant personnage_courant
-06fba  evt_coffre_magnus           64    0  |     4b93 coffres_rapportes fiche_heros_courant
+06fba  evt_coffre_magnus           64    0  |     4b93 coffres_ramasses fiche_heros_courant
 06ffa  evt_cle_melar               72    0  |     56d2 58d1
 07043  evt_talisman                18    0  |     fiche_heros_courant
 07055  evt_armure_borin            14    0  |     fiche_heros_courant
 07063  evt_coffre_karlen            9    0  |     
-0706c  evt_coffre_course           65    0  |     4b89 coffres_rapportes fiche_heros_courant
+0706c  evt_coffre_course           65    0  |     4b89 coffres_ramasses fiche_heros_courant
 070ad  evt_or_mine                 28    0  |     evenement_b fiche_heros_courant
 070c9  evt_coffre_200               9    0  |     
 070d2  prend_lame_esprit           15    0  |     fiche_heros_courant

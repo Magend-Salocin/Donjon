@@ -34,7 +34,7 @@ Tout passe par un octet, `commandes` (DS:3992), remis à zéro et recalculé à 
 | 0x04, 0x08 | gauche, droite |
 | 0x10 | bouton gauche (clic) |
 | 0x20 | bouton droit |
-| 0x40 | rôle à trouver (posé quand l'octet de la touche DS:392F est actif) |
+| 0x40 | touche Ctrl (code 1Dh, octet DS:392F de `etat_touches`) : quitter la partie ou le jeu |
 
 `lit_commandes` enchaîne :
 
@@ -83,7 +83,7 @@ Les fichiers graphiques sont chargés dans un tampon (segment 0x1463) puis déco
 | 0 | | arrêt du pilote (en quittant) |
 | 2 | DX segment des données, SI 0 | donne les données au pilote |
 | 3 | DX = CX = numéro du morceau | joue un morceau ; rend une poignée dans DI |
-| 4 | DI poignée | arrête le morceau (?) |
+| 4 | DI poignée | arrête le morceau |
 | 5 | DX numéro | joue un effet (pilote Tandy) |
 | 0Ah | | initialisation |
 | 0Bh | | silence (avec le haut-parleur coupé par le port 61h) |
@@ -95,7 +95,7 @@ Morceaux de GAME&FX.ALB : 0 la musique (« ingame », lancée au démarrage par 
 | 2 | `son_pas` | un pas sur trois |
 | 3 | `son_porte` | une porte s'ouvre |
 | 5 | `son_monstre_touche`, `son_monstre_tue` | gros plan du combat |
-| 6 | `son_des` | dés de déplacement (?) |
+| 6 | `son_des` | dés de déplacement |
 | 8 | `son_clic` | clic sur un bouton |
 | 9 | `son_sort`, `son_piege` | sort lancé, piège déclenché |
 
@@ -103,7 +103,7 @@ Avec le pilote 0, chaque effet est une suite de notes jouées directement sur le
 
 GAME&FX.ALB (18 008 octets) et .RLD (26 312 octets) ont le même début : un mot (somme de contrôle ?), 1 (un seul morceau nommé ?), le nom « ingame » sur 20 octets, puis 50 (0x32) et une liste de numéros 0, 1, 2, 3, 4, 5, 6, 5, 6, 7… qui ressemble à l'ordre des motifs d'un module. Le .RLD contient aussi les noms des sons MT-32 (« 4matchip3 », « harpsi 1 »…). Le format reste à décoder ; le choix entre décodage, émulation du pilote et capture est la décision D3 de la roadmap.
 
-À faire : `son_musique` (relance de la musique par la lecture des commandes, DS:3956).
+`son_prepare` lance la musique au démarrage (morceau de la table DS:31FE : 0, ou 1 pour Tandy) et les effets sont muets (`son_actif` = 0). `son_musique`, appelée à chaque lecture des commandes, attend la touche F10 : DS:3956 est l'octet de la touche 44h dans `etat_touches` (DS:3912 + 44h), jamais écrit autrement. Au premier appui, elle arrête la musique et active les effets, une fois pour toutes.
 
 ## Mémoire et vidéo
 

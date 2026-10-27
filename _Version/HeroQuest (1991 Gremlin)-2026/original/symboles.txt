@@ -4,7 +4,7 @@
 #   adresse : hexadécimal ; pour var et table, offset dans DS.
 # Enrichir ce fichier au fil de l'étude, puis relancer outils/desassembler.py.
 
-0x0000  code  ecran_shields          non appelée : écran SHIELDS (EGA) ; reste d'une version antérieure (?)
+0x0000  code  ecran_shields          non appelée : protection contre la copie (écran SHIELDS, EGA) : bouclier tiré au hasard, code saisi par saisie_nombre, erreur_fichier = FFFFh si faux
 0x00ed  code  demarrage              point d'entrée : DS = 0x097C, réduit la mémoire (int 21h AH=4Ah)
 0x0936  code  attaque_heros          le héros attaque : crânes (DS:3FB8 dés) contre boucliers noirs du monstre (DS:3FBB dés)
 0x0be6  code  affiche_des            affiche un résultat de dés (icône BX, position BP)
@@ -54,8 +54,8 @@
 # ---- Socle : son (pilote ADLIB.DRV, TANDY.DRV... appelé par int 60h)
 0x47a6  code  son_charge_pilote      réserve la mémoire et charge le pilote choisi par DS:3192 (tables DS:31F0, DS:31D0)
 0x476e  code  son_arret              int 60h AX=0Bh, coupe le haut-parleur (port 61h)
-0x4825  code  son_prepare            int 60h AX=2 puis AX=3 (?)
-0x4850  code  son_musique            lance la musique si DS:3956 = 1 (?)
+0x4825  code  son_prepare            au démarrage : int 60h AX=2 donne les données au pilote (sauf haut-parleur), puis AX=3 lance la musique (morceau DS:31FE : 0, 1 pour Tandy) ; poignée en DS:319C
+0x4850  code  son_musique            une fois la touche F10 enfoncée (DS:3956 = etat_touches + 44h) : coupe la musique (int 60h AX=4) et active les effets (son_actif = 1), une seule fois
 0x2827  code  son_porte              porte ouverte : morceau 3 (AdLib, MT-32), 8 (Tandy), bip sinon
 0x2a48  code  son_clic               clic d'interface : morceau 8 (AdLib, MT-32), 6 (Tandy)
 
@@ -214,7 +214,7 @@
 0x409e  var   heros_selectionne      0 à 3 ; FF = aucun
 0x44a0  table heros_en_jeu           4 octets, FF = en jeu
 0x45d7  table noms_heros             pointeurs vers les noms des 4 héros
-0x434b  table noms_types             pointeurs vers les noms des types de héros (barbare, nain...) (?)
+0x434b  table noms_types             5 pointeurs vers les noms des types en anglais, en dur : BARBARIAN, DWARF, ELF, WIZARD, RAGNAR (armurerie)
 0x4394  table corps_depart           points de corps de départ de chaque héros
 0xaa22  table zones_heros            9 zones : 4 portraits, 4 boutons, flèche de retour
 0xaa6c  table saut_heros             routines des zones de l'écran des héros
@@ -237,7 +237,7 @@
 0x40f9  table deplacements           4 routines, une par direction
 0x2c74  code  action_sort            icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
 0x2d84  code  retire_sort            efface le bit du sort lancé (+0x0B / +0x0C de la fiche) et le sort choisi (+0x16)
-0x4387  table proprietes_sorts       un octet par sort (1 à 12) : bit 1 cible un personnage, bit 2 un ennemi (?)
+0x4387  table proprietes_sorts       un octet par sort (1 à 13) : bit 0 cible un personnage, bit 1 un monstre, bit 2 une case vide (jamais posé) ; valeurs 1 ou 3
 0xad67  var   mode_inventaire        0 catégories, 1 armes et armures, 2 potions, 3 artefacts, 5 sorts
 0x3faf  var   objet_choisi
 
@@ -300,7 +300,7 @@
 
 # ---- Combat (voir original/notes/03-regles.md#monstres)
 0x4806  table types_monstres         5 octets par type (0 à 26) : déplacement, dés d'attaque, dés de défense, routine de mort
-0x47ff  table des_armes              7 armes (indice 6 - bit) : bits 0-1 dés - 1, bits 4-7 portée (?)
+0x47ff  table des_armes              7 armes (indice 6 - bit) : bits 0-1 dés - 1 (0 garde +0x14) ; les bits hauts ne sont jamais lus
 0x0b28  code  calcule_des_monstre            dés d'attaque (DS:3FBA) et de défense (DS:3FBB) du monstre DS:3FD4
 0x0b44  code  bonus_attaque_heros    Sorcier-Roi sans la lame de l'esprit : 0 dé ; +2 force, +2 courage (consommés)
 0x0b8b  code  calcule_defense_heros      +0x15, armures, bouclier, casque, ténacité, peau de pierre -> DS:3FB9
@@ -324,7 +324,7 @@
 0x6906  code  ajoute_or              ajoute DX pièces au héros courant (rien si l'or atteint déjà 9999)
 0x690a  code  ajoute_or_di           même chose pour la fiche DI
 0x3fbd  var   heros_sortis           nombre de héros sortis (quête 1)
-0x3fbe  var   coffres_rapportes      quête 4 : coffres d'or rapportés (3 en tout) (?)
+0x3fbe  var   coffres_ramasses       coffres d'or ramassés : 3 du prince Magnus (evt_coffre_magnus, DS:44D9), 2 de evt_coffre_course (DS:44DF)
 0x3fe7  var   fin_du_jeu             posé : écran final après la 15e quête ; posé par la mort du type 26 (mort_sorcier_final)
 
 # ---- Pièges (voir original/notes/03-regles.md#pièges)
@@ -405,7 +405,7 @@
 0x0785  etiq  ouvre_portes           icône : ouvre les portes de la case du héros (sub_07c0)
 0x07c0  code  ouvre_portes_case      pose le bit 0x04 des portes non secrètes autour de la case et révèle l'autre côté
 0x0790  code  porte_reveille         quêtes 5 et 16 : la porte en (5, 3-4) réveille le monstre 1
-0x0cb3  code  mode_regarder          informations sous le curseur, jusqu'à un clic sur la zone d'annulation (?)
+0x0cb3  code  mode_regarder          carte avec viseur : nomme ce qui est sous le curseur, jusqu'au bouton droit ou à un clic sur l'icône d'annulation
 0x48a0  etiq  pas_gauche
 0x4968  code  pas_droite
 0x4a2f  code  pas_haut
@@ -444,7 +444,7 @@
 0x28f9  code  son_pas                un pas sur trois : morceau 2 ; Tandy 0
 0x2964  code  son_sort               morceau 9 ; Tandy 1
 0x2aa7  code  son_piege              morceau 9 ; Tandy 4
-0x2b06  code  son_des                dés de déplacement (?) : morceau 6 ; Tandy 5
+0x2b06  code  son_des                dés de déplacement (appelée par affiche_deplacement) : morceau 6 ; Tandy 5 ; haut-parleur : deux notes en alternance
 0x2b8e  code  son_bip                haut-parleur (pilote 0) : AH, BH, CX, BP règlent la note et sa durée
 0x3199  var   son_actif
 0x319a  var   seg_son_donnees        GAME&FX.ALB ou .RLD
@@ -453,7 +453,7 @@
 0x31a0  table son_pilotes            noms : beeper.drv, adlib.drv, mt32.drv, tandy.drv
 0x31d0  table son_fichiers           données de chaque pilote : -, game&fx.alb, game&fx.rld, -
 
-# ======== Phase 1 : routines nommées le 27 octobre 2026 (hypothèses marquées (?))
+# ======== Phase 1 : routines nommées et relues le 27 octobre 2026
 
 # ---- Vue de la zone (voir original/notes/02-ecrans.md)
 0x0526  code  redessine_vue          fond, vide sprites_vue et le cache de meubles (DS:0E58, DS:0E5A), affiche_zone_heros, portrait, icônes, sauve_tampon, place_personnages ; DS:3F97 et DS:3F99 remis à 0
@@ -468,9 +468,9 @@
 0x13c1  code  sprite_occupant        occupant de la case DS:3FDE + 0x200 : monstre (code < 0x30, image +8 dans MONSTERS) ou meuble (0x4B et plus, prepare_meuble) ; rien pour 0x30 à 0x4A
 0x13f2  code  place_sprite_case      position du sprite SI sur la case index_case_courante (position_cases, ancré en bas, position_sprite_case) ; profondeur +1 = 3 × index + 1
 0x3f97  var   vue_a_refaire          posé quand le plateau change (portes, rocher, escalier, inventaire) : tour_personnage appelle alors redessine_vue
-0x3f9e  var   zone_nouvelle          (?) FFh quand revele_zone vient de révéler la zone, sinon NOT zone
+0x3f9e  var   zone_nouvelle          FFh quand revele_zone révèle la zone pour la première fois, sinon NOT zone ; jamais nul, si bien que affiche_zone_heros révèle toujours les monstres de la zone
 0x0e58  var   meuble_cache           code du meuble dont l'image est décompressée en DS:0E5C (0 = aucun)
-0x0e5a  var   meuble_cache_2         code du meuble en DS:1FF0 ; jamais écrit, ce second cache ne sert pas (?)
+0x0e5a  var   meuble_cache_2         code du meuble en DS:1FF0 ; jamais écrit : le second cache ne sert pas
 0x40cc  var   direction_pas          direction du pas en cours (0 à 3), FFh aucune
 0x40cd  table images_direction       4 pointeurs (un par direction) vers 5 numéros d'image (un par personnage)
 0x49d6  table ordre_cases_vue        30 décalages (dy × 26 + dx) des cases de la fenêtre 6 × 5, dans l'ordre de dessin (du fond vers l'avant)
@@ -490,7 +490,7 @@
 0x3fad  var   case_vide_designee     1 : case sans occupant désignée pendant un sort
 0x3fae  var   sort_en_cours          1 pendant le choix de la cible d'un sort
 0x3fb5  var   heros_designe          type (+0x19) du personnage sous le curseur, FFh aucun
-0x3fc9  var   proprietes_sort        proprietes_sorts du sort choisi : 1 personnage, 2 monstre, 4 case vide (?)
+0x3fc9  var   proprietes_sort        proprietes_sorts du sort choisi : bit 0 personnage, bit 1 monstre, bit 2 case vide
 0x3fd0  var   case_designee          pointeur dans grille_occupants de la case sous le curseur
 0x4095  var   colonne_curseur        x de la case sous le curseur
 0x4096  var   ligne_curseur          y de la case sous le curseur
@@ -514,11 +514,11 @@
 # ---- Tour d'un personnage et attaque
 0x06d0  code  evenements_et_piege    evenements_tour, puis declenche_piege
 0x0788  code  teste_porte_reveille   porte_reveille en gardant AX et DI (appelée par les 4 pas)
-0x0b03  code  fin_tir                (?) non appelée : perd_arme_lancee, puis AL = 0
-0x0b09  code  perd_arme_lancee       (?) retire l'arme en main de +0x0E et +0x11 si attaque_a_distance a le bit 0x20, jamais posé : code mort
-0x0c92  code  image_par_table        (?) non appelée : BX = DS:34FE, puis fin de image_personnage (image d'un personnage par xlat)
+0x0b03  code  fin_tir                non appelée : perd_arme_lancee, puis AL = 0
+0x0b09  code  perd_arme_lancee       code mort : retire l'arme en main de +0x0E et +0x11 si attaque_a_distance a le bit 0x20, qui ne vaut que 0 ou 1 ; seule fin_tir (morte) l'appelle
+0x0c92  code  image_par_table        non appelée : BX = DS:34FE, puis fin de image_personnage (image d'un personnage par xlat)
 0x1124  code  pause_250              attente : temporise avec CX = 250 (boucle de 1000 tours par unité)
-0x112a  code  retire_or_mine         (?) non appelée : avant la quête code 15, retire l'or de la mine (+0x0F bit 0x20) de la fiche DI
+0x112a  code  retire_or_mine         non appelée : avant la quête code 15, retire l'or de la mine (+0x0F bit 0x20) de la fiche DI
 
 # ---- Plateau : grille et cases (voir original/notes/03-regles.md)
 0x1602  code  adresse_case           BX = adresse de la case (CL = x, CH = y) dans grille_zones (lignes DS:5AC5), AL = sa zone (bits 0-5) ; revele_zone y aboutit avec le coin de la zone
@@ -533,7 +533,7 @@
 # ---- Plateau : dessin de la vue (sprites, sols, murs, portes)
 0x14fc  code  image_personnage_sprite sprite SI : largeur, hauteur (+6) et position (+0x0C) de l'image AL (images_personnages)
 0x1620  code  position_sprite_case   sprite SI sur la case index_case_courante (position_cases) : y = y case + 18 - hauteur, x = x case + 26 - largeur ; position écran en +0x10
-0x1652  code  sprite_porte_case      non appelée : sprite 24 × 44 de GRAPHICS (source DX) sur la case courante, décalage (CH, CL) et ordre AL écrits dans son propre code ; doublon de sprite_porte (?)
+0x1652  code  sprite_porte_case      non appelée : sprite 24 × 44 de GRAPHICS (source DX) sur la case courante, décalage (CH, CL) et ordre AL écrits dans son propre code ; doublon de sprite_porte
 0x16a5  etiq  portes_avant_case      portes du côté droit ([+1] bit 0x10) et du bas ([+0x1A] bit 0x20) de la case, en sprites (sprite_porte), devant les personnages ; porte secrète non trouvée (bits 0x0C = 8) omise
 0x16f2  etiq  murs_case              murs et portes du haut (0x80, 0x20) et de gauche (0x40, 0x10) de la case courante, copiés dans le tampon ; images de portes DS:4A31 (haut), DS:4A41 (gauche) ; porte secrète non trouvée dessinée en mur
 0x1776  code  copie_mur_gauche       image DX (24 × CX) en (x, y - 39) de la case (DS:3FE2), dans le tampon
@@ -548,14 +548,14 @@
 0x447a  table murs_gauches           2 images de mur gauche (0x7E00, 0x82E0)
 0x447e  table murs_hauts             2 images de mur haut (0x87C0, 0x8CA0)
 0x4482  table variante_mur           30 octets, 0 ou 1 : variante de mur de chaque case de la vue (index_case_courante)
-0x4a31  table images_portes_haut     image de porte du haut selon les bits 0x0C de l'octet de murs (?)
-0x4a41  table images_portes_gauche   même chose pour la porte de gauche (?)
+0x4a31  table images_portes_haut     image de la porte du haut, indexée par les bits 0x0C de l'octet de murs : 0 fermée (95A0h), 4 ouverte (9DE0h), 0Ch secrète révélée (B6A0h, une ligne plus bas) ; 8 (secrète cachée) donne un mur
+0x4a41  table images_portes_gauche   même chose pour la porte de gauche : 0 fermée (9180h), 4 ouverte (99C0h), 0Ch secrète révélée (B280h)
 
 # ---- Carte de la quête (parchemin MAPS, tuiles 8 × 8)
 0x1a50  code  dessine_carte          parchemin MAPS 256 × 197 en (32, 2), puis grille 26 × 19 de tuiles 8 × 8 depuis (56, 16) : sols, murs, bords droit (tuile 0x22) et bas (0x21), occupants, puis les 5 personnages (icône DS:52A1 par type)
 0x1bb5  code  sol_carte              case vue (bit 0x40) d'une zone : tuile de sol de la zone (table DS:A599)
 0x1bca  code  murs_carte             case vue : tuile de murs (octet de murs & 0xFE) puis occupant_carte ; case non vue mais bordée (0x80) : seuls les murs partagés avec une case vue ; hors zone : bord 0x81 / 0x41 si la case du haut / de gauche est vue
-0x1c51  code  porte_en_mur_carte     non appelée : bits de porte 0x30 recopiés en bits de mur 0xC0, puis tuile_murs (?)
+0x1c51  code  porte_en_mur_carte     non appelée : bits de porte 0x30 recopiés en bits de mur 0xC0, puis tuile_murs
 0x1c61  etiq  occupant_carte         monstre : icône DS:5265 selon son octet +8 (rien pour 0x15) ; codes 0x30 à 0x3F : DS:51ED + code × 2 ; 0x40, 0x41 : MAPS 0xC9C0, 0xC980 ; meubles : liste de tuiles DS:521F + code × 2
 0x1d0f  code  tuile_murs             AL = octet de murs -> tuile (table DS:5148), puis tuile_carte
 0x1d13  code  tuile_carte            tuile AL (MAPS 0xC500 + AL × 64, 8 × 8) en DS:37EB
@@ -565,7 +565,7 @@
 0x37eb  var   position_tuile_carte   position dans le tampon de la tuile à dessiner (dessine_carte)
 0x37ed  var   ligne_carte            rangée en cours (dessine_carte) ; ailleurs mot temporaire (séquence du héros dans animation_combat, message de ouvre_porte_secrete)
 0x37ef  var   colonne_carte          colonne en cours (dessine_carte)
-0x3fb0  var   carte_simplifiee       (?) seulement remis à 0 (portee_attaque) : le cas non nul (monstres en icône MAPS 0x489C, personnage courant masqué) ne sert pas
+0x3fb0  var   carte_simplifiee       toujours 0 (seulement remis à 0 par portee_attaque, 0 au chargement) : le cas non nul de dessine_carte (monstres en icône MAPS 0x489C, personnage courant masqué) est mort
 0x5148  table tuiles_murs_carte      tuile de la carte selon l'octet de murs (xlat)
 0xa599  table tuiles_sols_carte      tuile de sol de chaque zone sur la carte (xlat), juste après sols_zones
 0x51ed  table tuiles_codes_carte     image MAPS des codes 0x30 à 0x3F, indexée par code × 2 (début effectif DS:524D) ; 0 = rien
@@ -599,7 +599,9 @@
 0x3ffb  table chemin_pile            directions du chemin en cours d'exploration
 0x4013  table chemin_trouve          directions du meilleur chemin
 0x40f1  table murs_pas               4 tests de mur, un par direction (0x2F34 haut, 0x2F5A droite, 0x2F7C bas, 0x2F9E gauche)
-0x0e11  var   case_exclue            (?) case de murs exclue du chemin, posée par pas_fait, FFFFh en début de tour
+0x0e11  var   case_avant_porte       case (grille des murs) que le héros quittait en franchissant une porte ce tour, posée par pas_fait ; exclue du chemin (pas_permis) et des cases cliquables ; FFFFh en début de tour
+0x0e0f  var   case_apres_porte       case où le héros est entré par une porte ce tour : les pas refusent d'en repasser une depuis elle ; FFFFh en début de tour
+0x3eb4  var   porte_franchie         posé par un pas qui franchit une porte, lu et remis à 0 par pas_fait
 
 # ---- Gros plan du combat
 0x20bb  code  animation_attaque_monstre gros plan d'un monstre qui frappe : séquence du héros DS:A3AC (survit) ou DS:A3D9 (points de corps à 0), séquence du monstre DS:A1C9 par classe, puis suite d'animation_combat (0x1FBF)
@@ -615,7 +617,7 @@
 0x35e2  code  touche_enfoncee        première touche à 1 dans etat_touches : AH code clavier, AL ASCII (table DS:399D) ; AX = 0 sinon
 0x373a  table saut_caractere         affiche_caractere selon mode_video : 4 Tandy 0x31A3, 6 EGA 0x32E0, 8 VGA 0x34BC
 0x3113  table police                 8 octets par caractère, indexée par le code (0x20 et plus)
-0x377f  table couleurs_texte         couleur -> octet de pixels (index de couleur_texte ; branche Tandy) (?)
+0x377f  table couleurs_texte         couleur -> octet de 2 pixels de 4 bits (00h, 11h... FFh), branche Tandy de affiche_caractere
 0x3750  var   couleur_texte          encre de affiche_texte, code 10 octet 1 (Tandy : 0x38 devient 5)
 0x3751  var   couleur_fond           fond de affiche_texte (code 10 octet 2) ; couleur de efface_ecran
 0x3752  var   texte_colonne          0 à 39 (8 pixels)
@@ -626,11 +628,11 @@
 0x399d  table ascii_touches          code clavier -> ASCII (2 = « 1 »...), lu par touche_enfoncee
 
 # ---- Socle : vidéo (tables de saut indexées par mode_video : 0 et 2 vides, 4 Tandy, 6 EGA, 8 VGA)
-0x3640  code  efface_ecran           remet la position du texte (DS:3752, DS:3754) à 0 et remplit A000 ; 3 versions (table DS:3744) : VGA et EGA avec la couleur DS:3751, Tandy avec AX = mode_video (?)
+0x3640  code  efface_ecran           remet la position du texte à 0 et remplit A000 ; table DS:3744 : VGA avec couleur_fond, EGA avec couleur_fond mais 200 mots seulement, Tandy avec AX = mode_video (4)
 0x36a0  code  attend_retour_vertical attend le début du retour de trame (port 3DAh bit 3)
 0x468f  code  attend_trame           attend le début puis la fin du retour de trame, sur le port d'état DS:3A82
 0x46ab  code  lit_ports_video        DS:3A80 = port du CRTC lu dans le BIOS (0040:0063), DS:3A82 = ce port + 6 (état)
-0x3adc  code  adresse_ega            DI (y × 320 + x) -> DS:37FB = y × 160 + x / 8, DS:37F9 = x & 7 ; ligne du tampon EGA = 4 plans × 40 octets (?)
+0x3adc  code  adresse_ega            DI (y × 320 + x) -> DS:37FB = y × 160 + x / 8, DS:37F9 = x & 7 : 160 octets par ligne, soit 4 plans de 40 octets
 0x3b17  code  adresse_tandy          DI (y × 320 + x) -> DS:37FB = début de ligne (table DS:3A8B) + x / 2, DS:37F9 = 1 si x impair
 0x40d8  code  copie_image_opaque     comme copie_image, mais sans transparence (l'octet 0 est copié) ; 3 versions (table DS:3730 : 40E1 Tandy, 43B2 EGA, 43EA VGA) ; non appelée directement
 0x58b5  code  restaure_tampon        inverse de sauve_tampon : recopie le segment DS:5E35 dans le tampon (64 000 octets en VGA, 32 000 sinon)
@@ -670,14 +672,14 @@
 
 # ---- Plateau et tour de jeu
 0x56d0  code  plateau_ciblage        dessine la carte (dessine_carte) ; curseur = viseur (image 0x2D20) ; si carte_cible, icône d'annulation en (224, 180) et transition affiche_tampon_rideau ; sauve et affiche le tampon
-0x5b8d  code  bords_zone             case DS:3FDE en cours de dessin : liseré 16 × 6 (ODDS&SOD, table DS:4101) sur chaque côté sans mur ni porte qui donne sur une autre zone non nulle, sauf vers l'occupant 30h (?)
+0x5b8d  code  bords_zone             case DS:3FDE en cours de dessin : liseré 16 × 6 (ODDS&SOD, table DS:4101) sur chaque côté sans mur ni porte qui donne sur une autre zone non nulle, sauf si la voisine porte un éboulis (30h)
 0x58f4  code  fleches_deplacement    état des 4 flèches (icônes DS:42BF) : 0Bh si le pas est possible (bord, mur sauf traversée de la roche, porte fermée ou secrète, occupant 0 ou 32h-3Fh), 1 sinon
 0x5ab1  code  icones_etat            met CX icônes à partir de DI à l'état AL, à redessiner
 0x5a72  code  fleches_grisees        les 4 flèches à l'état 1 ; non appelée
 0x5d7f  code  fiche_personnage       SI = fiche du personnage AL (table DS:4341)
 0x4daa  code  tire_teleport          quête 10 : téléport tiré par deux dés (0-5 + 0-5) dans teleports_chateau, dont la zone diffère de l'octet +3 de la fiche DI
-0x5711  code  image_cible            image du monstre DS:3FD4 (type +8, table DS:45BA, MONSTERS) ; non appelée (?)
-0x5737  code  image_personnage       image du personnage courant (table DS:45B5, SHOPSP) ; non appelée (?)
+0x5711  code  image_cible            non appelée : image du monstre DS:3FD4 (type +8, table DS:45BA, MONSTERS)
+0x5737  code  image_personnage       non appelée (sa fin sert à image_par_table, morte aussi) : image du personnage courant (table DS:45B5, SHOPSP)
 
 # ---- Dés de déplacement
 0x4f9b  code  image_des              image suivante (DS:4B6F, 0 à 3) de l'animation des dés, 32 × 32 en (157, 162) ; sur l'image 0, son_des et affiche_deplacement
@@ -713,7 +715,7 @@
 0x3f91  var   carte_cible            1 : carte ouverte pour désigner une case (mode_attaque, mode_regarder, action_sort) ; icône d'annulation dessinée par plateau_ciblage
 0x3f99  var   sprites_figes          non nul : sprites ni animés ni dessinés ; 1 après redessine_plateau, 0 après redessine_vue
 0x3fde  var   case_dessinee          pointeur de la case en cours de dessin, dans la grille des murs (grille_zones + 200h)
-0x3fe9  var   sans_sprites           1 : affiche_message ne redessine pas les sprites (?)
+0x3fe9  var   sans_sprites           1 : affiche_message ne dessine ni les sprites ni les valeurs du panneau (carte, menus, écrans hors de la vue)
 0x4b6f  var   image_des_courante     0 à 3
 
 # ---- Socle : vidéo et affichage (voir original/notes/02-ecrans.md#affichage)
@@ -743,7 +745,7 @@
 0x8a70  code  dessine_boite_message  fond de la boîte (ODDS&SOD 0x58A0, 0x58E0, 0x5920, 8 × 8), texte DS:AD39, boutons, barres DS:AD20 et DS:AD22 ; hors des barres, le fond sauvé est restauré ; affiche le tampon sauf en attente (DS:AD3B)
 0x8b7d  code  restaure_boite         restaure_lignes sur toute la boîte : DS:AD2A lignes depuis DS:AD2D
 0x8b85  code  restaure_lignes        recopie CX lignes en DI, sur la largeur de la boîte (DS:AD28), depuis la copie DS:5E35 vers le tampon (0x6273)
-0x8b95  code  dessine_rouleau        barre horizontale à la ligne AX : bouts ODDS&SOD 0x55A0 et 0x57A0, milieu 0x56A0 (16 × 16) ; rouleau du parchemin qui s'ouvre (?)
+0x8b95  code  dessine_rouleau        barre du parchemin à la ligne AX (rouleau_haut ou rouleau_bas) : bouts ODDS&SOD 0x55A0 et 0x57A0, milieu 0x56A0 (16 × 16)
 0xad20  var   rouleau_haut           ligne de la barre du haut ; s'écarte de 4 pixels par étape à l'ouverture
 0xad22  var   rouleau_bas            ligne de la barre du bas
 0xad37  var   boutons_message        pointeur sur les boutons du message en cours
@@ -761,7 +763,7 @@
 0x6554  code  affiche_corps_esprit   un chiffre pour +6 (corps) et +7 (esprit) de la fiche, texte DS:44F1
 0x65c1  code  init_sprites_icones    vide les 14 sprites (DS:4BC6), les 10 premiers en 24 × 40 avec SHOPSP ; recopie les 12 icônes de DS:41FF (10 octets) dans icones_panneau
 0x661c  code  affiche_nom_portrait   nom du personnage courant (noms_heros) et son portrait 32 × 45 d'ODDS&SOD (table DS:41E9) en (0, 12)
-0x6680  code  dessine_icones_fiche   4 images 16 × 16 d'ODDS&SOD : 0x5F20 en (40, 11), 0x5D20 en (40, 30), 0x5E20 en (96, 11), 0x6020 en (96, 30), à côté de l'or, du déplacement, du corps et de l'esprit (?)
+0x6680  code  dessine_icones_fiche   4 icônes 16 × 16 d'ODDS&SOD à gauche des valeurs du panneau : 0x5F20 or (40, 11), 0x5D20 déplacement (40, 30), 0x5E20 corps (96, 11), 0x6020 esprit (96, 30)
 0x6eb0  code  redessin_plateau       DS:3F97 = 1 : la boucle du tour redessine tout le plateau (redessine_vue)
 0x44e3  table texte_or               11h 2 7, puis 4 chiffres de l'or
 0x44eb  table texte_deplacement      11h 4 7, puis 2 chiffres du déplacement restant
@@ -787,7 +789,7 @@
 0x6dd7  code  monstre_actif_case     pour monstre_dans_zone : si la case BX porte un monstre dont +6 a un bit autre que 1, DS:3FC7 = 1 ; bogue : décrémente AL avant adresse_monstre, qui le décrémente aussi, donc teste le monstre n - 1
 0x72f4  code  ouvre_porte_secrete    porte secrète voisine trouvée : bit 0x04, zone révélée (revele_derriere_porte), DS:37ED = 1 (message « UNE PORTE SECRETE S'OUVRE »), DS:3FCB = 1
 0x94f7  code  eau_benite_case        si la case BX porte un squelette, un zombi ou une momie (type 4, 5, 6) : retire_monstre et choix_menu + 1 (compte des morts)
-0x93b1  code  choix_arme_mort        code mort entre choix_arme et choix_artefact : arme DL en +0x11 et +0x14 masqué à 7 (?)
+0x93b1  code  choix_arme_mort        code mort entre choix_arme et choix_artefact : arme DL en +0x11 et +0x14 masqué à 7
 
 # ---- Écran des héros
 0x7895  code  choisit_heros_2        heros_selectionne = 1, commandes du joueur 2 (DS:3196)
