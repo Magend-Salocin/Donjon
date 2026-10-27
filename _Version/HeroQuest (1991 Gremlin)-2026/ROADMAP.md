@@ -29,7 +29,7 @@ Ordre proposé, du socle vers le jeu :
 
 Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (installé, voir [DEBOGUER.md](outils/DEBOGUER.md)) : points d'arrêt, lecture du segment de données.
 
-Reste de la phase 1 : confirmer au débogueur les lignes marquées (?) de `symboles.txt` et les bogues supposés, notés « à vérifier » dans les notes (ligne de vue vers le haut et blocage des tirs, cache des meubles, `monstre_actif_case`, joystick B, chemin des monstres).
+Bogues vérifiés dans le code le 27 octobre (ligne de vue vers le haut, mur manqué et blocage des tirs, cache des meubles, `monstre_actif_case`, joystick B, chemin des monstres) : voir les notes. Reste de la phase 1 : les 34 lignes marquées (?) de `symboles.txt`.
 
 Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (379 sur 379 au 27 octobre : toutes ont un nom, une partie reste marquée (?) ; 0x5EB0 n'est plus comptée, c'est un fragment mort de `curseur_dessine`). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
 

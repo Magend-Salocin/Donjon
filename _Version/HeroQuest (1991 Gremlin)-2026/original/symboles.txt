@@ -509,7 +509,7 @@
 0x3fa5  var   trace_x                case courante du tracé
 0x3fa6  var   trace_y
 0x3fb2  var   ligne_libre            1 si la ligne de vue vers la cible est libre (écrit seulement)
-0x4946  table occupants_vue          résultat de case_coupe_vue par code d'occupant ; seuls les codes 0x40 à 0x5F tombent dans une table de 0 et 1 (?)
+0x4946  table occupants_vue          résultat de case_coupe_vue, indexé par le code brut ; cohérente pour 0x40 à 0x5F seulement, monstres et codes 0x30 à 0x3F lisent les tables voisines (bogue)
 
 # ---- Tour d'un personnage et attaque
 0x06d0  code  evenements_et_piege    evenements_tour, puis declenche_piege
@@ -577,7 +577,7 @@
 0x2702  code  vue_alignee            cases vues dans les 4 directions depuis le héros courant jusqu'au premier mur ou porte fermée ; monstres croisés activés ; rien quand numero_quete = 9 (château des mystères)
 0x2723  code  vue_direction          lance la routine BX (DS:409C) depuis la case du héros ; en colonne 12 ou 13, aussi depuis l'autre colonne (couloirs centraux de 2 cases ?)
 0x2740  code  vue_depuis_case        CH = y du héros, BX = adresse_case, saute à la routine DS:409C
-0x274f  etiq  vue_haut               vers le haut ; s'arrête si x = 0 au lieu de y = 0 (bogue ?)
+0x274f  etiq  vue_haut               vers le haut ; bogue : teste x = 0 au lieu de y = 0, rien vers le haut en colonne 0
 0x277a  code  vue_bas                vers le bas jusqu'à y = 18
 0x27a6  code  vue_gauche             vers la gauche jusqu'à x = 0
 0x27cf  code  vue_droite             vers la droite jusqu'à x = 25
@@ -784,7 +784,7 @@
 
 # ---- Actions et événements pendant une quête
 0x6956  code  charge_maps            recharge MAPS.VGA (ou MAPS.EGA) dans l'image annexe, en redemandant la disquette 3 si besoin ; après un combat
-0x6dd7  code  monstre_actif_case     pour monstre_dans_zone : si la case BX porte un monstre dont +6 a un bit autre que 1, DS:3FC7 = 1 ; décrémente AL avant adresse_monstre, qui le décrémente aussi (bogue ?)
+0x6dd7  code  monstre_actif_case     pour monstre_dans_zone : si la case BX porte un monstre dont +6 a un bit autre que 1, DS:3FC7 = 1 ; bogue : décrémente AL avant adresse_monstre, qui le décrémente aussi, donc teste le monstre n - 1
 0x72f4  code  ouvre_porte_secrete    porte secrète voisine trouvée : bit 0x04, zone révélée (revele_derriere_porte), DS:37ED = 1 (message « UNE PORTE SECRETE S'OUVRE »), DS:3FCB = 1
 0x94f7  code  eau_benite_case        si la case BX porte un squelette, un zombi ou une momie (type 4, 5, 6) : retire_monstre et choix_menu + 1 (compte des morts)
 0x93b1  code  choix_arme_mort        code mort entre choix_arme et choix_artefact : arme DL en +0x11 et +0x14 masqué à 7 (?)

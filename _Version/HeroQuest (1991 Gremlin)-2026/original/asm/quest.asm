@@ -4534,7 +4534,7 @@ loc_2736:
 02747  59                   pop cx
 02748  bd 9c 40             mov bp, 0x409c
 0274b  3e ff 66 00          notrack jmp word ptr ds:[bp]
-vue_haut:    ; vers le haut ; s'arrête si x = 0 au lieu de y = 0 (bogue ?)
+vue_haut:    ; vers le haut ; bogue : teste x = 0 au lieu de y = 0, rien vers le haut en colonne 0
 0274f  e8 a7 00             call marque_case_ligne
 02752  81 c3 00 02          add bx, 0x200
 02756  0a c9                or cl, cl
@@ -13265,7 +13265,7 @@ loc_6dd0:
 06dd6  c3                   ret
 
 ; ======== monstre_actif_case   (appelée depuis 6dcd)
-; pour monstre_dans_zone : si la case BX porte un monstre dont +6 a un bit autre que 1, DS:3FC7 = 1 ; décrémente AL avant adresse_monstre, qui le décrémente aussi (bogue ?)
+; pour monstre_dans_zone : si la case BX porte un monstre dont +6 a un bit autre que 1, DS:3FC7 = 1 ; bogue : décrémente AL avant adresse_monstre, qui le décrémente aussi, donc teste le monstre n - 1
 06dd7  80 c7 04             add bh, 4
 06dda  8a 07                mov al, byte ptr [bx]
 06ddc  0a c0                or al, al

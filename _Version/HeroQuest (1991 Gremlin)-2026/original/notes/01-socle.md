@@ -58,7 +58,7 @@ Le clavier est lu par un gestionnaire d'interruption propre au jeu : `clavier_in
 
 Attentes : `attend_commande` (une commande quelconque), `attend_relache` (plus aucune), `attend_bouton_droit` (le bouton droit seul, puis son relâchement), `attend_clic` (bit 0x10), `attend_relache_boutons` (bits 0x10 et 0x20 à 0), `attend_touche` (une touche, puis son relâchement).
 
-Bogue probable du joystick B : `etalonne_joystick` met `masque_joystick` (DS:320A) à C0h, qui ne garde que les bits des boutons et pas ceux des axes (0Ch). `joystick_position` boucle alors, interruptions coupées, jusqu'à l'appui des deux boutons B. À vérifier au débogueur.
+Bogue du joystick B (vérifié dans le code) : si l'on appuie sur un bouton du joystick B à l'étalonnage, `etalonne_joystick` met `masque_joystick` (DS:320A) à C0h. Ce masque garde les bits des boutons (6 et 7) au lieu de ceux des axes (2 et 3, soit 0Ch). `joystick_position` boucle, interruptions coupées, tant que les deux boutons B ne sont pas enfoncés : le jeu se fige, et le centre reste à 0.
 
 ## Fichiers
 

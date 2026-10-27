@@ -215,7 +215,7 @@ Les 12 sorts du jeu de plateau, numérotés par élément, trois par trois. Leur
 
 Écart avec le jeu de plateau : la résistance au sommeil et aux sorts de feu se joue sur un ou deux dés de combat (bouclier blanc), et non sur les points d'esprit de la cible.
 
-Les sorts sont sans effet sur le Sorcier-Roi : avant l'effet, le jeu teste le type de la cible (champ +9 du monstre : 0x0C ou 0x0D avant la quête 15 du code, 0x0E ensuite) et affiche « CE SORT N'A AUCUN EFFET SUR UN ENNEMI ».
+Les sorts sont sans effet sur le Sorcier-Roi : avant l'effet, le jeu teste le type de la cible (champ +9 du monstre : 0x0B ou 0x0C avant la quête 15 du code, 0x0E ensuite) et affiche « CE SORT N'A AUCUN EFFET SUR UN ENNEMI ».
 
 `action_sort` (0x2C74), quand l'icône des sorts (icône 11) est enfoncée :
 
@@ -231,12 +231,12 @@ Il faut voir la cible ([ligne de vue](#ligne-de-vue)), sauf pour les sorts 6, 9 
 
 Deux mécanismes distincts.
 
-**Vers une cible** (tir et sorts) : `ligne_de_vue` (0x1148) trace une ligne de type Bresenham du héros à la case visée, une case à la fois sur l'axe le plus long. `case_coupe_vue` teste le mur du haut (masque 0xAC) ou de gauche (0x5C) de chaque case ; une porte ne laisse voir que si elle est ouverte (bit 0x04). `resultat_vise` vaut 0 si la ligne est libre ; `portee_attaque` ne refuse le tir que s'il vaut 1 (mur, porte fermée ou personnage). L'occupant de la dernière case n'est pas testé. Points à vérifier au débogueur :
+**Vers une cible** (tir et sorts) : `ligne_de_vue` (0x1148) trace une ligne de type Bresenham du héros à la case visée, une case à la fois sur l'axe le plus long. `case_coupe_vue` teste le mur du haut (masque 0xAC) ou de gauche (0x5C) de chaque case ; une porte ne laisse voir que si elle est ouverte (bit 0x04). `resultat_vise` vaut 0 si la ligne est libre ; `portee_attaque` ne refuse le tir que s'il vaut 1 (mur, porte fermée ou personnage). L'occupant de la dernière case n'est pas testé. Deux bogues, vérifiés dans le code :
 
-- en montant ou vers la gauche, c'est le mauvais mur qui serait testé, et le dernier pas sauté ;
-- l'occupant passe par la table DS:4946 + code, cohérente (0 ou 1) seulement pour les meubles 0x40 à 0x5F : armoires, râteliers et cheminées bloquent, tables et coffres non. Les monstres lisent les données voisines : seuls les monstres 13, 15, 16 et 17 bloqueraient un tir (bogue d'indexation probable).
+- Mur manqué. Le tracé teste toujours le mur du haut (ou de gauche) de la case où il entre. C'est juste en descendant ou vers la droite. En montant ou vers la gauche, le mur franchi est celui de la case qu'il quitte : le jeu teste donc le mur suivant, et saute le dernier test pour ne pas dépasser la cible. Le mur du haut (ou de gauche) de la case du tireur n'est jamais testé : un héros adossé à un mur voit et tire à travers lui vers le haut ou vers la gauche.
+- Occupants. `case_coupe_vue` lit `occupants_vue` (DS:4946) indexée par le code brut de l'occupant. La table n'est cohérente (0 ou 1) que pour les meubles 0x40 à 0x5F : armoires, râteliers et cheminées bloquent, tables et coffres non. Pour un monstre (1 à 32) et pour les codes 0x30 à 0x3F, le jeu lit les tables voisines (`occupants_noms`...), jamais écrites pendant la partie. Le tir n'est refusé que si le résultat vaut 1 : seuls les monstres rangés 13, 15, 16 et 17 dans la quête bloquent un tir, et pièges ni éboulis ne bloquent. Le sort, lui, échoue dès que le résultat n'est pas nul : tout monstre sauf ceux rangés 2, 3, 18, 20 à 23 et 28 à 31, et tous les codes 0x30 à 0x3F, coupent la vue d'un sort.
 
-**Cases alignées** : `vue_alignee` (0x2702), appelée à chaque redessin, marque vues sur la carte les cases alignées avec le héros dans les 4 directions, jusqu'au premier mur ou porte fermée, et réveille les monstres croisés. Rien dans la quête de code 9 (château des mystères). En colonne 12 ou 13, les deux colonnes sont balayées. Bogue probable : vers le haut, le balayage s'arrête sur x = 0 au lieu de y = 0.
+**Cases alignées** : `vue_alignee` (0x2702), appelée à chaque redessin, marque vues sur la carte les cases alignées avec le héros dans les 4 directions, jusqu'au premier mur ou porte fermée, et réveille les monstres croisés. Rien dans la quête de code 9 (château des mystères). En colonne 12 ou 13, les deux colonnes sont balayées. Bogue (vérifié dans le code) : `vue_haut` teste `cl` (x) là où `vue_bas` teste `ch` (y). En colonne 0, le couloir de gauche du plateau, rien n'est révélé vers le haut ; ailleurs, le balayage vers le haut ne s'arrête que sur un mur. Dans les 24 quêtes, il en rencontre toujours un avant de sortir du plateau, même portes ouvertes (vérifié sur les données des quêtes) : pas de lecture hors de la grille.
 
 ## Objets
 
@@ -291,7 +291,7 @@ Sans piège à portée : « IL N'Y A PAS DE PIEGES SUR LESQUELS VOUS POUVEZ UTIL
 1. Le personnage doit exister, être dans la même zone que le monstre et ne pas porter le voile de brume (+0x18 bit 1).
 2. Le chemin est en L : d'abord sur l'axe où l'écart est le plus grand, puis sur l'autre, une case à la fois vers le personnage. Chaque pas (dx, dy) est rangé en DS:40A2.
 3. Chaque case testée (`case_libre`) : la case du personnage visé termine le chemin (résultat 0 : attaque) ; un autre héros, un occupant (monstre, meuble) ou une autre zone le bloque (résultat 2 : pas d'attaque). Le monstre ne contourne pas un obstacle.
-4. Le déplacement du monstre (premier octet de `types_monstres`) est décompté à chaque pas, mais le test qui devrait arrêter le chemin ne peut jamais réussir (retenue d'un `add` sur un pointeur) : le chemin n'est pas limité. À confirmer au débogueur.
+4. Le déplacement du monstre (premier octet de `types_monstres`) est décompté à chaque pas (`pas_chemin`), mais le test qui devrait arrêter le chemin (`jae` après l'appel) lit la retenue d'un `add` sur le pointeur du chemin, qui ne déborde jamais ; `inc` et `dec` ne la changent pas. Le chemin n'est donc pas limité : un monstre qui a un chemin libre vers un personnage de sa zone l'atteint et l'attaque, quelle que soit la distance (vérifié dans le code).
 
 `combat_monstre` (0x1D8F) charge les images de combat (MEN), calcule les dés, appelle `attaque_contre_heros`, puis recharge MAPS. Les dés :
 
@@ -402,4 +402,4 @@ Abandon de la partie (`commandes` = 40h pendant un tour) : les fiches et `heros_
 
 Octet de zone : bits 0 à 5 la zone, bit 0x40 case vue sur la carte, bit 0x80 bord vu (une voisine de gauche ou du haut est vue, ses murs sont tracés). Fiche d'un personnage : +4 et +5 pointent sa case dans la grille des murs (`place_personnage`). Monstre : +8 l'image (sprite, nom, carte), +9 le type (`types_monstres`), +0 bit 0x80 « pas encore vu », effacé quand un héros voit la zone.
 
-Bogue possible : `monstre_actif_case` (0x6DD7) retire 1 au numéro du monstre avant `adresse_monstre`, qui le retire déjà. `monstre_dans_zone` lit donc le monstre n − 1 (et un mot nul pour le monstre 1). `eau_benite_case` n'a pas ce décalage. À vérifier au débogueur.
+Bogue (vérifié dans le code) : `monstre_actif_case` (0x6DD7) retire 1 au numéro du monstre avant `adresse_monstre`, qui le retire déjà ; c'est le seul des 6 appelants à le faire. Quand un héros fouille le trésor, `monstre_dans_zone` teste donc l'octet +6 du monstre n − 1 au lieu du monstre n. Pour le monstre 1, l'index devient FEh : le pointeur est lu en DS:4E06, c'est-à-dire les octets +8 et +9 (image et type) du monstre 19.
