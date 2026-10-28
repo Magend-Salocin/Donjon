@@ -10,14 +10,14 @@ Les données de Gremlin et Hasbro restent réservées à un usage personnel : ne
 
 | Chemin | Contenu |
 | --- | --- |
-| `original/symboles.txt` | noms des routines, variables et tables de QUEST.EXE, à enrichir au fil de l'étude |
+| `original/symboles.txt` | noms des routines, variables et tables de QUEST.EXE, à enrichir au fil de l'étude ; `symboles-intro.txt` pour INTRO.EXE |
 | `original/binaires/` | QUEST.EXE et INTRO.EXE décompressés (image mémoire) |
 | `original/asm/` | désassemblage annoté (`quest.asm`, `intro.asm`), segment de données (`*-donnees.txt`), couverture (`*-rapport.txt`), résumé des routines (`*-routines.txt`) |
 | `original/notes/` | ce que fait le code, par sous-système (phase 1 de la roadmap) |
 | `original/donnees/` | palettes, écrans, sprites et images, textes des 5 langues, quêtes en JSON |
-| `outils/` | `desassembler.py`, `extraire.py`, `ecran.py` (images dessinées et messages affichés par une routine), et le lancement du jeu original sous DOSBox-X avec débogueur ([DEBOGUER.md](outils/DEBOGUER.md)) |
+| `outils/` | `desassembler.py`, `extraire.py`, `ecran.py` (images dessinées et messages affichés par une routine), le lancement du jeu original sous DOSBox-X avec débogueur ([DEBOGUER.md](outils/DEBOGUER.md)), et pour le portage `recompiler.py`, `difference.py`, `essai.mjs`, `navigateur.mjs` ([web/README.md](web/README.md#vérifier)) |
 | `travail/` | copie du jeu utilisée par DOSBox-X (sauvegardes, journal), ignorée par git |
-| `web/` | le portage JavaScript et PHP (à venir) |
+| `web/` | le portage JavaScript et PHP : [web/README.md](web/README.md) |
 
 ## Régénérer
 

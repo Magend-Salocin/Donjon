@@ -5045,7 +5045,57 @@ loc_6f84:
 loc_6fc7:
 06fc7  1f                   pop ds
 06fc8  c3                   ret
-; ---- 73 octets non atteints (6fc9-7011)
+
+; ======== clavier_interruption
+; int 9 installé par sub_6f7a (CS:2B19) : lit le port 60h, met à 1 ou 0 l'octet de la touche dans DS:1BB4 (64 touches)
+06fc9  9c                   pushf
+06fca  50                   push ax
+06fcb  53                   push bx
+06fcc  51                   push cx
+06fcd  52                   push dx
+06fce  57                   push di
+06fcf  56                   push si
+06fd0  55                   push bp
+06fd1  06                   push es
+06fd2  1e                   push ds
+06fd3  50                   push ax
+06fd4  b8 00 00             mov ax, 0
+06fd7  8e d8                mov ds, ax
+06fd9  58                   pop ax
+06fda  e4 60                in al, 0x60
+06fdc  8a d8                mov bl, al
+06fde  e4 61                in al, 0x61
+06fe0  8a e0                mov ah, al
+06fe2  0c 80                or al, 0x80
+06fe4  e6 61                out 0x61, al
+06fe6  86 e0                xchg al, ah
+06fe8  e6 61                out 0x61, al
+06fea  8a c3                mov al, bl
+06fec  32 e4                xor ah, ah
+06fee  bb b4 1b             mov bx, 0x1bb4
+06ff1  a8 80                test al, 0x80
+06ff3  75 07                jne loc_6ffc
+06ff5  03 d8                add bx, ax
+06ff7  c6 07 01             mov byte ptr [bx], 1
+06ffa  eb 07                jmp loc_7003
+loc_6ffc:
+06ffc  24 7f                and al, 0x7f
+06ffe  03 d8                add bx, ax
+07000  c6 07 00             mov byte ptr [bx], 0
+loc_7003:
+07003  b0 61                mov al, 0x61
+07005  e6 20                out 0x20, al
+07007  1f                   pop ds
+07008  07                   pop es
+07009  5d                   pop bp
+0700a  5e                   pop si
+0700b  5f                   pop di
+0700c  5a                   pop dx
+0700d  59                   pop cx
+0700e  5b                   pop bx
+0700f  58                   pop ax
+07010  9d                   popf
+07011  cf                   iret
 
 ; ======== sub_7012   (appelée depuis 71af, 71ba, 71d6, 71ff, 7225)
 07012  c6 06 34 1c 00       mov byte ptr [0x1c34], 0

@@ -1,6 +1,6 @@
 # Roadmap
 
-État au 27 octobre 2026. Objectif : rejouer HeroQuest PC (Gremlin, 1991) dans un navigateur, à l'identique, à partir du code original. Chaque phase produit un livrable utilisable seul.
+État au 28 octobre 2026. Objectif : rejouer HeroQuest PC (Gremlin, 1991) dans un navigateur, à l'identique, à partir du code original. Chaque phase produit un livrable utilisable seul.
 
 ## Phase 0 : récupérer l'original (faite)
 
@@ -48,29 +48,43 @@ Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` d
 4. Musique et effets : interface du pilote et numéros des morceaux faits ([01-socle.md](original/notes/01-socle.md#son)). Reste le contenu des morceaux (GAME&FX.ALB), selon la décision D3.
 5. `QUEST.SAV` : fait (32 personnages, noms et fiches ; voir FORMATS.md). Les quêtes accomplies ne sont mémorisées nulle part : le fichier fait exactement 32 noms et 32 fiches, et le joueur choisit librement sa quête.
 
-## Phase 3 : portage JavaScript
+## Phase 3 : portage JavaScript (faite le 28 octobre 2026)
 
-Principe : traduire routine par routine, en gardant le nom et l'adresse d'origine en commentaire, pour pouvoir comparer avec l'original à chaque étape.
+Le jeu se joue dans un navigateur : [web/README.md](web/README.md).
 
-1. **Moteur d'affichage** : écran virtuel 320 × 200 en 8 bits et palette VGA, agrandi sans lissage dans un canvas ; `copie_image`, décompression LZ, fondus, cadence calée sur le balayage vertical (70 Hz).
-2. **État du jeu** : un tableau d'octets qui reproduit le segment de données (mêmes offsets), pour comparer l'état avec un vidage mémoire de l'original.
-3. **Hasard** : le même registre à décalage (`hasard`, 0x3613) et la même graine, pour obtenir les mêmes suites de dés que l'original.
-4. **Écrans dans l'ordre du jeu** : intro, menu titre, héros, armurerie, briefing, plateau statique, déplacement, combat, monstres, sorts, fin de quête.
-5. **Entrées** : souris et clavier comme sous DOS.
+Méthode retenue : plutôt que de réécrire 15 000 instructions à la main, `outils/recompiler.py` les traduit toutes, routine par routine, en gardant le nom de `symboles.txt` et l'adresse d'origine (une fonction JavaScript par routine, l'instruction d'origine en commentaire de chaque ligne). Le portage reproduit donc l'original par construction : même mémoire et mêmes offsets que le segment de données, même générateur de hasard et même graine, mêmes pixels. Cela répond à la décision D1 (au pixel près et mêmes dés).
 
-Contrôle : pour chaque écran, une capture de l'original sous DOSBox et la même capture du portage, comparées pixel à pixel ; pour les règles, des parties rejouées avec la même graine.
+| Étape prévue | Réalisation |
+| --- | --- |
+| Moteur d'affichage | VGA 13h et palette (DAC, int 10h), EGA 0Dh pour l'écran des drapeaux, mode texte pour la configuration ; temps compté en instructions (3000 par ms, comme DOSBox-X), retour de trame à 70 Hz |
+| État du jeu | la mémoire de 1 Mo du PC, avec le programme chargé et relogé comme par DOS |
+| Hasard | le code d'origine (`hasard`, 0x3613), graine tirée de l'heure (int 21h AH=2Ch) |
+| Écrans | tous : HERO.EXE est remplacé par la page, qui enchaîne INTRO.EXE puis QUEST.EXE |
+| Entrées | souris (int 33h), clavier (IRQ 1 et port 60h pour le gestionnaire du jeu, int 16h) |
+
+Contrôles faits :
+
+- `outils/difference.py` : chaque instruction traduite contre un vrai x86 (Unicorn), 10 états au hasard par instruction : QUEST 146 660 cas, INTRO 66 500 cas, 0 écart.
+- `outils/essai.mjs` : parcours sans navigateur (menu, héros, choix de quête, briefing, plateau, dés, pas) et 4 parties de clics au hasard de 13 minutes chacune, sans erreur ni service DOS ou BIOS manquant.
+- `outils/navigateur.mjs` : la page dans Chrome (intro en mode texte, écrans graphiques, clics, temps du jeu égal au temps réel).
+
+Reste :
+
+1. Comparer des écrans pixel à pixel avec des captures de DOSBox-X (le contrôle prévu), et rejouer une partie avec la même graine sur les deux.
+2. Son : le pilote `int 60h` est muet (D3) ; seuls les effets du haut-parleur sont joués.
+3. Réécrire à la main, si on le souhaite, les routines qui doivent devenir lisibles ou modifiables, en comparant à la version générée.
 
 ## Phase 4 : PHP et finition
 
-1. PHP sert le jeu et les fichiers de données, et garde les sauvegardes (l'équivalent de `QUEST.SAV`, par joueur).
+1. PHP sert le jeu et les fichiers de données, et garde les sauvegardes : fait pour un seul joueur (`web/fichiers.php`, dossier `web/sauvegardes/`) ; reste une sauvegarde par joueur.
 2. Son : émulation AdLib (OPL2) en JavaScript, ou enregistrement des musiques.
-3. Langues : les 5 langues d'origine sont disponibles.
+3. Langues : fait, les 5 langues se choisissent sur l'écran des drapeaux de l'intro.
 
 ## Décisions à prendre
 
 | N° | Question | Proposition |
 | --- | --- | --- |
-| D1 | Jusqu'où va « à l'identique » : au pixel près et mêmes suites de dés, ou seulement même rendu et mêmes règles ? | Au pixel près et mêmes dés : c'est ce qui permet de vérifier automatiquement le portage |
+| D1 | Jusqu'où va « à l'identique » : au pixel près et mêmes suites de dés, ou seulement même rendu et mêmes règles ? | Tranchée par la méthode de la phase 3 : au pixel près et mêmes dés, par construction |
 | D2 | Rôle de PHP : simple service (fichiers, sauvegardes) ou aussi les règles côté serveur ? | Simple service : le jeu d'origine tourne en local, les règles restent en JavaScript |
 | D3 | Son : émulation AdLib ou musiques enregistrées ? | À trancher en phase 2, selon le format trouvé |
 | D4 | Langue par défaut | Français (`FRENCH.BIN`), les autres en option |

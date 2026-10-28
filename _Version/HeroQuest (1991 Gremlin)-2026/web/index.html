@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HeroQuest 1991</title>
+  <style>
+    :root { --fond: #000; --texte: #ccc; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--fond); color: var(--texte); font: 14px sans-serif; }
+    main { display: grid; gap: 8px; justify-items: center; }
+    /* 320 x 200 affiché en 4/3, comme sur un écran VGA, sans lissage */
+    #ecran { width: min(96vw, 128vh); aspect-ratio: 4 / 3; image-rendering: pixelated; cursor: none; }
+    #etat { min-height: 1.2em; }
+    /* mode texte (questions de configuration de l'intro) : 80 x 25 */
+    #texte { margin: 0; width: min(96vw, 128vh); aspect-ratio: 4 / 3; box-sizing: border-box; padding: 2vh 2vw;
+             background: #000; color: #aaa; font: clamp(8px, 1.9vh, 18px)/1.25 monospace; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <main>
+    <canvas id="ecran" width="320" height="200"></canvas>
+    <pre id="texte" hidden></pre>
+    <div id="etat"></div>
+  </main>
+  <script type="module" src="jeu/principal.js"></script>
+</body>
+</html>

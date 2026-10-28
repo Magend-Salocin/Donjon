@@ -1,4 +1,4 @@
-; Routines de INTRO.EXE : 85, dont 0 nommées dans symboles.txt.
+; Routines de INTRO.EXE : 86, dont 1 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
 044b0  sub_44b0                  1116    0  | 10h/00 10h/? 16h 21h/09 21h/3d 21h/3e 21h/41 21h/4a 21h/4c    10a2 1440 1442 1443 1444 1445 1446 1447 1448 19f2 19f8 19fb  "quest.exe"
@@ -44,6 +44,7 @@
 06f60  sub_6f60                    13    1  |   dx  
 06f7a  sub_6f7a                    55    1  | 21h/25 21h/35    1c3d
 06fb1  sub_6fb1                    24   10  | 21h/25    
+06fc9  clavier_interruption        73    0  |   0x20 0x60 0x61  
 07012  sub_7012                    87    5  |     1bb5 1bd1 1c34 1c35
 07069  sub_7069                   138    1  |     1443 14ac 14ad 14af 1c34
 070f5  sub_70f5                    81    1  |     1c34 1c35 1c37

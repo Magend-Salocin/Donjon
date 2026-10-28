@@ -1,0 +1,4 @@
+# Symboles de INTRO.EXE (image mémoire décompressée ; adresses = positions dans l'image, CS:0 = 0x44B0).
+# Même format que symboles.txt.
+
+0x6fc9  code  clavier_interruption   int 9 installé par sub_6f7a (CS:2B19) : lit le port 60h, met à 1 ou 0 l'octet de la touche dans DS:1BB4 (64 touches)
