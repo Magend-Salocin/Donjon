@@ -71,13 +71,13 @@ Contrôles faits :
 Reste :
 
 1. Comparer des écrans pixel à pixel avec des captures de DOSBox-X (le contrôle prévu), et rejouer une partie avec la même graine sur les deux.
-2. Son : le pilote `int 60h` est muet (D3) ; seuls les effets du haut-parleur sont joués.
+2. Son : fait en phase 4 (WAV de l'AdLib).
 3. Réécrire à la main, si on le souhaite, les routines qui doivent devenir lisibles ou modifiables, en comparant à la version générée.
 
 ## Phase 4 : PHP et finition
 
 1. PHP sert le jeu et les fichiers de données, et garde les sauvegardes : fait pour un seul joueur (`web/fichiers.php`, dossier `web/sauvegardes/`) ; reste une sauvegarde par joueur.
-2. Son : émulation AdLib (OPL2) en JavaScript, ou enregistrement des musiques.
+2. Son : fait. Les morceaux du pilote AdLib sont rendus en WAV (`outils/son.py` puis `outils/sons.mjs`) et joués par la page ; un seul type de son, l'AdLib. Reste à les comparer à l'oreille avec DOSBox-X, et le MP3 si un encodeur est installé.
 3. Langues : fait, les 5 langues se choisissent sur l'écran des drapeaux de l'intro.
 
 ## Décisions à prendre
@@ -86,6 +86,6 @@ Reste :
 | --- | --- | --- |
 | D1 | Jusqu'où va « à l'identique » : au pixel près et mêmes suites de dés, ou seulement même rendu et mêmes règles ? | Tranchée par la méthode de la phase 3 : au pixel près et mêmes dés, par construction |
 | D2 | Rôle de PHP : simple service (fichiers, sauvegardes) ou aussi les règles côté serveur ? | Simple service : le jeu d'origine tourne en local, les règles restent en JavaScript |
-| D3 | Son : émulation AdLib ou musiques enregistrées ? | À trancher en phase 2, selon le format trouvé |
+| D3 | Son : émulation AdLib ou musiques enregistrées ? | Tranchée le 28 octobre 2026 : musiques enregistrées (WAV), AdLib seulement |
 | D4 | Langue par défaut | Français (`FRENCH.BIN`), les autres en option |
 | D5 | Lien avec `donjon-v2` : projets séparés, ou le remake devient un mode de `donjon-v2` ? | Séparés tant que le portage n'est pas fini |

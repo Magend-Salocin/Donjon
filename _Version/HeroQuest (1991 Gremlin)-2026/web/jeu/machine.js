@@ -56,7 +56,9 @@ export class Machine {
     this.touchesEnAttente = [];       // codes clavier (bit 7 = relâchement) à livrer par l'IRQ 1
     this.tamponBios = [];             // touches pour int 16h
     this.souris = { x: 320, y: 100, boutons: 0 };
-    this.haut_parleur = { diviseur: 0, octetBas: null };
+    this.son = null;                  // { jouer(morceau, poignee), arreter(poignee), silence() }, posé par la page
+    this.sonDonnees = false;
+    this.poigneeSon = 0;
     this.signale = new Set();
     this.codeReecrit = new Set(codeReecrit);
   }
@@ -275,13 +277,7 @@ export class Machine {
     }
     switch (port) {
       case 0x20: return;                             // fin d'interruption
-      case 0x42: {                                   // diviseur du haut-parleur (octet bas puis haut)
-        const h = this.haut_parleur;
-        if (h.octetBas === null) h.octetBas = valeur;
-        else { h.diviseur = h.octetBas | (valeur << 8); h.octetBas = null; }
-        return;
-      }
-      case 0x43: return;
+      case 0x42: case 0x43: return;                  // haut-parleur : non joué (le son passe par l'AdLib)
       case 0x61: this.port61 = valeur; return;
       case 0x3c8: this.dacEcriture = valeur; this.dacComposante = 0; return;
       case 0x3c7: this.dacLecture = valeur; this.dacComposante = 0; return;
@@ -400,9 +396,21 @@ export class Machine {
     return true;
   }
 
-  // Pilote de son (ADLIB.DRV...) : muet pour l'instant (décision D3 de la roadmap).
+  // Pilote de son (int 60h). Le pilote d'origine n'est pas exécuté : ses morceaux, rendus en WAV
+  // (outils/sons.mjs), sont joués par this.son quand le programme lui a donné ses données (AX=2).
+  //   AX=2 données, AX=3 jouer le morceau DX (poignée rendue dans DI), AX=4 arrêter la poignée DI,
+  //   AX=0 et AX=0Bh silence.
   pilote60() {
-    if (this.ax === 3) this.di = 1;
+    switch (this.ax) {
+      case 2: this.sonDonnees = true; break;
+      case 3:
+        this.di = ++this.poigneeSon;
+        if (this.sonDonnees && this.son) this.son.jouer(this.dx, this.di);
+        break;
+      case 4: if (this.son) this.son.arreter(this.di); break;
+      case 0: case 0x0b: if (this.son) this.son.silence(); break;
+      default: break;
+    }
     return true;
   }
 

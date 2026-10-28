@@ -6,10 +6,11 @@
 
 import { Machine, INSTRUCTIONS_PAR_MS } from './machine.js';
 import { codeClavier, asciiDe } from './clavier.js';
-import { HautParleur } from './haut-parleur.js';
+import { Son } from './son.js';
 
-// VGA, haut-parleur, souris, français, souris pour les 4 joueurs (format : notes/01-socle.md)
-const CONFIGURATION = Uint8Array.from([8, 0, 0, 0, 1, 0, 0, 0, 0]);
+// VGA, AdLib, souris, français, souris pour les 4 joueurs (format : notes/01-socle.md)
+const CONFIGURATION = Uint8Array.from([8, 0, 1, 0, 1, 0, 0, 0, 0]);
+const PILOTE_ADLIB = 1;              // un seul type de son : le jeu joue toujours par l'AdLib
 const RETARD_MAX_MS = 100;
 const OPTIONS = new URLSearchParams(location.search);
 const PROGRAMMES = { INTRO: () => import('./intro.gen.js'), QUEST: () => import('./quest.gen.js') };
@@ -73,7 +74,7 @@ async function executer(nom, fichiers, son) {
   const m = new Machine({ fichiers, routines, codeReecrit: CODE_REECRIT });
   m.charger(`${nom}.EXE`);
   machine = m;
-  son.machine = m;
+  m.son = son;
   return new Promise((fini, echec) => {
     let precedent = performance.now();
     const image_suivante = (maintenant) => {
@@ -85,7 +86,6 @@ async function executer(nom, fichiers, son) {
         echec(erreur);
         return;
       }
-      son.suivre();
       afficher(m);
       if (OPTIONS.has('debug')) etat.textContent = `${nom} t = ${(m.t / INSTRUCTIONS_PAR_MS / 1000).toFixed(1)} s, IP ${m.ip.toString(16)}`;
       if (m.arret !== null) fini(m.arret);
@@ -110,14 +110,18 @@ function afficher(m) {
 async function demarrer() {
   etat.textContent = 'Chargement des fichiers du jeu…';
   const fichiers = await chargerFichiers();
-  const son = new HautParleur();
+  const son = new Son();
+  if (OPTIONS.has('debug')) window.jeu = { son, machine: () => machine };   // pour outils/navigateur.mjs
   window.addEventListener('pointerdown', () => son.activer(), { once: true });
   window.addEventListener('keydown', () => son.activer(), { once: true });
   brancherEntrees();
   etat.textContent = '';
 
   if (!OPTIONS.has('sans-intro')) await executer('INTRO', fichiers, son);
-  if (!fichiers.has('QUEST.CFG')) fichiers.set('QUEST.CFG', CONFIGURATION);
+  // Le choix de carte son de l'intro est ignoré : le jeu tourne toujours avec l'AdLib.
+  const configuration = (fichiers.get('QUEST.CFG') || CONFIGURATION).slice();
+  configuration[2] = PILOTE_ADLIB;
+  fichiers.set('QUEST.CFG', configuration);
   await executer('QUEST', fichiers, son);
   etat.textContent = 'Le jeu est terminé.';
 }

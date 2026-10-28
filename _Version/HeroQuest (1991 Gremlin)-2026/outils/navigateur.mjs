@@ -62,6 +62,7 @@ async function principal() {
     if (nom === 'attendre') await attendre(Number(reste[0]) * 1000);
     else if (nom === 'capture') await capturer(reste.join(':'));
     else if (nom === 'etat') console.log(await evaluer(`document.querySelector('#etat').textContent`));
+    else if (nom === 'eval') console.log(JSON.stringify(await evaluer(reste.join(':'))));
     else if (nom === 'clic') {
       const [x, y] = await point(Number(reste[0]), Number(reste[1]));
       await envoyer('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });

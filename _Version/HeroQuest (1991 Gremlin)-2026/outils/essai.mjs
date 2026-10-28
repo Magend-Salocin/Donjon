@@ -12,8 +12,8 @@ import { Machine, INSTRUCTIONS_PAR_MS } from '../web/jeu/machine.js';
 
 const ici = path.dirname(fileURLToPath(import.meta.url));
 const JEU = path.join(ici, '..', '..', 'HeroQuest (1991 Gremlin)');
-// VGA, haut-parleur, souris, français, souris pour les 4 joueurs
-export const CONFIGURATION = Uint8Array.from([8, 0, 0, 0, 1, 0, 0, 0, 0]);
+// VGA, AdLib, souris, français, souris pour les 4 joueurs (comme la page)
+export const CONFIGURATION = Uint8Array.from([8, 0, 1, 0, 1, 0, 0, 0, 0]);
 
 export function fichiersDuJeu() {
   const fichiers = new Map();

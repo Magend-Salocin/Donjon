@@ -12,10 +12,12 @@ Puis ouvrir `http://127.0.0.1:8765/`. La page enchaîne les programmes comme `HE
 
 | Adresse | Effet |
 | --- | --- |
-| `index.html?sans-intro` | lance directement le jeu (configuration par défaut si `QUEST.CFG` manque : VGA, haut-parleur, souris, français) |
-| `index.html?debug` | affiche sous l'écran le programme, le temps de jeu et l'IP |
+| `index.html?sans-intro` | lance directement le jeu (configuration par défaut si `QUEST.CFG` manque : VGA, AdLib, souris, français) |
+| `index.html?debug` | affiche sous l'écran le programme, le temps de jeu et l'IP ; expose `window.jeu` (son, machine) |
 
-Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; F10 coupe la musique, Ctrl quitte.
+Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; Ctrl quitte.
+
+Son : un seul type, l'AdLib (le choix de carte son de l'intro est ignoré). Comme dans l'original, la musique joue au départ et les effets sont muets ; F10 coupe la musique et active les effets. Le navigateur n'ouvre le son qu'au premier clic ou à la première touche. L'intro est muette : elle ne donne pas de morceaux à son pilote.
 
 ## Fichiers
 
@@ -25,7 +27,9 @@ Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `je
 | `jeu/machine.js` | ce que le code attend autour de lui : registres et drapeaux du 8086, mémoire de 1 Mo, pile, DOS (fichiers, mémoire, vecteurs), BIOS (vidéo, clavier, zone de données), VGA 13h, EGA 0Dh, mode texte, souris, ports, IRQ clavier, temps |
 | `jeu/exepack.js` | décompression EXEPACK et relocations, comme DOS au chargement |
 | `jeu/principal.js` | la page : chargement des fichiers, boucle au rythme du temps réel, affichage, entrées |
-| `jeu/clavier.js`, `jeu/haut-parleur.js` | codes clavier du PC ; haut-parleur (ports 42h et 61h) en WebAudio |
+| `jeu/clavier.js` | codes clavier du PC |
+| `jeu/son.js` | joue les WAV de `sons/` quand le jeu appelle son pilote (int 60h : jouer, arrêter, silence) ; la musique en boucle |
+| `sons/` | les morceaux du pilote AdLib en WAV (mono, 16 bits, 22 050 Hz), générés (voir « Son »), ignorés par git |
 | `fichiers.php` | les fichiers d'origine en une archive ; écrit `QUEST.SAV` et `QUEST.CFG` dans `sauvegardes/` (ignoré par git), jamais dans le jeu d'origine |
 
 ## Comment le code est traduit
@@ -37,6 +41,22 @@ Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `je
 - Le temps est compté en instructions, 3000 par milliseconde, comme `cycles = fixed 3000` dans `outils/dosbox-x.conf` : attentes, animations et retour de trame (70 Hz) durent comme sous DOSBox-X.
 
 Le résultat est identique à l'original par construction : même mémoire, mêmes adresses, même générateur de hasard. On peut ensuite réécrire une routine à la main en gardant la version générée comme référence.
+
+## Son
+
+Le pilote d'origine (`ADLIB.DRV`) n'est pas exécuté dans la page. Ses morceaux sont rendus une fois en WAV, depuis `outils/` :
+
+```bash
+python son.py        # fait jouer chaque morceau par ADLIB.DRV (Unicorn) et relève les écritures dans la puce
+node sons.mjs        # les rend en WAV avec opl2.mjs, émulateur de la puce OPL2 écrit pour le projet
+```
+
+| Fichier | Contenu |
+| --- | --- |
+| `morceau00.wav` | la musique, 603 s ; elle n'a pas de boucle globale (chaque voix boucle à sa façon) : la page la rejoue depuis le début |
+| `morceau02.wav`, `06`, `08`, `05`, `09` | pas, dés, clic, gros plan du combat, sort et piège |
+
+Le morceau 3 (porte) ne fait qu'arrêter une note : avec l'AdLib, une porte qui s'ouvre est muette, comme dans l'original. Le rendu suit le fonctionnement de la puce décrit par Nuked-OPL3 (tables, enveloppes, vibrato, trémolo, mode rythmique) ; les hauteurs ont été vérifiées par analyse de fréquence, pas encore à l'oreille contre DOSBox-X. Le MP3 demanderait un encodeur (lame ou ffmpeg), absent pour l'instant.
 
 ## Vérifier
 
@@ -54,6 +74,6 @@ node navigateur.mjs "http://127.0.0.1:8765/?sans-intro&debug" page.png "attendre
 
 ## Limites
 
-- Son : le pilote (`ADLIB.DRV`, `int 60h`) est muet ; seuls les effets du haut-parleur (pilote 0, « Internal ») sont joués. Décision D3 de la roadmap.
+- Son : morceaux préenregistrés ; un effet se mêle à la musique au lieu de lui prendre le canal 0 comme sur la vraie puce.
 - Joystick non émulé (le port 201h répond « rien de branché »).
 - Les écrans n'ont pas encore été comparés pixel à pixel avec des captures de DOSBox-X.
