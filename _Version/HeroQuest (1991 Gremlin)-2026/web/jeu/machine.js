@@ -1,7 +1,8 @@
 // Machine qui fait tourner le code traduit (quest.gen.js) : registres et drapeaux du 8086,
 // mémoire de 1 Mo, pile, et l'environnement que le jeu attend (DOS, BIOS, VGA, souris,
-// clavier, pilote de son). Le temps est compté en instructions : 3000 par milliseconde,
-// le réglage de DOSBox-X (outils/dosbox-x.conf), pour que les attentes du jeu durent pareil.
+// clavier, pilote de son). Un seul affichage : le VGA 13h, plus le mode texte de DOS.
+// Le temps est compté en instructions : 3000 par milliseconde, le réglage de DOSBox-X
+// (outils/dosbox-x.conf), pour que les attentes du jeu durent pareil.
 
 import { decompresser } from './exepack.js';
 
@@ -40,14 +41,6 @@ export class Machine {
     this.curseur = { x: 0, y: 0 };
     this.zoneBios();
     this.dac = new Uint8Array(768);
-    // EGA (mode 0Dh, écran des drapeaux de l'intro) : 4 plans, séquenceur et contrôleur graphique
-    this.plans = new Uint8Array(4 * 0x10000);
-    this.planaire = false;
-    this.verrous = new Uint8Array(4);
-    this.sequenceur = new Uint8Array(8).fill(0); this.sequenceur[2] = 0x0f;
-    this.graphique = new Uint8Array(16); this.graphique[8] = 0xff;
-    this.indexSequenceur = 0; this.indexGraphique = 0;
-    this.paletteEga = Uint8Array.from([0, 1, 2, 3, 4, 5, 0x14, 7, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f]);
     this.dacEcriture = 0;
     this.dacLecture = 0;
     this.dacComposante = 0;
@@ -147,15 +140,10 @@ export class Machine {
   // ---- Mémoire et pile
 
   // Un mot à l'offset FFFFh déborde sur l'adresse linéaire suivante, comme dans DOSBox.
-  rb(seg, off) {
-    const a = ((seg << 4) + off) & 0xfffff;
-    if (this.planaire && a >= 0xa0000 && a < 0xb0000) return this.lireEga(a - 0xa0000);
-    return this.mem[a];
-  }
+  rb(seg, off) { return this.mem[((seg << 4) + off) & 0xfffff]; }
   rw(seg, off) { return this.rb(seg, off) | (this.rb(seg + (off === 0xffff ? 0x1000 : 0), (off + 1) & 0xffff) << 8); }
   wb(seg, off, v) {
     const a = ((seg << 4) + off) & 0xfffff;
-    if (this.planaire && a >= 0xa0000 && a < 0xb0000) { this.ecrireEga(a - 0xa0000, v & 0xff); return; }
     if (seg === this.cs && this.L !== undefined && this.table[off] && !this.codeReecrit.has(off)) {
       this.signaler(`ecriture-code-${off}`, `écriture dans le code traduit en ${off.toString(16)}`);
     }
@@ -285,11 +273,7 @@ export class Machine {
         this.dac[this.dacEcriture * 3 + this.dacComposante] = valeur & 0x3f;
         if (++this.dacComposante === 3) { this.dacComposante = 0; this.dacEcriture = (this.dacEcriture + 1) & 0xff; }
         return;
-      case 0x3c4: this.indexSequenceur = valeur & 7; return;
-      case 0x3c5: this.sequenceur[this.indexSequenceur] = valeur; return;
-      case 0x3ce: this.indexGraphique = valeur & 15; return;
-      case 0x3cf: this.graphique[this.indexGraphique] = valeur; return;
-      case 0x3d4: case 0x3d5: case 0x3c0: return;    // CRTC, contrôleur d'attributs
+      case 0x3c4: case 0x3c5: case 0x3ce: case 0x3cf: case 0x3d4: case 0x3d5: case 0x3c0: return;   // registres EGA, CRTC
       default:
         this.signaler(`out-${port}`, `écriture du port ${port.toString(16)} non émulée`);
     }
@@ -326,10 +310,9 @@ export class Machine {
     const ah = this.ah;
     if (ah === 0x00) {
       this.mode = this.al & 0x7f;
-      this.planaire = this.mode === 0x0d;
       if (this.mode === 0x13) this.mem.fill(0, 0xa0000, 0xa0000 + 64000);
-      else if (this.planaire) this.initialiserEga();
-      else this.effacerTexte();
+      else if (this.mode <= 3 || this.mode === 7) this.effacerTexte();
+      else this.signaler(`mode-${this.mode}`, `mode vidéo ${this.mode.toString(16)}h non émulé : seul le VGA 13h l'est`);
       this.mem[0x449] = this.mode;
     } else if (this.ax === 0x1012) {
       for (let k = 0; k < this.cx; k++) {
@@ -340,12 +323,8 @@ export class Machine {
       this.dac[i] = (this.dx >> 8) & 0x3f;
       this.dac[i + 1] = (this.cx >> 8) & 0x3f;
       this.dac[i + 2] = this.cx & 0x3f;
-    } else if (this.ax === 0x1002) {
-      for (let k = 0; k < 16; k++) this.paletteEga[k] = this.rb(this.es, (this.dx + k) & 0xffff) & 0x3f;
-    } else if (this.ax === 0x1000) {
-      if ((this.bx & 0xff) < 16) this.paletteEga[this.bx & 0xff] = (this.bx >> 8) & 0x3f;
-    } else if (this.ax === 0x1001) {
-      // bordure
+    } else if (this.ax === 0x1000 || this.ax === 0x1001 || this.ax === 0x1002) {
+      // registres de palette EGA, bordure : sans effet en VGA 256 couleurs
     } else if (ah === 0x0f) {
       this.ax = (40 << 8) | this.mode;
       this.bx &= 0x00ff;
@@ -539,44 +518,6 @@ export class Machine {
     }
   }
 
-  // ---- EGA planaire (modes d'écriture 0, 1 et 2, lecture en mode 0)
-
-  initialiserEga() {
-    this.plans.fill(0);
-    this.paletteEga = Uint8Array.from([0, 1, 2, 3, 4, 5, 0x14, 7, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f]);
-    for (let c = 0; c < 64; c++) {                   // 64 couleurs EGA (rgbRGB) dans le DAC, comme le BIOS VGA
-      const niveau = (fort, faible) => (((c >> fort) & 1) * 2 + ((c >> faible) & 1)) * 21;
-      this.dac[c * 3] = niveau(2, 5);
-      this.dac[c * 3 + 1] = niveau(1, 4);
-      this.dac[c * 3 + 2] = niveau(0, 3);
-    }
-  }
-
-  lireEga(off) {
-    for (let p = 0; p < 4; p++) this.verrous[p] = this.plans[p * 0x10000 + off];
-    return this.verrous[this.graphique[4] & 3];
-  }
-
-  ecrireEga(off, v) {
-    const g = this.graphique;
-    const masquePlans = this.sequenceur[2];
-    const mode = g[5] & 3;
-    const rotation = g[3] & 7;
-    const fonction = (g[3] >> 3) & 3;
-    v = ((v >> rotation) | (v << (8 - rotation))) & 0xff;
-    for (let p = 0; p < 4; p++) {
-      if (!(masquePlans & (1 << p))) continue;
-      let d;
-      if (mode === 1) { this.plans[p * 0x10000 + off] = this.verrous[p]; continue; }
-      if (mode === 2) d = (v >> p) & 1 ? 0xff : 0;
-      else d = (g[1] >> p) & 1 ? ((g[0] >> p) & 1 ? 0xff : 0) : v;
-      const l = this.verrous[p];
-      if (fonction === 1) d &= l; else if (fonction === 2) d |= l; else if (fonction === 3) d ^= l;
-      const masque = g[8];
-      this.plans[p * 0x10000 + off] = (d & masque) | (l & ~masque & 0xff);
-    }
-  }
-
   // ---- Console en mode texte (80 x 25, mémoire B800h) : messages de DOS et du BIOS
 
   effacerTexte() {
@@ -630,15 +571,6 @@ export class Machine {
       pal[k] = 0xff000000 | (b << 16) | (g << 8) | r;
     }
     const sortie = new Uint32Array(rgba.buffer, rgba.byteOffset, 64000);
-    if (this.planaire) {
-      for (let k = 0; k < 64000; k++) {
-        const octet = k >> 3, bit = 7 - (k & 7);
-        let c = 0;
-        for (let p = 0; p < 4; p++) c |= ((this.plans[p * 0x10000 + octet] >> bit) & 1) << p;
-        sortie[k] = pal[this.paletteEga[c]];
-      }
-      return;
-    }
     if (this.mode !== 0x13) { sortie.fill(0xff000000); return; }
     for (let k = 0; k < 64000; k++) sortie[k] = pal[vram[k]];
   }

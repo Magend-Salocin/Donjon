@@ -56,7 +56,7 @@ Méthode retenue : plutôt que de réécrire 15 000 instructions à la main, `ou
 
 | Étape prévue | Réalisation |
 | --- | --- |
-| Moteur d'affichage | VGA 13h et palette (DAC, int 10h), EGA 0Dh pour l'écran des drapeaux, mode texte pour la configuration ; temps compté en instructions (3000 par ms, comme DOSBox-X), retour de trame à 70 Hz |
+| Moteur d'affichage | un seul : VGA 13h et palette (DAC, int 10h), plus le mode texte de DOS ; la page force VGA et AdLib dans `QUEST.CFG`, si bien que l'intro ne pose pas ses questions (la langue se choisit dans l'adresse) ; temps compté en instructions (3000 par ms, comme DOSBox-X), retour de trame à 70 Hz |
 | État du jeu | la mémoire de 1 Mo du PC, avec le programme chargé et relogé comme par DOS |
 | Hasard | le code d'origine (`hasard`, 0x3613), graine tirée de l'heure (int 21h AH=2Ch) |
 | Écrans | tous : HERO.EXE est remplacé par la page, qui enchaîne INTRO.EXE puis QUEST.EXE |
@@ -78,7 +78,7 @@ Reste :
 
 1. PHP sert le jeu et les fichiers de données, et garde les sauvegardes : fait pour un seul joueur (`web/fichiers.php`, dossier `web/sauvegardes/`) ; reste une sauvegarde par joueur.
 2. Son : fait. Les morceaux du pilote AdLib sont rendus en WAV (`outils/son.py` puis `outils/sons.mjs`) et joués par la page ; un seul type de son, l'AdLib. Reste à les comparer à l'oreille avec DOSBox-X, et le MP3 si un encodeur est installé.
-3. Langues : fait, les 5 langues se choisissent sur l'écran des drapeaux de l'intro.
+3. Langues : fait, les 5 langues se choisissent dans l'adresse de la page (`?langue=en`), l'écran des drapeaux de l'intro n'existant qu'en EGA.
 
 ## Décisions à prendre
 

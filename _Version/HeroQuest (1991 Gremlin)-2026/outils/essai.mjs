@@ -53,11 +53,10 @@ export function capturer(m, fichier) {
   fs.writeFileSync(fichier, png(rgba, 320, 200));
 }
 
-// PROGRAMME=INTRO pour l'intro (sans QUEST.CFG : elle le crée).
+// PROGRAMME=INTRO pour l'intro (avec QUEST.CFG, comme dans la page : pas de questions).
 export async function machine(programme = process.env.PROGRAMME || 'QUEST') {
   const { routines, CODE_REECRIT } = await import(`../web/jeu/${programme.toLowerCase()}.gen.js`);
   const fichiers = fichiersDuJeu();
-  if (programme !== 'QUEST') fichiers.delete('QUEST.CFG');
   const m = new Machine({ fichiers, routines, codeReecrit: CODE_REECRIT });
   m.horloge = () => new Date(2026, 9, 27, 12, 0, 0, 0);    // même graine à chaque essai
   m.charger(`${programme}.EXE`);

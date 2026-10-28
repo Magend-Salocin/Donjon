@@ -1,7 +1,10 @@
 // Page du jeu : charge les fichiers d'origine (servis par fichiers.php), puis enchaîne les
-// programmes comme HERO.EXE : INTRO.EXE (configuration et intro), puis QUEST.EXE.
-// La machine tourne au rythme du temps réel ; souris et clavier lui sont transmis.
+// programmes comme HERO.EXE : INTRO.EXE, puis QUEST.EXE. La machine tourne au rythme du temps
+// réel ; souris et clavier lui sont transmis.
+// Un seul affichage (VGA) et un seul son (AdLib) : la page fournit QUEST.CFG avec ces choix,
+// si bien que l'intro ne pose pas ses questions de configuration.
 //   index.html?sans-intro   lance directement QUEST.EXE
+//   index.html?langue=en    langue des textes : fr (par défaut), en, es, de, it
 //   index.html?debug        affiche le temps de jeu et l'IP sous l'écran
 
 import { Machine, INSTRUCTIONS_PAR_MS } from './machine.js';
@@ -10,7 +13,11 @@ import { Son } from './son.js';
 
 // VGA, AdLib, souris, français, souris pour les 4 joueurs (format : notes/01-socle.md)
 const CONFIGURATION = Uint8Array.from([8, 0, 1, 0, 1, 0, 0, 0, 0]);
-const PILOTE_ADLIB = 1;              // un seul type de son : le jeu joue toujours par l'AdLib
+const VGA = 8;
+const PILOTE_ADLIB = 1;
+const LANGUES = { en: 0, fr: 1, es: 2, de: 3, it: 4 };   // ordre des fichiers de textes du jeu
+// « Press S to change config » : S rouvrirait les questions (écran, carte son) et l'écran EGA des drapeaux.
+const TOUCHE_S = 0x1f;
 const RETARD_MAX_MS = 100;
 const OPTIONS = new URLSearchParams(location.search);
 const PROGRAMMES = { INTRO: () => import('./intro.gen.js'), QUEST: () => import('./quest.gen.js') };
@@ -21,6 +28,7 @@ const etat = document.querySelector('#etat');
 const contexte = ecran.getContext('2d');
 const image = contexte.createImageData(320, 200);
 let machine = null;                                  // programme en cours, pour les entrées
+let programme = null;
 
 async function chargerFichiers() {
   const archive = new Uint8Array(await (await fetch('fichiers.php')).arrayBuffer());
@@ -59,6 +67,7 @@ function brancherEntrees() {
     const code = codeClavier(e.code);
     if (!machine || code === undefined) return;
     e.preventDefault();
+    if (programme === 'INTRO' && code === TOUCHE_S) return;
     if (!e.repeat) machine.appuyer(code);
     machine.toucheBios(asciiDe(e), code);
   });
@@ -74,6 +83,7 @@ async function executer(nom, fichiers, son) {
   const m = new Machine({ fichiers, routines, codeReecrit: CODE_REECRIT });
   m.charger(`${nom}.EXE`);
   machine = m;
+  programme = nom;
   m.son = son;
   return new Promise((fini, echec) => {
     let precedent = performance.now();
@@ -96,7 +106,7 @@ async function executer(nom, fichiers, son) {
 }
 
 function afficher(m) {
-  const graphique = m.mode === 0x13 || m.planaire;
+  const graphique = m.mode === 0x13;
   ecran.hidden = !graphique;
   console_.hidden = graphique;
   if (graphique) {
@@ -105,6 +115,17 @@ function afficher(m) {
   } else {
     console_.textContent = m.texte();
   }
+}
+
+// La configuration enregistrée (commandes des joueurs), avec VGA, AdLib et la langue demandée.
+function configuration(enregistree) {
+  const cfg = (enregistree && enregistree.length === 9 ? enregistree : CONFIGURATION).slice();
+  cfg[0] = VGA;
+  cfg[1] = 0;
+  cfg[2] = PILOTE_ADLIB;
+  const langue = LANGUES[OPTIONS.get('langue')];
+  if (langue !== undefined) cfg[4] = langue;
+  return cfg;
 }
 
 async function demarrer() {
@@ -117,11 +138,8 @@ async function demarrer() {
   brancherEntrees();
   etat.textContent = '';
 
+  fichiers.set('QUEST.CFG', configuration(fichiers.get('QUEST.CFG')));
   if (!OPTIONS.has('sans-intro')) await executer('INTRO', fichiers, son);
-  // Le choix de carte son de l'intro est ignoré : le jeu tourne toujours avec l'AdLib.
-  const configuration = (fichiers.get('QUEST.CFG') || CONFIGURATION).slice();
-  configuration[2] = PILOTE_ADLIB;
-  fichiers.set('QUEST.CFG', configuration);
   await executer('QUEST', fichiers, son);
   etat.textContent = 'Le jeu est terminé.';
 }

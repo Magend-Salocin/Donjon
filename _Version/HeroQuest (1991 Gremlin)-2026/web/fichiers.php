@@ -11,6 +11,8 @@ declare(strict_types=1);
 const JEU = __DIR__ . '/../../HeroQuest (1991 Gremlin)';
 const SAUVEGARDES = __DIR__ . '/sauvegardes';
 const ECRITS = ['QUEST.SAV', 'QUEST.CFG'];
+// Un seul affichage (VGA) et un seul son (AdLib) : les fichiers des autres versions ne sont pas servis.
+const ECARTES = '/\.(EGA|PIF|MD)$|^(TANDY|MT32)\.DRV$/';
 
 function nomValide(string $nom): bool
 {
@@ -35,7 +37,7 @@ $nom = strtoupper((string)($_GET['nom'] ?? ''));
 if ($nom === '') {
     $noms = array_map('strtoupper', array_values(array_filter(
         scandir(JEU) ?: [],
-        fn ($f) => is_file(JEU . '/' . $f) && nomValide(strtoupper($f)) && !str_ends_with(strtoupper($f), '.MD')
+        fn ($f) => is_file(JEU . '/' . $f) && nomValide(strtoupper($f)) && !preg_match(ECARTES, strtoupper($f))
     )));
     foreach (ECRITS as $ecrit) {
         if (is_file(SAUVEGARDES . '/' . $ecrit) && !in_array($ecrit, $noms, true)) {

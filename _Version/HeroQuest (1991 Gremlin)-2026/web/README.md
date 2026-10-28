@@ -8,29 +8,32 @@ HeroQuest PC (Gremlin, 1991) dans un navigateur, à partir du code original trad
 php -S 127.0.0.1:8765 -t web       # depuis HeroQuest (1991 Gremlin)-2026/
 ```
 
-Puis ouvrir `http://127.0.0.1:8765/`. La page enchaîne les programmes comme `HERO.EXE` : `INTRO.EXE` (questions de configuration en mode texte, intro, choix de la langue sur l'écran des drapeaux), puis `QUEST.EXE`.
+Puis ouvrir `http://127.0.0.1:8765/`. La page enchaîne les programmes comme `HERO.EXE` : `INTRO.EXE`, puis `QUEST.EXE`.
+
+Un seul affichage, le VGA, et un seul son, l'AdLib. La page fournit `QUEST.CFG` avec ces choix : l'intro ne pose donc pas ses questions de configuration, et la touche S (« Press S to change config ») est ignorée, car elle rouvrirait ces questions et l'écran des drapeaux, qui n'existe qu'en EGA. La langue se choisit dans l'adresse. Les commandes des joueurs restent celles du `QUEST.CFG` enregistré (souris par défaut).
 
 | Adresse | Effet |
 | --- | --- |
-| `index.html?sans-intro` | lance directement le jeu (configuration par défaut si `QUEST.CFG` manque : VGA, AdLib, souris, français) |
+| `index.html?sans-intro` | lance directement le jeu |
+| `index.html?langue=en` | langue des textes : `fr` (par défaut), `en`, `es`, `de`, `it` |
 | `index.html?debug` | affiche sous l'écran le programme, le temps de jeu et l'IP ; expose `window.jeu` (son, machine) |
 
 Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; Ctrl quitte.
 
-Son : un seul type, l'AdLib (le choix de carte son de l'intro est ignoré). Comme dans l'original, la musique joue au départ et les effets sont muets ; F10 coupe la musique et active les effets. Le navigateur n'ouvre le son qu'au premier clic ou à la première touche. L'intro est muette : elle ne donne pas de morceaux à son pilote.
+Son : comme dans l'original, la musique joue au départ (dès l'intro) et les effets sont muets ; F10 coupe la musique et active les effets. Le navigateur n'ouvre le son qu'au premier clic ou à la première touche.
 
 ## Fichiers
 
 | Chemin | Rôle |
 | --- | --- |
 | `jeu/quest.gen.js`, `jeu/intro.gen.js` | code traduit, généré par `outils/recompiler.py` : une fonction par routine, au nom de `original/symboles.txt` (ou `symboles-intro.txt`), chaque instruction d'origine en commentaire. Ne pas modifier à la main |
-| `jeu/machine.js` | ce que le code attend autour de lui : registres et drapeaux du 8086, mémoire de 1 Mo, pile, DOS (fichiers, mémoire, vecteurs), BIOS (vidéo, clavier, zone de données), VGA 13h, EGA 0Dh, mode texte, souris, ports, IRQ clavier, temps |
+| `jeu/machine.js` | ce que le code attend autour de lui : registres et drapeaux du 8086, mémoire de 1 Mo, pile, DOS (fichiers, mémoire, vecteurs), BIOS (vidéo, clavier, zone de données), VGA 13h, mode texte, souris, ports, IRQ clavier, temps |
 | `jeu/exepack.js` | décompression EXEPACK et relocations, comme DOS au chargement |
 | `jeu/principal.js` | la page : chargement des fichiers, boucle au rythme du temps réel, affichage, entrées |
 | `jeu/clavier.js` | codes clavier du PC |
 | `jeu/son.js` | joue les WAV de `sons/` quand le jeu appelle son pilote (int 60h : jouer, arrêter, silence) ; la musique en boucle |
 | `sons/` | les morceaux du pilote AdLib en WAV (mono, 16 bits, 22 050 Hz), générés (voir « Son »), ignorés par git |
-| `fichiers.php` | les fichiers d'origine en une archive ; écrit `QUEST.SAV` et `QUEST.CFG` dans `sauvegardes/` (ignoré par git), jamais dans le jeu d'origine |
+| `fichiers.php` | les fichiers d'origine en une archive, sans ceux des autres versions (`.EGA`, pilotes Tandy et MT-32) ; écrit `QUEST.SAV` et `QUEST.CFG` dans `sauvegardes/` (ignoré par git), jamais dans le jeu d'origine |
 
 ## Comment le code est traduit
 
@@ -66,7 +69,7 @@ Depuis `outils/` (prérequis : `pip install capstone unicorn`, Node 22 ou plus) 
 python recompiler.py QUEST        # puis INTRO : régénère jeu/*.gen.js
 python difference.py 10 QUEST     # chaque instruction traduite contre un vrai x86 (Unicorn), 10 états au hasard ; puis INTRO
 node essai.mjs 5 menu.png "clic:68:128,attendre:3,clic:160:44,attendre:4"   # le jeu sans navigateur
-PROGRAMME=INTRO node essai.mjs 1 intro.png "car:1,car:1"                    # l'intro
+PROGRAMME=INTRO node essai.mjs 15 intro.png "espace,attendre:8"             # l'intro
 node navigateur.mjs "http://127.0.0.1:8765/?sans-intro&debug" page.png "attendre:5,clic:163:130"  # dans Chrome
 ```
 
@@ -76,4 +79,5 @@ node navigateur.mjs "http://127.0.0.1:8765/?sans-intro&debug" page.png "attendre
 
 - Son : morceaux préenregistrés ; un effet se mêle à la musique au lieu de lui prendre le canal 0 comme sur la vraie puce.
 - Joystick non émulé (le port 201h répond « rien de branché »).
+- Les modes EGA et Tandy du jeu ne sont pas émulés : un seul affichage, le VGA.
 - Les écrans n'ont pas encore été comparés pixel à pixel avec des captures de DOSBox-X.
