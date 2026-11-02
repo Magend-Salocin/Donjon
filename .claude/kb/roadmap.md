@@ -10,7 +10,7 @@
 | Héros | Inscription (4 types × 2 sexes), fiche, niveaux (5 points par niveau), grades Novice à Légende | `Progression.php` |
 | Village | 3 villages, boutiques et stocks, inventaire, équipement sur 7 emplacements, voyages minutés | `World.php`, `Inventory.php`, `Travel.php` |
 | Social | Messagerie, discussion de taverne par village, duels simulés côté serveur (60 par jour) | `Duel.php`, `Chat.php` |
-| Taverne | Discussion et Tetris. Conception complète des PNJ, dialogues et compagnons, non développée | [concept-taverne](taverne/concept-taverne.md) |
+| Taverne | Discussion. Conception complète des PNJ, dialogues et compagnons, non développée | [concept-taverne](taverne/concept-taverne.md) |
 | Plateau | Moteur de 2009 nettoyé : dés, déplacement, combat, trésors, pièges, IA des monstres, sauvegarde par `api.php` | `public/assets/game/` |
 | Aventures | 6 aventures de 2009 (cartes 1 à 6), 22 du HeroQuest PC (101 à 124 sauf 105 et 110) | `database/seed.sql`, `quests/` |
 | Vue iso | Vues 3D, classique et de dessus. Gros plan de combat. Atlas de 177 images, barbare h/f animé (marche, attaque, touché, mort) | `ModuleIso.js`, skill `atlas-iso` |

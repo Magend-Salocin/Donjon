@@ -4,7 +4,7 @@ Statut : proposition, à valider avant développement.
 
 ## Objectif
 
-Aujourd'hui, la taverne ([taverne.php](../../../donjon-v2/templates/pages/taverne.php)) ne contient qu'un forum de village et un lien vers Tetris. L'idée est d'en faire le lieu où la campagne (`Campagne01` du dépôt HeroQuest) entre dans le jeu :
+Aujourd'hui, la taverne ([taverne.php](../../../donjon-v2/templates/pages/taverne.php)) ne contient qu'un forum de village. L'idée est d'en faire le lieu où la campagne (`Campagne01` du dépôt HeroQuest) entre dans le jeu :
 
 - parler aux PNJ par des dialogues à choix fermés ;
 - ouvrir des aventures : celles de la campagne, et les quêtes de 2009 ;

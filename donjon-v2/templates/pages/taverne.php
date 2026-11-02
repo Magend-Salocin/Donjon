@@ -28,8 +28,6 @@
             </form>
         </div>
         <div>
-            <h3>Jeux de taverne</h3>
-            <p><a href="games/tetris/index.html">Tetris</a></p>
             <h3>Bientôt à la taverne</h3>
             <ul>
                 <li>News sur les dernières aventures</li>

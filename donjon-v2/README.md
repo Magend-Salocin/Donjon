@@ -52,7 +52,6 @@ public/               Racine web
   index.php           Point d'entrée des pages
   api.php             Appels AJAX du plateau de donjon (JSON)
   assets/             CSS, images, musiques (audio/), Flash (flash/), jeu de plateau (game/)
-  games/tetris/       Mini-jeu de la taverne
 ```
 
 ## Le plateau de donjon
