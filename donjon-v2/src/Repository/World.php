@@ -123,6 +123,15 @@ final class World
         );
     }
 
+    /** @return list<int> codes des aventures réussies au moins une fois */
+    public function completedAdventures(int $hero): array
+    {
+        return array_map('intval', array_column(
+            $this->db->all('SELECT aven_num FROM accomplir WHERE jou_num = ? AND nb > 0', [$hero]),
+            'aven_num'
+        ));
+    }
+
     /** Nombre d'aventures terminées par grade d'aventure : ['Novice' => 12, ...]. */
     public function missionCountsByGrade(int $hero): array
     {

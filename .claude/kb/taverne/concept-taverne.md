@@ -1,6 +1,6 @@
 # Concept : la taverne
 
-Statut : proposition, à valider avant développement.
+Statut : proposition, à valider avant développement. Un POC de l'étape 1 tourne dans le jeu (voir [POC](#poc)).
 
 ## Objectif
 
@@ -130,6 +130,29 @@ return [
 6. Allié visible sur le plateau, avec son IA.
 
 Chaque étape est jouable seule. La 1 donne déjà une raison d'aller à la taverne.
+
+## POC
+
+Une version simplifiée de l'étape 1, pour voir le système dans le jeu.
+
+| Élément | Où |
+| --- | --- |
+| Moteur : présence, variantes de nœud, conditions, effets | [Tavern.php](../../../donjon-v2/src/Game/Tavern.php) |
+| Drapeaux (table `drapeau`) | [upgrade.sql](../../../donjon-v2/database/upgrade.sql), [Flags.php](../../../donjon-v2/src/Repository/Flags.php) |
+| Dialogues : Hergard et Magotte (Valtordu), Brunhilde et Jos (Waldorg), Snorri et Gnorg (Gzor) | [data/dialogues/](../../../donjon-v2/data/dialogues/) |
+| Page : salle, portrait, réplique, réponses ; forum replié en bas | [taverne.php](../../../donjon-v2/templates/pages/taverne.php) |
+| Images, découpées dans `Visuel_art/Taverne/` | [decouper-taverne.py](../../../donjon-v2/bin/decouper-taverne.py) |
+
+Ce que le POC sait faire :
+
+- conditions qui masquent la réponse : `drapeau`, `sans`, `aventure`, `sans-aventure`, `type`, `sans-type` ;
+- conditions qui la grisent avec la raison : `or`, `grade` ;
+- effets : `or`, `pv plein`, `drapeau`, `effacer`, `debloquer`, `objet` ;
+- un nœud peut avoir des `variantes` : la première dont les conditions sont vraies remplace le nœud (rumeurs, retour du PNJ après l'aventure).
+
+Le nœud en cours est gardé en session. Le serveur vérifie de nouveau les conditions à chaque choix.
+
+Pas encore fait : réputation, corruption, bonus, recrutement (les taverniers répondent « personne pour l'instant »), débriefings. `debloquer` pose le drapeau `aventure_<code>`, mais la liste des aventures ne le lit pas encore (décision « Quêtes de 2009 verrouillées »). Brunhilde et Snorri utilisent le portrait du tenancier, faute du leur. La quatrième maquette (vue en plongée) n'est pas utilisée.
 
 ## Décisions à prendre
 

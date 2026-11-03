@@ -38,6 +38,7 @@ final class Database
         if ($isNew) {
             $db->install($sqlDir);
         }
+        $pdo->exec((string) file_get_contents($sqlDir . '/upgrade.sql'));
 
         return $db;
     }

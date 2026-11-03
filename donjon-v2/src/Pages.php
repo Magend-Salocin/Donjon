@@ -150,12 +150,32 @@ final class Pages
         ];
     }
 
+    /**
+     * Salle de la taverne, ou dialogue en cours avec un PNJ ($_SESSION['taverne'] : pnj, noeud).
+     * ?pnj=code engage la conversation, ?salle=1 la quitte.
+     */
     public function taverne(): array
     {
+        $npcs = $this->app->tavern->npcs($this->hero);
+        if (isset($_GET['salle'])) {
+            unset($_SESSION['taverne']);
+        } elseif (isset($npcs[$_GET['pnj'] ?? ''])) {
+            $_SESSION['taverne'] = ['pnj' => $_GET['pnj'], 'noeud' => 'accueil'];
+        }
+
+        $dialogue = $_SESSION['taverne'] ?? null;
+        $node = $dialogue !== null ? $this->app->tavern->node($this->hero, $dialogue['pnj'], $dialogue['noeud']) : null;
+        if ($node === null) {
+            unset($_SESSION['taverne']);
+        }
+
         return [
             'title' => 'Taverne',
             'side' => true,
             'village' => $this->app->world->village($this->hero['village']),
+            'npcs' => $npcs,
+            'npc' => $node !== null ? $npcs[$dialogue['pnj']] : null,
+            'node' => $node,
             'chat' => array_reverse($this->app->chat->latest($this->hero['village'])),
         ];
     }

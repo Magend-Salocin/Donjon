@@ -10,7 +10,7 @@
 | Héros | Inscription (4 types × 2 sexes), fiche, niveaux (5 points par niveau), grades Novice à Légende | `Progression.php` |
 | Village | 3 villages, boutiques et stocks, inventaire, équipement sur 7 emplacements, voyages minutés | `World.php`, `Inventory.php`, `Travel.php` |
 | Social | Messagerie, discussion de taverne par village, duels simulés côté serveur (60 par jour) | `Duel.php`, `Chat.php` |
-| Taverne | Discussion. Conception complète des PNJ, dialogues et compagnons, non développée | [concept-taverne](taverne/concept-taverne.md) |
+| Taverne | POC de dialogue : 6 PNJ, drapeaux, salle et portrait d'après les maquettes. Forum conservé. Le reste de la conception n'est pas développé | [concept-taverne](taverne/concept-taverne.md#poc) |
 | Plateau | Moteur de 2009 nettoyé : dés, déplacement, combat, trésors, pièges, IA des monstres, sauvegarde par `api.php` | `public/assets/game/` |
 | Aventures | 6 aventures de 2009 (cartes 1 à 6), 22 du HeroQuest PC (101 à 124 sauf 105 et 110) | `database/seed.sql`, `quests/` |
 | Vue iso | Vues 3D, classique et de dessus. Gros plan de combat. Atlas de 177 images, barbare h/f animé (marche, attaque, touché, mort) | `ModuleIso.js`, skill `atlas-iso` |
@@ -21,7 +21,7 @@
 | Constat | Effet | Parade |
 | --- | --- | --- |
 | Aucun test automatisé, PHP ou navigateur | Chaque modification se vérifie à la main ([verification.md](../rules/verification.md), étape 4) | Jalon 1 |
-| Pas de migration de base : une nouvelle aventure ou table demande `bin/reset-db.php` | La taverne ajoute des tables : les héros existants seraient perdus | Jalon 1 |
+| Pas de migration de base : une nouvelle aventure demande `bin/reset-db.php` | Les nouvelles tables passent par `database/upgrade.sql` (idempotent), mais une colonne ou une donnée de seed ne s'ajoute pas à une base existante | Jalon 1 |
 | `api.php` `item-add` accepte n'importe quel objet `item` ou `quete`, même hors aventure | Un client modifié se donne des objets à volonté | Tirer les trésors côté serveur (jalon 2) |
 | L'or des trésors est calculé par le navigateur (plafond 1 000 par sauvegarde) | Idem pour l'or | Jalon 2 |
 | Les points de magie (`pm`, `man`, `ppm`) sont stockés mais aucun sort n'existe | Elfe et enchanteur n'ont pas leur rôle de HeroQuest | Jalon 2 |

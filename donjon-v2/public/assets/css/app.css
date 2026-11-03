@@ -82,13 +82,6 @@ table.scroll-body td { padding: 4px; }
 .buildings a, .destinations button { margin: 4px; }
 .buildings a { display: inline-block; padding: 3px 8px; background: #3b2d14; border-radius: 3px; }
 
-/* Taverne */
-.tavern-image { max-width: 100%; }
-.tavern-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.tavern ul.chat { list-style: none; padding: 0; max-height: 250px; overflow-y: auto; background: #fdf6e3; color: #2b1a08; }
-.tavern ul.chat li { padding: 4px 8px; border-bottom: 1px solid #e0cfa5; }
-.tavern input[type=text] { width: 150px; }
-
 /* Défis */
 table.duels { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
 table.duels th, table.duels td { border: 1px solid #694421; padding: 3px; text-align: center; }

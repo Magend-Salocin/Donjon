@@ -33,18 +33,21 @@ php -d extension_dir="$(Split-Path (Get-Command php).Source)\ext" -d extension=p
 config/config.php     Chemin de la base, mode debug, limites (duels par jour, délai « en ligne »)
 database/schema.sql   Tables SQLite (noms de tables et colonnes de la base MySQL d'origine)
 database/seed.sql     Races, villages, boutiques, objets, aventures (dump MySQL de 2007)
+database/upgrade.sql  Tables ajoutées depuis (drapeaux de la taverne), créées aussi dans une base existante
+data/dialogues/       Un fichier par PNJ de la taverne (notation : .claude/kb/taverne/mecaniques.md)
 bin/reset-db.php      Recrée la base et le compte de démonstration
 bin/import-heroquest.py  Convertit les quêtes du HeroQuest PC de Gremlin en cartes 101 à 124
 bin/heroquest-tiles/  Sols et meubles utilisés pour dessiner ces cartes (repris du remake HeroQuest en C#)
 bin/extract-heroquest-graphics.py  Extrait les graphismes du HeroQuest PC pour la vue isométrique
 bin/heroquest-outils.py  Outils pour explorer les fichiers du HeroQuest PC (formats : _Version/HeroQuest (1991 Gremlin)/FORMATS.md)
 bin/decouper-maquette.py  Découpe bin/maquette/maquette-connexion.png en images du thème (public/assets/img/theme/)
+bin/decouper-taverne.py   Découpe les maquettes Visuel_art/Taverne/ en salles, portrait et icônes (public/assets/img/taverne/)
 bin/decouper-heros.py     Découpe la planche des héros (Campagne01/01-regles/heros-prompt.md) en portraits, images de combat et pions
 src/                  Code PHP
   bootstrap.php       Autoload, configuration, session, ouverture de la base
   Database.php        Accès PDO (requêtes préparées, transactions)
   Repository/         Une classe par groupe de tables (joueurs, objets, monde, messages, défis, taverne)
-  Game/               Règles du jeu : inventaire, progression (niveaux, grades, aventures), voyage, duel
+  Game/               Règles du jeu : inventaire, progression (niveaux, grades, aventures), voyage, duel, dialogues de la taverne
   Actions.php         Formulaires POST (une méthode par action, puis redirection)
   Pages.php           Données de chaque page (?page=...)
 templates/            Gabarit, pages et fragments HTML

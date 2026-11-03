@@ -7,9 +7,11 @@ namespace Donjon;
 use Donjon\Game\Duel;
 use Donjon\Game\Inventory;
 use Donjon\Game\Progression;
+use Donjon\Game\Tavern;
 use Donjon\Game\Travel;
 use Donjon\Repository\Chat;
 use Donjon\Repository\Duels;
+use Donjon\Repository\Flags;
 use Donjon\Repository\Items;
 use Donjon\Repository\Messages;
 use Donjon\Repository\Players;
@@ -24,11 +26,13 @@ final class App
     public readonly Messages $messages;
     public readonly Duels $duels;
     public readonly Chat $chat;
+    public readonly Flags $flags;
 
     public readonly Inventory $inventory;
     public readonly Progression $progression;
     public readonly Travel $travel;
     public readonly Duel $duel;
+    public readonly Tavern $tavern;
 
     public function __construct(public readonly Database $db, public readonly array $config)
     {
@@ -38,10 +42,12 @@ final class App
         $this->messages = new Messages($db);
         $this->duels = new Duels($db);
         $this->chat = new Chat($db);
+        $this->flags = new Flags($db);
 
         $this->inventory = new Inventory($this->players, $this->items);
         $this->progression = new Progression($db, $this->players, $this->world);
         $this->travel = new Travel($this->players, $this->world);
         $this->duel = new Duel($this->players, $this->duels, (int) $config['duels_per_day']);
+        $this->tavern = new Tavern($db, $this->players, $this->items, $this->world, $this->flags);
     }
 }

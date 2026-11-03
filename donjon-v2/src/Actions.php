@@ -49,6 +49,7 @@ final class Actions
                 'delete-challenges' => $this->deleteChallenges($hero),
                 'fight' => $this->fight($hero),
                 'chat' => $this->chat($hero),
+                'dialogue' => $this->dialogue($hero),
                 default => redirect('personnage'),
             };
         } catch (GameError $error) {
@@ -241,6 +242,19 @@ final class Actions
         $message = limit_text(post_string('message'), 200);
         if ($message !== '') {
             $this->app->chat->post($hero['village'], $hero['nom'], $message);
+        }
+        redirect('taverne');
+    }
+
+    /** Réponse choisie dans le dialogue en cours de la taverne. */
+    private function dialogue(array $hero): never
+    {
+        $dialogue = $_SESSION['taverne'] ?? throw new GameError("Personne ne vous parle.");
+        $next = $this->app->tavern->choose($hero, $dialogue['pnj'], $dialogue['noeud'], post_int('choix'));
+        if ($next === null) {
+            unset($_SESSION['taverne']);
+        } else {
+            $_SESSION['taverne']['noeud'] = $next;
         }
         redirect('taverne');
     }
