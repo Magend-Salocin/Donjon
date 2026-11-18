@@ -7,7 +7,7 @@
 | Livrable | État |
 | --- | --- |
 | Exécutables décompressés (EXEPACK) | `original/binaires/` |
-| Désassemblage suivant le flot, annoté par `symboles.txt` | QUEST 98,7 %, INTRO 95,9 % du code (le reste : des données dans le segment de code) |
+| Désassemblage suivant le flot, annoté par `symboles.txt` | QUEST 98,7 %, INTRO 97,9 % du code (le reste : des données dans le segment de code) |
 | Segment de données en clair | `original/asm/*-donnees.txt` |
 | Palettes du jeu et des 9 écrans de l'intro | `original/donnees/palettes.json` |
 | Écrans, sprites, images d'interface | 13 écrans, 176 sprites, 327 images |
@@ -29,7 +29,7 @@ Ordre proposé, du socle vers le jeu :
 
 Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (installé, voir [DEBOGUER.md](outils/DEBOGUER.md)) : points d'arrêt, lecture du segment de données.
 
-Bogues vérifiés dans le code le 27 octobre (ligne de vue vers le haut, mur manqué et blocage des tirs, cache des meubles, `monstre_actif_case`, joystick B, chemin des monstres) : voir les notes. Les hypothèses (?) de `symboles.txt` ont toutes été relues le 27 octobre : il n'en reste aucune. La phase 1 est terminée pour QUEST.EXE ; seules restent les 4 sauts indirects non résolus du rapport, et INTRO.EXE (85 routines, dont 26 probables).
+Bogues vérifiés dans le code le 27 octobre (ligne de vue vers le haut, mur manqué et blocage des tirs, cache des meubles, `monstre_actif_case`, joystick B, chemin des monstres) : voir les notes. Les hypothèses (?) de `symboles.txt` ont toutes été relues le 27 octobre : il n'en reste aucune. La phase 1 est terminée le 18 novembre 2026 : les 4 sauts indirects de QUEST sont résolus (`SAUTS_INDIRECTS` de `desassembler.py`), et les 91 routines d'INTRO.EXE sont nommées et décrites ([04-intro.md](original/notes/04-intro.md)).
 
 Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` donne le nombre de routines nommées (379 sur 379 au 27 octobre : toutes ont un nom, une partie reste marquée (?) ; 0x5EB0 n'est plus comptée, c'est un fragment mort de `curseur_dessine`). Ce fichier résume aussi chaque routine (taille, appelants, interruptions, ports, variables), ce qui aide à les classer avant de les lire.
 
@@ -39,6 +39,7 @@ Avancement mesurable : la première ligne de `original/asm/quest-routines.txt` d
 | Machine d'écrans | vue de la zone, carte et désignation d'une cible, ouverture des messages ; boucle principale, menu titre, héros, armurerie, choix de la quête, affichage, messages, boucle des tours, inventaire, briefing et préparation de la quête, sauvegarde des personnages | [02-ecrans.md](original/notes/02-ecrans.md) |
 | Règles | ligne de vue (tir, sorts, cases alignées), chemin du héros vers la case cliquée, choix des sorts au départ ; dés, déplacement, attaque du héros, trésors ; tour d'un personnage, panneau d'icônes, événements et fouilles scriptés, sorts et leurs effets, objets (armes, armures, potions, artefacts, trousse à outils), monstres (chemin, attaque, types), dés d'attaque et de défense, fin de quête et récompenses, mort d'un héros, pièges, portée des armes, fouilles et cartes trésor, les 30 événements scriptés, événements de zone et morts des monstres spéciaux, panneau (positions) et déplacement | [03-regles.md](original/notes/03-regles.md) |
 | Textes | index des messages décodé (`french-messages.txt`), annoté dans le listing | [02-ecrans.md](original/notes/02-ecrans.md#messages) |
+| INTRO.EXE | configuration, intro VGA et EGA, langue, bibliothèque commune (en partie morte) | [04-intro.md](original/notes/04-intro.md) |
 
 ## Phase 2 : compléter les données
 
@@ -64,7 +65,7 @@ Méthode retenue : plutôt que de réécrire 15 000 instructions à la main, `ou
 
 Contrôles faits :
 
-- `outils/difference.py` : chaque instruction traduite contre un vrai x86 (Unicorn), 10 états au hasard par instruction : QUEST 146 660 cas, INTRO 66 500 cas, 0 écart.
+- `outils/difference.py` : chaque instruction traduite contre un vrai x86 (Unicorn), 10 états au hasard par instruction : QUEST 146 660 cas, INTRO 67 400 cas (18 novembre), 0 écart.
 - `outils/essai.mjs` : parcours sans navigateur (menu, héros, choix de quête, briefing, plateau, dés, pas) et 4 parties de clics au hasard de 13 minutes chacune, sans erreur ni service DOS ou BIOS manquant.
 - `outils/navigateur.mjs` : la page dans Chrome (intro en mode texte, écrans graphiques, clics, temps du jeu égal au temps réel).
 

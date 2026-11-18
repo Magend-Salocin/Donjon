@@ -113,7 +113,7 @@ Choix des sorts (`attribue_sorts`, 0x7F74) : l'enchanteur choisit 3 éléments, 
 
 ## Intro
 
-INTRO.EXE enchaîne GREMLIN, PIC1, TEXT1, puis 6 scènes (tables DS:0052 texte, DS:005E palette, DS:006A écran ; routine de chaque scène dans la table CS:071E). Dans l'ordre : HERO1, HERO2, HERO4, HERO6, HERO3, HERO7. Chaque écran a sa palette de 32 couleurs ([palettes](../donnees/palettes.json)).
+INTRO.EXE enchaîne GREMLIN, PIC1, TEXT1, puis 6 scènes (tables DS:0052 texte, DS:005E palette, DS:006A écran ; routine de chaque scène dans la table CS:071E). Dans l'ordre : HERO1, HERO2, HERO4, HERO6, HERO3, HERO7. Chaque écran a sa palette de 32 couleurs ([palettes](../donnees/palettes.json)). Le reste du programme (configuration, langue, code) : [04-intro.md](04-intro.md).
 
 Les sprites animés viennent de ANIMS.VGA, chargé tel quel (pas de compression) en segment 0x2523. Une image est rangée sur 5 plans de bits consécutifs (plan 0 = bit faible, 1 bit par pixel, rangée après rangée) ; trois routines la convertissent en un octet par pixel (0x4D50 pour 16 × 16, 0x4D93 pour 32 × 64, 0x4DDC pour 64 × 64). La couleur 0 est transparente. Les 6 scènes occupent exactement les 20 480 octets du fichier :
 

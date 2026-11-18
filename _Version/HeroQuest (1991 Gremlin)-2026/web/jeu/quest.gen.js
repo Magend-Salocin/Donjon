@@ -9399,10 +9399,10 @@ function son_musique_4850(m, ip) {
       case 0x4898: if (!m.interruption(0x10)) { m.pas = 0; ip = 0x4898; continue; }  // int 0x10
       case 0x489a: m.t += 2; m.pas -= 2; m.ax = 0x4c00;  // mov ax, 0x4c00
       case 0x489d: if (!m.interruption(0x21)) { m.pas = 0; ip = 0x489d; continue; }  // int 0x21
-      case 0x489f: m.t += 4; m.pas -= 4; m.wb(m.ss, ((m.bp + m.si + 0x155) & 0xffff), m.add8(m.rb(m.ss, ((m.bp + m.si + 0x155) & 0xffff)), (m.cx & 0xff)));  // add byte ptr [bp + si + 0x155], cl
+      case 0x489f: m.t += 1; m.pas -= 1; m.wb(m.ss, ((m.bp + m.si + 0x155) & 0xffff), m.add8(m.rb(m.ss, ((m.bp + m.si + 0x155) & 0xffff)), (m.cx & 0xff)));  // add byte ptr [bp + si + 0x155], cl
         ip = 0x48a3; continue;
       // pas_gauche
-      case 0x48a0: m.dx = (m.dx & 0xff00) | m.rb(m.ds, ((m.di + 0x1) & 0xffff));  // mov dl, byte ptr [di + 1]
+      case 0x48a0: m.t += 3; m.pas -= 3; m.dx = (m.dx & 0xff00) | m.rb(m.ds, ((m.di + 0x1) & 0xffff));  // mov dl, byte ptr [di + 1]
       case 0x48a3: m.sub8((m.dx & 0xff), 0x0);  // cmp dl, 0
       case 0x48a6: if (!m.zf) { ip = 0x48ab; continue; }  // jne 0x48ab
       case 0x48a8: m.t += 1; m.pas -= 1; ip = 0x4d9f; continue;  // jmp 0x4d9f

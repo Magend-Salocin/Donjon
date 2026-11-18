@@ -3,7 +3,7 @@
 // réel ; souris et clavier lui sont transmis.
 // Un seul affichage (VGA) et un seul son (AdLib) : la page fournit QUEST.CFG avec ces choix,
 // si bien que l'intro ne pose pas ses questions de configuration.
-//   index.html?sans-intro   lance directement QUEST.EXE
+//   index.html?sans-intro   lance directement QUEST.EXE (pendant l'intro : Échap ou le bouton)
 //   index.html?langue=en    langue des textes : fr (par défaut), en, es, de, it
 //   index.html?debug        affiche le temps de jeu et l'IP sous l'écran
 
@@ -68,6 +68,7 @@ function brancherEntrees() {
     if (!machine || code === undefined) return;
     e.preventDefault();
     if (programme === 'INTRO' && code === TOUCHE_S) return;
+    if (programme === 'INTRO' && e.code === 'Escape') { passerIntro(); return; }
     if (!e.repeat) machine.appuyer(code);
     machine.toucheBios(asciiDe(e), code);
   });
@@ -75,6 +76,11 @@ function brancherEntrees() {
     const code = codeClavier(e.code);
     if (machine && code !== undefined) machine.relacher(code);
   });
+}
+
+// Termine INTRO.EXE comme s'il rendait la main (int 21h AH=4Ch) : la page lance QUEST.EXE.
+function passerIntro() {
+  if (programme === 'INTRO' && machine.arret === null) machine.arret = 0;
 }
 
 // Fait tourner un programme jusqu'à sa fin (int 21h AH=4Ch) ; rend son code de sortie.
@@ -139,7 +145,13 @@ async function demarrer() {
   etat.textContent = '';
 
   fichiers.set('QUEST.CFG', configuration(fichiers.get('QUEST.CFG')));
-  if (!OPTIONS.has('sans-intro')) await executer('INTRO', fichiers, son);
+  if (!OPTIONS.has('sans-intro')) {
+    const bouton = document.querySelector('#passer-intro');
+    bouton.hidden = false;
+    bouton.addEventListener('click', passerIntro);
+    await executer('INTRO', fichiers, son);
+    bouton.hidden = true;
+  }
   await executer('QUEST', fichiers, son);
   etat.textContent = 'Le jeu est terminé.';
 }

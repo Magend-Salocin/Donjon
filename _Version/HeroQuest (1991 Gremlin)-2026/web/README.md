@@ -14,7 +14,7 @@ Un seul affichage, le VGA, et un seul son, l'AdLib. La page fournit `QUEST.CFG` 
 
 | Adresse | Effet |
 | --- | --- |
-| `index.html?sans-intro` | lance directement le jeu |
+| `index.html?sans-intro` | lance directement le jeu ; pendant l'intro, Échap ou le bouton « Passer l'intro » font de même |
 | `index.html?langue=en` | langue des textes : `fr` (par défaut), `en`, `es`, `de`, `it` |
 | `index.html?debug` | affiche sous l'écran le programme, le temps de jeu et l'IP ; expose `window.jeu` (son, machine) |
 
@@ -73,7 +73,7 @@ PROGRAMME=INTRO node essai.mjs 15 intro.png "espace,attendre:8"             # l'
 node navigateur.mjs "http://127.0.0.1:8765/?sans-intro&debug" page.png "attendre:5,clic:163:130"  # dans Chrome
 ```
 
-`difference.py` compare registres, drapeaux définis, octets écrits et instruction suivante ; il exclut les interruptions, les ports et l'appel du pilote de son, qui dépendent de l'environnement. Résultat au 28 octobre 2026 : QUEST 146 660 cas, INTRO 66 500 cas, 0 écart.
+`difference.py` compare registres, drapeaux définis, octets écrits et instruction suivante ; il exclut les interruptions, les ports et l'appel du pilote de son, qui dépendent de l'environnement. Résultat au 18 novembre 2026 : QUEST 146 660 cas, INTRO 67 400 cas, 0 écart.
 
 ## Limites
 

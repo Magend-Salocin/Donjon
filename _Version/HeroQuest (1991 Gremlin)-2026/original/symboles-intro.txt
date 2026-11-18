@@ -1,4 +1,206 @@
 # Symboles de INTRO.EXE (image mémoire décompressée ; adresses = positions dans l'image, CS:0 = 0x44B0).
-# Même format que symboles.txt.
+# Même format que symboles.txt. DS = 0 : l'offset DS d'une variable est sa position dans l'image.
+# Ce que fait le programme : original/notes/04-intro.md.
 
-0x6fc9  code  clavier_interruption   int 9 installé par sub_6f7a (CS:2B19) : lit le port 60h, met à 1 ou 0 l'octet de la touche dans DS:1BB4 (64 touches)
+# ---- Déroulé
+0x44b0  code  demarrage_intro        point d'entrée : réduit la mémoire (int 21h AH=4Ah), lit QUEST.CFG ; présent : « Press S to change config » (S l'efface) ; absent : questions (écran, son, commandes des 4 héros) ; mode vidéo, son, intro VGA ou EGA/Tandy ; première configuration : drapeaux et écriture de QUEST.CFG ; quitte (code 0)
+0x4739  etiq  fin_intro              relit QUEST.CFG : présent, on quitte ; absent (nouvelle configuration), écran des drapeaux
+0x4758  etiq  ecran_drapeaux         FLAGS.EGA en mode EGA, même en VGA (mode gardé en DS:10A2) ; touches E F S G I -> langue 0 à 4 ; écrit QUEST.CFG ; vérifie QUEST.EXE (« Insert disk 2 »)
+0x4876  etiq  quitte_intro           remet int 9, arrête le son (son_arret), mode texte 3, int 21h AH=4Ch
+0x4887  etiq  intro_ega              EGA et Tandy : SHOPMP.EGA et BORDERED.EGA, puis copyright, crédits et les 6 textes, sans animation
+0x4912  code  ecran_texte_ega        EGA/Tandy : fond BORDERED (Tandy : rempli de CCh), écusson SHOPMP si BP = texte_copyright, texte BP, copie à l'écran, palette, attend Espace ou Échap (AL = 1 si Échap)
+0x4980  code  copie_ecran_ega        tampon 0A86:0 vers l'écran : EGA, 4 plans de 40 × 200 octets (port 3C4h) ; Tandy, 32 Ko vers B800h
+0x49e2  code  palette_ega            registres de palette (int 10h AX=1002h) : DS:105E en EGA, DS:106F en Tandy
+0x49fc  code  palette_ega_noire      registres de palette à zéro (DS:0C5E) : écran noir avant de dessiner
+
+# ---- Scènes animées (VGA)
+0x4a0c  code  anime_scene            saut vers l'animation de la scène BX (0 à 10, pas 2), table CS:071E (image 0x4BCE)
+0x4a11  code  scene_flamme           scène 1 (HERO1) : 4 images 16 × 16, flamme en (260, 104), 24 images toutes les 6 trames
+0x4a4d  code  scene_feu              scène 2 (HERO2) : 3 images 32 × 64, feu en (134, 88), 10 tours de 3 images (2 trames)
+0x4a6a  code  scene_visage           scène 3 (HERO4) : 4 images 64 × 64, attend 60 trames, visage qui parle en (128, 32) (4 trames par image), puis 240 trames
+0x4a92  code  scene_table            scène 4 (HERO6) : 16 images 16 × 16, 30 images (12 trames) de 4 sprites : deux cycles de 5 (DS:128E), deux de 3 (DS:1290)
+0x4b19  code  scene_deux_sprites     scène 5 (HERO3) : 12 images 16 × 16, 30 images (8 trames) de 2 sprites : cycles de 5 et de 7
+0x4b80  code  scene_finale           scène 6 (HERO7) : 8 images 16 × 16, attend 60 trames, 10 images en (65, 120) qui finissent en boucle sur 6-7, attend 60 trames
+0x4bda  code  attend_trames          attend DX retours de trame (attend_trame)
+0x4be1  code  restaure_fond          redécompresse l'écran de la scène (segment 1A26) dans le tampon 0A86:0
+0x4bfd  code  tampon_vers_ecran      copie le tampon 0A86:0 (64 000 octets) en A000:0
+0x4c1f  code  sprite_16              dessine dans le tampon une image 16 × 16 du segment 2A23 (SI = n° × 256) en DI ; couleur 0 transparente
+0x4c56  code  anime_32x64            CX images 32 × 64 en DI : fond restauré, DX trames, image, copie à l'écran (scène 2)
+0x4cd3  code  anime_64x64            même chose en 64 × 64 (scène 3)
+0x4d50  code  convertit_16           CX images 16 × 16 de ANIMS (segment 2523, SI) : 5 plans de bits -> un octet par pixel en 2A23:DI
+0x4d93  code  convertit_32x64        même conversion, images 32 × 64 (plans de 100h octets)
+0x4ddc  code  convertit_64x64        même conversion, images 64 × 64 (plans de 200h octets)
+
+# ---- Écrans et palettes
+0x4e25  code  mode_video_intro       mode vidéo selon mode_video (table DS:1284) : 8 -> 13h, 6 -> 0Dh, 4 -> 09h (Tandy)
+0x4e43  code  palette_vga            attend un retour de trame, puis 32 couleurs (DAC 0 à 31, ports 3C8h/3C9h) depuis DS:DX
+0x4e5b  code  ecran_texte_vga        fondu au noir, TEXT1.VGA, texte BP, fondu d'entrée (palette DS:0D86), attend Espace ou Échap (AL = 1 si Échap)
+0x4ecd  code  affiche_ecran_vga      fondu au noir, décompresse l'écran chargé (1A26 -> 0A86), le copie en A000, fondu d'entrée vers la palette DI
+0x4f1b  code  attend_espace_echap    regarde la touche en attente (int 16h AH=1, sans la retirer), puis attend Espace (AL = 0) ou Échap (AL = 1)
+0x4f33  code  pas_du_fondu           pas du fondu depuis la palette DI (32 × 3 octets) : valeur × 2, en 8.8, dans pas_fondu
+0x4f82  code  fondu_entree           palette à zéro, puis 128 étapes : ajoute les pas, envoie la palette (une trame par étape)
+0x4fbf  code  fondu_noir             128 étapes : retire les pas de la palette en cours (les pas de l'écran précédent)
+0x4fed  code  affiche_tandy          mode 4 seulement (écran des drapeaux) : tampon 0A86 (rangée de 160 octets = 4 plans de 40) -> 4 bits par pixel en B800h, 4 banques de 2000h ; boucle déroulée, compteur de rangées en CS:23EF (image 0x689F)
+
+# ---- Texte
+0x6a3c  code  affiche_chaine         chaîne DS:BP terminée par 0, chaque caractère passé à affiche_caractere
+0x6a4b  code  affiche_caractere      caractère AL en police 8 × 8 (DS:13B5) à colonne_texte, ligne_texte ; une routine par mode (table DS:19DC) ; codes 1 = segment (mot suivant), 10h = couleurs (encre, fond), 11h = position (ligne, colonne), 12h = position (colonne, ligne + 4)
+0x6a63  etiq  caractere_tandy        mode 4 : glyphe en 4 bits par pixel (pixels_tandy), 4 banques de 2000h ; code 10h : couleur 38h remplacée par 5
+0x6ba0  etiq  caractere_ega          mode 6 : glyphe sur 4 plans ; à l'écran (A000h) par les ports 3CEh/3C4h, sinon dans un tampon de 4 plans de 40 octets par rangée
+0x6d7c  etiq  caractere_vga          mode 8 : un octet par pixel, ligne de texte = A00h octets ; texte_inverse bit 0 inverse le glyphe, texte_transparent = 1 laisse le fond
+
+# ---- Bibliothèque commune avec QUEST (code mort quand il n'est pas appelé)
+0x69b6  code  lit_configuration      non appelée : copie de lit_configuration de QUEST (DS:192F « quest.cfg », « Configuration file missing », souris, « No mouse installed », etalonne_joystick)
+0x6a34  code  ligne_ecran            non appelée : BX += AX × 320, copie de ligne_ecran de QUEST
+0x6e5e  code  mode_tandy             non appelée : mode_video = 4, int 10h mode 8 ; copie de mode_tandy de QUEST
+0x6e6b  code  pause_courte           boucle de 1000 nop, registres conservés
+0x6e86  code  pause_longue           non appelée : même boucle sur 65 535 tours
+0x6e95  code  attend_touche          attend une touche enfoncée (touche_enfoncee), puis son relâchement ; AH = code de la touche, AL = ASCII
+0x6ea2  code  touche_enfoncee        première touche à 1 dans etat_touches (128) ; AH = code, AL = ASCII (ascii_touches) ; AX = 0 si aucune
+0x6ecb  code  attend_relachement     boucle tant qu'une touche est enfoncée
+0x6ed3  code  hasard                 non appelée : générateur de QUEST (registre à décalage DS:1B9F), nombre de 1 à BL dans AL
+0x6f00  code  efface_ecran           non appelée : texte en (0, 0), puis efface l'écran selon le mode (table DS:19E6) ; les branches Tandy (A000h rempli de mode_video) et EGA (200 mots) semblent fausses, sans effet puisque mortes
+0x6f60  code  attend_retour_trame    attend le retour de trame (port 3DAh, bit 3) ; la suite (6F6D-6F79, attente de sa fin) n'est pas atteinte
+0x6f7a  code  installe_clavier       si int 9 n'est pas déjà détourné (DS:1C3D ≠ 2B19h) : garde l'ancien en ancien_int9, installe clavier_interruption (CS:2B19), remet etat_touches à 0
+0x6fb1  code  restaure_clavier       remet l'ancien int 9 s'il a été gardé
+0x6fc9  code  clavier_interruption   int 9 : lit le port 60h, met à 1 ou 0 l'octet de la touche dans etat_touches (128 touches)
+
+# ---- Saisie : clavier, joystick, souris
+0x7012  code  lit_commandes          6 touches de touches_commandes -> bits de commandes (Entrée 20h, Espace 10h, P 8, O 4, A 2, Q 1) ; Échap + Ctrl -> 40h ; puis lit_joystick, curseur_clavier, lit_souris ; x borné à 12Fh ; son_musique
+0x7069  code  lit_joystick           si commande_type = 2 : joystick_position comparé au centre (DS:14AD, DS:14AF) à 16 près ; joystick B si masque_joystick ≠ 3 ; boutons -> 10h et 20h
+0x70f5  code  curseur_clavier        déplace le curseur de 4 pixels selon les bits de direction (x 4 à 13Bh, y 4 à C2h)
+0x7146  code  lit_souris             si commande_type = 0 : int 33h AX=3 ; boutons -> 10h et 20h, directions selon l'écart avec le curseur, puis curseur = souris (x / 2)
+0x719d  code  souris_position        non appelée : int 33h AX=4 (place le curseur de la souris), si commande_type = 0
+0x71af  code  attend_commande        non appelée : attend que commandes soit non nul
+0x71ba  code  attend_relache         attend que commandes revienne à 0
+0x71c5  etiq  attend_bouton_droit    registres conservés : attend le bit 20h, puis attend_relache ; atteinte seulement par affiche_registres_attend (morte)
+0x71ee  code  attend_clic            non appelée : attend le bit 10h de commandes, registres conservés
+0x7214  code  attend_relache_boutons non appelée : attend que les bits 10h et 20h de commandes soient à 0
+
+# ---- Fichiers
+0x7241  code  charge_fichier         retire le clavier, ouvre (mode erreur_fichier = 0), lit FFFFh octets au plus vers fichier_segment:fichier_offset, taille dans fichier_taille, ferme, remet le clavier
+0x7260  code  sauve_fichier          retire le clavier, crée, écrit fichier_taille octets, ferme, remet le clavier
+0x7276  code  fichier_cree           int 21h AH=3Ch
+0x7288  code  fichier_ouvre          int 21h AH=3Dh, mode AL = erreur_fichier ; erreur dans erreur_fichier
+0x72a2  code  fichier_ecrit          int 21h AH=40h
+0x72bc  code  fichier_lit            int 21h AH=3Fh
+0x72d4  code  fichier_ferme          int 21h AH=3Eh
+
+# ---- Saisie de texte
+0x72df  code  saisie_ligne           DI tampon (rempli d'espaces), CX longueur max ; caractères 20h à 7Ah (chiffres seuls si saisie_chiffres = 1), retour arrière, Entrée termine ; écho par affiche_caractere
+0x7365  code  saisie_nombre          non appelée : 1 ou 2 chiffres dans DS:1A95, recommence si vide ; valeur dans AX
+
+# ---- Images selon le mode vidéo
+0x7399  code  adresse_ega            DI = y × 320 + x -> adresse_tampon = y × 160 + x / 8, decalage_pixel = x & 7
+0x73d4  code  adresse_tandy          DI = y × 320 + x -> adresse_tampon = lignes_tandy[y] + x / 2, decalage_pixel = x impair
+0x7410  code  affiche_sprite         image transparente (couleur 0) : SI source dans segment_source, BP largeur, CX hauteur, DI = y × 320 + x ; table saut_affiche_sprite ; compteurs en CS:2500-2504 (image 0x69B0)
+0x7995  code  copie_image            non appelée : même chose, opaque ; table saut_copie_image
+0x7cc4  code  efface_rectangle       non appelée : SI -> position (2 octets), hauteur, largeur, couleur ; remplit d'espaces (chaîne DS:1A33)
+
+# ---- Mise au point (code mort, commun avec QUEST)
+0x7d57  code  longueur_texte         non appelée : SI = position du 0 final du texte BP ; identique à QUEST 0x449A
+0x7d64  code  affiche_registres_attend non appelée : affiche_registres, puis attend_bouton_droit
+0x7d6a  code  affiche_registres      AX à DS en hexadécimal (chaînes DS:17B5 à DS:1805), position et couleurs du texte conservées
+0x7e2e  code  affiche_hexa           DX en 4 chiffres hexadécimaux
+0x7e4c  code  chiffre_hexa_bas       chiffre du quartet bas de AL
+0x7e52  code  chiffre_hexa_haut      chiffre du quartet haut de AL
+0x7e60  code  chiffre_hexa           affiche le chiffre AL (0 à 15) avec chiffres_hexa
+0x7e68  code  numero_bit             non appelée : numéro du premier bit posé de AL (0 à 7) ; identique à QUEST 0x45AB
+0x7e7c  code  installe_erreur_disque non appelée : int 24h -> CS:39DA (erreur_disque)
+0x7e8a  code  erreur_disque          non appelée : AL = 0 (ignorer l'erreur)
+
+# ---- Divers
+0x7e8d  code  lz_decompresse         décompression LZ de DS:SI vers ES:DI, CX octets au plus ; identique à QUEST 0x45D1
+0x7f43  code  temporise              CX fois pause_courte
+0x7f4b  code  attend_trame           attend le début puis la fin du retour de trame (bit 3 de port_etat_video)
+0x7f67  code  lit_ports_video        port_crtc = mot BIOS 0040:0063, port_etat_video = ce port + 6
+0x7f7a  code  etalonne_joystick      non appelée (seulement par lit_configuration, morte) : mode texte, « Centre joystick and press fire », masque_joystick = 3 (A) ou C0h (B), centre relevé par joystick_position
+0x7fca  code  joystick_position      chronomètre le port 201h, interruptions coupées, masqué par masque_joystick : BX x et CX y du joystick A ; DI et SI du joystick B
+0x8011  code  joystick_boutons       boutons des deux joysticks dans les bits 0 à 3 de AL (port 201h inversé) ; identique à QUEST 0x4755
+0x8136  code  quitte                 non appelée : retire le clavier, mode texte 3, int 21h AX=4C00h
+
+# ---- Son (pilote appelé par int 60h, voir notes/01-socle.md#son)
+0x802a  code  son_arret              en quittant : silence (AX=0Bh, port 61h pour le haut-parleur), arrête la poignée DS:144E si musique_coupee, sinon son_poignee (AX=4), puis AX=0Bh et AX=0
+0x8062  code  son_charge_pilote      réserve 697h paragraphes (int 21h AH=48h), y charge les données (son_donnees), charge le pilote (son_pilotes) au segment 01ECh, l'appelle (son_entree_pilote), puis int 60h AX=0Ah
+0x80ca  code  son_prepare            int 60h AX=2 (données, sauf haut-parleur), puis AX=3 morceau son_morceaux[pilote] ; poignée dans son_poignee
+0x80f5  code  son_musique            première pression de F10 : musique_coupee = 1 ; Tandy : AX=3 morceau 0 ; sinon AX=4 (arrête son_poignee), et pour le haut-parleur AX=0Bh + port 61h
+
+# ---- Variables et tables
+0x0000  var   scene_courante         n° de scène × 2 (0 à 10), index des tables textes_scenes, palettes_scenes, ecrans_scenes
+0x0002  var   nom_config             "quest.cfg"
+0x0052  table textes_scenes          texte affiché après chaque scène
+0x005e  table palettes_scenes        palette (32 couleurs) de chaque écran de scène
+0x006a  table ecrans_scenes          hero1, hero2, hero4, hero6, hero3, hero7 (.vga)
+0x00fd  var   texte_credits          « PROGRAM BY ROGER WOMACK … PRESS SPACE BAR »
+0x0251  var   texte_copyright        « HERO QUEST COPYRIGHT 1991 HASBRO BRADLEY … GREMLIN GRAPHICS LIMITED »
+0x0c5e  table palette_noire          96 octets à zéro (DAC et registres EGA)
+0x0cbe  table palette_gremlin        palette du logo GREMLIN
+0x0d1e  table palette_pic1
+0x0d86  table palette_text1          fond des textes
+0x105e  table palette_ega_registres  17 registres de palette EGA (int 10h AX=1002h)
+0x106f  table palette_tandy_registres
+0x1080  table palette_drapeaux_ega
+0x1091  table palette_drapeaux_tandy
+0x10a2  var   mode_video_garde       mode choisi, gardé pendant l'écran des drapeaux (forcé en EGA)
+0x10a4  table pas_fondu              96 mots 8.8 : pas de chaque composante pour un fondu en 128 étapes
+0x1164  table palette_fondu          96 mots 8.8 : palette en cours de fondu
+0x1224  table palette_envoyee        96 octets : octets forts de palette_fondu, envoyés au DAC
+0x1284  table modes_video_intro      routine de passage en mode vidéo, indexée par mode_video
+0x128e  var   image_anim_1           image en cours (1er cycle) d'une scène
+0x1290  var   image_anim_2           image en cours (2e cycle)
+0x13b5  table police                 police 8 × 8, 8 octets par caractère
+0x142b  var   nom_quest_exe          "quest.exe"
+0x1440  var   mode_video             début de la configuration (QUEST.CFG, 9 octets, voir notes/01-socle.md) : 4 Tandy, 6 EGA, 8 VGA
+0x1442  var   son_pilote             0 haut-parleur, 1 AdLib, 2 MT-32 ; 3 Tandy (haut-parleur en mode Tandy)
+0x1443  var   commande_type          0 souris, 1 clavier, 2 joystick (celle du 1er héros, recopiée)
+0x1444  var   langue                 0 en, 1 fr, 2 es, 3 de, 4 it (touches E F S G I)
+0x1445  table commandes_joueurs      commande de chacun des 4 héros
+0x1449  var   musique_coupee         1 après F10
+0x144a  var   son_segment_donnees    segment réservé par son_charge_pilote
+0x144c  var   son_poignee            poignée de la musique (int 60h AX=3)
+0x1450  table son_pilotes            beeper.drv, adlib.drv, mt32.drv, tandy.drv
+0x1480  table son_donnees            fichiers de données : -, game&fx.alb, game&fx.rld, -
+0x14a0  table son_morceaux           morceau de la musique par pilote : 0, 0, 0, 1
+0x14a8  var   son_entree_pilote      appel lointain 01ECh:0000 vers le début du pilote
+0x14ac  var   masque_joystick        3 joystick A, C0h joystick B
+0x14ad  var   centre_joystick_y
+0x14af  var   centre_joystick_x
+0x192f  var   nom_config_bis         "quest.cfg", lu seulement par lit_configuration (morte)
+0x19c8  table saut_affiche_sprite
+0x19d2  table saut_copie_image
+0x19dc  table saut_caractere         affichage d'un caractère selon le mode vidéo
+0x19e6  table saut_efface_ecran      effacement de l'écran selon le mode vidéo
+0x19f0  var   segment_source         segment des images d'affiche_sprite et de copie_image
+0x19f2  var   couleur_encre
+0x19f3  var   couleur_fond
+0x19f4  var   colonne_texte          0 à 39, passe à la ligne après 39
+0x19f6  var   ligne_texte
+0x19f8  var   segment_texte          segment où écrit affiche_caractere (A000h = écran)
+0x19fa  var   texte_inverse          bit 0 : glyphe inversé (mode 8)
+0x19fb  var   texte_transparent      1 : le fond n'est pas dessiné
+0x19ff  table glyphe_tampon          glyphe converti (32 octets) avant écriture
+0x1a21  table pixels_tandy           couleur -> paire de pixels 4 bits
+0x1a8b  var   erreur_fichier         mode d'ouverture en entrée, erreur DOS en sortie (2 = fichier absent)
+0x1a95  var   saisie_tampon          2 chiffres de saisie_nombre ; mot temporaire d'affiche_hexa
+0x1a9b  var   decalage_pixel         EGA : x & 7 ; Tandy : x impair
+0x1a9d  var   adresse_tampon         adresse calculée par adresse_ega ou adresse_tandy
+0x1ba3  var   fichier_segment
+0x1ba5  var   fichier_offset
+0x1ba7  var   fichier_taille
+0x1ba9  var   fichier_nom
+0x1bab  var   fichier_handle
+0x1bad  table touches_commandes      6 codes clavier : Entrée, Espace, P, O, A, Q
+0x1bb4  table etat_touches           un octet par code clavier (Échap DS:1BB5, Ctrl DS:1BD1, F10 DS:1BF8)
+0x1c34  var   commandes              bits : 1 haut, 2 bas, 4 gauche, 8 droite, 10h clic, 20h bouton droit, 40h quitter
+0x1c35  var   curseur_x
+0x1c37  var   curseur_y
+0x1c3b  var   ancien_int9            segment, puis offset en DS:1C3D
+0x1c3f  table ascii_touches          code de touche -> ASCII (QWERTY)
+0x1d12  table chiffres_hexa          "0123456789ABCDEF"
+0x1d22  var   port_crtc
+0x1d24  var   port_etat_video
+0x1d26  var   saisie_max
+0x1d28  var   saisie_pointeur
+0x1d2a  var   saisie_longueur
+0x1d2c  var   saisie_chiffres        1 : saisie_ligne n'accepte que les chiffres
+0x1d2d  table lignes_tandy           début de chaque ligne en mode Tandy (4 banques de 2000h, 160 octets par ligne)

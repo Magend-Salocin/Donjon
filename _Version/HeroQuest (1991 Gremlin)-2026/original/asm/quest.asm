@@ -756,7 +756,7 @@ loc_0726:
 00752  e9 f5 12             jmp loc_1a4a
 ; ---- 1 octets non atteints (0755-0755)
 
-; ======== fin_tour   (appelée depuis 0425)
+; ======== fin_tour   (appelée depuis 0425, 6462)
 ; icône fin du tour : DS:3F9A = 1 ; traversée de la roche activée
 00756  80 3e c8 3f 00       cmp byte ptr [0x3fc8], 0    ; pas_en_file
 0075b  74 01                je loc_075e
@@ -868,7 +868,7 @@ loc_082a:
 0082d  e8 f7 1f             call son_porte
 00830  e9 cc 0a             jmp revele_derriere_porte
 
-; ======== mode_attaque
+; ======== mode_attaque   (appelée depuis 6462)
 ; actif quand l'icône attaque est enfoncée (état 0x1C) ; clic sur une cible, zone DS:4337 pour annuler
 00833  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 00838  75 01                jne loc_083b
@@ -1425,7 +1425,7 @@ loc_0caa:
 00cad  c6 06 9d 3f 01       mov byte ptr [0x3f9d], 1    ; cible_validee
 00cb2  c3                   ret
 
-; ======== mode_regarder
+; ======== mode_regarder   (appelée depuis 6462)
 ; carte avec viseur : nomme ce qui est sous le curseur, jusqu'au bouton droit ou à un clic sur l'icône d'annulation
 00cb3  c6 06 91 3f 01       mov byte ptr [0x3f91], 1    ; carte_cible
 00cb8  e8 15 4a             call plateau_ciblage
@@ -1688,7 +1688,7 @@ loc_0efe:
 00f01  bb 97 40             mov bx, 0x4097
 00f04  ff 27                jmp word ptr [bx]
 
-; ======== sort_guerison
+; ======== sort_guerison   (appelée depuis 0f04)
 ; 2 eau de guérison et 12 guérison du corps : +4 points de corps, sans dépasser DS:4394
 00f06  8a 44 06             mov al, byte ptr [si + 6]
 00f09  8a 1e ca 3f          mov bl, byte ptr [0x3fca]    ; heros_courant
@@ -1704,28 +1704,28 @@ loc_0f1e:
 00f24  eb 47                jmp sort_message
 ; ---- 1 octets non atteints (0f26-0f26)
 
-; ======== sort_vent
+; ======== sort_vent   (appelée depuis 0f04)
 ; 5 vent rapide : +0x18 bit 8, déplacement doublé au prochain tour
 00f27  80 4c 18 08          or byte ptr [si + 0x18], 8
 00f2b  bb 5c 00             mov bx, 0x5c
 00f2e  eb 3d                jmp sort_message
 ; ---- 1 octets non atteints (0f30-0f30)
 
-; ======== sort_courage
+; ======== sort_courage   (appelée depuis 0f04)
 ; 7 : +0x18 bit 0x10, deux dés d'attaque de plus
 00f31  80 4c 18 10          or byte ptr [si + 0x18], 0x10
 00f35  bb 8c 00             mov bx, 0x8c
 00f38  eb 33                jmp sort_message
 ; ---- 1 octets non atteints (0f3a-0f3a)
 
-; ======== sort_peau_pierre
+; ======== sort_peau_pierre   (appelée depuis 0f04)
 ; 11 : +0x18 bit 0x40, deux dés de défense de plus
 00f3b  80 4c 18 40          or byte ptr [si + 0x18], 0x40
 00f3f  bb 8e 00             mov bx, 0x8e
 00f42  eb 29                jmp sort_message
 ; ---- 1 octets non atteints (0f44-0f44)
 
-; ======== sort_tempete
+; ======== sort_tempete   (appelée depuis 0f04)
 ; 4 : la cible passe son prochain tour (héros +0x18 bit 4, monstre +6 bit 2)
 00f45  3c 05                cmp al, 5
 00f47  75 03                jne loc_0f4c
@@ -1753,7 +1753,7 @@ sort_message:    ; affiche le message BX du sort, puis fin de l'action
 00f70  e8 b1 01             call pause_250
 00f73  e9 34 03             jmp fin_action
 
-; ======== sort_boule_feu
+; ======== sort_boule_feu   (appelée depuis 0f04)
 ; 8 : deux dés, 2 points de dégâts moins un par bouclier blanc
 00f76  e8 3e 12             call de_combat
 00f79  b2 00                mov dl, 0
@@ -1789,7 +1789,7 @@ loc_0fb0:
 00fb7  bb 72 00             mov bx, 0x72
 00fba  eb b1                jmp sort_message
 
-; ======== sort_feu_colere
+; ======== sort_feu_colere   (appelée depuis 0f04)
 ; 9 : un dé, 1 point de dégât sauf bouclier blanc
 00fbc  e8 f8 11             call de_combat
 00fbf  80 fb 01             cmp bl, 1
@@ -1808,7 +1808,7 @@ loc_0fd9:
 00fdc  bb 74 00             mov bx, 0x74
 00fdf  eb 8c                jmp sort_message
 
-; ======== sort_sommeil
+; ======== sort_sommeil   (appelée depuis 0f04)
 ; 3 : un dé ; sauf bouclier blanc, la cible s'endort (héros +0x18 bit 2, monstre +6 bit 4)
 00fe1  e8 d3 11             call de_combat
 00fe4  80 3e ca 3f 05       cmp byte ptr [0x3fca], 5    ; heros_courant
@@ -1835,13 +1835,13 @@ loc_1016:
 01016  bb 6c 00             mov bx, 0x6c
 01019  e9 51 ff             jmp sort_message
 
-; ======== sort_brume
+; ======== sort_brume   (appelée depuis 0f04)
 ; 1 voile de brume : fiche +0x18 bit 1 (invisible aux monstres)
 0101c  80 4c 18 01          or byte ptr [si + 0x18], 1
 01020  bb 80 00             mov bx, 0x80
 01023  e9 47 ff             jmp sort_message
 
-; ======== sort_genie
+; ======== sort_genie   (appelée depuis 0f04)
 ; 6 génie : attaque à 5 dés de combat ; si la cible vaut 6, révèle la pièce (0x102d)
 01026  a0 ca 3f             mov al, byte ptr [0x3fca]    ; heros_courant
 01029  3c 06                cmp al, 6
@@ -1902,7 +1902,7 @@ loc_10aa:
 010ad  bb 4e 00             mov bx, 0x4e
 010b0  e9 ba fe             jmp sort_message
 
-; ======== sort_traverse_roche
+; ======== sort_traverse_roche   (appelée depuis 0f04)
 ; 10 : +0x18 bit 0x20 (ou 0x80), passer à travers un mur au prochain déplacement
 010b3  bb 5a 00             mov bx, 0x5a
 010b6  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3    ; personnage_courant
@@ -5316,7 +5316,7 @@ loc_2c6c:
 02c70  e8 65 e4             call mort_heros
 02c73  c3                   ret
 
-; ======== action_sort
+; ======== action_sort   (appelée depuis 6462)
 ; icône sorts enfoncée : choix du sort (inventaire_sorts, mode 5), puis de la cible
 02c74  80 3e a7 3f 02       cmp byte ptr [0x3fa7], 2    ; personnage_courant
 02c79  73 01                jae loc_2c7c
@@ -8888,7 +8888,7 @@ loc_495a:
 04963  b0 02                mov al, 2
 04965  e9 57 02             jmp pas_fait
 
-; ======== pas_droite
+; ======== pas_droite   (appelée depuis 6462)
 04968  8a 55 01             mov dl, byte ptr [di + 1]
 0496b  80 fa 19             cmp dl, 0x19
 0496e  75 03                jne loc_4973
@@ -8978,7 +8978,7 @@ loc_4a21:
 04a2a  b0 01                mov al, 1
 04a2c  e9 90 01             jmp pas_fait
 
-; ======== pas_haut
+; ======== pas_haut   (appelée depuis 6462)
 04a2f  8a 55 01             mov dl, byte ptr [di + 1]
 04a32  8a 75 02             mov dh, byte ptr [di + 2]
 04a35  80 fe 00             cmp dh, 0
@@ -9066,7 +9066,7 @@ loc_4ae7:
 04af2  b0 03                mov al, 3
 04af4  e9 c8 00             jmp pas_fait
 
-; ======== pas_bas
+; ======== pas_bas   (appelée depuis 6462)
 04af7  8a 55 01             mov dl, byte ptr [di + 1]
 04afa  8a 75 02             mov dh, byte ptr [di + 2]
 04afd  80 fe 13             cmp dh, 0x13
@@ -13015,7 +13015,7 @@ loc_6bd8:
 06bde  58                   pop ax
 06bdf  c3                   ret
 
-; ======== fouille_tresor
+; ======== fouille_tresor   (appelée depuis 6462)
 ; carte trésor ou événement de la zone ; « CETTE PIECE A DEJA ETE FOUILLEE »
 06be0  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 06be5  75 01                jne loc_6be8
@@ -13286,7 +13286,7 @@ loc_6df4:
 06df4  c6 06 c7 3f 01       mov byte ptr [0x3fc7], 1
 06df9  c3                   ret
 
-; ======== fouille_portes
+; ======== fouille_portes   (appelée depuis 6462)
 ; icône de fouille des portes secrètes et des pièges ; « UNE PORTE SECRETE S'OUVRE »
 06dfa  80 3e a7 3f 04       cmp byte ptr [0x3fa7], 4    ; personnage_courant
 06dff  75 01                jne loc_6e02
@@ -13393,12 +13393,12 @@ loc_6eef:
 06f06  e8 86 ae             call combat_monstre
 06f09  e9 9e a3             jmp fin_action
 
-; ======== evt_coffre_desarme_2
+; ======== evt_coffre_desarme_2   (appelée depuis 6ea8)
 ; 1 : « LE COFFRE A ETE PIEGE. VOUS LE DESARMEZ »
 06f0c  be 96 00             mov si, 0x96
 06f0f  e9 23 ab             jmp message_puis_sortie
 
-; ======== fouille_vide
+; ======== fouille_vide   (appelée depuis 6ea8)
 06f12  80 3e c2 4b ff       cmp byte ptr [0x4bc2], 0xff
 06f17  74 18                je loc_6f31
 06f19  e8 8b bb             call son_piege
@@ -13415,13 +13415,13 @@ loc_6f31:
 06f34  e8 b6 19             call affiche_message
 06f37  c3                   ret
 
-; ======== evt_coffre_potion_50
+; ======== evt_coffre_potion_50   (appelée depuis 6ea8)
 ; 6 : potion curative et 50 pièces
 06f38  ba 32 00             mov dx, 0x32
 06f3b  be 9a 00             mov si, 0x9a
 06f3e  eb 08                jmp potion_or_message
 
-; ======== evt_armoire
+; ======== evt_armoire   (appelée depuis 6ea8)
 ; 3 : potion curative et 30 pièces
 06f40  ba 1e 00             mov dx, 0x1e
 06f43  be 9e 00             mov si, 0x9e
@@ -13439,7 +13439,7 @@ loc_6f58:
 06f5d  e8 8d 19             call affiche_message
 06f60  e9 d7 aa             jmp apres_sortie
 
-; ======== evt_coffre_100
+; ======== evt_coffre_100   (appelée depuis 6ea8)
 ; 4 : 100 pièces, piège si non trouvé
 06f63  ba 64 00             mov dx, 0x64
 06f66  e8 9d f9             call ajoute_or
@@ -13465,7 +13465,7 @@ loc_6f8b:
 06f9e  e8 7b f6             call affiche_nom_portrait
 06fa1  e9 1d f6             jmp init_sprites_icones
 
-; ======== evt_lance
+; ======== evt_lance   (appelée depuis 6ea8)
 ; 5 : une lance, sauf pour l'enchanteur
 06fa4  80 3e a7 3f 03       cmp byte ptr [0x3fa7], 3    ; personnage_courant
 06fa9  75 01                jne loc_6fac
@@ -13476,7 +13476,7 @@ loc_6fac:
 06fb4  be a6 00             mov si, 0xa6
 06fb7  e9 7b aa             jmp message_puis_sortie
 
-; ======== evt_coffre_magnus
+; ======== evt_coffre_magnus   (appelée depuis 6ea8)
 ; 7 : coffre du prince Magnus (250 pièces, porté)
 06fba  80 3e be 3f 03       cmp byte ptr [0x3fbe], 3    ; coffres_ramasses
 06fbf  74 05                je loc_6fc6
@@ -13499,7 +13499,7 @@ loc_6fd3:
 06ff2  81 45 09 fa 00       add word ptr [di + 9], 0xfa
 06ff7  e9 3b aa             jmp message_puis_sortie
 
-; ======== evt_cle_melar
+; ======== evt_cle_melar   (appelée depuis 6ea8)
 ; 8 : clé de Melar, le trône glisse
 06ffa  be b6 00             mov si, 0xb6
 06ffd  e8 35 aa             call message_puis_sortie
@@ -13532,7 +13532,7 @@ loc_7035:
 0703d  e8 bf a2             call revele_derriere_porte
 07040  e9 67 fe             jmp loc_6eaa
 
-; ======== evt_talisman
+; ======== evt_talisman   (appelée depuis 6ea8)
 ; 9 : talisman du savoir, +2 points d'esprit
 07043  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 07047  80 4d 0d 04          or byte ptr [di + 0xd], 4
@@ -13540,20 +13540,20 @@ loc_7035:
 0704f  be ba 00             mov si, 0xba
 07052  e9 e0 a9             jmp message_puis_sortie
 
-; ======== evt_armure_borin
+; ======== evt_armure_borin   (appelée depuis 6ea8)
 ; 10
 07055  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 07059  80 4d 0d 01          or byte ptr [di + 0xd], 1
 0705d  be c0 00             mov si, 0xc0
 07060  e9 d2 a9             jmp message_puis_sortie
 
-; ======== evt_coffre_karlen
+; ======== evt_coffre_karlen   (appelée depuis 6ea8)
 ; 11 : 200 pièces
 07063  ba c8 00             mov dx, 0xc8
 07066  be c2 00             mov si, 0xc2
 07069  e9 ec fe             jmp loc_6f58
 
-; ======== evt_coffre_course
+; ======== evt_coffre_course   (appelée depuis 6ea8)
 ; 13 : un coffre (100 pièces, porté)
 0706c  80 3e be 3f 01       cmp byte ptr [0x3fbe], 1    ; coffres_ramasses
 07071  74 05                je loc_7078
@@ -13577,7 +13577,7 @@ loc_7088:
 070a7  ba 64 00             mov dx, 0x64
 070aa  e9 ab fe             jmp loc_6f58
 
-; ======== evt_or_mine
+; ======== evt_or_mine   (appelée depuis 6ea8)
 ; 30 : 5000 pièces, plus d'attaque ni de défense
 070ad  c6 06 c0 3f 00       mov byte ptr [0x3fc0], 0    ; evenement_b
 070b2  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -13587,13 +13587,13 @@ loc_7088:
 070c3  be da 00             mov si, 0xda
 070c6  e9 6c a9             jmp message_puis_sortie
 
-; ======== evt_coffre_200
+; ======== evt_coffre_200   (appelée depuis 6ea8)
 ; 18
 070c9  ba c8 00             mov dx, 0xc8
 070cc  be f2 00             mov si, 0xf2
 070cf  e9 86 fe             jmp loc_6f58
 
-; ======== prend_lame_esprit
+; ======== prend_lame_esprit   (appelée depuis 6ea8)
 ; « VOUS PRENEZ LA LAME DE L'ESPRIT »
 070d2  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 070d6  80 4d 0d 10          or byte ptr [di + 0xd], 0x10
@@ -13601,52 +13601,52 @@ loc_7088:
 070dd  e8 0d 18             call affiche_message
 070e0  c3                   ret
 
-; ======== evt_coffre_200_b
+; ======== evt_coffre_200_b   (appelée depuis 6ea8)
 ; 19
 070e1  ba c8 00             mov dx, 0xc8
 070e4  be 28 02             mov si, 0x228
 070e7  e9 6e fe             jmp loc_6f58
 
-; ======== evt_coffre_250
+; ======== evt_coffre_250   (appelée depuis 6ea8)
 ; 27
 070ea  ba fa 00             mov dx, 0xfa
 070ed  be 46 02             mov si, 0x246
 070f0  e9 65 fe             jmp loc_6f58
 
-; ======== evt_coffre_300
+; ======== evt_coffre_300   (appelée depuis 6ea8)
 ; 20
 070f3  ba 2c 01             mov dx, 0x12c
 070f6  be 2a 02             mov si, 0x22a
 070f9  e9 5c fe             jmp loc_6f58
 
-; ======== evt_coffre_350
+; ======== evt_coffre_350   (appelée depuis 6ea8)
 ; 26
 070fc  ba 5e 01             mov dx, 0x15e
 070ff  be 44 02             mov si, 0x244
 07102  e9 53 fe             jmp loc_6f58
 
-; ======== evt_trone_500
+; ======== evt_trone_500   (appelée depuis 6ea8)
 ; 28
 07105  ba f4 01             mov dx, 0x1f4
 07108  be 48 02             mov si, 0x248
 0710b  eb 3e                jmp or_message
 ; ---- 1 octets non atteints (710d-710d)
 
-; ======== evt_coffre_400
+; ======== evt_coffre_400   (appelée depuis 6ea8)
 ; 25 : 400 pièces, le message dit 200
 0710e  ba 90 01             mov dx, 0x190
 07111  be 3a 02             mov si, 0x23a
 07114  eb 35                jmp or_message
 ; ---- 1 octets non atteints (7116-7116)
 
-; ======== evt_coffre_potion_100
+; ======== evt_coffre_potion_100   (appelée depuis 6ea8)
 ; 21
 07117  ba 64 00             mov dx, 0x64
 0711a  be 2e 02             mov si, 0x22e
 0711d  eb 1b                jmp potion_or_message_b
 ; ---- 1 octets non atteints (711f-711f)
 
-; ======== coffre_potion
+; ======== coffre_potion   (appelée depuis 6ea8)
 ; « VOUS TROUVEZ UNE POTION CURATIVE DANS LE COFFRE »
 07120  f6 45 10 04          test byte ptr [di + 0x10], 4
 07124  75 07                jne loc_712d
@@ -13675,7 +13675,7 @@ or_message:    ; DX pièces, message SI
 07150  e8 9a 17             call affiche_message
 07153  e9 e4 a8             jmp apres_sortie
 
-; ======== coffre_fleche
+; ======== coffre_fleche   (appelée depuis 6ea8)
 ; « LE COFFRE ETAIT PIEGE ! UNE FLECHE PART DU MUR »
 07156  c6 06 bc 4b ff       mov byte ptr [0x4bbc], 0xff
 0715b  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -13690,13 +13690,13 @@ or_message:    ; DX pièces, message SI
 loc_7178:
 07178  c3                   ret
 
-; ======== coffre_desarme
+; ======== coffre_desarme   (appelée depuis 6ea8)
 07179  c6 06 91 4b ff       mov byte ptr [0x4b91], 0xff
 0717e  bb 96 00             mov bx, 0x96    ; message « VOUS DECOUVREZ QUE LE / COFFRE A ETE PIEGE. VOUS / LE DESARMEZ »
 07181  e8 69 17             call affiche_message
 07184  e9 b3 a8             jmp apres_sortie
 
-; ======== cles_agrain
+; ======== cles_agrain   (appelée depuis 6ea8)
 ; « LES CLES D'AGRAIN SONT SUR LA TABLE »
 07187  56                   push si
 07188  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
@@ -13722,7 +13722,7 @@ loc_71b8:
 071be  5e                   pop si
 071bf  c3                   ret
 
-; ======== evt_baguette
+; ======== evt_baguette   (appelée depuis 6ea8)
 ; 12 : baguette de rappel et 150 pièces
 071c0  8b 3e 37 46          mov di, word ptr [0x4637]    ; fiche_heros_courant
 071c4  80 4d 0d 02          or byte ptr [di + 0xd], 2
@@ -13730,7 +13730,7 @@ loc_71b8:
 071cb  be ca 00             mov si, 0xca
 071ce  e9 87 fd             jmp loc_6f58
 
-; ======== evt_bouclier
+; ======== evt_bouclier   (appelée depuis 6ea8)
 ; 14
 071d1  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 071d4  3c 03                cmp al, 3
@@ -13744,12 +13744,12 @@ loc_71e3:
 071eb  be e4 00             mov si, 0xe4
 071ee  e9 44 a8             jmp message_puis_sortie
 
-; ======== evt_coffre_piege
+; ======== evt_coffre_piege   (appelée depuis 6ea8)
 ; 15 : « ATTENTION, LE COFFRE EST PIEGE »
 071f1  be e8 00             mov si, 0xe8
 071f4  e9 3e a8             jmp message_puis_sortie
 
-; ======== coffre_gargouille
+; ======== coffre_gargouille   (appelée depuis 6ea8)
 ; « LA GARGOUILLE S'ANIME SUBITEMENT »
 071f7  bf 54 4d             mov di, 0x4d54
 071fa  80 4d 06 01          or byte ptr [di + 6], 1
@@ -14418,42 +14418,42 @@ loc_787b:
 07881  81 c3 6c aa          add bx, 0xaa6c    ; saut_heros
 07885  ff 27                jmp word ptr [bx]
 
-; ======== choisit_heros_1
+; ======== choisit_heros_1   (appelée depuis 7885)
 ; sélectionne le héros 1 (DS:409E) et passe aux commandes de son joueur ; 0x7895, 0x78A3, 0x78B1 pour 2 à 4
 07887  c6 06 9e 40 00       mov byte ptr [0x409e], 0    ; heros_selectionne
 0788c  a0 95 31             mov al, byte ptr [0x3195]    ; commandes_joueurs
 0788f  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 07892  e9 87 fe             jmp loc_771c
 
-; ======== choisit_heros_2
+; ======== choisit_heros_2   (appelée depuis 7885)
 ; heros_selectionne = 1, commandes du joueur 2 (DS:3196)
 07895  c6 06 9e 40 01       mov byte ptr [0x409e], 1    ; heros_selectionne
 0789a  a0 96 31             mov al, byte ptr [0x3196]
 0789d  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078a0  e9 79 fe             jmp loc_771c
 
-; ======== choisit_heros_3
+; ======== choisit_heros_3   (appelée depuis 7885)
 ; heros_selectionne = 2, commandes du joueur 3
 078a3  c6 06 9e 40 02       mov byte ptr [0x409e], 2    ; heros_selectionne
 078a8  a0 97 31             mov al, byte ptr [0x3197]
 078ab  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078ae  e9 6b fe             jmp loc_771c
 
-; ======== choisit_heros_4
+; ======== choisit_heros_4   (appelée depuis 7885)
 ; heros_selectionne = 3, commandes du joueur 4
 078b1  c6 06 9e 40 03       mov byte ptr [0x409e], 3    ; heros_selectionne
 078b6  a0 98 31             mov al, byte ptr [0x3198]
 078b9  a2 93 31             mov byte ptr [0x3193], al    ; commande_type
 078bc  e9 5d fe             jmp loc_771c
 
-; ======== heros_en_jeu
+; ======== heros_en_jeu   (appelée depuis 7885)
 ; bouton portrait : met le héros en jeu ou l'en retire (DS:44A0 + n)
 078bf  8a 1e 9e 40          mov bl, byte ptr [0x409e]    ; heros_selectionne
 078c3  32 ff                xor bh, bh
 078c5  80 b7 a0 44 ff       xor byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 078ca  e9 4f fe             jmp loc_771c
 
-; ======== heros_renouvele
+; ======== heros_renouvele   (appelée depuis 7885)
 ; « LE PERSONNAGE A ETE RENOUVELE »
 078cd  a0 9e 40             mov al, byte ptr [0x409e]    ; heros_selectionne
 078d0  e8 ac e4             call fiche_personnage
@@ -14479,7 +14479,7 @@ loc_7912:
 07915  e8 d5 0f             call affiche_message
 07918  e9 01 fe             jmp loc_771c
 
-; ======== heros_nomme
+; ======== heros_nomme   (appelée depuis 7885)
 ; bouton plume : saisie du nom (15 caractères) puis mise en jeu
 0791b  ff 36 59 37          push word ptr [0x3759]    ; texte_transparent
 0791f  c6 06 59 37 00       mov byte ptr [0x3759], 0    ; texte_transparent
@@ -14501,7 +14501,7 @@ loc_7912:
 0794c  c6 87 a0 44 ff       mov byte ptr [bx + 0x44a0], 0xff    ; heros_en_jeu
 07951  e9 c8 fd             jmp loc_771c
 
-; ======== sauvegarde_menu
+; ======== sauvegarde_menu   (appelée depuis 7885)
 ; 0 sauvegarder, 1 charger le personnage sélectionné dans QUEST.SAV, 2 annuler
 07954  e8 a3 bf             call attend_relache
 07957  bb 0c 00             mov bx, 0xc
@@ -15124,7 +15124,7 @@ loc_7f3d:
 07f47  c6 06 7a ab 00       mov byte ptr [0xab7a], 0    ; choix_menu
 07f4c  e9 be fe             jmp loc_7e0d
 
-; ======== saisie_fin
+; ======== saisie_fin   (appelée depuis 6462)
 ; zone de fin de saisie_texte (pointée en DS:AB75) : termine le texte DS:ABFA par 00h, choix_menu = FFh
 07f4f  be fa ab             mov si, 0xabfa    ; "________________"
 07f52  43                   inc bx
@@ -16486,7 +16486,7 @@ loc_8bc7:
 08c13  c3                   ret
 ; ---- 12 octets non atteints (8c14-8c1f)
 
-; ======== inventaire_sorts   (appelée depuis 2cbb)
+; ======== inventaire_sorts   (appelée depuis 2cbb, 6462)
 ; inventaire pendant la quête (WIZBACK, INVENT, SPELLIT) : armes et armures, potions, artefacts, sorts ; rien pour le personnage 4
 08c20  a0 a7 3f             mov al, byte ptr [0x3fa7]    ; personnage_courant
 08c23  3c 04                cmp al, 4

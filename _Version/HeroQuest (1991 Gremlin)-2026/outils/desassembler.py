@@ -49,6 +49,23 @@ TABLES_ESPACEES = {
     },
 }
 
+# Sauts indirects que la reconnaissance automatique ne peut pas suivre (l'adresse de la table passe par un
+# registre ou une variable) : adresse de l'instruction -> tables (offset DS de la 1re entrée, nombre, pas).
+SAUTS_INDIRECTS = {
+    'QUEST': {
+        0x0f04: [(0x5a6f, 13, 2)],                  # jmp [effet_sort_choisi] : posé depuis effets_sorts (0x0E94)
+        0x6462: [(0x48a4 + 8, 12, 10),              # jmp [zone + 8] : routine de la zone de zones_actives,
+                 (0xab6d + 8, 1, 10)],              # zones_panneau ou la zone de saisie_texte (0x7D94)
+        0x6ea8: [(0x5a89, 30, 2)],                  # call [evenements_fouille + 2 × (événement - 1)]
+        0x7885: [(0xaa6c + 2, 9, 2)],               # jmp [saut_heros + BX], BX = zone 2 à 12h
+    },
+    'INTRO': {
+        # jmp cs:[bx + 0x71E] : animation de chacune des 6 scènes. Table dans le segment de code ;
+        # le segment de données d'INTRO commence l'image, d'où l'offset 0x44B0 + 0x71E.
+        0x4a0c: [(0x44b0 + 0x71e, 6, 2)],
+    },
+}
+
 AFFICHE_MESSAGE = 0x88ED            # routine de QUEST.EXE qui affiche le message BX (voir original/notes/02-ecrans.md)
 MESSAGES = RACINE / 'original' / 'donnees' / 'textes' / 'french.bin'
 
@@ -91,9 +108,10 @@ def charger_symboles(fichier):
 
 
 class Desassembleur:
-    def __init__(self, image, entree, ds, symboles, code, base, espacees):
+    def __init__(self, image, entree, ds, symboles, code, base, espacees, indirects_connus=None):
         self.image, self.entree, self.ds, self.sym = image, entree, ds, symboles
-        self.espacees = espacees
+        self.espacees = dict(espacees)
+        self.indirects_connus = indirects_connus or {}
         self.debut_code, self.fin_code = code
         self.base = base
         self.md = Cs(CS_ARCH_X86, CS_MODE_16)
@@ -181,6 +199,9 @@ class Desassembleur:
         if m3:
             variable = int(m3.group(1), 16)
             cibles = self.lire_table(variable, 1, 2) + sorted(v for v in self.ecritures[variable] if self.plausible(v))
+        for table, nombre, pas in self.indirects_connus.get(instr.address, []):
+            self.espacees.setdefault(table, (nombre, pas))
+            cibles += self.lire_table(table, nombre, pas)
         cibles = sorted(set(cibles))
         if not cibles:
             self.indirects.append(instr.address)
@@ -399,7 +420,8 @@ def main():
     reglage = PROGRAMMES[prefixe]
     code = (reglage['code'][0], reglage['code'][1] or len(image))
     symboles = charger_symboles(RACINE / 'original' / ('symboles.txt' if prefixe == 'QUEST' else f'symboles-{prefixe.lower()}.txt'))
-    d = Desassembleur(image, reglage['entree'], reglage['ds'], symboles, code, reglage['base'], TABLES_ESPACEES.get(prefixe, {}))
+    d = Desassembleur(image, reglage['entree'], reglage['ds'], symboles, code, reglage['base'], TABLES_ESPACEES.get(prefixe, {}),
+                      SAUTS_INDIRECTS.get(prefixe, {}))
     d.parcourir()
     d.zones_non_atteintes()
     d.ecrire(prefixe)

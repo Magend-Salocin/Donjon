@@ -1,7 +1,8 @@
 ; INTRO.EXE décompressé, désassemblé par outils/desassembler.py. Ne pas modifier : enrichir original/symboles.txt puis relancer.
 
 
-; ======== sub_44b0
+; ======== demarrage_intro
+; point d'entrée : réduit la mémoire (int 21h AH=4Ah), lit QUEST.CFG ; présent : « Press S to change config » (S l'efface) ; absent : questions (écran, son, commandes des 4 héros) ; mode vidéo, son, intro VGA ou EGA/Tandy ; première configuration : drapeaux et écriture de QUEST.CFG ; quitte (code 0)
 044b0  50                   push ax
 044b1  b8 00 00             mov ax, 0
 044b4  8e d8                mov ds, ax
@@ -15,17 +16,17 @@
 044c4  73 03                jae loc_44c9
 044c6  e9 b3 03             jmp loc_487c
 loc_44c9:
-044c9  c7 06 40 14 08 00    mov word ptr [0x1440], 8
+044c9  c7 06 40 14 08 00    mov word ptr [0x1440], 8    ; mode_video
 044cf  32 e4                xor ah, ah
 044d1  b0 03                mov al, 3
 044d3  cd 10                int 0x10
-044d5  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2
-044db  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440
+044d5  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2    ; fichier_nom
+044db  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440    ; fichier_offset
 044e1  b8 00 00             mov ax, 0
-044e4  a3 a3 1b             mov word ptr [0x1ba3], ax
-044e7  e8 57 2d             call sub_7241
-044ea  e8 c4 2a             call sub_6fb1
-044ed  83 3e 8b 1a 02       cmp word ptr [0x1a8b], 2
+044e4  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+044e7  e8 57 2d             call charge_fichier
+044ea  e8 c4 2a             call restaure_clavier
+044ed  83 3e 8b 1a 02       cmp word ptr [0x1a8b], 2    ; erreur_fichier
 044f2  75 03                jne loc_44f7
 044f4  eb 25                jmp loc_451b
 ; ---- 1 octets non atteints (44f6-44f6)
@@ -56,7 +57,7 @@ loc_451b:
 04522  ba 0f 18             mov dx, 0x180f
 04525  b4 09                mov ah, 9
 04527  cd 21                int 0x21
-04529  c7 06 40 14 00 00    mov word ptr [0x1440], 0
+04529  c7 06 40 14 00 00    mov word ptr [0x1440], 0    ; mode_video
 loc_452f:
 0452f  32 e4                xor ah, ah
 04531  cd 16                int 0x16
@@ -68,22 +69,22 @@ loc_452f:
 loc_453d:
 0453d  3c 31                cmp al, 0x31
 0453f  75 06                jne loc_4547
-04541  c7 06 40 14 08 00    mov word ptr [0x1440], 8
+04541  c7 06 40 14 08 00    mov word ptr [0x1440], 8    ; mode_video
 loc_4547:
 04547  3c 32                cmp al, 0x32
 04549  75 06                jne loc_4551
-0454b  c7 06 40 14 06 00    mov word ptr [0x1440], 6
+0454b  c7 06 40 14 06 00    mov word ptr [0x1440], 6    ; mode_video
 loc_4551:
 04551  3c 33                cmp al, 0x33
 04553  75 06                jne loc_455b
-04555  c7 06 40 14 04 00    mov word ptr [0x1440], 4
+04555  c7 06 40 14 04 00    mov word ptr [0x1440], 4    ; mode_video
 loc_455b:
-0455b  83 3e 40 14 04       cmp word ptr [0x1440], 4
+0455b  83 3e 40 14 04       cmp word ptr [0x1440], 4    ; mode_video
 04560  72 cd                jb loc_452f
 04562  ba 55 18             mov dx, 0x1855
 04565  b4 09                mov ah, 9
 04567  cd 21                int 0x21
-04569  c6 06 42 14 ff       mov byte ptr [0x1442], 0xff
+04569  c6 06 42 14 ff       mov byte ptr [0x1442], 0xff    ; son_pilote
 loc_456e:
 0456e  32 e4                xor ah, ah
 04570  cd 16                int 0x16
@@ -95,28 +96,28 @@ loc_456e:
 loc_457c:
 0457c  3c 31                cmp al, 0x31
 0457e  75 05                jne loc_4585
-04580  c6 06 42 14 00       mov byte ptr [0x1442], 0
+04580  c6 06 42 14 00       mov byte ptr [0x1442], 0    ; son_pilote
 loc_4585:
 04585  3c 32                cmp al, 0x32
 04587  75 05                jne loc_458e
-04589  c6 06 42 14 01       mov byte ptr [0x1442], 1
+04589  c6 06 42 14 01       mov byte ptr [0x1442], 1    ; son_pilote
 loc_458e:
 0458e  3c 33                cmp al, 0x33
 04590  75 05                jne loc_4597
-04592  c6 06 42 14 02       mov byte ptr [0x1442], 2
+04592  c6 06 42 14 02       mov byte ptr [0x1442], 2    ; son_pilote
 loc_4597:
-04597  80 3e 42 14 ff       cmp byte ptr [0x1442], 0xff
+04597  80 3e 42 14 ff       cmp byte ptr [0x1442], 0xff    ; son_pilote
 0459c  74 d0                je loc_456e
-0459e  80 3e 42 14 00       cmp byte ptr [0x1442], 0
+0459e  80 3e 42 14 00       cmp byte ptr [0x1442], 0    ; son_pilote
 045a3  75 0c                jne loc_45b1
-045a5  83 3e 40 14 04       cmp word ptr [0x1440], 4
+045a5  83 3e 40 14 04       cmp word ptr [0x1440], 4    ; mode_video
 045aa  75 05                jne loc_45b1
-045ac  c6 06 42 14 03       mov byte ptr [0x1442], 3
+045ac  c6 06 42 14 03       mov byte ptr [0x1442], 3    ; son_pilote
 loc_45b1:
 045b1  ba 92 12             mov dx, 0x1292
 045b4  b4 09                mov ah, 9
 045b6  cd 21                int 0x21
-045b8  c6 06 43 14 ff       mov byte ptr [0x1443], 0xff
+045b8  c6 06 43 14 ff       mov byte ptr [0x1443], 0xff    ; commande_type
 loc_45bd:
 045bd  32 e4                xor ah, ah
 045bf  cd 16                int 0x16
@@ -134,8 +135,8 @@ loc_45cb:
 045d5  75 e6                jne loc_45bd
 loc_45d7:
 045d7  2c 31                sub al, 0x31
-045d9  a2 43 14             mov byte ptr [0x1443], al
-045dc  a2 45 14             mov byte ptr [0x1445], al
+045d9  a2 43 14             mov byte ptr [0x1443], al    ; commande_type
+045dc  a2 45 14             mov byte ptr [0x1445], al    ; commandes_joueurs
 045df  ba da 12             mov dx, 0x12da
 045e2  b4 09                mov ah, 9
 045e4  cd 21                int 0x21
@@ -200,52 +201,52 @@ loc_464c:
 0464c  2c 31                sub al, 0x31
 0464e  a2 48 14             mov byte ptr [0x1448], al
 loc_4651:
-04651  e8 d1 07             call sub_4e25
-04654  c6 06 fb 19 01       mov byte ptr [0x19fb], 1
-04659  c6 06 f2 19 06       mov byte ptr [0x19f2], 6
+04651  e8 d1 07             call mode_video_intro
+04654  c6 06 fb 19 01       mov byte ptr [0x19fb], 1    ; texte_transparent
+04659  c6 06 f2 19 06       mov byte ptr [0x19f2], 6    ; couleur_encre
 0465e  b8 86 0a             mov ax, 0xa86
-04661  a3 f8 19             mov word ptr [0x19f8], ax
-04664  e8 00 39             call sub_7f67
-04667  e8 f8 39             call sub_8062
-0466a  e8 5d 3a             call sub_80ca
-0466d  83 3e 40 14 08       cmp word ptr [0x1440], 8
+04661  a3 f8 19             mov word ptr [0x19f8], ax    ; segment_texte
+04664  e8 00 39             call lit_ports_video
+04667  e8 f8 39             call son_charge_pilote
+0466a  e8 5d 3a             call son_prepare
+0466d  83 3e 40 14 08       cmp word ptr [0x1440], 8    ; mode_video
 04672  74 03                je loc_4677
-04674  e9 10 02             jmp loc_4887
+04674  e9 10 02             jmp intro_ega
 loc_4677:
-04677  c7 06 a9 1b b2 00    mov word ptr [0x1ba9], 0xb2
-0467d  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+04677  c7 06 a9 1b b2 00    mov word ptr [0x1ba9], 0xb2    ; fichier_nom
+0467d  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 04683  b8 26 1a             mov ax, 0x1a26
-04686  a3 a3 1b             mov word ptr [0x1ba3], ax
-04689  e8 b5 2b             call sub_7241
-0468c  c7 06 a9 1b be 00    mov word ptr [0x1ba9], 0xbe
-04692  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+04686  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+04689  e8 b5 2b             call charge_fichier
+0468c  c7 06 a9 1b be 00    mov word ptr [0x1ba9], 0xbe    ; fichier_nom
+04692  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 04698  b8 23 25             mov ax, 0x2523
-0469b  a3 a3 1b             mov word ptr [0x1ba3], ax
-0469e  e8 a0 2b             call sub_7241
-046a1  ba 5e 0c             mov dx, 0xc5e
-046a4  e8 9c 07             call sub_4e43
-046a7  bf be 0c             mov di, 0xcbe
-046aa  e8 20 08             call sub_4ecd
+0469b  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+0469e  e8 a0 2b             call charge_fichier
+046a1  ba 5e 0c             mov dx, 0xc5e    ; palette_noire
+046a4  e8 9c 07             call palette_vga
+046a7  bf be 0c             mov di, 0xcbe    ; palette_gremlin
+046aa  e8 20 08             call affiche_ecran_vga
 046ad  b9 d0 07             mov cx, 0x7d0
-046b0  e8 90 38             call sub_7f43
-046b3  c7 06 a9 1b c8 00    mov word ptr [0x1ba9], 0xc8
-046b9  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+046b0  e8 90 38             call temporise
+046b3  c7 06 a9 1b c8 00    mov word ptr [0x1ba9], 0xc8    ; fichier_nom
+046b9  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 046bf  b8 26 1a             mov ax, 0x1a26
-046c2  a3 a3 1b             mov word ptr [0x1ba3], ax
-046c5  e8 79 2b             call sub_7241
-046c8  bf 1e 0d             mov di, 0xd1e
-046cb  e8 ff 07             call sub_4ecd
-046ce  e8 4a 08             call sub_4f1b
+046c2  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+046c5  e8 79 2b             call charge_fichier
+046c8  bf 1e 0d             mov di, 0xd1e    ; palette_pic1
+046cb  e8 ff 07             call affiche_ecran_vga
+046ce  e8 4a 08             call attend_espace_echap
 046d1  3c 01                cmp al, 1
 046d3  75 03                jne loc_46d8
-046d5  eb 62                jmp loc_4739
+046d5  eb 62                jmp fin_intro
 ; ---- 1 octets non atteints (46d7-46d7)
 loc_46d8:
 046d8  bd fd 00             mov bp, 0xfd
-046db  e8 7d 07             call sub_4e5b
+046db  e8 7d 07             call ecran_texte_vga
 046de  3c 01                cmp al, 1
 046e0  75 03                jne loc_46e5
-046e2  eb 55                jmp loc_4739
+046e2  eb 55                jmp fin_intro
 ; ---- 1 octets non atteints (46e4-46e4)
 loc_46e5:
 046e5  b9 06 00             mov cx, 6
@@ -253,53 +254,53 @@ loc_46e5:
 loc_46ee:
 046ee  51                   push cx
 046ef  8b 1e 00 00          mov bx, word ptr [0]
-046f3  8b 97 6a 00          mov dx, word ptr [bx + 0x6a]
-046f7  89 16 a9 1b          mov word ptr [0x1ba9], dx
-046fb  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+046f3  8b 97 6a 00          mov dx, word ptr [bx + 0x6a]    ; ecrans_scenes
+046f7  89 16 a9 1b          mov word ptr [0x1ba9], dx    ; fichier_nom
+046fb  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 04701  b8 26 1a             mov ax, 0x1a26
-04704  a3 a3 1b             mov word ptr [0x1ba3], ax
-04707  e8 37 2b             call sub_7241
+04704  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+04707  e8 37 2b             call charge_fichier
 0470a  8b 1e 00 00          mov bx, word ptr [0]
-0470e  8b bf 5e 00          mov di, word ptr [bx + 0x5e]
-04712  e8 b8 07             call sub_4ecd
+0470e  8b bf 5e 00          mov di, word ptr [bx + 0x5e]    ; palettes_scenes
+04712  e8 b8 07             call affiche_ecran_vga
 04715  8b 1e 00 00          mov bx, word ptr [0]
-04719  e8 f0 02             call sub_4a0c
+04719  e8 f0 02             call anime_scene
 0471c  8b 1e 00 00          mov bx, word ptr [0]
-04720  8b af 52 00          mov bp, word ptr [bx + 0x52]
-04724  e8 34 07             call sub_4e5b
+04720  8b af 52 00          mov bp, word ptr [bx + 0x52]    ; textes_scenes
+04724  e8 34 07             call ecran_texte_vga
 04727  59                   pop cx
 04728  3c 01                cmp al, 1
 0472a  75 03                jne loc_472f
-0472c  eb 0b                jmp loc_4739
+0472c  eb 0b                jmp fin_intro
 ; ---- 1 octets non atteints (472e-472e)
 loc_472f:
 0472f  83 06 00 00 02       add word ptr [0], 2
 04734  e2 b8                loop loc_46ee
-04736  e8 86 08             call sub_4fbf
-loc_4739:
-04739  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2
-0473f  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440
+04736  e8 86 08             call fondu_noir
+fin_intro:    ; relit QUEST.CFG : présent, on quitte ; absent (nouvelle configuration), écran des drapeaux
+04739  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2    ; fichier_nom
+0473f  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440    ; fichier_offset
 04745  b8 00 00             mov ax, 0
-04748  a3 a3 1b             mov word ptr [0x1ba3], ax
-0474b  e8 f3 2a             call sub_7241
-0474e  83 3e 8b 1a 02       cmp word ptr [0x1a8b], 2
-04753  74 03                je loc_4758
-04755  e9 1e 01             jmp loc_4876
-loc_4758:
-04758  a1 40 14             mov ax, word ptr [0x1440]
-0475b  a3 a2 10             mov word ptr [0x10a2], ax
+04748  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+0474b  e8 f3 2a             call charge_fichier
+0474e  83 3e 8b 1a 02       cmp word ptr [0x1a8b], 2    ; erreur_fichier
+04753  74 03                je ecran_drapeaux
+04755  e9 1e 01             jmp quitte_intro
+ecran_drapeaux:    ; FLAGS.EGA en mode EGA, même en VGA (mode gardé en DS:10A2) ; touches E F S G I -> langue 0 à 4 ; écrit QUEST.CFG ; vérifie QUEST.EXE (« Insert disk 2 »)
+04758  a1 40 14             mov ax, word ptr [0x1440]    ; mode_video
+0475b  a3 a2 10             mov word ptr [0x10a2], ax    ; mode_video_garde
 0475e  3d 08 00             cmp ax, 8
 04761  75 06                jne loc_4769
-04763  c7 06 40 14 06 00    mov word ptr [0x1440], 6
+04763  c7 06 40 14 06 00    mov word ptr [0x1440], 6    ; mode_video
 loc_4769:
-04769  e8 90 02             call sub_49fc
-0476c  e8 b6 06             call sub_4e25
-0476f  c7 06 a9 1b e6 00    mov word ptr [0x1ba9], 0xe6
-04775  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+04769  e8 90 02             call palette_ega_noire
+0476c  e8 b6 06             call mode_video_intro
+0476f  c7 06 a9 1b e6 00    mov word ptr [0x1ba9], 0xe6    ; fichier_nom
+04775  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 0477b  b8 26 1a             mov ax, 0x1a26
-0477e  a3 a3 1b             mov word ptr [0x1ba3], ax
-04781  e8 bd 2a             call sub_7241
-04784  e8 2a 28             call sub_6fb1
+0477e  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+04781  e8 bd 2a             call charge_fichier
+04784  e8 2a 28             call restaure_clavier
 04787  50                   push ax
 04788  b8 86 0a             mov ax, 0xa86
 0478b  8e c0                mov es, ax
@@ -311,20 +312,20 @@ loc_4769:
 04795  33 ff                xor di, di
 04797  8b f7                mov si, di
 04799  b9 00 7d             mov cx, 0x7d00
-0479c  e8 ee 36             call sub_7e8d
+0479c  e8 ee 36             call lz_decompresse
 0479f  50                   push ax
 047a0  b8 00 00             mov ax, 0
 047a3  8e d8                mov ds, ax
 047a5  58                   pop ax
-047a6  83 3e 40 14 04       cmp word ptr [0x1440], 4
+047a6  83 3e 40 14 04       cmp word ptr [0x1440], 4    ; mode_video
 047ab  74 09                je loc_47b6
-047ad  e8 d0 01             call sub_4980
-047b0  ba 80 10             mov dx, 0x1080
+047ad  e8 d0 01             call copie_ecran_ega
+047b0  ba 80 10             mov dx, 0x1080    ; palette_drapeaux_ega
 047b3  eb 07                jmp loc_47bc
 ; ---- 1 octets non atteints (47b5-47b5)
 loc_47b6:
-047b6  e8 34 08             call sub_4fed
-047b9  ba 91 10             mov dx, 0x1091
+047b6  e8 34 08             call affiche_tandy
+047b9  ba 91 10             mov dx, 0x1091    ; palette_drapeaux_tandy
 loc_47bc:
 047bc  b8 02 10             mov ax, 0x1002
 047bf  50                   push ax
@@ -335,34 +336,34 @@ loc_47bc:
 loc_47c8:
 047c8  b4 00                mov ah, 0
 047ca  cd 16                int 0x16
-047cc  c6 06 44 14 00       mov byte ptr [0x1444], 0
+047cc  c6 06 44 14 00       mov byte ptr [0x1444], 0    ; langue
 047d1  80 fc 12             cmp ah, 0x12
 047d4  74 28                je loc_47fe
-047d6  c6 06 44 14 01       mov byte ptr [0x1444], 1
+047d6  c6 06 44 14 01       mov byte ptr [0x1444], 1    ; langue
 047db  80 fc 21             cmp ah, 0x21
 047de  74 1e                je loc_47fe
-047e0  c6 06 44 14 02       mov byte ptr [0x1444], 2
+047e0  c6 06 44 14 02       mov byte ptr [0x1444], 2    ; langue
 047e5  80 fc 1f             cmp ah, 0x1f
 047e8  74 14                je loc_47fe
-047ea  c6 06 44 14 03       mov byte ptr [0x1444], 3
+047ea  c6 06 44 14 03       mov byte ptr [0x1444], 3    ; langue
 047ef  80 fc 22             cmp ah, 0x22
 047f2  74 0a                je loc_47fe
-047f4  c6 06 44 14 04       mov byte ptr [0x1444], 4
+047f4  c6 06 44 14 04       mov byte ptr [0x1444], 4    ; langue
 047f9  80 fc 17             cmp ah, 0x17
 047fc  75 ca                jne loc_47c8
 loc_47fe:
-047fe  a1 a2 10             mov ax, word ptr [0x10a2]
-04801  a3 40 14             mov word ptr [0x1440], ax
+047fe  a1 a2 10             mov ax, word ptr [0x10a2]    ; mode_video_garde
+04801  a3 40 14             mov word ptr [0x1440], ax    ; mode_video
 04804  32 e4                xor ah, ah
 04806  b0 03                mov al, 3
 04808  cd 10                int 0x10
-0480a  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2
-04810  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440
-04816  c7 06 a7 1b 09 00    mov word ptr [0x1ba7], 9
+0480a  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2    ; fichier_nom
+04810  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440    ; fichier_offset
+04816  c7 06 a7 1b 09 00    mov word ptr [0x1ba7], 9    ; fichier_taille
 0481c  b8 00 00             mov ax, 0
-0481f  a3 a3 1b             mov word ptr [0x1ba3], ax
-04822  e8 3b 2a             call sub_7260
-04825  e8 89 27             call sub_6fb1
+0481f  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+04822  e8 3b 2a             call sauve_fichier
+04825  e8 89 27             call restaure_clavier
 04828  ba 2b 14             mov dx, 0x142b    ; "quest.exe"
 0482b  32 c0                xor al, al
 0482d  b4 3d                mov ah, 0x3d
@@ -371,7 +372,7 @@ loc_47fe:
 04833  8b d8                mov bx, ax
 04835  b4 3e                mov ah, 0x3e
 04837  cd 21                int 0x21
-04839  eb 3b                jmp loc_4876
+04839  eb 3b                jmp quitte_intro
 ; ---- 1 octets non atteints (483b-483b)
 loc_483c:
 0483c  ba 9d 13             mov dx, 0x139d
@@ -387,30 +388,30 @@ loc_483c:
 04852  8b d8                mov bx, ax
 04854  b4 3e                mov ah, 0x3e
 04856  cd 21                int 0x21
-04858  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2
-0485e  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440
-04864  c7 06 a7 1b 09 00    mov word ptr [0x1ba7], 9
+04858  c7 06 a9 1b 02 00    mov word ptr [0x1ba9], 2    ; fichier_nom
+0485e  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440    ; fichier_offset
+04864  c7 06 a7 1b 09 00    mov word ptr [0x1ba7], 9    ; fichier_taille
 0486a  b8 00 00             mov ax, 0
-0486d  a3 a3 1b             mov word ptr [0x1ba3], ax
-04870  e8 ed 29             call sub_7260
-04873  e8 3b 27             call sub_6fb1
-loc_4876:
-04876  e8 38 27             call sub_6fb1
-04879  e8 ae 37             call sub_802a
+0486d  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+04870  e8 ed 29             call sauve_fichier
+04873  e8 3b 27             call restaure_clavier
+quitte_intro:    ; remet int 9, arrête le son (son_arret), mode texte 3, int 21h AH=4Ch
+04876  e8 38 27             call restaure_clavier
+04879  e8 ae 37             call son_arret
 loc_487c:
 0487c  32 e4                xor ah, ah
 0487e  b0 03                mov al, 3
 04880  cd 10                int 0x10
 04882  b8 00 4c             mov ax, 0x4c00
 04885  cd 21                int 0x21
-loc_4887:
-04887  c6 06 f2 19 07       mov byte ptr [0x19f2], 7
-0488c  e8 6d 01             call sub_49fc
-0488f  c7 06 a9 1b db 00    mov word ptr [0x1ba9], 0xdb
-04895  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+intro_ega:    ; EGA et Tandy : SHOPMP.EGA et BORDERED.EGA, puis copyright, crédits et les 6 textes, sans animation
+04887  c6 06 f2 19 07       mov byte ptr [0x19f2], 7    ; couleur_encre
+0488c  e8 6d 01             call palette_ega_noire
+0488f  c7 06 a9 1b db 00    mov word ptr [0x1ba9], 0xdb    ; fichier_nom
+04895  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 0489b  b8 26 1a             mov ax, 0x1a26
-0489e  a3 a3 1b             mov word ptr [0x1ba3], ax
-048a1  e8 9d 29             call sub_7241
+0489e  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+048a1  e8 9d 29             call charge_fichier
 048a4  b8 23 2e             mov ax, 0x2e23
 048a7  8e c0                mov es, ax
 048a9  33 f6                xor si, si
@@ -418,43 +419,44 @@ loc_4887:
 048ae  b8 26 1a             mov ax, 0x1a26
 048b1  8e d8                mov ds, ax
 048b3  b9 ff ff             mov cx, 0xffff
-048b6  e8 d4 35             call sub_7e8d
+048b6  e8 d4 35             call lz_decompresse
 048b9  50                   push ax
 048ba  b8 00 00             mov ax, 0
 048bd  8e d8                mov ds, ax
 048bf  58                   pop ax
-048c0  c7 06 a9 1b f0 00    mov word ptr [0x1ba9], 0xf0
-048c6  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+048c0  c7 06 a9 1b f0 00    mov word ptr [0x1ba9], 0xf0    ; fichier_nom
+048c6  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 048cc  b8 26 1a             mov ax, 0x1a26
-048cf  a3 a3 1b             mov word ptr [0x1ba3], ax
-048d2  e8 6c 29             call sub_7241
-048d5  e8 d9 26             call sub_6fb1
+048cf  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+048d2  e8 6c 29             call charge_fichier
+048d5  e8 d9 26             call restaure_clavier
 048d8  bd 51 02             mov bp, 0x251
-048db  e8 34 00             call sub_4912
+048db  e8 34 00             call ecran_texte_ega
 048de  bd fd 00             mov bp, 0xfd
-048e1  e8 2e 00             call sub_4912
+048e1  e8 2e 00             call ecran_texte_ega
 048e4  3c 01                cmp al, 1
 048e6  75 03                jne loc_48eb
-048e8  e9 4e fe             jmp loc_4739
+048e8  e9 4e fe             jmp fin_intro
 loc_48eb:
 048eb  b9 06 00             mov cx, 6
 048ee  c7 06 00 00 00 00    mov word ptr [0], 0
 loc_48f4:
 048f4  51                   push cx
 048f5  8b 1e 00 00          mov bx, word ptr [0]
-048f9  8b af 52 00          mov bp, word ptr [bx + 0x52]
-048fd  e8 12 00             call sub_4912
+048f9  8b af 52 00          mov bp, word ptr [bx + 0x52]    ; textes_scenes
+048fd  e8 12 00             call ecran_texte_ega
 04900  59                   pop cx
 04901  3c 01                cmp al, 1
 04903  75 03                jne loc_4908
-04905  e9 31 fe             jmp loc_4739
+04905  e9 31 fe             jmp fin_intro
 loc_4908:
 04908  83 06 00 00 02       add word ptr [0], 2
 0490d  e2 e5                loop loc_48f4
-0490f  e9 27 fe             jmp loc_4739
+0490f  e9 27 fe             jmp fin_intro
 
-; ======== sub_4912   (appelée depuis 48db, 48e1, 48fd)
-04912  83 3e 40 14 04       cmp word ptr [0x1440], 4
+; ======== ecran_texte_ega   (appelée depuis 48db, 48e1, 48fd)
+; EGA/Tandy : fond BORDERED (Tandy : rempli de CCh), écusson SHOPMP si BP = texte_copyright, texte BP, copie à l'écran, palette, attend Espace ou Échap (AL = 1 si Échap)
+04912  83 3e 40 14 04       cmp word ptr [0x1440], 4    ; mode_video
 04917  74 24                je loc_493d
 04919  55                   push bp
 0491a  50                   push ax
@@ -468,7 +470,7 @@ loc_4908:
 04928  33 ff                xor di, di
 0492a  8b f7                mov si, di
 0492c  b9 00 7d             mov cx, 0x7d00
-0492f  e8 5b 35             call sub_7e8d
+0492f  e8 5b 35             call lz_decompresse
 04932  50                   push ax
 04933  b8 00 00             mov ax, 0
 04936  8e d8                mov ds, ax
@@ -492,7 +494,7 @@ loc_494e:
 04955  be 40 7c             mov si, 0x7c40
 04958  bf 2c 14             mov di, 0x142c    ; "uest.exe"
 0495b  b8 23 2e             mov ax, 0x2e23
-0495e  a3 f0 19             mov word ptr [0x19f0], ax
+0495e  a3 f0 19             mov word ptr [0x19f0], ax    ; segment_source
 04961  50                   push ax
 04962  b8 86 0a             mov ax, 0xa86
 04965  8e c0                mov es, ax
@@ -500,17 +502,18 @@ loc_494e:
 04968  bd e0 00             mov bp, 0xe0
 0496b  b9 44 00             mov cx, 0x44
 0496e  1e                   push ds
-0496f  e8 9e 2a             call sub_7410
+0496f  e8 9e 2a             call affiche_sprite
 04972  1f                   pop ds
 04973  5d                   pop bp
 loc_4974:
-04974  e8 c5 20             call sub_6a3c
-04977  e8 06 00             call sub_4980
-0497a  e8 65 00             call sub_49e2
-0497d  e9 9b 05             jmp sub_4f1b
+04974  e8 c5 20             call affiche_chaine
+04977  e8 06 00             call copie_ecran_ega
+0497a  e8 65 00             call palette_ega
+0497d  e9 9b 05             jmp attend_espace_echap
 
-; ======== sub_4980   (appelée depuis 47ad, 4977)
-04980  83 3e 40 14 04       cmp word ptr [0x1440], 4
+; ======== copie_ecran_ega   (appelée depuis 47ad, 4977)
+; tampon 0A86:0 vers l'écran : EGA, 4 plans de 40 × 200 octets (port 3C4h) ; Tandy, 32 Ko vers B800h
+04980  83 3e 40 14 04       cmp word ptr [0x1440], 4    ; mode_video
 04985  74 3a                je loc_49c1
 04987  50                   push ax
 04988  b8 00 a0             mov ax, 0xa000
@@ -563,11 +566,12 @@ loc_49c1:
 049e0  58                   pop ax
 049e1  c3                   ret
 
-; ======== sub_49e2   (appelée depuis 497a)
-049e2  ba 5e 10             mov dx, 0x105e
-049e5  83 3e 40 14 04       cmp word ptr [0x1440], 4
+; ======== palette_ega   (appelée depuis 497a)
+; registres de palette (int 10h AX=1002h) : DS:105E en EGA, DS:106F en Tandy
+049e2  ba 5e 10             mov dx, 0x105e    ; palette_ega_registres
+049e5  83 3e 40 14 04       cmp word ptr [0x1440], 4    ; mode_video
 049ea  75 03                jne loc_49ef
-049ec  ba 6f 10             mov dx, 0x106f
+049ec  ba 6f 10             mov dx, 0x106f    ; palette_tandy_registres
 loc_49ef:
 049ef  b8 02 10             mov ax, 0x1002
 049f2  50                   push ax
@@ -577,217 +581,227 @@ loc_49ef:
 049f9  cd 10                int 0x10
 049fb  c3                   ret
 
-; ======== sub_49fc   (appelée depuis 4769, 488c)
+; ======== palette_ega_noire   (appelée depuis 4769, 488c)
+; registres de palette à zéro (DS:0C5E) : écran noir avant de dessiner
 049fc  b8 02 10             mov ax, 0x1002
 049ff  50                   push ax
 04a00  b8 00 00             mov ax, 0
 04a03  8e c0                mov es, ax
 04a05  58                   pop ax
-04a06  ba 5e 0c             mov dx, 0xc5e
+04a06  ba 5e 0c             mov dx, 0xc5e    ; palette_noire
 04a09  cd 10                int 0x10
 04a0b  c3                   ret
 
-; ======== sub_4a0c   (appelée depuis 4719)
+; ======== anime_scene   (appelée depuis 4719)
+; saut vers l'animation de la scène BX (0 à 10, pas 2), table CS:071E (image 0x4BCE)
 04a0c  2e ff a7 1e 07       jmp word ptr cs:[bx + 0x71e]
 
-; ======== sub_4a11   (routine probable : non appelée directement)
+; ======== scene_flamme   (appelée depuis 4a0c)
+; scène 1 (HERO1) : 4 images 16 × 16, flamme en (260, 104), 24 images toutes les 6 trames
 04a11  be 00 00             mov si, 0
 04a14  bf 00 00             mov di, 0
 04a17  b9 04 00             mov cx, 4
-04a1a  e8 33 03             call sub_4d50
+04a1a  e8 33 03             call convertit_16
 04a1d  b9 18 00             mov cx, 0x18
-04a20  c7 06 8e 12 00 00    mov word ptr [0x128e], 0
+04a20  c7 06 8e 12 00 00    mov word ptr [0x128e], 0    ; image_anim_1
 loc_4a26:
 04a26  51                   push cx
-04a27  e8 b7 01             call sub_4be1
-04a2a  a1 8e 12             mov ax, word ptr [0x128e]
+04a27  e8 b7 01             call restaure_fond
+04a2a  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04a2d  86 e0                xchg al, ah
 04a2f  8b f0                mov si, ax
 04a31  bf 04 83             mov di, 0x8304
-04a34  e8 e8 01             call sub_4c1f
-04a37  e8 c3 01             call sub_4bfd
+04a34  e8 e8 01             call sprite_16
+04a37  e8 c3 01             call tampon_vers_ecran
 04a3a  ba 06 00             mov dx, 6
-04a3d  e8 9a 01             call sub_4bda
-04a40  ff 06 8e 12          inc word ptr [0x128e]
-04a44  83 26 8e 12 03       and word ptr [0x128e], 3
+04a3d  e8 9a 01             call attend_trames
+04a40  ff 06 8e 12          inc word ptr [0x128e]    ; image_anim_1
+04a44  83 26 8e 12 03       and word ptr [0x128e], 3    ; image_anim_1
 04a49  59                   pop cx
 04a4a  e2 da                loop loc_4a26
 04a4c  c3                   ret
 
-; ======== sub_4a4d   (routine probable : non appelée directement)
+; ======== scene_feu   (appelée depuis 4a0c)
+; scène 2 (HERO2) : 3 images 32 × 64, feu en (134, 88), 10 tours de 3 images (2 trames)
 04a4d  be 80 02             mov si, 0x280
 04a50  b9 03 00             mov cx, 3
-04a53  e8 3d 03             call sub_4d93
+04a53  e8 3d 03             call convertit_32x64
 04a56  b9 0a 00             mov cx, 0xa
 loc_4a59:
 04a59  51                   push cx
 04a5a  b9 03 00             mov cx, 3
 04a5d  ba 02 00             mov dx, 2
 04a60  bf 86 6e             mov di, 0x6e86
-04a63  e8 f0 01             call sub_4c56
+04a63  e8 f0 01             call anime_32x64
 04a66  59                   pop cx
 04a67  e2 f0                loop loc_4a59
 04a69  c3                   ret
 
-; ======== sub_4a6a   (routine probable : non appelée directement)
+; ======== scene_visage   (appelée depuis 4a0c)
+; scène 3 (HERO4) : 4 images 64 × 64, attend 60 trames, visage qui parle en (128, 32) (4 trames par image), puis 240 trames
 04a6a  be 80 11             mov si, 0x1180
 04a6d  b9 04 00             mov cx, 4
-04a70  e8 69 03             call sub_4ddc
+04a70  e8 69 03             call convertit_64x64
 04a73  ba 3c 00             mov dx, 0x3c
 loc_4a76:
-04a76  e8 d2 34             call sub_7f4b
+04a76  e8 d2 34             call attend_trame
 04a79  4a                   dec dx
 04a7a  75 fa                jne loc_4a76
 04a7c  b9 04 00             mov cx, 4
 04a7f  ba 04 00             mov dx, 4
 04a82  bf 80 28             mov di, 0x2880
-04a85  e8 4b 02             call sub_4cd3
+04a85  e8 4b 02             call anime_64x64
 04a88  ba f0 00             mov dx, 0xf0
 loc_4a8b:
-04a8b  e8 bd 34             call sub_7f4b
+04a8b  e8 bd 34             call attend_trame
 04a8e  4a                   dec dx
 04a8f  75 fa                jne loc_4a8b
 04a91  c3                   ret
 
-; ======== sub_4a92   (routine probable : non appelée directement)
+; ======== scene_table   (appelée depuis 4a0c)
+; scène 4 (HERO6) : 16 images 16 × 16, 30 images (12 trames) de 4 sprites : deux cycles de 5 (DS:128E), deux de 3 (DS:1290)
 04a92  be 80 39             mov si, 0x3980
 04a95  bf 00 00             mov di, 0
 04a98  b9 10 00             mov cx, 0x10
-04a9b  e8 b2 02             call sub_4d50
+04a9b  e8 b2 02             call convertit_16
 04a9e  b9 1e 00             mov cx, 0x1e
-04aa1  c7 06 8e 12 00 00    mov word ptr [0x128e], 0
-04aa7  c7 06 90 12 00 00    mov word ptr [0x1290], 0
+04aa1  c7 06 8e 12 00 00    mov word ptr [0x128e], 0    ; image_anim_1
+04aa7  c7 06 90 12 00 00    mov word ptr [0x1290], 0    ; image_anim_2
 loc_4aad:
 04aad  51                   push cx
-04aae  e8 30 01             call sub_4be1
-04ab1  a1 8e 12             mov ax, word ptr [0x128e]
+04aae  e8 30 01             call restaure_fond
+04ab1  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04ab4  86 e0                xchg al, ah
 04ab6  8b f0                mov si, ax
 04ab8  bf 80 82             mov di, 0x8280
-04abb  e8 61 01             call sub_4c1f
-04abe  a1 8e 12             mov ax, word ptr [0x128e]
+04abb  e8 61 01             call sprite_16
+04abe  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04ac1  86 e0                xchg al, ah
 04ac3  be 00 08             mov si, 0x800
 04ac6  03 f0                add si, ax
 04ac8  bf 62 8c             mov di, 0x8c62
-04acb  e8 51 01             call sub_4c1f
-04ace  a1 90 12             mov ax, word ptr [0x1290]
+04acb  e8 51 01             call sprite_16
+04ace  a1 90 12             mov ax, word ptr [0x1290]    ; image_anim_2
 04ad1  86 e0                xchg al, ah
 04ad3  be 00 05             mov si, 0x500
 04ad6  03 f0                add si, ax
 04ad8  bf 78 78             mov di, 0x7878
-04adb  e8 41 01             call sub_4c1f
-04ade  a1 90 12             mov ax, word ptr [0x1290]
+04adb  e8 41 01             call sprite_16
+04ade  a1 90 12             mov ax, word ptr [0x1290]    ; image_anim_2
 04ae1  86 e0                xchg al, ah
 04ae3  be 00 0d             mov si, 0xd00
 04ae6  03 f0                add si, ax
 04ae8  bf 78 96             mov di, 0x9678
-04aeb  e8 31 01             call sub_4c1f
-04aee  e8 0c 01             call sub_4bfd
+04aeb  e8 31 01             call sprite_16
+04aee  e8 0c 01             call tampon_vers_ecran
 04af1  ba 0c 00             mov dx, 0xc
-04af4  e8 e3 00             call sub_4bda
-04af7  a1 8e 12             mov ax, word ptr [0x128e]
+04af4  e8 e3 00             call attend_trames
+04af7  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04afa  40                   inc ax
 04afb  3d 04 00             cmp ax, 4
 04afe  7e 03                jle loc_4b03
 04b00  b8 00 00             mov ax, 0
 loc_4b03:
-04b03  a3 8e 12             mov word ptr [0x128e], ax
-04b06  a1 90 12             mov ax, word ptr [0x1290]
+04b03  a3 8e 12             mov word ptr [0x128e], ax    ; image_anim_1
+04b06  a1 90 12             mov ax, word ptr [0x1290]    ; image_anim_2
 04b09  40                   inc ax
 04b0a  3d 02 00             cmp ax, 2
 04b0d  7e 03                jle loc_4b12
 04b0f  b8 00 00             mov ax, 0
 loc_4b12:
-04b12  a3 90 12             mov word ptr [0x1290], ax
+04b12  a3 90 12             mov word ptr [0x1290], ax    ; image_anim_2
 04b15  59                   pop cx
 04b16  e2 95                loop loc_4aad
 04b18  c3                   ret
 
-; ======== sub_4b19   (routine probable : non appelée directement)
+; ======== scene_deux_sprites   (appelée depuis 4a0c)
+; scène 5 (HERO3) : 12 images 16 × 16, 30 images (8 trames) de 2 sprites : cycles de 5 et de 7
 04b19  be 80 43             mov si, 0x4380
 04b1c  bf 00 00             mov di, 0
 04b1f  b9 0c 00             mov cx, 0xc
-04b22  e8 2b 02             call sub_4d50
+04b22  e8 2b 02             call convertit_16
 04b25  b9 1e 00             mov cx, 0x1e
-04b28  c7 06 8e 12 00 00    mov word ptr [0x128e], 0
-04b2e  c7 06 90 12 00 00    mov word ptr [0x1290], 0
+04b28  c7 06 8e 12 00 00    mov word ptr [0x128e], 0    ; image_anim_1
+04b2e  c7 06 90 12 00 00    mov word ptr [0x1290], 0    ; image_anim_2
 loc_4b34:
 04b34  51                   push cx
-04b35  e8 a9 00             call sub_4be1
-04b38  a1 8e 12             mov ax, word ptr [0x128e]
+04b35  e8 a9 00             call restaure_fond
+04b38  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04b3b  86 e0                xchg al, ah
 04b3d  8b f0                mov si, ax
 04b3f  bf e0 96             mov di, 0x96e0
-04b42  e8 da 00             call sub_4c1f
-04b45  a1 90 12             mov ax, word ptr [0x1290]
+04b42  e8 da 00             call sprite_16
+04b45  a1 90 12             mov ax, word ptr [0x1290]    ; image_anim_2
 04b48  86 e0                xchg al, ah
 04b4a  be 00 05             mov si, 0x500
 04b4d  03 f0                add si, ax
 04b4f  bf 68 8c             mov di, 0x8c68
-04b52  e8 ca 00             call sub_4c1f
-04b55  e8 a5 00             call sub_4bfd
+04b52  e8 ca 00             call sprite_16
+04b55  e8 a5 00             call tampon_vers_ecran
 04b58  ba 08 00             mov dx, 8
-04b5b  e8 7c 00             call sub_4bda
-04b5e  a1 8e 12             mov ax, word ptr [0x128e]
+04b5b  e8 7c 00             call attend_trames
+04b5e  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04b61  40                   inc ax
 04b62  3d 04 00             cmp ax, 4
 04b65  7e 03                jle loc_4b6a
 04b67  b8 00 00             mov ax, 0
 loc_4b6a:
-04b6a  a3 8e 12             mov word ptr [0x128e], ax
-04b6d  a1 90 12             mov ax, word ptr [0x1290]
+04b6a  a3 8e 12             mov word ptr [0x128e], ax    ; image_anim_1
+04b6d  a1 90 12             mov ax, word ptr [0x1290]    ; image_anim_2
 04b70  40                   inc ax
 04b71  3d 06 00             cmp ax, 6
 04b74  7e 03                jle loc_4b79
 04b76  b8 00 00             mov ax, 0
 loc_4b79:
-04b79  a3 90 12             mov word ptr [0x1290], ax
+04b79  a3 90 12             mov word ptr [0x1290], ax    ; image_anim_2
 04b7c  59                   pop cx
 04b7d  e2 b5                loop loc_4b34
 04b7f  c3                   ret
 
-; ======== sub_4b80   (routine probable : non appelée directement)
+; ======== scene_finale   (appelée depuis 4a0c)
+; scène 6 (HERO7) : 8 images 16 × 16, attend 60 trames, 10 images en (65, 120) qui finissent en boucle sur 6-7, attend 60 trames
 04b80  be 00 4b             mov si, 0x4b00
 04b83  bf 00 00             mov di, 0
 04b86  b9 08 00             mov cx, 8
-04b89  e8 c4 01             call sub_4d50
+04b89  e8 c4 01             call convertit_16
 04b8c  ba 3c 00             mov dx, 0x3c
-04b8f  e8 48 00             call sub_4bda
+04b8f  e8 48 00             call attend_trames
 04b92  b9 0a 00             mov cx, 0xa
-04b95  c7 06 8e 12 00 00    mov word ptr [0x128e], 0
+04b95  c7 06 8e 12 00 00    mov word ptr [0x128e], 0    ; image_anim_1
 loc_4b9b:
 04b9b  51                   push cx
-04b9c  e8 42 00             call sub_4be1
-04b9f  a1 8e 12             mov ax, word ptr [0x128e]
+04b9c  e8 42 00             call restaure_fond
+04b9f  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04ba2  86 e0                xchg al, ah
 04ba4  8b f0                mov si, ax
 04ba6  bf 41 96             mov di, 0x9641
-04ba9  e8 73 00             call sub_4c1f
-04bac  e8 4e 00             call sub_4bfd
+04ba9  e8 73 00             call sprite_16
+04bac  e8 4e 00             call tampon_vers_ecran
 04baf  ba 08 00             mov dx, 8
-04bb2  e8 25 00             call sub_4bda
-04bb5  a1 8e 12             mov ax, word ptr [0x128e]
+04bb2  e8 25 00             call attend_trames
+04bb5  a1 8e 12             mov ax, word ptr [0x128e]    ; image_anim_1
 04bb8  40                   inc ax
 04bb9  3d 07 00             cmp ax, 7
 04bbc  7e 03                jle loc_4bc1
 04bbe  b8 06 00             mov ax, 6
 loc_4bc1:
-04bc1  a3 8e 12             mov word ptr [0x128e], ax
+04bc1  a3 8e 12             mov word ptr [0x128e], ax    ; image_anim_1
 04bc4  59                   pop cx
 04bc5  e2 d4                loop loc_4b9b
 04bc7  ba 3c 00             mov dx, 0x3c
-04bca  e8 0d 00             call sub_4bda
+04bca  e8 0d 00             call attend_trames
 04bcd  c3                   ret
 ; ---- 12 octets non atteints (4bce-4bd9)
 
-; ======== sub_4bda   (appelée depuis 4a3d, 4af4, 4b5b, 4b8f, 4bb2, 4bca)
-04bda  e8 6e 33             call sub_7f4b
+; ======== attend_trames   (appelée depuis 4a3d, 4af4, 4b5b, 4b8f, 4bb2, 4bca)
+; attend DX retours de trame (attend_trame)
+04bda  e8 6e 33             call attend_trame
 04bdd  4a                   dec dx
-04bde  75 fa                jne sub_4bda
+04bde  75 fa                jne attend_trames
 04be0  c3                   ret
 
-; ======== sub_4be1   (appelée depuis 4a27, 4aae, 4b35, 4b9c)
+; ======== restaure_fond   (appelée depuis 4a27, 4aae, 4b35, 4b9c)
+; redécompresse l'écran de la scène (segment 1A26) dans le tampon 0A86:0
 04be1  b8 86 0a             mov ax, 0xa86
 04be4  8e c0                mov es, ax
 04be6  b8 26 1a             mov ax, 0x1a26
@@ -795,12 +809,13 @@ loc_4bc1:
 04beb  bf 00 00             mov di, 0
 04bee  be 00 00             mov si, 0
 04bf1  b9 ff ff             mov cx, 0xffff
-04bf4  e8 96 32             call sub_7e8d
+04bf4  e8 96 32             call lz_decompresse
 04bf7  b8 00 00             mov ax, 0
 04bfa  8e d8                mov ds, ax
 04bfc  c3                   ret
 
-; ======== sub_4bfd   (appelée depuis 4a37, 4aee, 4b55, 4bac)
+; ======== tampon_vers_ecran   (appelée depuis 4a37, 4aee, 4b55, 4bac)
+; copie le tampon 0A86:0 (64 000 octets) en A000:0
 04bfd  b8 00 a0             mov ax, 0xa000
 04c00  8e c0                mov es, ax
 04c02  b8 86 0a             mov ax, 0xa86
@@ -817,7 +832,8 @@ loc_4bc1:
 04c1c  8e d8                mov ds, ax
 04c1e  c3                   ret
 
-; ======== sub_4c1f   (appelée depuis 4a34, 4abb, 4acb, 4adb, 4aeb, 4b42, 4b52, 4ba9)
+; ======== sprite_16   (appelée depuis 4a34, 4abb, 4acb, 4adb, 4aeb, 4b42, 4b52, 4ba9)
+; dessine dans le tampon une image 16 × 16 du segment 2A23 (SI = n° × 256) en DI ; couleur 0 transparente
 04c1f  b8 86 0a             mov ax, 0xa86
 04c22  8e c0                mov es, ax
 04c24  b8 23 2a             mov ax, 0x2a23
@@ -845,7 +861,8 @@ loc_4c41:
 04c53  8e d8                mov ds, ax
 04c55  c3                   ret
 
-; ======== sub_4c56   (appelée depuis 4a63)
+; ======== anime_32x64   (appelée depuis 4a63)
+; CX images 32 × 64 en DI : fond restauré, DX trames, image, copie à l'écran (scène 2)
 04c56  be 00 00             mov si, 0
 loc_4c59:
 04c59  51                   push cx
@@ -859,7 +876,7 @@ loc_4c59:
 04c67  bf 00 00             mov di, 0
 04c6a  be 00 00             mov si, 0
 04c6d  b9 ff ff             mov cx, 0xffff
-04c70  e8 1a 32             call sub_7e8d
+04c70  e8 1a 32             call lz_decompresse
 04c73  5e                   pop si
 04c74  5a                   pop dx
 04c75  5f                   pop di
@@ -868,7 +885,7 @@ loc_4c59:
 04c78  b8 23 2a             mov ax, 0x2a23
 04c7b  8e d8                mov ds, ax
 loc_4c7d:
-04c7d  e8 cb 32             call sub_7f4b
+04c7d  e8 cb 32             call attend_trame
 04c80  4a                   dec dx
 04c81  75 fa                jne loc_4c7d
 04c83  bd 40 00             mov bp, 0x40
@@ -912,7 +929,8 @@ loc_4c9b:
 04cd0  8e d8                mov ds, ax
 04cd2  c3                   ret
 
-; ======== sub_4cd3   (appelée depuis 4a85)
+; ======== anime_64x64   (appelée depuis 4a85)
+; même chose en 64 × 64 (scène 3)
 04cd3  be 00 00             mov si, 0
 loc_4cd6:
 04cd6  51                   push cx
@@ -926,7 +944,7 @@ loc_4cd6:
 04ce4  bf 00 00             mov di, 0
 04ce7  be 00 00             mov si, 0
 04cea  b9 ff ff             mov cx, 0xffff
-04ced  e8 9d 31             call sub_7e8d
+04ced  e8 9d 31             call lz_decompresse
 04cf0  5e                   pop si
 04cf1  5a                   pop dx
 04cf2  5f                   pop di
@@ -935,7 +953,7 @@ loc_4cd6:
 04cf5  b8 23 2a             mov ax, 0x2a23
 04cf8  8e d8                mov ds, ax
 loc_4cfa:
-04cfa  e8 4e 32             call sub_7f4b
+04cfa  e8 4e 32             call attend_trame
 04cfd  4a                   dec dx
 04cfe  75 fa                jne loc_4cfa
 04d00  bd 40 00             mov bp, 0x40
@@ -979,7 +997,8 @@ loc_4d18:
 04d4d  8e d8                mov ds, ax
 04d4f  c3                   ret
 
-; ======== sub_4d50   (appelée depuis 4a1a, 4a9b, 4b22, 4b89)
+; ======== convertit_16   (appelée depuis 4a1a, 4a9b, 4b22, 4b89)
+; CX images 16 × 16 de ANIMS (segment 2523, SI) : 5 plans de bits -> un octet par pixel en 2A23:DI
 04d50  b8 23 2a             mov ax, 0x2a23
 04d53  8e c0                mov es, ax
 04d55  b8 23 25             mov ax, 0x2523
@@ -1014,7 +1033,8 @@ loc_4d61:
 04d90  8e d8                mov ds, ax
 04d92  c3                   ret
 
-; ======== sub_4d93   (appelée depuis 4a53)
+; ======== convertit_32x64   (appelée depuis 4a53)
+; même conversion, images 32 × 64 (plans de 100h octets)
 04d93  b8 23 2a             mov ax, 0x2a23
 04d96  8e c0                mov es, ax
 04d98  bf 00 00             mov di, 0
@@ -1050,7 +1070,8 @@ loc_4da7:
 04dd9  8e d8                mov ds, ax
 04ddb  c3                   ret
 
-; ======== sub_4ddc   (appelée depuis 4a70)
+; ======== convertit_64x64   (appelée depuis 4a70)
+; même conversion, images 64 × 64 (plans de 200h octets)
 04ddc  b8 23 2a             mov ax, 0x2a23
 04ddf  8e c0                mov es, ax
 04de1  bf 00 00             mov di, 0
@@ -1086,9 +1107,10 @@ loc_4df0:
 04e22  8e d8                mov ds, ax
 04e24  c3                   ret
 
-; ======== sub_4e25   (appelée depuis 4651, 476c)
-04e25  bb 84 12             mov bx, 0x1284
-04e28  03 1e 40 14          add bx, word ptr [0x1440]
+; ======== mode_video_intro   (appelée depuis 4651, 476c)
+; mode vidéo selon mode_video (table DS:1284) : 8 -> 13h, 6 -> 0Dh, 4 -> 09h (Tandy)
+04e25  bb 84 12             mov bx, 0x1284    ; modes_video_intro
+04e28  03 1e 40 14          add bx, word ptr [0x1440]    ; mode_video
 04e2c  ff 27                jmp word ptr [bx]
 loc_4e2e:
 04e2e  32 e4                xor ah, ah
@@ -1106,8 +1128,9 @@ loc_4e3c:
 04e40  cd 10                int 0x10
 04e42  c3                   ret
 
-; ======== sub_4e43   (appelée depuis 46a4, 4fb8, 4fe6)
-04e43  e8 05 31             call sub_7f4b
+; ======== palette_vga   (appelée depuis 46a4, 4fb8, 4fe6)
+; attend un retour de trame, puis 32 couleurs (DAC 0 à 31, ports 3C8h/3C9h) depuis DS:DX
+04e43  e8 05 31             call attend_trame
 04e46  8b f2                mov si, dx
 04e48  ba c8 03             mov dx, 0x3c8
 04e4b  32 c0                xor al, al
@@ -1124,17 +1147,18 @@ loc_4e52:
 04e58  e2 f8                loop loc_4e52
 04e5a  c3                   ret
 
-; ======== sub_4e5b   (appelée depuis 46db, 4724)
+; ======== ecran_texte_vga   (appelée depuis 46db, 4724)
+; fondu au noir, TEXT1.VGA, texte BP, fondu d'entrée (palette DS:0D86), attend Espace ou Échap (AL = 1 si Échap)
 04e5b  55                   push bp
-04e5c  e8 60 01             call sub_4fbf
-04e5f  c7 06 a9 1b d1 00    mov word ptr [0x1ba9], 0xd1
-04e65  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+04e5c  e8 60 01             call fondu_noir
+04e5f  c7 06 a9 1b d1 00    mov word ptr [0x1ba9], 0xd1    ; fichier_nom
+04e65  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 04e6b  b8 26 1a             mov ax, 0x1a26
-04e6e  a3 a3 1b             mov word ptr [0x1ba3], ax
-04e71  e8 cd 23             call sub_7241
-04e74  e8 3a 21             call sub_6fb1
-04e77  bf 86 0d             mov di, 0xd86
-04e7a  e8 b6 00             call sub_4f33
+04e6e  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+04e71  e8 cd 23             call charge_fichier
+04e74  e8 3a 21             call restaure_clavier
+04e77  bf 86 0d             mov di, 0xd86    ; palette_text1
+04e7a  e8 b6 00             call pas_du_fondu
 04e7d  50                   push ax
 04e7e  b8 86 0a             mov ax, 0xa86
 04e81  8e c0                mov es, ax
@@ -1146,13 +1170,13 @@ loc_4e52:
 04e8b  33 ff                xor di, di
 04e8d  8b f7                mov si, di
 04e8f  b9 ff ff             mov cx, 0xffff
-04e92  e8 f8 2f             call sub_7e8d
+04e92  e8 f8 2f             call lz_decompresse
 04e95  50                   push ax
 04e96  b8 00 00             mov ax, 0
 04e99  8e d8                mov ds, ax
 04e9b  58                   pop ax
 04e9c  5d                   pop bp
-04e9d  e8 9c 1b             call sub_6a3c
+04e9d  e8 9c 1b             call affiche_chaine
 04ea0  50                   push ax
 04ea1  b8 00 a0             mov ax, 0xa000
 04ea4  8e c0                mov es, ax
@@ -1173,16 +1197,17 @@ loc_4e52:
 04ec1  b8 00 00             mov ax, 0
 04ec4  8e d8                mov ds, ax
 04ec6  58                   pop ax
-04ec7  e8 b8 00             call sub_4f82
-04eca  eb 4f                jmp sub_4f1b
+04ec7  e8 b8 00             call fondu_entree
+04eca  eb 4f                jmp attend_espace_echap
 ; ---- 1 octets non atteints (4ecc-4ecc)
 
-; ======== sub_4ecd   (appelée depuis 46aa, 46cb, 4712)
+; ======== affiche_ecran_vga   (appelée depuis 46aa, 46cb, 4712)
+; fondu au noir, décompresse l'écran chargé (1A26 -> 0A86), le copie en A000, fondu d'entrée vers la palette DI
 04ecd  57                   push di
-04ece  e8 ee 00             call sub_4fbf
+04ece  e8 ee 00             call fondu_noir
 04ed1  5f                   pop di
-04ed2  e8 5e 00             call sub_4f33
-04ed5  e8 d9 20             call sub_6fb1
+04ed2  e8 5e 00             call pas_du_fondu
+04ed5  e8 d9 20             call restaure_clavier
 04ed8  50                   push ax
 04ed9  b8 86 0a             mov ax, 0xa86
 04edc  8e c0                mov es, ax
@@ -1194,7 +1219,7 @@ loc_4e52:
 04ee6  33 ff                xor di, di
 04ee8  8b f7                mov si, di
 04eea  b9 ff ff             mov cx, 0xffff
-04eed  e8 9d 2f             call sub_7e8d
+04eed  e8 9d 2f             call lz_decompresse
 04ef0  50                   push ax
 04ef1  b8 00 a0             mov ax, 0xa000
 04ef4  8e c0                mov es, ax
@@ -1215,10 +1240,11 @@ loc_4e52:
 04f11  b8 00 00             mov ax, 0
 04f14  8e d8                mov ds, ax
 04f16  58                   pop ax
-04f17  e8 68 00             call sub_4f82
+04f17  e8 68 00             call fondu_entree
 04f1a  c3                   ret
 
-; ======== sub_4f1b   (appelée depuis 46ce)
+; ======== attend_espace_echap   (appelée depuis 46ce)
+; regarde la touche en attente (int 16h AH=1, sans la retirer), puis attend Espace (AL = 0) ou Échap (AL = 1)
 04f1b  b4 01                mov ah, 1
 04f1d  cd 16                int 0x16
 loc_4f1f:
@@ -1234,8 +1260,9 @@ loc_4f2b:
 04f30  32 c0                xor al, al
 04f32  c3                   ret
 
-; ======== sub_4f33   (appelée depuis 4e7a, 4ed2)
-04f33  be a4 10             mov si, 0x10a4
+; ======== pas_du_fondu   (appelée depuis 4e7a, 4ed2)
+; pas du fondu depuis la palette DI (32 × 3 octets) : valeur × 2, en 8.8, dans pas_fondu
+04f33  be a4 10             mov si, 0x10a4    ; pas_fondu
 04f36  b9 20 00             mov cx, 0x20
 loc_4f39:
 04f39  8a 25                mov ah, byte ptr [di]
@@ -1273,8 +1300,9 @@ loc_4f39:
 04f7f  e2 b8                loop loc_4f39
 04f81  c3                   ret
 
-; ======== sub_4f82   (appelée depuis 4ec7, 4f17)
-04f82  bf 64 11             mov di, 0x1164
+; ======== fondu_entree   (appelée depuis 4ec7, 4f17)
+; palette à zéro, puis 128 étapes : ajoute les pas, envoie la palette (une trame par étape)
+04f82  bf 64 11             mov di, 0x1164    ; palette_fondu
 04f85  8c d8                mov ax, ds
 04f87  8e c0                mov es, ax
 04f89  b8 00 00             mov ax, 0
@@ -1284,9 +1312,9 @@ loc_4f39:
 loc_4f94:
 04f94  51                   push cx
 04f95  b9 60 00             mov cx, 0x60
-04f98  be 64 11             mov si, 0x1164
-04f9b  bf 24 12             mov di, 0x1224
-04f9e  bb a4 10             mov bx, 0x10a4
+04f98  be 64 11             mov si, 0x1164    ; palette_fondu
+04f9b  bf 24 12             mov di, 0x1224    ; palette_envoyee
+04f9e  bb a4 10             mov bx, 0x10a4    ; pas_fondu
 loc_4fa1:
 04fa1  8b 04                mov ax, word ptr [si]
 04fa3  03 07                add ax, word ptr [bx]
@@ -1296,21 +1324,22 @@ loc_4fa1:
 04fac  83 c3 02             add bx, 2
 04faf  47                   inc di
 04fb0  e2 ef                loop loc_4fa1
-04fb2  e8 96 2f             call sub_7f4b
-04fb5  ba 24 12             mov dx, 0x1224
-04fb8  e8 88 fe             call sub_4e43
+04fb2  e8 96 2f             call attend_trame
+04fb5  ba 24 12             mov dx, 0x1224    ; palette_envoyee
+04fb8  e8 88 fe             call palette_vga
 04fbb  59                   pop cx
 04fbc  e2 d6                loop loc_4f94
 04fbe  c3                   ret
 
-; ======== sub_4fbf   (appelée depuis 4736, 4e5c, 4ece)
+; ======== fondu_noir   (appelée depuis 4736, 4e5c, 4ece)
+; 128 étapes : retire les pas de la palette en cours (les pas de l'écran précédent)
 04fbf  b9 80 00             mov cx, 0x80
 loc_4fc2:
 04fc2  51                   push cx
 04fc3  b9 60 00             mov cx, 0x60
-04fc6  be 64 11             mov si, 0x1164
-04fc9  bf 24 12             mov di, 0x1224
-04fcc  bb a4 10             mov bx, 0x10a4
+04fc6  be 64 11             mov si, 0x1164    ; palette_fondu
+04fc9  bf 24 12             mov di, 0x1224    ; palette_envoyee
+04fcc  bb a4 10             mov bx, 0x10a4    ; pas_fondu
 loc_4fcf:
 04fcf  8b 04                mov ax, word ptr [si]
 04fd1  2b 07                sub ax, word ptr [bx]
@@ -1320,14 +1349,15 @@ loc_4fcf:
 04fda  83 c3 02             add bx, 2
 04fdd  47                   inc di
 04fde  e2 ef                loop loc_4fcf
-04fe0  e8 68 2f             call sub_7f4b
-04fe3  ba 24 12             mov dx, 0x1224
-04fe6  e8 5a fe             call sub_4e43
+04fe0  e8 68 2f             call attend_trame
+04fe3  ba 24 12             mov dx, 0x1224    ; palette_envoyee
+04fe6  e8 5a fe             call palette_vga
 04fe9  59                   pop cx
 04fea  e2 d6                loop loc_4fc2
 04fec  c3                   ret
 
-; ======== sub_4fed   (appelée depuis 47b6)
+; ======== affiche_tandy   (appelée depuis 47b6)
+; mode 4 seulement (écran des drapeaux) : tampon 0A86 (rangée de 160 octets = 4 plans de 40) -> 4 bits par pixel en B800h, 4 banques de 2000h ; boucle déroulée, compteur de rangées en CS:23EF (image 0x689F)
 04fed  50                   push ax
 04fee  b8 00 b8             mov ax, 0xb800
 04ff1  8e c0                mov es, ax
@@ -4315,30 +4345,103 @@ loc_6897:
 0689b  8e d8                mov ds, ax
 0689d  58                   pop ax
 0689e  c3                   ret
-; ---- 413 octets non atteints (689f-6a3b)
+; ---- 279 octets non atteints (689f-69b5)
 
-; ======== sub_6a3c   (appelée depuis 4974, 4e9d, 7d07, 7d2b, 7d49, 7d97, 7da5, 7db3)
+; ======== lit_configuration
+; non appelée : copie de lit_configuration de QUEST (DS:192F « quest.cfg », « Configuration file missing », souris, « No mouse installed », etalonne_joystick)
+069b6  e8 c3 14             call installe_erreur_disque
+069b9  c7 06 a9 1b 2f 19    mov word ptr [0x1ba9], 0x192f    ; fichier_nom, "quest.cfg"
+069bf  c7 06 a5 1b 40 14    mov word ptr [0x1ba5], 0x1440    ; fichier_offset
+069c5  b8 00 00             mov ax, 0
+069c8  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+069cb  e8 73 08             call charge_fichier
+069ce  83 3e 8b 1a 02       cmp word ptr [0x1a8b], 2    ; erreur_fichier
+069d3  74 03                je loc_69d8
+069d5  eb 13                jmp loc_69ea
+; ---- 1 octets non atteints (69d7-69d7)
+loc_69d8:
+069d8  32 e4                xor ah, ah
+069da  b0 03                mov al, 3
+069dc  cd 10                int 0x10
+069de  ba 61 19             mov dx, 0x1961
+069e1  b4 09                mov ah, 9
+069e3  cd 21                int 0x21
+loc_69e5:
+069e5  e8 c9 05             call restaure_clavier
+069e8  f9                   stc
+069e9  c3                   ret
+loc_69ea:
+069ea  b8 33 35             mov ax, 0x3533
+069ed  cd 21                int 0x21
+069ef  8c c0                mov ax, es
+069f1  0b c3                or ax, bx
+069f3  a3 b3 14             mov word ptr [0x14b3], ax
+069f6  74 09                je loc_6a01
+069f8  33 c0                xor ax, ax
+069fa  cd 33                int 0x33
+069fc  0b c0                or ax, ax
+069fe  a3 b3 14             mov word ptr [0x14b3], ax
+loc_6a01:
+06a01  b9 04 00             mov cx, 4
+06a04  bb 45 14             mov bx, 0x1445    ; commandes_joueurs
+loc_6a07:
+06a07  80 3f 00             cmp byte ptr [bx], 0
+06a0a  75 07                jne loc_6a13
+06a0c  83 3e b3 14 00       cmp word ptr [0x14b3], 0
+06a11  74 13                je loc_6a26
+loc_6a13:
+06a13  43                   inc bx
+06a14  e2 f1                loop loc_6a07
+06a16  b9 04 00             mov cx, 4
+06a19  bb 45 14             mov bx, 0x1445    ; commandes_joueurs
+loc_6a1c:
+06a1c  80 3f 02             cmp byte ptr [bx], 2
+06a1f  74 0e                je loc_6a2f
+06a21  43                   inc bx
+06a22  e2 f8                loop loc_6a1c
+06a24  f8                   clc
+06a25  c3                   ret
+loc_6a26:
+06a26  ba a1 19             mov dx, 0x19a1
+06a29  b4 09                mov ah, 9
+06a2b  cd 21                int 0x21
+06a2d  eb b6                jmp loc_69e5
+loc_6a2f:
+06a2f  e8 48 15             call etalonne_joystick
+06a32  f8                   clc
+06a33  c3                   ret
+
+; ======== ligne_ecran
+; non appelée : BX += AX × 320, copie de ligne_ecran de QUEST
+06a34  ba 40 01             mov dx, 0x140
+06a37  f7 e2                mul dx
+06a39  03 d8                add bx, ax
+06a3b  c3                   ret
+
+; ======== affiche_chaine   (appelée depuis 4974, 4e9d, 7d07, 7d2b, 7d49, 7d97, 7da5, 7db3)
+; chaîne DS:BP terminée par 0, chaque caractère passé à affiche_caractere
 06a3c  3e 8a 46 00          mov al, byte ptr ds:[bp]
 06a40  22 c0                and al, al
 06a42  75 01                jne loc_6a45
 06a44  c3                   ret
 loc_6a45:
-06a45  e8 03 00             call sub_6a4b
+06a45  e8 03 00             call affiche_caractere
 06a48  45                   inc bp
-06a49  eb f1                jmp sub_6a3c
+06a49  eb f1                jmp affiche_chaine
 
-; ======== sub_6a4b   (appelée depuis 6a45, 7337, 7358, 7e64)
+; ======== affiche_caractere   (appelée depuis 6a45, 7337, 7358, 7e64)
+; caractère AL en police 8 × 8 (DS:13B5) à colonne_texte, ligne_texte ; une routine par mode (table DS:19DC) ; codes 1 = segment (mot suivant), 10h = couleurs (encre, fond), 11h = position (ligne, colonne), 12h = position (colonne, ligne + 4)
 06a4b  3c 01                cmp al, 1
 06a4d  74 09                je loc_6a58
-06a4f  bb dc 19             mov bx, 0x19dc
-06a52  03 1e 40 14          add bx, word ptr [0x1440]
+06a4f  bb dc 19             mov bx, 0x19dc    ; saut_caractere
+06a52  03 1e 40 14          add bx, word ptr [0x1440]    ; mode_video
 06a56  ff 27                jmp word ptr [bx]
 loc_6a58:
 06a58  3e 8b 46 01          mov ax, word ptr ds:[bp + 1]
-06a5c  a3 f8 19             mov word ptr [0x19f8], ax
+06a5c  a3 f8 19             mov word ptr [0x19f8], ax    ; segment_texte
 06a5f  83 c5 02             add bp, 2
 06a62  c3                   ret
-loc_6a63:
+caractere_tandy:    ; mode 4 : glyphe en 4 bits par pixel (pixels_tandy), 4 banques de 2000h ; code 10h : couleur 38h remplacée par 5
 06a63  3c 10                cmp al, 0x10
 06a65  75 03                jne loc_6a6a
 06a67  e9 1e 01             jmp loc_6b88
@@ -4352,14 +4455,14 @@ loc_6a71:
 06a75  e9 be 03             jmp loc_6e36
 loc_6a78:
 06a78  50                   push ax
-06a79  bb 21 1a             mov bx, 0x1a21
-06a7c  a0 f2 19             mov al, byte ptr [0x19f2]
+06a79  bb 21 1a             mov bx, 0x1a21    ; pixels_tandy
+06a7c  a0 f2 19             mov al, byte ptr [0x19f2]    ; couleur_encre
 06a7f  d7                   xlatb
 06a80  8a d0                mov dl, al
-06a82  a0 f3 19             mov al, byte ptr [0x19f3]
+06a82  a0 f3 19             mov al, byte ptr [0x19f3]    ; couleur_fond
 06a85  d7                   xlatb
 06a86  8a f0                mov dh, al
-06a88  80 3e fb 19 01       cmp byte ptr [0x19fb], 1
+06a88  80 3e fb 19 01       cmp byte ptr [0x19fb], 1    ; texte_transparent
 06a8d  75 02                jne loc_6a91
 06a8f  b6 00                mov dh, 0
 loc_6a91:
@@ -4369,9 +4472,9 @@ loc_6a91:
 06a95  d1 e0                shl ax, 1
 06a97  d1 e0                shl ax, 1
 06a99  d1 e0                shl ax, 1
-06a9b  05 b5 13             add ax, 0x13b5
+06a9b  05 b5 13             add ax, 0x13b5    ; police
 06a9e  8b f0                mov si, ax
-06aa0  bf ff 19             mov di, 0x19ff
+06aa0  bf ff 19             mov di, 0x19ff    ; glyphe_tampon
 06aa3  b9 08 00             mov cx, 8
 loc_6aa6:
 06aa6  51                   push cx
@@ -4398,22 +4501,22 @@ loc_6ac9:
 06acc  e2 dd                loop loc_6aab
 06ace  59                   pop cx
 06acf  e2 d5                loop loc_6aa6
-06ad1  a1 f6 19             mov ax, word ptr [0x19f6]
+06ad1  a1 f6 19             mov ax, word ptr [0x19f6]    ; ligne_texte
 06ad4  32 e4                xor ah, ah
 06ad6  ba 40 01             mov dx, 0x140
 06ad9  f7 e2                mul dx
-06adb  8b 3e f4 19          mov di, word ptr [0x19f4]
+06adb  8b 3e f4 19          mov di, word ptr [0x19f4]    ; colonne_texte
 06adf  d1 e7                shl di, 1
 06ae1  d1 e7                shl di, 1
 06ae3  03 f8                add di, ax
-06ae5  a1 f8 19             mov ax, word ptr [0x19f8]
+06ae5  a1 f8 19             mov ax, word ptr [0x19f8]    ; segment_texte
 06ae8  8e c0                mov es, ax
 06aea  bb 00 24             mov bx, 0x2400
-06aed  be ff 19             mov si, 0x19ff
+06aed  be ff 19             mov si, 0x19ff    ; glyphe_tampon
 06af0  b9 08 00             mov cx, 8
 loc_6af3:
 06af3  ac                   lodsb al, byte ptr [si]
-06af4  80 3e fb 19 01       cmp byte ptr [0x19fb], 1
+06af4  80 3e fb 19 01       cmp byte ptr [0x19fb], 1    ; texte_transparent
 06af9  74 06                je loc_6b01
 06afb  26 88 05             mov byte ptr es:[di], al
 06afe  eb 0b                jmp loc_6b0b
@@ -4426,7 +4529,7 @@ loc_6b01:
 loc_6b0b:
 06b0b  47                   inc di
 06b0c  ac                   lodsb al, byte ptr [si]
-06b0d  80 3e fb 19 01       cmp byte ptr [0x19fb], 1
+06b0d  80 3e fb 19 01       cmp byte ptr [0x19fb], 1    ; texte_transparent
 06b12  74 06                je loc_6b1a
 06b14  26 88 05             mov byte ptr es:[di], al
 06b17  eb 0b                jmp loc_6b24
@@ -4439,7 +4542,7 @@ loc_6b1a:
 loc_6b24:
 06b24  47                   inc di
 06b25  ac                   lodsb al, byte ptr [si]
-06b26  80 3e fb 19 01       cmp byte ptr [0x19fb], 1
+06b26  80 3e fb 19 01       cmp byte ptr [0x19fb], 1    ; texte_transparent
 06b2b  74 06                je loc_6b33
 06b2d  26 88 05             mov byte ptr es:[di], al
 06b30  eb 0b                jmp loc_6b3d
@@ -4452,7 +4555,7 @@ loc_6b33:
 loc_6b3d:
 06b3d  47                   inc di
 06b3e  ac                   lodsb al, byte ptr [si]
-06b3f  80 3e fb 19 01       cmp byte ptr [0x19fb], 1
+06b3f  80 3e fb 19 01       cmp byte ptr [0x19fb], 1    ; texte_transparent
 06b44  74 06                je loc_6b4c
 06b46  26 88 05             mov byte ptr es:[di], al
 06b49  eb 0b                jmp loc_6b56
@@ -4475,11 +4578,11 @@ loc_6b65:
 06b6b  b8 00 00             mov ax, 0
 06b6e  8e d8                mov ds, ax
 06b70  58                   pop ax
-06b71  ff 06 f4 19          inc word ptr [0x19f4]
-06b75  83 3e f4 19 28       cmp word ptr [0x19f4], 0x28
+06b71  ff 06 f4 19          inc word ptr [0x19f4]    ; colonne_texte
+06b75  83 3e f4 19 28       cmp word ptr [0x19f4], 0x28    ; colonne_texte
 06b7a  72 0a                jb loc_6b86
-06b7c  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0
-06b82  ff 06 f6 19          inc word ptr [0x19f6]
+06b7c  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0    ; colonne_texte
+06b82  ff 06 f6 19          inc word ptr [0x19f6]    ; ligne_texte
 loc_6b86:
 06b86  5d                   pop bp
 06b87  c3                   ret
@@ -4489,12 +4592,12 @@ loc_6b88:
 06b8e  75 02                jne loc_6b92
 06b90  b0 05                mov al, 5
 loc_6b92:
-06b92  a2 f2 19             mov byte ptr [0x19f2], al
+06b92  a2 f2 19             mov byte ptr [0x19f2], al    ; couleur_encre
 06b95  3e 8a 46 02          mov al, byte ptr ds:[bp + 2]
-06b99  a2 f3 19             mov byte ptr [0x19f3], al
+06b99  a2 f3 19             mov byte ptr [0x19f3], al    ; couleur_fond
 06b9c  83 c5 02             add bp, 2
 06b9f  c3                   ret
-loc_6ba0:
+caractere_ega:    ; mode 6 : glyphe sur 4 plans ; à l'écran (A000h) par les ports 3CEh/3C4h, sinon dans un tampon de 4 plans de 40 octets par rangée
 06ba0  3c 10                cmp al, 0x10
 06ba2  75 03                jne loc_6ba7
 06ba4  e9 c3 01             jmp loc_6d6a
@@ -4512,11 +4615,11 @@ loc_6bb5:
 06bb8  d1 e0                shl ax, 1
 06bba  d1 e0                shl ax, 1
 06bbc  d1 e0                shl ax, 1
-06bbe  05 b5 13             add ax, 0x13b5
+06bbe  05 b5 13             add ax, 0x13b5    ; police
 06bc1  8b f0                mov si, ax
-06bc3  bf ff 19             mov di, 0x19ff
-06bc6  8a 1e f2 19          mov bl, byte ptr [0x19f2]
-06bca  8a 3e f3 19          mov bh, byte ptr [0x19f3]
+06bc3  bf ff 19             mov di, 0x19ff    ; glyphe_tampon
+06bc6  8a 1e f2 19          mov bl, byte ptr [0x19f2]    ; couleur_encre
+06bca  8a 3e f3 19          mov bh, byte ptr [0x19f3]    ; couleur_fond
 06bce  b9 08 00             mov cx, 8
 loc_6bd1:
 06bd1  53                   push bx
@@ -4551,7 +4654,7 @@ loc_6bfe:
 06c00  88 45 18             mov byte ptr [di + 0x18], al
 loc_6c03:
 06c03  f6 d0                not al
-06c05  80 3e fb 19 00       cmp byte ptr [0x19fb], 0
+06c05  80 3e fb 19 00       cmp byte ptr [0x19fb], 0    ; texte_transparent
 06c0a  75 1b                jne loc_6c27
 06c0c  d0 ef                shr bh, 1
 06c0e  73 02                jae loc_6c12
@@ -4572,15 +4675,15 @@ loc_6c27:
 06c27  5b                   pop bx
 06c28  47                   inc di
 06c29  e2 a6                loop loc_6bd1
-06c2b  be ff 19             mov si, 0x19ff
-06c2e  a1 f8 19             mov ax, word ptr [0x19f8]
+06c2b  be ff 19             mov si, 0x19ff    ; glyphe_tampon
+06c2e  a1 f8 19             mov ax, word ptr [0x19f8]    ; segment_texte
 06c31  8e c0                mov es, ax
 06c33  3d 00 a0             cmp ax, 0xa000
 06c36  75 7a                jne loc_6cb2
-06c38  a1 f6 19             mov ax, word ptr [0x19f6]
+06c38  a1 f6 19             mov ax, word ptr [0x19f6]    ; ligne_texte
 06c3b  ba 40 01             mov dx, 0x140
 06c3e  f7 e2                mul dx
-06c40  03 06 f4 19          add ax, word ptr [0x19f4]
+06c40  03 06 f4 19          add ax, word ptr [0x19f4]    ; colonne_texte
 06c44  8b f8                mov di, ax
 06c46  ba ce 03             mov dx, 0x3ce
 06c49  b4 18                mov ah, 0x18
@@ -4622,24 +4725,24 @@ loc_6c94:
 06c95  b8 00 00             mov ax, 0
 06c98  8e d8                mov ds, ax
 06c9a  58                   pop ax
-06c9b  ff 06 f4 19          inc word ptr [0x19f4]
-06c9f  83 3e f4 19 28       cmp word ptr [0x19f4], 0x28
+06c9b  ff 06 f4 19          inc word ptr [0x19f4]    ; colonne_texte
+06c9f  83 3e f4 19 28       cmp word ptr [0x19f4], 0x28    ; colonne_texte
 06ca4  72 0a                jb loc_6cb0
-06ca6  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0
-06cac  ff 06 f6 19          inc word ptr [0x19f6]
+06ca6  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0    ; colonne_texte
+06cac  ff 06 f6 19          inc word ptr [0x19f6]    ; ligne_texte
 loc_6cb0:
 06cb0  5d                   pop bp
 06cb1  c3                   ret
 loc_6cb2:
-06cb2  a1 f6 19             mov ax, word ptr [0x19f6]
+06cb2  a1 f6 19             mov ax, word ptr [0x19f6]    ; ligne_texte
 06cb5  ba 40 01             mov dx, 0x140
 06cb8  f7 e2                mul dx
 06cba  d1 e0                shl ax, 1
 06cbc  d1 e0                shl ax, 1
-06cbe  03 06 f4 19          add ax, word ptr [0x19f4]
+06cbe  03 06 f4 19          add ax, word ptr [0x19f4]    ; colonne_texte
 06cc2  8b f8                mov di, ax
 06cc4  b9 08 00             mov cx, 8
-06cc7  80 3e fb 19 00       cmp byte ptr [0x19fb], 0
+06cc7  80 3e fb 19 00       cmp byte ptr [0x19fb], 0    ; texte_transparent
 06ccc  75 29                jne loc_6cf7
 loc_6cce:
 06cce  57                   push di
@@ -4694,28 +4797,28 @@ loc_6cf7:
 loc_6d40:
 06d40  3e 8a 46 01          mov al, byte ptr ds:[bp + 1]
 06d44  32 e4                xor ah, ah
-06d46  a3 f6 19             mov word ptr [0x19f6], ax
+06d46  a3 f6 19             mov word ptr [0x19f6], ax    ; ligne_texte
 06d49  3e 8a 46 02          mov al, byte ptr ds:[bp + 2]
-06d4d  a3 f4 19             mov word ptr [0x19f4], ax
+06d4d  a3 f4 19             mov word ptr [0x19f4], ax    ; colonne_texte
 06d50  83 c5 02             add bp, 2
 06d53  c3                   ret
 loc_6d54:
 06d54  3e 8a 46 02          mov al, byte ptr ds:[bp + 2]
 06d58  04 04                add al, 4
 06d5a  32 e4                xor ah, ah
-06d5c  a3 f6 19             mov word ptr [0x19f6], ax
+06d5c  a3 f6 19             mov word ptr [0x19f6], ax    ; ligne_texte
 06d5f  3e 8a 46 01          mov al, byte ptr ds:[bp + 1]
-06d63  a3 f4 19             mov word ptr [0x19f4], ax
+06d63  a3 f4 19             mov word ptr [0x19f4], ax    ; colonne_texte
 06d66  83 c5 02             add bp, 2
 06d69  c3                   ret
 loc_6d6a:
 06d6a  3e 8a 46 01          mov al, byte ptr ds:[bp + 1]
-06d6e  a2 f2 19             mov byte ptr [0x19f2], al
+06d6e  a2 f2 19             mov byte ptr [0x19f2], al    ; couleur_encre
 06d71  3e 8a 46 02          mov al, byte ptr ds:[bp + 2]
-06d75  a2 f3 19             mov byte ptr [0x19f3], al
+06d75  a2 f3 19             mov byte ptr [0x19f3], al    ; couleur_fond
 06d78  83 c5 02             add bp, 2
 06d7b  c3                   ret
-loc_6d7c:
+caractere_vga:    ; mode 8 : un octet par pixel, ligne de texte = A00h octets ; texte_inverse bit 0 inverse le glyphe, texte_transparent = 1 laisse le fond
 06d7c  3c 10                cmp al, 0x10
 06d7e  75 03                jne loc_6d83
 06d80  e9 c9 00             jmp loc_6e4c
@@ -4742,26 +4845,26 @@ loc_6d91:
 06d9d  d1 e0                shl ax, 1
 06d9f  d1 e0                shl ax, 1
 06da1  d1 e0                shl ax, 1
-06da3  05 b5 13             add ax, 0x13b5
+06da3  05 b5 13             add ax, 0x13b5    ; police
 06da6  8b f0                mov si, ax
-06da8  a1 f6 19             mov ax, word ptr [0x19f6]
+06da8  a1 f6 19             mov ax, word ptr [0x19f6]    ; ligne_texte
 06dab  ba 00 0a             mov dx, 0xa00
 06dae  f7 e2                mul dx
-06db0  8b 16 f4 19          mov dx, word ptr [0x19f4]
+06db0  8b 16 f4 19          mov dx, word ptr [0x19f4]    ; colonne_texte
 06db4  d1 e2                shl dx, 1
 06db6  d1 e2                shl dx, 1
 06db8  d1 e2                shl dx, 1
 06dba  03 c2                add ax, dx
 06dbc  8b f8                mov di, ax
-06dbe  a1 f8 19             mov ax, word ptr [0x19f8]
+06dbe  a1 f8 19             mov ax, word ptr [0x19f8]    ; segment_texte
 06dc1  8e c0                mov es, ax
-06dc3  8a 1e f2 19          mov bl, byte ptr [0x19f2]
-06dc7  8a 3e f3 19          mov bh, byte ptr [0x19f3]
+06dc3  8a 1e f2 19          mov bl, byte ptr [0x19f2]    ; couleur_encre
+06dc7  8a 3e f3 19          mov bh, byte ptr [0x19f3]    ; couleur_fond
 06dcb  b9 08 00             mov cx, 8
 loc_6dce:
 06dce  51                   push cx
 06dcf  ac                   lodsb al, byte ptr [si]
-06dd0  f6 06 fa 19 01       test byte ptr [0x19fa], 1
+06dd0  f6 06 fa 19 01       test byte ptr [0x19fa], 1    ; texte_inverse
 06dd5  74 02                je loc_6dd9
 06dd7  f6 d0                not al
 loc_6dd9:
@@ -4772,7 +4875,7 @@ loc_6dde:
 06de0  d0 e4                shl ah, 1
 06de2  72 0d                jb loc_6df1
 06de4  8a c7                mov al, bh
-06de6  80 3e fb 19 00       cmp byte ptr [0x19fb], 0
+06de6  80 3e fb 19 00       cmp byte ptr [0x19fb], 0    ; texte_transparent
 06deb  74 04                je loc_6df1
 06ded  47                   inc di
 06dee  eb 02                jmp loc_6df2
@@ -4788,11 +4891,11 @@ loc_6df2:
 06dfc  b8 00 00             mov ax, 0
 06dff  8e d8                mov ds, ax
 06e01  58                   pop ax
-06e02  ff 06 f4 19          inc word ptr [0x19f4]
-06e06  83 3e f4 19 28       cmp word ptr [0x19f4], 0x28
+06e02  ff 06 f4 19          inc word ptr [0x19f4]    ; colonne_texte
+06e06  83 3e f4 19 28       cmp word ptr [0x19f4], 0x28    ; colonne_texte
 06e0b  72 0a                jb loc_6e17
-06e0d  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0
-06e13  ff 06 f6 19          inc word ptr [0x19f6]
+06e0d  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0    ; colonne_texte
+06e13  ff 06 f6 19          inc word ptr [0x19f6]    ; ligne_texte
 loc_6e17:
 06e17  1f                   pop ds
 06e18  07                   pop es
@@ -4807,37 +4910,39 @@ loc_6e17:
 06e21  c3                   ret
 loc_6e22:
 06e22  3e 8a 46 01          mov al, byte ptr ds:[bp + 1]
-06e26  a3 f6 19             mov word ptr [0x19f6], ax
+06e26  a3 f6 19             mov word ptr [0x19f6], ax    ; ligne_texte
 06e29  32 e4                xor ah, ah
 06e2b  3e 8a 46 02          mov al, byte ptr ds:[bp + 2]
-06e2f  a3 f4 19             mov word ptr [0x19f4], ax
+06e2f  a3 f4 19             mov word ptr [0x19f4], ax    ; colonne_texte
 06e32  83 c5 02             add bp, 2
 06e35  c3                   ret
 loc_6e36:
 06e36  3e 8a 46 02          mov al, byte ptr ds:[bp + 2]
 06e3a  32 e4                xor ah, ah
 06e3c  04 04                add al, 4
-06e3e  a3 f6 19             mov word ptr [0x19f6], ax
+06e3e  a3 f6 19             mov word ptr [0x19f6], ax    ; ligne_texte
 06e41  3e 8a 46 01          mov al, byte ptr ds:[bp + 1]
-06e45  a3 f4 19             mov word ptr [0x19f4], ax
+06e45  a3 f4 19             mov word ptr [0x19f4], ax    ; colonne_texte
 06e48  83 c5 02             add bp, 2
 06e4b  c3                   ret
 loc_6e4c:
 06e4c  3e 8a 46 01          mov al, byte ptr ds:[bp + 1]
-06e50  a2 f2 19             mov byte ptr [0x19f2], al
+06e50  a2 f2 19             mov byte ptr [0x19f2], al    ; couleur_encre
 06e53  3e 8a 46 02          mov al, byte ptr ds:[bp + 2]
-06e57  a2 f3 19             mov byte ptr [0x19f3], al
+06e57  a2 f3 19             mov byte ptr [0x19f3], al    ; couleur_fond
 06e5a  83 c5 02             add bp, 2
 06e5d  c3                   ret
 
-; ======== sub_6e5e   (routine probable : non appelée directement)
-06e5e  c7 06 40 14 04 00    mov word ptr [0x1440], 4
+; ======== mode_tandy
+; non appelée : mode_video = 4, int 10h mode 8 ; copie de mode_tandy de QUEST
+06e5e  c7 06 40 14 04 00    mov word ptr [0x1440], 4    ; mode_video
 06e64  b4 00                mov ah, 0
 06e66  b0 08                mov al, 8
 06e68  cd 10                int 0x10
 06e6a  c3                   ret
 
-; ======== sub_6e6b   (appelée depuis 7f44)
+; ======== pause_courte   (appelée depuis 7f44)
+; boucle de 1000 nop, registres conservés
 06e6b  9c                   pushf
 06e6c  50                   push ax
 06e6d  53                   push bx
@@ -4864,7 +4969,8 @@ loc_6e78:
 06e84  9d                   popf
 06e85  c3                   ret
 
-; ======== sub_6e86   (routine probable : non appelée directement)
+; ======== pause_longue
+; non appelée : même boucle sur 65 535 tours
 06e86  9c                   pushf
 06e87  50                   push ax
 06e88  53                   push bx
@@ -4878,16 +4984,18 @@ loc_6e78:
 06e90  b9 ff ff             mov cx, 0xffff
 06e93  eb e3                jmp loc_6e78
 
-; ======== sub_6e95   (appelée depuis 72f9)
-06e95  e8 0a 00             call sub_6ea2
+; ======== attend_touche   (appelée depuis 72f9)
+; attend une touche enfoncée (touche_enfoncee), puis son relâchement ; AH = code de la touche, AL = ASCII
+06e95  e8 0a 00             call touche_enfoncee
 06e98  0a c0                or al, al
-06e9a  74 f9                je sub_6e95
+06e9a  74 f9                je attend_touche
 06e9c  50                   push ax
-06e9d  e8 2b 00             call sub_6ecb
+06e9d  e8 2b 00             call attend_relachement
 06ea0  58                   pop ax
 06ea1  c3                   ret
 
-; ======== sub_6ea2   (appelée depuis 6e95, 6ecb)
+; ======== touche_enfoncee   (appelée depuis 6e95, 6ecb)
+; première touche à 1 dans etat_touches (128) ; AH = code, AL = ASCII (ascii_touches) ; AX = 0 si aucune
 06ea2  06                   push es
 06ea3  50                   push ax
 06ea4  b8 00 00             mov ax, 0
@@ -4896,7 +5004,7 @@ loc_6e78:
 06eaa  fc                   cld
 06eab  b9 80 00             mov cx, 0x80
 06eae  b0 01                mov al, 1
-06eb0  bf b4 1b             mov di, 0x1bb4
+06eb0  bf b4 1b             mov di, 0x1bb4    ; etat_touches
 loc_6eb3:
 06eb3  26 38 05             cmp byte ptr es:[di], al
 06eb6  74 07                je loc_6ebf
@@ -4909,18 +5017,20 @@ loc_6ebf:
 06ebf  b0 80                mov al, 0x80
 06ec1  2a c1                sub al, cl
 06ec3  8a e0                mov ah, al
-06ec5  bb 3f 1c             mov bx, 0x1c3f
+06ec5  bb 3f 1c             mov bx, 0x1c3f    ; ascii_touches
 06ec8  d7                   xlatb
 06ec9  07                   pop es
 06eca  c3                   ret
 
-; ======== sub_6ecb   (appelée depuis 6e9d)
-06ecb  e8 d4 ff             call sub_6ea2
+; ======== attend_relachement   (appelée depuis 6e9d)
+; boucle tant qu'une touche est enfoncée
+06ecb  e8 d4 ff             call touche_enfoncee
 06ece  0a c0                or al, al
-06ed0  75 f9                jne sub_6ecb
+06ed0  75 f9                jne attend_relachement
 06ed2  c3                   ret
 
-; ======== sub_6ed3   (routine probable : non appelée directement)
+; ======== hasard
+; non appelée : générateur de QUEST (registre à décalage DS:1B9F), nombre de 1 à BL dans AL
 06ed3  a1 9f 1b             mov ax, word ptr [0x1b9f]
 06ed6  24 48                and al, 0x48
 06ed8  04 38                add al, 0x38
@@ -4941,16 +5051,17 @@ loc_6ebf:
 loc_6eff:
 06eff  c3                   ret
 
-; ======== sub_6f00   (routine probable : non appelée directement)
-06f00  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0
-06f06  c7 06 f6 19 00 00    mov word ptr [0x19f6], 0
+; ======== efface_ecran
+; non appelée : texte en (0, 0), puis efface l'écran selon le mode (table DS:19E6) ; les branches Tandy (A000h rempli de mode_video) et EGA (200 mots) semblent fausses, sans effet puisque mortes
+06f00  c7 06 f4 19 00 00    mov word ptr [0x19f4], 0    ; colonne_texte
+06f06  c7 06 f6 19 00 00    mov word ptr [0x19f6], 0    ; ligne_texte
 06f0c  fc                   cld
 06f0d  33 c0                xor ax, ax
 06f0f  8b f8                mov di, ax
 06f11  b9 00 00             mov cx, 0
-06f14  a1 40 14             mov ax, word ptr [0x1440]
-06f17  bb e6 19             mov bx, 0x19e6
-06f1a  03 1e 40 14          add bx, word ptr [0x1440]
+06f14  a1 40 14             mov ax, word ptr [0x1440]    ; mode_video
+06f17  bb e6 19             mov bx, 0x19e6    ; saut_efface_ecran
+06f1a  03 1e 40 14          add bx, word ptr [0x1440]    ; mode_video
 06f1e  ff 27                jmp word ptr [bx]
 loc_6f20:
 06f20  50                   push ax
@@ -4967,7 +5078,7 @@ loc_6f2f:
 06f33  8e c0                mov es, ax
 06f35  58                   pop ax
 06f36  ba ce 03             mov dx, 0x3ce
-06f39  8a 26 f3 19          mov ah, byte ptr [0x19f3]
+06f39  8a 26 f3 19          mov ah, byte ptr [0x19f3]    ; couleur_fond
 06f3d  b0 00                mov al, 0
 06f3f  ef                   out dx, ax
 06f40  b8 01 0f             mov ax, 0xf01
@@ -4982,13 +5093,14 @@ loc_6f4e:
 06f4f  b8 00 a0             mov ax, 0xa000
 06f52  8e c0                mov es, ax
 06f54  58                   pop ax
-06f55  a0 f3 19             mov al, byte ptr [0x19f3]
+06f55  a0 f3 19             mov al, byte ptr [0x19f3]    ; couleur_fond
 06f58  8a e0                mov ah, al
 06f5a  b9 00 7d             mov cx, 0x7d00
 06f5d  f3 ab                rep stosw word ptr es:[di], ax
 06f5f  c3                   ret
 
-; ======== sub_6f60   (appelée depuis 7d91)
+; ======== attend_retour_trame   (appelée depuis 7d91)
+; attend le retour de trame (port 3DAh, bit 3) ; la suite (6F6D-6F79, attente de sa fin) n'est pas atteinte
 06f60  52                   push dx
 06f61  50                   push ax
 06f62  ba da 03             mov dx, 0x3da
@@ -5001,7 +5113,8 @@ loc_6f65:
 06f6c  c3                   ret
 ; ---- 13 octets non atteints (6f6d-6f79)
 
-; ======== sub_6f7a   (appelée depuis 7272)
+; ======== installe_clavier   (appelée depuis 7272)
+; si int 9 n'est pas déjà détourné (DS:1C3D ≠ 2B19h) : garde l'ancien en ancien_int9, installe clavier_interruption (CS:2B19), remet etat_touches à 0
 06f7a  bb 19 2b             mov bx, 0x2b19
 06f7d  39 1e 3d 1c          cmp word ptr [0x1c3d], bx
 06f81  75 01                jne loc_6f84
@@ -5023,7 +5136,7 @@ loc_6f84:
 06f9c  b0 09                mov al, 9
 06f9e  cd 21                int 0x21
 06fa0  1f                   pop ds
-06fa1  bf b4 1b             mov di, 0x1bb4
+06fa1  bf b4 1b             mov di, 0x1bb4    ; etat_touches
 06fa4  b8 00 00             mov ax, 0
 06fa7  8e c0                mov es, ax
 06fa9  33 c0                xor ax, ax
@@ -5031,7 +5144,8 @@ loc_6f84:
 06fae  f3 ab                rep stosw word ptr es:[di], ax
 06fb0  c3                   ret
 
-; ======== sub_6fb1   (appelée depuis 44ea, 4784, 4825, 4873, 4876, 48d5, 4e74, 4ed5)
+; ======== restaure_clavier   (appelée depuis 44ea, 4784, 4825, 4873, 4876, 48d5, 4e74, 4ed5)
+; remet l'ancien int 9 s'il a été gardé
 06fb1  1e                   push ds
 06fb2  bf 3b 1c             mov di, 0x1c3b
 06fb5  8b 55 02             mov dx, word ptr [di + 2]
@@ -5047,7 +5161,7 @@ loc_6fc7:
 06fc8  c3                   ret
 
 ; ======== clavier_interruption
-; int 9 installé par sub_6f7a (CS:2B19) : lit le port 60h, met à 1 ou 0 l'octet de la touche dans DS:1BB4 (64 touches)
+; int 9 : lit le port 60h, met à 1 ou 0 l'octet de la touche dans etat_touches (128 touches)
 06fc9  9c                   pushf
 06fca  50                   push ax
 06fcb  53                   push bx
@@ -5072,7 +5186,7 @@ loc_6fc7:
 06fe8  e6 61                out 0x61, al
 06fea  8a c3                mov al, bl
 06fec  32 e4                xor ah, ah
-06fee  bb b4 1b             mov bx, 0x1bb4
+06fee  bb b4 1b             mov bx, 0x1bb4    ; etat_touches
 06ff1  a8 80                test al, 0x80
 06ff3  75 07                jne loc_6ffc
 06ff5  03 d8                add bx, ax
@@ -5097,129 +5211,133 @@ loc_7003:
 07010  9d                   popf
 07011  cf                   iret
 
-; ======== sub_7012   (appelée depuis 71af, 71ba, 71d6, 71ff, 7225)
-07012  c6 06 34 1c 00       mov byte ptr [0x1c34], 0
+; ======== lit_commandes   (appelée depuis 71af, 71ba, 71d6, 71ff, 7225)
+; 6 touches de touches_commandes -> bits de commandes (Entrée 20h, Espace 10h, P 8, O 4, A 2, Q 1) ; Échap + Ctrl -> 40h ; puis lit_joystick, curseur_clavier, lit_souris ; x borné à 12Fh ; son_musique
+07012  c6 06 34 1c 00       mov byte ptr [0x1c34], 0    ; commandes
 07017  b9 06 00             mov cx, 6
 0701a  33 db                xor bx, bx
-0701c  be ad 1b             mov si, 0x1bad
-0701f  bf b4 1b             mov di, 0x1bb4
+0701c  be ad 1b             mov si, 0x1bad    ; touches_commandes
+0701f  bf b4 1b             mov di, 0x1bb4    ; etat_touches
 loc_7022:
 07022  8a 1c                mov bl, byte ptr [si]
 07024  8a 01                mov al, byte ptr [bx + di]
 07026  d0 e8                shr al, 1
-07028  d0 16 34 1c          rcl byte ptr [0x1c34]
+07028  d0 16 34 1c          rcl byte ptr [0x1c34]    ; commandes
 0702c  46                   inc si
 0702d  e2 f3                loop loc_7022
-0702f  80 26 34 1c 7f       and byte ptr [0x1c34], 0x7f
+0702f  80 26 34 1c 7f       and byte ptr [0x1c34], 0x7f    ; commandes
 07034  f6 06 b5 1b 01       test byte ptr [0x1bb5], 1
 07039  74 13                je loc_704e
 0703b  f6 06 d1 1b 01       test byte ptr [0x1bd1], 1
 07040  74 05                je loc_7047
-07042  80 0e 34 1c 40       or byte ptr [0x1c34], 0x40
+07042  80 0e 34 1c 40       or byte ptr [0x1c34], 0x40    ; commandes
 loc_7047:
 07047  a0 d1 1b             mov al, byte ptr [0x1bd1]
 0704a  8a 26 b5 1b          mov ah, byte ptr [0x1bb5]
 loc_704e:
-0704e  e8 18 00             call sub_7069
-07051  e8 a1 00             call sub_70f5
-07054  e8 ef 00             call sub_7146
-07057  81 3e 35 1c 2f 01    cmp word ptr [0x1c35], 0x12f
+0704e  e8 18 00             call lit_joystick
+07051  e8 a1 00             call curseur_clavier
+07054  e8 ef 00             call lit_souris
+07057  81 3e 35 1c 2f 01    cmp word ptr [0x1c35], 0x12f    ; curseur_x
 0705d  76 06                jbe loc_7065
-0705f  c7 06 35 1c 2f 01    mov word ptr [0x1c35], 0x12f
+0705f  c7 06 35 1c 2f 01    mov word ptr [0x1c35], 0x12f    ; curseur_x
 loc_7065:
-07065  e8 8d 10             call sub_80f5
+07065  e8 8d 10             call son_musique
 07068  c3                   ret
 
-; ======== sub_7069   (appelée depuis 704e)
-07069  80 3e 43 14 02       cmp byte ptr [0x1443], 2
+; ======== lit_joystick   (appelée depuis 704e)
+; si commande_type = 2 : joystick_position comparé au centre (DS:14AD, DS:14AF) à 16 près ; joystick B si masque_joystick ≠ 3 ; boutons -> 10h et 20h
+07069  80 3e 43 14 02       cmp byte ptr [0x1443], 2    ; commande_type
 0706e  74 01                je loc_7071
 07070  c3                   ret
 loc_7071:
-07071  e8 56 0f             call sub_7fca
-07074  80 3e ac 14 03       cmp byte ptr [0x14ac], 3
+07071  e8 56 0f             call joystick_position
+07074  80 3e ac 14 03       cmp byte ptr [0x14ac], 3    ; masque_joystick
 07079  74 04                je loc_707f
 0707b  8b df                mov bx, di
 0707d  8b ce                mov cx, si
 loc_707f:
-0707f  3b 0e ad 14          cmp cx, word ptr [0x14ad]
+0707f  3b 0e ad 14          cmp cx, word ptr [0x14ad]    ; centre_joystick_y
 07083  72 11                jb loc_7096
-07085  2b 0e ad 14          sub cx, word ptr [0x14ad]
+07085  2b 0e ad 14          sub cx, word ptr [0x14ad]    ; centre_joystick_y
 07089  83 f9 10             cmp cx, 0x10
 0708c  72 16                jb loc_70a4
-0708e  80 0e 34 1c 02       or byte ptr [0x1c34], 2
+0708e  80 0e 34 1c 02       or byte ptr [0x1c34], 2    ; commandes
 07093  eb 0f                jmp loc_70a4
 ; ---- 1 octets non atteints (7095-7095)
 loc_7096:
-07096  2b 0e ad 14          sub cx, word ptr [0x14ad]
+07096  2b 0e ad 14          sub cx, word ptr [0x14ad]    ; centre_joystick_y
 0709a  83 f9 f0             cmp cx, -0x10
 0709d  77 05                ja loc_70a4
-0709f  80 0e 34 1c 01       or byte ptr [0x1c34], 1
+0709f  80 0e 34 1c 01       or byte ptr [0x1c34], 1    ; commandes
 loc_70a4:
-070a4  3b 1e af 14          cmp bx, word ptr [0x14af]
+070a4  3b 1e af 14          cmp bx, word ptr [0x14af]    ; centre_joystick_x
 070a8  72 11                jb loc_70bb
-070aa  2b 1e af 14          sub bx, word ptr [0x14af]
+070aa  2b 1e af 14          sub bx, word ptr [0x14af]    ; centre_joystick_x
 070ae  83 fb 10             cmp bx, 0x10
 070b1  72 16                jb loc_70c9
-070b3  80 0e 34 1c 08       or byte ptr [0x1c34], 8
+070b3  80 0e 34 1c 08       or byte ptr [0x1c34], 8    ; commandes
 070b8  eb 0f                jmp loc_70c9
 ; ---- 1 octets non atteints (70ba-70ba)
 loc_70bb:
-070bb  2b 1e af 14          sub bx, word ptr [0x14af]
+070bb  2b 1e af 14          sub bx, word ptr [0x14af]    ; centre_joystick_x
 070bf  83 fb f0             cmp bx, -0x10
 070c2  77 05                ja loc_70c9
-070c4  80 0e 34 1c 04       or byte ptr [0x1c34], 4
+070c4  80 0e 34 1c 04       or byte ptr [0x1c34], 4    ; commandes
 loc_70c9:
-070c9  e8 45 0f             call sub_8011
+070c9  e8 45 0f             call joystick_boutons
 070cc  a9 01 00             test ax, 1
 070cf  74 05                je loc_70d6
-070d1  80 0e 34 1c 10       or byte ptr [0x1c34], 0x10
+070d1  80 0e 34 1c 10       or byte ptr [0x1c34], 0x10    ; commandes
 loc_70d6:
 070d6  a9 02 00             test ax, 2
 070d9  74 05                je loc_70e0
-070db  80 0e 34 1c 20       or byte ptr [0x1c34], 0x20
+070db  80 0e 34 1c 20       or byte ptr [0x1c34], 0x20    ; commandes
 loc_70e0:
 070e0  a9 04 00             test ax, 4
 070e3  74 05                je loc_70ea
-070e5  80 0e 34 1c 10       or byte ptr [0x1c34], 0x10
+070e5  80 0e 34 1c 10       or byte ptr [0x1c34], 0x10    ; commandes
 loc_70ea:
 070ea  a9 08 00             test ax, 8
 070ed  74 05                je loc_70f4
-070ef  80 0e 34 1c 20       or byte ptr [0x1c34], 0x20
+070ef  80 0e 34 1c 20       or byte ptr [0x1c34], 0x20    ; commandes
 loc_70f4:
 070f4  c3                   ret
 
-; ======== sub_70f5   (appelée depuis 7051)
-070f5  f6 06 34 1c 01       test byte ptr [0x1c34], 1
+; ======== curseur_clavier   (appelée depuis 7051)
+; déplace le curseur de 4 pixels selon les bits de direction (x 4 à 13Bh, y 4 à C2h)
+070f5  f6 06 34 1c 01       test byte ptr [0x1c34], 1    ; commandes
 070fa  74 0c                je loc_7108
-070fc  83 3e 37 1c 04       cmp word ptr [0x1c37], 4
+070fc  83 3e 37 1c 04       cmp word ptr [0x1c37], 4    ; curseur_y
 07101  72 05                jb loc_7108
-07103  83 2e 37 1c 04       sub word ptr [0x1c37], 4
+07103  83 2e 37 1c 04       sub word ptr [0x1c37], 4    ; curseur_y
 loc_7108:
-07108  f6 06 34 1c 02       test byte ptr [0x1c34], 2
+07108  f6 06 34 1c 02       test byte ptr [0x1c34], 2    ; commandes
 0710d  74 0d                je loc_711c
-0710f  81 3e 37 1c c2 00    cmp word ptr [0x1c37], 0xc2
+0710f  81 3e 37 1c c2 00    cmp word ptr [0x1c37], 0xc2    ; curseur_y
 07115  77 05                ja loc_711c
-07117  83 06 37 1c 04       add word ptr [0x1c37], 4
+07117  83 06 37 1c 04       add word ptr [0x1c37], 4    ; curseur_y
 loc_711c:
-0711c  f6 06 34 1c 04       test byte ptr [0x1c34], 4
+0711c  f6 06 34 1c 04       test byte ptr [0x1c34], 4    ; commandes
 07121  74 0c                je loc_712f
-07123  83 3e 35 1c 04       cmp word ptr [0x1c35], 4
+07123  83 3e 35 1c 04       cmp word ptr [0x1c35], 4    ; curseur_x
 07128  72 05                jb loc_712f
-0712a  83 2e 35 1c 04       sub word ptr [0x1c35], 4
+0712a  83 2e 35 1c 04       sub word ptr [0x1c35], 4    ; curseur_x
 loc_712f:
-0712f  f6 06 34 1c 08       test byte ptr [0x1c34], 8
+0712f  f6 06 34 1c 08       test byte ptr [0x1c34], 8    ; commandes
 07134  75 01                jne loc_7137
 07136  c3                   ret
 loc_7137:
-07137  81 3e 35 1c 3b 01    cmp word ptr [0x1c35], 0x13b
+07137  81 3e 35 1c 3b 01    cmp word ptr [0x1c35], 0x13b    ; curseur_x
 0713d  76 01                jbe loc_7140
 0713f  c3                   ret
 loc_7140:
-07140  83 06 35 1c 04       add word ptr [0x1c35], 4
+07140  83 06 35 1c 04       add word ptr [0x1c35], 4    ; curseur_x
 07145  c3                   ret
 
-; ======== sub_7146   (appelée depuis 7054)
-07146  80 3e 43 14 00       cmp byte ptr [0x1443], 0
+; ======== lit_souris   (appelée depuis 7054)
+; si commande_type = 0 : int 33h AX=3 ; boutons -> 10h et 20h, directions selon l'écart avec le curseur, puis curseur = souris (x / 2)
+07146  80 3e 43 14 00       cmp byte ptr [0x1443], 0    ; commande_type
 0714b  74 01                je loc_714e
 0714d  c3                   ret
 loc_714e:
@@ -5227,36 +5345,37 @@ loc_714e:
 07151  cd 33                int 0x33
 07153  f7 c3 01 00          test bx, 1
 07157  74 05                je loc_715e
-07159  80 0e 34 1c 10       or byte ptr [0x1c34], 0x10
+07159  80 0e 34 1c 10       or byte ptr [0x1c34], 0x10    ; commandes
 loc_715e:
 0715e  f7 c3 02 00          test bx, 2
 07162  74 05                je loc_7169
-07164  80 0e 34 1c 20       or byte ptr [0x1c34], 0x20
+07164  80 0e 34 1c 20       or byte ptr [0x1c34], 0x20    ; commandes
 loc_7169:
 07169  d1 e9                shr cx, 1
-0716b  3b 0e 35 1c          cmp cx, word ptr [0x1c35]
+0716b  3b 0e 35 1c          cmp cx, word ptr [0x1c35]    ; curseur_x
 0716f  74 0e                je loc_717f
 07171  72 07                jb loc_717a
-07173  80 0e 34 1c 08       or byte ptr [0x1c34], 8
+07173  80 0e 34 1c 08       or byte ptr [0x1c34], 8    ; commandes
 07178  eb 05                jmp loc_717f
 loc_717a:
-0717a  80 0e 34 1c 04       or byte ptr [0x1c34], 4
+0717a  80 0e 34 1c 04       or byte ptr [0x1c34], 4    ; commandes
 loc_717f:
-0717f  3b 16 37 1c          cmp dx, word ptr [0x1c37]
+0717f  3b 16 37 1c          cmp dx, word ptr [0x1c37]    ; curseur_y
 07183  74 0f                je loc_7194
 07185  72 08                jb loc_718f
-07187  80 0e 34 1c 02       or byte ptr [0x1c34], 2
+07187  80 0e 34 1c 02       or byte ptr [0x1c34], 2    ; commandes
 0718c  eb 06                jmp loc_7194
 ; ---- 1 octets non atteints (718e-718e)
 loc_718f:
-0718f  80 0e 34 1c 01       or byte ptr [0x1c34], 1
+0718f  80 0e 34 1c 01       or byte ptr [0x1c34], 1    ; commandes
 loc_7194:
-07194  89 0e 35 1c          mov word ptr [0x1c35], cx
-07198  89 16 37 1c          mov word ptr [0x1c37], dx
+07194  89 0e 35 1c          mov word ptr [0x1c35], cx    ; curseur_x
+07198  89 16 37 1c          mov word ptr [0x1c37], dx    ; curseur_y
 0719c  c3                   ret
 
-; ======== sub_719d   (routine probable : non appelée directement)
-0719d  80 3e 43 14 00       cmp byte ptr [0x1443], 0
+; ======== souris_position
+; non appelée : int 33h AX=4 (place le curseur de la souris), si commande_type = 0
+0719d  80 3e 43 14 00       cmp byte ptr [0x1443], 0    ; commande_type
 071a2  74 01                je loc_71a5
 071a4  c3                   ret
 loc_71a5:
@@ -5266,18 +5385,20 @@ loc_71a5:
 071ac  cd 33                int 0x33
 071ae  c3                   ret
 
-; ======== sub_71af   (routine probable : non appelée directement)
-071af  e8 60 fe             call sub_7012
-071b2  80 3e 34 1c 00       cmp byte ptr [0x1c34], 0
-071b7  74 f6                je sub_71af
+; ======== attend_commande
+; non appelée : attend que commandes soit non nul
+071af  e8 60 fe             call lit_commandes
+071b2  80 3e 34 1c 00       cmp byte ptr [0x1c34], 0    ; commandes
+071b7  74 f6                je attend_commande
 071b9  c3                   ret
 
-; ======== sub_71ba   (appelée depuis 71e0)
-071ba  e8 55 fe             call sub_7012
-071bd  80 3e 34 1c 00       cmp byte ptr [0x1c34], 0
-071c2  75 f6                jne sub_71ba
+; ======== attend_relache   (appelée depuis 71e0)
+; attend que commandes revienne à 0
+071ba  e8 55 fe             call lit_commandes
+071bd  80 3e 34 1c 00       cmp byte ptr [0x1c34], 0    ; commandes
+071c2  75 f6                jne attend_relache
 071c4  c3                   ret
-loc_71c5:
+attend_bouton_droit:    ; registres conservés : attend le bit 20h, puis attend_relache ; atteinte seulement par affiche_registres_attend (morte)
 071c5  9c                   pushf
 071c6  50                   push ax
 071c7  53                   push bx
@@ -5293,10 +5414,10 @@ loc_71c5:
 071d3  8e d8                mov ds, ax
 071d5  58                   pop ax
 loc_71d6:
-071d6  e8 39 fe             call sub_7012
-071d9  80 3e 34 1c 20       cmp byte ptr [0x1c34], 0x20
+071d6  e8 39 fe             call lit_commandes
+071d9  80 3e 34 1c 20       cmp byte ptr [0x1c34], 0x20    ; commandes
 071de  75 f6                jne loc_71d6
-071e0  e8 d7 ff             call sub_71ba
+071e0  e8 d7 ff             call attend_relache
 071e3  1f                   pop ds
 071e4  07                   pop es
 071e5  5d                   pop bp
@@ -5309,7 +5430,8 @@ loc_71d6:
 071ec  9d                   popf
 071ed  c3                   ret
 
-; ======== sub_71ee   (routine probable : non appelée directement)
+; ======== attend_clic
+; non appelée : attend le bit 10h de commandes, registres conservés
 071ee  9c                   pushf
 071ef  50                   push ax
 071f0  53                   push bx
@@ -5325,8 +5447,8 @@ loc_71d6:
 071fc  8e d8                mov ds, ax
 071fe  58                   pop ax
 loc_71ff:
-071ff  e8 10 fe             call sub_7012
-07202  f6 06 34 1c 10       test byte ptr [0x1c34], 0x10
+071ff  e8 10 fe             call lit_commandes
+07202  f6 06 34 1c 10       test byte ptr [0x1c34], 0x10    ; commandes
 07207  74 f6                je loc_71ff
 07209  1f                   pop ds
 0720a  07                   pop es
@@ -5340,7 +5462,8 @@ loc_71ff:
 07212  9d                   popf
 07213  c3                   ret
 
-; ======== sub_7214   (routine probable : non appelée directement)
+; ======== attend_relache_boutons
+; non appelée : attend que les bits 10h et 20h de commandes soient à 0
 07214  9c                   pushf
 07215  50                   push ax
 07216  53                   push bx
@@ -5356,10 +5479,10 @@ loc_71ff:
 07222  8e d8                mov ds, ax
 07224  58                   pop ax
 loc_7225:
-07225  e8 ea fd             call sub_7012
-07228  f6 06 34 1c 10       test byte ptr [0x1c34], 0x10
+07225  e8 ea fd             call lit_commandes
+07228  f6 06 34 1c 10       test byte ptr [0x1c34], 0x10    ; commandes
 0722d  75 f6                jne loc_7225
-0722f  f6 06 34 1c 20       test byte ptr [0x1c34], 0x20
+0722f  f6 06 34 1c 20       test byte ptr [0x1c34], 0x20    ; commandes
 07234  75 ef                jne loc_7225
 07236  1f                   pop ds
 07237  07                   pop es
@@ -5373,59 +5496,64 @@ loc_7225:
 0723f  9d                   popf
 07240  c3                   ret
 
-; ======== sub_7241   (appelée depuis 44e7, 4689, 469e, 46c5, 4707, 474b, 4781, 48a1)
-07241  c7 06 8b 1a 00 00    mov word ptr [0x1a8b], 0
-07247  e8 67 fd             call sub_6fb1
-0724a  e8 3b 00             call sub_7288
-0724d  83 3e 8b 1a 00       cmp word ptr [0x1a8b], 0
+; ======== charge_fichier   (appelée depuis 44e7, 4689, 469e, 46c5, 4707, 474b, 4781, 48a1)
+; retire le clavier, ouvre (mode erreur_fichier = 0), lit FFFFh octets au plus vers fichier_segment:fichier_offset, taille dans fichier_taille, ferme, remet le clavier
+07241  c7 06 8b 1a 00 00    mov word ptr [0x1a8b], 0    ; erreur_fichier
+07247  e8 67 fd             call restaure_clavier
+0724a  e8 3b 00             call fichier_ouvre
+0724d  83 3e 8b 1a 00       cmp word ptr [0x1a8b], 0    ; erreur_fichier
 07252  74 03                je loc_7257
 07254  eb 1c                jmp loc_7272
 ; ---- 1 octets non atteints (7256-7256)
 loc_7257:
-07257  e8 62 00             call sub_72bc
-0725a  a3 a7 1b             mov word ptr [0x1ba7], ax
+07257  e8 62 00             call fichier_lit
+0725a  a3 a7 1b             mov word ptr [0x1ba7], ax    ; fichier_taille
 0725d  eb 10                jmp loc_726f
 ; ---- 1 octets non atteints (725f-725f)
 
-; ======== sub_7260   (appelée depuis 4822, 4870)
-07260  c7 06 8b 1a 00 00    mov word ptr [0x1a8b], 0
-07266  e8 48 fd             call sub_6fb1
-07269  e8 0a 00             call sub_7276
-0726c  e8 33 00             call sub_72a2
+; ======== sauve_fichier   (appelée depuis 4822, 4870)
+; retire le clavier, crée, écrit fichier_taille octets, ferme, remet le clavier
+07260  c7 06 8b 1a 00 00    mov word ptr [0x1a8b], 0    ; erreur_fichier
+07266  e8 48 fd             call restaure_clavier
+07269  e8 0a 00             call fichier_cree
+0726c  e8 33 00             call fichier_ecrit
 loc_726f:
-0726f  e8 62 00             call sub_72d4
+0726f  e8 62 00             call fichier_ferme
 loc_7272:
-07272  e8 05 fd             call sub_6f7a
+07272  e8 05 fd             call installe_clavier
 07275  c3                   ret
 
-; ======== sub_7276   (appelée depuis 7269)
-07276  8b 16 a9 1b          mov dx, word ptr [0x1ba9]
+; ======== fichier_cree   (appelée depuis 7269)
+; int 21h AH=3Ch
+07276  8b 16 a9 1b          mov dx, word ptr [0x1ba9]    ; fichier_nom
 0727a  33 c9                xor cx, cx
 0727c  b0 02                mov al, 2
 0727e  b4 3c                mov ah, 0x3c
 07280  cd 21                int 0x21
 07282  72 1a                jb loc_729e
-07284  a3 ab 1b             mov word ptr [0x1bab], ax
+07284  a3 ab 1b             mov word ptr [0x1bab], ax    ; fichier_handle
 07287  c3                   ret
 
-; ======== sub_7288   (appelée depuis 724a)
-07288  8b 16 a9 1b          mov dx, word ptr [0x1ba9]
+; ======== fichier_ouvre   (appelée depuis 724a)
+; int 21h AH=3Dh, mode AL = erreur_fichier ; erreur dans erreur_fichier
+07288  8b 16 a9 1b          mov dx, word ptr [0x1ba9]    ; fichier_nom
 0728c  32 c0                xor al, al
 0728e  b4 3d                mov ah, 0x3d
 07290  cd 21                int 0x21
 07292  72 0a                jb loc_729e
-07294  c7 06 8b 1a 00 00    mov word ptr [0x1a8b], 0
-0729a  a3 ab 1b             mov word ptr [0x1bab], ax
+07294  c7 06 8b 1a 00 00    mov word ptr [0x1a8b], 0    ; erreur_fichier
+0729a  a3 ab 1b             mov word ptr [0x1bab], ax    ; fichier_handle
 0729d  c3                   ret
 loc_729e:
-0729e  a3 8b 1a             mov word ptr [0x1a8b], ax
+0729e  a3 8b 1a             mov word ptr [0x1a8b], ax    ; erreur_fichier
 072a1  c3                   ret
 
-; ======== sub_72a2   (appelée depuis 726c)
-072a2  a1 a3 1b             mov ax, word ptr [0x1ba3]
-072a5  8b 1e ab 1b          mov bx, word ptr [0x1bab]
-072a9  8b 0e a7 1b          mov cx, word ptr [0x1ba7]
-072ad  8b 16 a5 1b          mov dx, word ptr [0x1ba5]
+; ======== fichier_ecrit   (appelée depuis 726c)
+; int 21h AH=40h
+072a2  a1 a3 1b             mov ax, word ptr [0x1ba3]    ; fichier_segment
+072a5  8b 1e ab 1b          mov bx, word ptr [0x1bab]    ; fichier_handle
+072a9  8b 0e a7 1b          mov cx, word ptr [0x1ba7]    ; fichier_taille
+072ad  8b 16 a5 1b          mov dx, word ptr [0x1ba5]    ; fichier_offset
 072b1  1e                   push ds
 072b2  8e d8                mov ds, ax
 072b4  b4 40                mov ah, 0x40
@@ -5434,11 +5562,12 @@ loc_729e:
 072b9  72 e3                jb loc_729e
 072bb  c3                   ret
 
-; ======== sub_72bc   (appelée depuis 7257)
-072bc  a1 a3 1b             mov ax, word ptr [0x1ba3]
-072bf  8b 1e ab 1b          mov bx, word ptr [0x1bab]
+; ======== fichier_lit   (appelée depuis 7257)
+; int 21h AH=3Fh
+072bc  a1 a3 1b             mov ax, word ptr [0x1ba3]    ; fichier_segment
+072bf  8b 1e ab 1b          mov bx, word ptr [0x1bab]    ; fichier_handle
 072c3  b9 ff ff             mov cx, 0xffff
-072c6  8b 16 a5 1b          mov dx, word ptr [0x1ba5]
+072c6  8b 16 a5 1b          mov dx, word ptr [0x1ba5]    ; fichier_offset
 072ca  1e                   push ds
 072cb  8e d8                mov ds, ax
 072cd  b4 3f                mov ah, 0x3f
@@ -5446,25 +5575,27 @@ loc_729e:
 072d1  1f                   pop ds
 072d2  72 ca                jb loc_729e
 
-; ======== sub_72d4   (appelée depuis 726f)
-072d4  8b 1e ab 1b          mov bx, word ptr [0x1bab]
+; ======== fichier_ferme   (appelée depuis 726f)
+; int 21h AH=3Eh
+072d4  8b 1e ab 1b          mov bx, word ptr [0x1bab]    ; fichier_handle
 072d8  b4 3e                mov ah, 0x3e
 072da  cd 21                int 0x21
 072dc  72 c0                jb loc_729e
 072de  c3                   ret
 
-; ======== sub_72df   (appelée depuis 7370)
-072df  89 0e 26 1d          mov word ptr [0x1d26], cx
-072e3  89 3e 28 1d          mov word ptr [0x1d28], di
+; ======== saisie_ligne   (appelée depuis 7370)
+; DI tampon (rempli d'espaces), CX longueur max ; caractères 20h à 7Ah (chiffres seuls si saisie_chiffres = 1), retour arrière, Entrée termine ; écho par affiche_caractere
+072df  89 0e 26 1d          mov word ptr [0x1d26], cx    ; saisie_max
+072e3  89 3e 28 1d          mov word ptr [0x1d28], di    ; saisie_pointeur
 072e7  50                   push ax
 072e8  b8 00 00             mov ax, 0
 072eb  8e c0                mov es, ax
 072ed  58                   pop ax
 072ee  b8 20 00             mov ax, 0x20
 072f1  f3 aa                rep stosb byte ptr es:[di], al
-072f3  c7 06 2a 1d 00 00    mov word ptr [0x1d2a], 0
+072f3  c7 06 2a 1d 00 00    mov word ptr [0x1d2a], 0    ; saisie_longueur
 loc_72f9:
-072f9  e8 99 fb             call sub_6e95
+072f9  e8 99 fb             call attend_touche
 072fc  3c 0d                cmp al, 0xd
 072fe  75 01                jne loc_7301
 07300  c3                   ret
@@ -5475,49 +5606,50 @@ loc_7301:
 07308  72 ef                jb loc_72f9
 0730a  3c 7a                cmp al, 0x7a
 0730c  77 eb                ja loc_72f9
-0730e  80 3e 2c 1d 01       cmp byte ptr [0x1d2c], 1
+0730e  80 3e 2c 1d 01       cmp byte ptr [0x1d2c], 1    ; saisie_chiffres
 07313  75 08                jne loc_731d
 07315  3c 30                cmp al, 0x30
 07317  72 e0                jb loc_72f9
 07319  3c 39                cmp al, 0x39
 0731b  77 dc                ja loc_72f9
 loc_731d:
-0731d  8b 1e 2a 1d          mov bx, word ptr [0x1d2a]
-07321  3b 1e 26 1d          cmp bx, word ptr [0x1d26]
+0731d  8b 1e 2a 1d          mov bx, word ptr [0x1d2a]    ; saisie_longueur
+07321  3b 1e 26 1d          cmp bx, word ptr [0x1d26]    ; saisie_max
 07325  73 d2                jae loc_72f9
 07327  50                   push ax
 07328  b8 00 00             mov ax, 0
 0732b  8e c0                mov es, ax
 0732d  58                   pop ax
-0732e  8b 3e 28 1d          mov di, word ptr [0x1d28]
+0732e  8b 3e 28 1d          mov di, word ptr [0x1d28]    ; saisie_pointeur
 07332  aa                   stosb byte ptr es:[di], al
-07333  89 3e 28 1d          mov word ptr [0x1d28], di
-07337  e8 11 f7             call sub_6a4b
-0733a  ff 06 2a 1d          inc word ptr [0x1d2a]
+07333  89 3e 28 1d          mov word ptr [0x1d28], di    ; saisie_pointeur
+07337  e8 11 f7             call affiche_caractere
+0733a  ff 06 2a 1d          inc word ptr [0x1d2a]    ; saisie_longueur
 0733e  eb b9                jmp loc_72f9
 loc_7340:
-07340  83 3e 2a 1d 00       cmp word ptr [0x1d2a], 0
+07340  83 3e 2a 1d 00       cmp word ptr [0x1d2a], 0    ; saisie_longueur
 07345  74 b2                je loc_72f9
-07347  ff 0e f4 19          dec word ptr [0x19f4]
+07347  ff 0e f4 19          dec word ptr [0x19f4]    ; colonne_texte
 0734b  b0 20                mov al, 0x20
-0734d  8b 3e 28 1d          mov di, word ptr [0x1d28]
+0734d  8b 3e 28 1d          mov di, word ptr [0x1d28]    ; saisie_pointeur
 07351  4f                   dec di
 07352  88 05                mov byte ptr [di], al
-07354  89 3e 28 1d          mov word ptr [0x1d28], di
-07358  e8 f0 f6             call sub_6a4b
-0735b  ff 0e f4 19          dec word ptr [0x19f4]
-0735f  ff 0e 2a 1d          dec word ptr [0x1d2a]
+07354  89 3e 28 1d          mov word ptr [0x1d28], di    ; saisie_pointeur
+07358  e8 f0 f6             call affiche_caractere
+0735b  ff 0e f4 19          dec word ptr [0x19f4]    ; colonne_texte
+0735f  ff 0e 2a 1d          dec word ptr [0x1d2a]    ; saisie_longueur
 07363  eb 94                jmp loc_72f9
 
-; ======== sub_7365   (routine probable : non appelée directement)
-07365  c6 06 2c 1d 01       mov byte ptr [0x1d2c], 1
+; ======== saisie_nombre
+; non appelée : 1 ou 2 chiffres dans DS:1A95, recommence si vide ; valeur dans AX
+07365  c6 06 2c 1d 01       mov byte ptr [0x1d2c], 1    ; saisie_chiffres
 0736a  bf 95 1a             mov di, 0x1a95
 0736d  b9 02 00             mov cx, 2
-07370  e8 6c ff             call sub_72df
-07373  83 3e 2a 1d 00       cmp word ptr [0x1d2a], 0
-07378  74 eb                je sub_7365
-0737a  c6 06 2c 1d 00       mov byte ptr [0x1d2c], 0
-0737f  8b 0e 2a 1d          mov cx, word ptr [0x1d2a]
+07370  e8 6c ff             call saisie_ligne
+07373  83 3e 2a 1d 00       cmp word ptr [0x1d2a], 0    ; saisie_longueur
+07378  74 eb                je saisie_nombre
+0737a  c6 06 2c 1d 00       mov byte ptr [0x1d2c], 0    ; saisie_chiffres
+0737f  8b 0e 2a 1d          mov cx, word ptr [0x1d2a]    ; saisie_longueur
 07383  bf 95 1a             mov di, 0x1a95
 07386  33 c0                xor ax, ax
 07388  b2 0a                mov dl, 0xa
@@ -5531,7 +5663,8 @@ loc_738a:
 07396  32 e4                xor ah, ah
 07398  c3                   ret
 
-; ======== sub_7399   (appelée depuis 7419)
+; ======== adresse_ega   (appelée depuis 7419)
+; DI = y × 320 + x -> adresse_tampon = y × 160 + x / 8, decalage_pixel = x & 7
 07399  9c                   pushf
 0739a  50                   push ax
 0739b  53                   push bx
@@ -5553,12 +5686,12 @@ loc_738a:
 073b4  58                   pop ax
 073b5  8b c8                mov cx, ax
 073b7  80 e1 07             and cl, 7
-073ba  89 0e 9b 1a          mov word ptr [0x1a9b], cx
+073ba  89 0e 9b 1a          mov word ptr [0x1a9b], cx    ; decalage_pixel
 073be  d1 e8                shr ax, 1
 073c0  d1 e8                shr ax, 1
 073c2  d1 e8                shr ax, 1
 073c4  03 c2                add ax, dx
-073c6  a3 9d 1a             mov word ptr [0x1a9d], ax
+073c6  a3 9d 1a             mov word ptr [0x1a9d], ax    ; adresse_tampon
 073c9  1f                   pop ds
 073ca  07                   pop es
 073cb  5d                   pop bp
@@ -5571,7 +5704,8 @@ loc_738a:
 073d2  9d                   popf
 073d3  c3                   ret
 
-; ======== sub_73d4   (appelée depuis 75f7, 799e)
+; ======== adresse_tandy   (appelée depuis 75f7, 799e)
+; DI = y × 320 + x -> adresse_tampon = lignes_tandy[y] + x / 2, decalage_pixel = x impair
 073d4  9c                   pushf
 073d5  50                   push ax
 073d6  53                   push bx
@@ -5582,10 +5716,10 @@ loc_738a:
 073db  55                   push bp
 073dc  06                   push es
 073dd  1e                   push ds
-073de  c7 06 9b 1a 00 00    mov word ptr [0x1a9b], 0
+073de  c7 06 9b 1a 00 00    mov word ptr [0x1a9b], 0    ; decalage_pixel
 073e4  d1 ef                shr di, 1
 073e6  73 06                jae loc_73ee
-073e8  c7 06 9b 1a 01 00    mov word ptr [0x1a9b], 1
+073e8  c7 06 9b 1a 01 00    mov word ptr [0x1a9b], 1    ; decalage_pixel
 loc_73ee:
 073ee  8b c7                mov ax, di
 073f0  33 d2                xor dx, dx
@@ -5593,9 +5727,9 @@ loc_73ee:
 073f5  f7 f1                div cx
 073f7  8b d8                mov bx, ax
 073f9  d1 e3                shl bx, 1
-073fb  8b bf 2d 1d          mov di, word ptr [bx + 0x1d2d]
+073fb  8b bf 2d 1d          mov di, word ptr [bx + 0x1d2d]    ; lignes_tandy
 073ff  03 fa                add di, dx
-07401  89 3e 9d 1a          mov word ptr [0x1a9d], di
+07401  89 3e 9d 1a          mov word ptr [0x1a9d], di    ; adresse_tampon
 07405  1f                   pop ds
 07406  07                   pop es
 07407  5d                   pop bp
@@ -5608,16 +5742,17 @@ loc_73ee:
 0740e  9d                   popf
 0740f  c3                   ret
 
-; ======== sub_7410   (appelée depuis 496f)
-07410  bb c8 19             mov bx, 0x19c8
-07413  03 1e 40 14          add bx, word ptr [0x1440]
+; ======== affiche_sprite   (appelée depuis 496f)
+; image transparente (couleur 0) : SI source dans segment_source, BP largeur, CX hauteur, DI = y × 320 + x ; table saut_affiche_sprite ; compteurs en CS:2500-2504 (image 0x69B0)
+07410  bb c8 19             mov bx, 0x19c8    ; saut_affiche_sprite
+07413  03 1e 40 14          add bx, word ptr [0x1440]    ; mode_video
 07417  ff 27                jmp word ptr [bx]
 loc_7419:
-07419  e8 7d ff             call sub_7399
-0741c  a1 9b 1a             mov ax, word ptr [0x1a9b]
-0741f  8b 3e 9d 1a          mov di, word ptr [0x1a9d]
+07419  e8 7d ff             call adresse_ega
+0741c  a1 9b 1a             mov ax, word ptr [0x1a9b]    ; decalage_pixel
+0741f  8b 3e 9d 1a          mov di, word ptr [0x1a9d]    ; adresse_tampon
 07423  50                   push ax
-07424  a1 f0 19             mov ax, word ptr [0x19f0]
+07424  a1 f0 19             mov ax, word ptr [0x19f0]    ; segment_source
 07427  8e d8                mov ds, ax
 07429  d1 ed                shr bp, 1
 0742b  d1 ed                shr bp, 1
@@ -5840,11 +5975,11 @@ loc_7584:
 loc_75f6:
 075f6  c3                   ret
 loc_75f7:
-075f7  e8 da fd             call sub_73d4
-075fa  8b 3e 9d 1a          mov di, word ptr [0x1a9d]
-075fe  8b 1e 9b 1a          mov bx, word ptr [0x1a9b]
+075f7  e8 da fd             call adresse_tandy
+075fa  8b 3e 9d 1a          mov di, word ptr [0x1a9d]    ; adresse_tampon
+075fe  8b 1e 9b 1a          mov bx, word ptr [0x1a9b]    ; decalage_pixel
 07602  d1 ee                shr si, 1
-07604  a1 f0 19             mov ax, word ptr [0x19f0]
+07604  a1 f0 19             mov ax, word ptr [0x19f0]    ; segment_source
 07607  8e d8                mov ds, ax
 07609  2e 89 0e 02 25       mov word ptr cs:[0x2502], cx
 0760e  d1 ed                shr bp, 1
@@ -6269,7 +6404,7 @@ loc_7961:
 07967  58                   pop ax
 07968  c3                   ret
 loc_7969:
-07969  a1 f0 19             mov ax, word ptr [0x19f0]
+07969  a1 f0 19             mov ax, word ptr [0x19f0]    ; segment_source
 0796c  8e d8                mov ds, ax
 loc_796e:
 0796e  8b d1                mov dx, cx
@@ -6296,16 +6431,17 @@ loc_798d:
 07993  58                   pop ax
 07994  c3                   ret
 
-; ======== sub_7995   (routine probable : non appelée directement)
-07995  bb d2 19             mov bx, 0x19d2
-07998  03 1e 40 14          add bx, word ptr [0x1440]
+; ======== copie_image
+; non appelée : même chose, opaque ; table saut_copie_image
+07995  bb d2 19             mov bx, 0x19d2    ; saut_copie_image
+07998  03 1e 40 14          add bx, word ptr [0x1440]    ; mode_video
 0799c  ff 27                jmp word ptr [bx]
 loc_799e:
-0799e  e8 33 fa             call sub_73d4
-079a1  8b 3e 9d 1a          mov di, word ptr [0x1a9d]
-079a5  8b 1e 9b 1a          mov bx, word ptr [0x1a9b]
+0799e  e8 33 fa             call adresse_tandy
+079a1  8b 3e 9d 1a          mov di, word ptr [0x1a9d]    ; adresse_tampon
+079a5  8b 1e 9b 1a          mov bx, word ptr [0x1a9b]    ; decalage_pixel
 079a9  d1 ee                shr si, 1
-079ab  a1 f0 19             mov ax, word ptr [0x19f0]
+079ab  a1 f0 19             mov ax, word ptr [0x19f0]    ; segment_source
 079ae  8e d8                mov ds, ax
 079b0  2e 89 0e 02 25       mov word ptr cs:[0x2502], cx
 079b5  d1 ed                shr bp, 1
@@ -6635,7 +6771,7 @@ loc_7c67:
 07c6d  58                   pop ax
 07c6e  c3                   ret
 loc_7c6f:
-07c6f  a1 f0 19             mov ax, word ptr [0x19f0]
+07c6f  a1 f0 19             mov ax, word ptr [0x19f0]    ; segment_source
 07c72  8e d8                mov ds, ax
 07c74  d1 ed                shr bp, 1
 07c76  d1 ed                shr bp, 1
@@ -6665,7 +6801,7 @@ loc_7c81:
 07ca5  58                   pop ax
 07ca6  c3                   ret
 loc_7ca7:
-07ca7  a1 f0 19             mov ax, word ptr [0x19f0]
+07ca7  a1 f0 19             mov ax, word ptr [0x19f0]    ; segment_source
 07caa  8e d8                mov ds, ax
 loc_7cac:
 07cac  8b d1                mov dx, cx
@@ -6682,7 +6818,8 @@ loc_7cac:
 07cc2  58                   pop ax
 07cc3  c3                   ret
 
-; ======== sub_7cc4   (routine probable : non appelée directement)
+; ======== efface_rectangle
+; non appelée : SI -> position (2 octets), hauteur, largeur, couleur ; remplit d'espaces (chaîne DS:1A33)
 07cc4  9c                   pushf
 07cc5  50                   push ax
 07cc6  53                   push bx
@@ -6706,7 +6843,7 @@ loc_7cac:
 07ce6  a3 89 1a             mov word ptr [0x1a89], ax
 07ce9  8b c8                mov cx, ax
 07ceb  8b 44 06             mov ax, word ptr [si + 6]
-07cee  a3 f2 19             mov word ptr [0x19f2], ax
+07cee  a3 f2 19             mov word ptr [0x19f2], ax    ; couleur_encre
 07cf1  b0 20                mov al, 0x20
 07cf3  88 45 03             mov byte ptr [di + 3], al
 07cf6  b0 20                mov al, 0x20
@@ -6718,7 +6855,7 @@ loc_7cac:
 07d02  aa                   stosb byte ptr es:[di], al
 07d03  bd 33 1a             mov bp, 0x1a33
 07d06  06                   push es
-07d07  e8 32 ed             call sub_6a3c
+07d07  e8 32 ed             call affiche_chaine
 07d0a  07                   pop es
 07d0b  bf 36 1a             mov di, 0x1a36
 07d0e  b0 20                mov al, 0x20
@@ -6736,7 +6873,7 @@ loc_7d25:
 07d25  55                   push bp
 07d26  51                   push cx
 07d27  3e fe 46 01          inc byte ptr ds:[bp + 1]
-07d2b  e8 0e ed             call sub_6a3c
+07d2b  e8 0e ed             call affiche_chaine
 07d2e  59                   pop cx
 07d2f  5d                   pop bp
 07d30  e2 f3                loop loc_7d25
@@ -6751,7 +6888,7 @@ loc_7d25:
 07d42  b0 20                mov al, 0x20
 07d44  aa                   stosb byte ptr es:[di], al
 07d45  3e fe 46 01          inc byte ptr ds:[bp + 1]
-07d49  e8 f0 ec             call sub_6a3c
+07d49  e8 f0 ec             call affiche_chaine
 07d4c  1f                   pop ds
 07d4d  07                   pop es
 07d4e  5d                   pop bp
@@ -6764,7 +6901,8 @@ loc_7d25:
 07d55  9d                   popf
 07d56  c3                   ret
 
-; ======== sub_7d57   (routine probable : non appelée directement)
+; ======== longueur_texte
+; non appelée : SI = position du 0 final du texte BP ; identique à QUEST 0x449A
 07d57  be 01 00             mov si, 1
 loc_7d5a:
 07d5a  3e 80 3a 00          cmp byte ptr ds:[bp + si], 0
@@ -6774,15 +6912,17 @@ loc_7d61:
 07d61  46                   inc si
 07d62  eb f6                jmp loc_7d5a
 
-; ======== sub_7d64   (routine probable : non appelée directement)
-07d64  e8 03 00             call sub_7d6a
-07d67  e9 5b f4             jmp loc_71c5
+; ======== affiche_registres_attend
+; non appelée : affiche_registres, puis attend_bouton_droit
+07d64  e8 03 00             call affiche_registres
+07d67  e9 5b f4             jmp attend_bouton_droit
 
-; ======== sub_7d6a   (appelée depuis 7d64)
-07d6a  ff 36 f2 19          push word ptr [0x19f2]
-07d6e  ff 36 f4 19          push word ptr [0x19f4]
-07d72  ff 36 f6 19          push word ptr [0x19f6]
-07d76  ff 36 fb 19          push word ptr [0x19fb]
+; ======== affiche_registres   (appelée depuis 7d64)
+; AX à DS en hexadécimal (chaînes DS:17B5 à DS:1805), position et couleurs du texte conservées
+07d6a  ff 36 f2 19          push word ptr [0x19f2]    ; couleur_encre
+07d6e  ff 36 f4 19          push word ptr [0x19f4]    ; colonne_texte
+07d72  ff 36 f6 19          push word ptr [0x19f6]    ; ligne_texte
+07d76  ff 36 fb 19          push word ptr [0x19fb]    ; texte_transparent
 07d7a  9c                   pushf
 07d7b  9c                   pushf
 07d7c  50                   push ax
@@ -6798,53 +6938,53 @@ loc_7d61:
 07d86  b8 00 00             mov ax, 0
 07d89  8e d8                mov ds, ax
 07d8b  58                   pop ax
-07d8c  c6 06 fb 19 00       mov byte ptr [0x19fb], 0
-07d91  e8 cc f1             call sub_6f60
+07d8c  c6 06 fb 19 00       mov byte ptr [0x19fb], 0    ; texte_transparent
+07d91  e8 cc f1             call attend_retour_trame
 07d94  bd b5 17             mov bp, 0x17b5
-07d97  e8 a2 ec             call sub_6a3c
+07d97  e8 a2 ec             call affiche_chaine
 07d9a  8b ec                mov bp, sp
 07d9c  8b 56 10             mov dx, word ptr [bp + 0x10]
-07d9f  e8 8c 00             call sub_7e2e
+07d9f  e8 8c 00             call affiche_hexa
 07da2  bd bf 17             mov bp, 0x17bf
-07da5  e8 94 ec             call sub_6a3c
+07da5  e8 94 ec             call affiche_chaine
 07da8  8b ec                mov bp, sp
 07daa  8b 56 0e             mov dx, word ptr [bp + 0xe]
-07dad  e8 7e 00             call sub_7e2e
+07dad  e8 7e 00             call affiche_hexa
 07db0  bd c9 17             mov bp, 0x17c9
-07db3  e8 86 ec             call sub_6a3c
+07db3  e8 86 ec             call affiche_chaine
 07db6  8b ec                mov bp, sp
 07db8  8b 56 0c             mov dx, word ptr [bp + 0xc]
-07dbb  e8 70 00             call sub_7e2e
+07dbb  e8 70 00             call affiche_hexa
 07dbe  bd d3 17             mov bp, 0x17d3
-07dc1  e8 78 ec             call sub_6a3c
+07dc1  e8 78 ec             call affiche_chaine
 07dc4  8b ec                mov bp, sp
 07dc6  8b 56 0a             mov dx, word ptr [bp + 0xa]
-07dc9  e8 62 00             call sub_7e2e
+07dc9  e8 62 00             call affiche_hexa
 07dcc  bd 05 18             mov bp, 0x1805
-07dcf  e8 6a ec             call sub_6a3c
+07dcf  e8 6a ec             call affiche_chaine
 07dd2  8b ec                mov bp, sp
 07dd4  8b 56 04             mov dx, word ptr [bp + 4]
-07dd7  e8 54 00             call sub_7e2e
+07dd7  e8 54 00             call affiche_hexa
 07dda  bd dd 17             mov bp, 0x17dd
-07ddd  e8 5c ec             call sub_6a3c
+07ddd  e8 5c ec             call affiche_chaine
 07de0  8b ec                mov bp, sp
 07de2  8b 56 08             mov dx, word ptr [bp + 8]
-07de5  e8 46 00             call sub_7e2e
+07de5  e8 46 00             call affiche_hexa
 07de8  bd e7 17             mov bp, 0x17e7
-07deb  e8 4e ec             call sub_6a3c
+07deb  e8 4e ec             call affiche_chaine
 07dee  8b ec                mov bp, sp
 07df0  8b 56 06             mov dx, word ptr [bp + 6]
-07df3  e8 38 00             call sub_7e2e
+07df3  e8 38 00             call affiche_hexa
 07df6  bd f1 17             mov bp, 0x17f1
-07df9  e8 40 ec             call sub_6a3c
+07df9  e8 40 ec             call affiche_chaine
 07dfc  8b ec                mov bp, sp
 07dfe  8b 56 02             mov dx, word ptr [bp + 2]
-07e01  e8 2a 00             call sub_7e2e
+07e01  e8 2a 00             call affiche_hexa
 07e04  bd fb 17             mov bp, 0x17fb
-07e07  e8 32 ec             call sub_6a3c
+07e07  e8 32 ec             call affiche_chaine
 07e0a  8b ec                mov bp, sp
 07e0c  8b 56 00             mov dx, word ptr [bp]
-07e0f  e8 1c 00             call sub_7e2e
+07e0f  e8 1c 00             call affiche_hexa
 07e12  1f                   pop ds
 07e13  07                   pop es
 07e14  5d                   pop bp
@@ -6856,46 +6996,51 @@ loc_7d61:
 07e1a  58                   pop ax
 07e1b  9d                   popf
 07e1c  9d                   popf
-07e1d  8f 06 fb 19          pop word ptr [0x19fb]
-07e21  8f 06 f6 19          pop word ptr [0x19f6]
-07e25  8f 06 f4 19          pop word ptr [0x19f4]
-07e29  8f 06 f2 19          pop word ptr [0x19f2]
+07e1d  8f 06 fb 19          pop word ptr [0x19fb]    ; texte_transparent
+07e21  8f 06 f6 19          pop word ptr [0x19f6]    ; ligne_texte
+07e25  8f 06 f4 19          pop word ptr [0x19f4]    ; colonne_texte
+07e29  8f 06 f2 19          pop word ptr [0x19f2]    ; couleur_encre
 07e2d  c3                   ret
 
-; ======== sub_7e2e   (appelée depuis 7d9f, 7dad, 7dbb, 7dc9, 7dd7, 7de5, 7df3, 7e01)
-07e2e  89 16 95 1a          mov word ptr [0x1a95], dx
+; ======== affiche_hexa   (appelée depuis 7d9f, 7dad, 7dbb, 7dc9, 7dd7, 7de5, 7df3, 7e01)
+; DX en 4 chiffres hexadécimaux
+07e2e  89 16 95 1a          mov word ptr [0x1a95], dx    ; saisie_tampon
 07e32  8a c6                mov al, dh
-07e34  e8 1b 00             call sub_7e52
-07e37  a1 95 1a             mov ax, word ptr [0x1a95]
+07e34  e8 1b 00             call chiffre_hexa_haut
+07e37  a1 95 1a             mov ax, word ptr [0x1a95]    ; saisie_tampon
 07e3a  8a c4                mov al, ah
-07e3c  e8 0d 00             call sub_7e4c
-07e3f  a1 95 1a             mov ax, word ptr [0x1a95]
-07e42  e8 0d 00             call sub_7e52
-07e45  a1 95 1a             mov ax, word ptr [0x1a95]
-07e48  e8 01 00             call sub_7e4c
+07e3c  e8 0d 00             call chiffre_hexa_bas
+07e3f  a1 95 1a             mov ax, word ptr [0x1a95]    ; saisie_tampon
+07e42  e8 0d 00             call chiffre_hexa_haut
+07e45  a1 95 1a             mov ax, word ptr [0x1a95]    ; saisie_tampon
+07e48  e8 01 00             call chiffre_hexa_bas
 07e4b  c3                   ret
 
-; ======== sub_7e4c   (appelée depuis 7e3c, 7e48)
+; ======== chiffre_hexa_bas   (appelée depuis 7e3c, 7e48)
+; chiffre du quartet bas de AL
 07e4c  24 0f                and al, 0xf
-07e4e  e8 0f 00             call sub_7e60
+07e4e  e8 0f 00             call chiffre_hexa
 07e51  c3                   ret
 
-; ======== sub_7e52   (appelée depuis 7e34, 7e42)
+; ======== chiffre_hexa_haut   (appelée depuis 7e34, 7e42)
+; chiffre du quartet haut de AL
 07e52  24 f0                and al, 0xf0
 07e54  d0 e8                shr al, 1
 07e56  d0 e8                shr al, 1
 07e58  d0 e8                shr al, 1
 07e5a  d0 e8                shr al, 1
-07e5c  e8 01 00             call sub_7e60
+07e5c  e8 01 00             call chiffre_hexa
 07e5f  c3                   ret
 
-; ======== sub_7e60   (appelée depuis 7e4e, 7e5c)
+; ======== chiffre_hexa   (appelée depuis 7e4e, 7e5c)
+; affiche le chiffre AL (0 à 15) avec chiffres_hexa
 07e60  bb 12 1d             mov bx, 0x1d12    ; "0123456789ABCDEF"
 07e63  d7                   xlatb
-07e64  e8 e4 eb             call sub_6a4b
+07e64  e8 e4 eb             call affiche_caractere
 07e67  c3                   ret
 
-; ======== sub_7e68   (routine probable : non appelée directement)
+; ======== numero_bit
+; non appelée : numéro du premier bit posé de AL (0 à 7) ; identique à QUEST 0x45AB
 07e68  51                   push cx
 07e69  b4 00                mov ah, 0
 07e6b  b9 08 00             mov cx, 8
@@ -6910,7 +7055,8 @@ loc_7e78:
 07e7a  59                   pop cx
 07e7b  c3                   ret
 
-; ======== sub_7e7c   (routine probable : non appelée directement)
+; ======== installe_erreur_disque   (appelée depuis 69b6)
+; non appelée : int 24h -> CS:39DA (erreur_disque)
 07e7c  b4 25                mov ah, 0x25
 07e7e  b0 24                mov al, 0x24
 07e80  ba da 39             mov dx, 0x39da
@@ -6920,9 +7066,14 @@ loc_7e78:
 07e86  cd 21                int 0x21
 07e88  1f                   pop ds
 07e89  c3                   ret
-; ---- 3 octets non atteints (7e8a-7e8c)
 
-; ======== sub_7e8d   (appelée depuis 479c, 48b6, 492f, 4bf4, 4c70, 4ced, 4e92, 4eed)
+; ======== erreur_disque
+; non appelée : AL = 0 (ignorer l'erreur)
+07e8a  b0 00                mov al, 0
+07e8c  c3                   ret
+
+; ======== lz_decompresse   (appelée depuis 479c, 48b6, 492f, 4bf4, 4c70, 4ced, 4e92, 4eed)
+; décompression LZ de DS:SI vers ES:DI, CX octets au plus ; identique à QUEST 0x45D1
 07e8d  fc                   cld
 07e8e  ba 00 00             mov dx, 0
 loc_7e91:
@@ -7031,14 +7182,16 @@ loc_7f2c:
 loc_7f42:
 07f42  c3                   ret
 
-; ======== sub_7f43   (appelée depuis 46b0)
+; ======== temporise   (appelée depuis 46b0)
+; CX fois pause_courte
 07f43  51                   push cx
-07f44  e8 24 ef             call sub_6e6b
+07f44  e8 24 ef             call pause_courte
 07f47  59                   pop cx
-07f48  e2 f9                loop sub_7f43
+07f48  e2 f9                loop temporise
 07f4a  c3                   ret
 
-; ======== sub_7f4b   (appelée depuis 4a76, 4a8b, 4bda, 4c7d, 4cfa, 4e43, 4fb2, 4fe0)
+; ======== attend_trame   (appelée depuis 4a76, 4a8b, 4bda, 4c7d, 4cfa, 4e43, 4fb2, 4fe0)
+; attend le début puis la fin du retour de trame (bit 3 de port_etat_video)
 07f4b  50                   push ax
 07f4c  52                   push dx
 07f4d  1e                   push ds
@@ -7046,7 +7199,7 @@ loc_7f42:
 07f4f  b8 00 00             mov ax, 0
 07f52  8e d8                mov ds, ax
 07f54  58                   pop ax
-07f55  8b 16 24 1d          mov dx, word ptr [0x1d24]
+07f55  8b 16 24 1d          mov dx, word ptr [0x1d24]    ; port_etat_video
 loc_7f59:
 07f59  ec                   in al, dx
 07f5a  a8 08                test al, 8
@@ -7060,17 +7213,60 @@ loc_7f5e:
 07f65  58                   pop ax
 07f66  c3                   ret
 
-; ======== sub_7f67   (appelée depuis 4664)
+; ======== lit_ports_video   (appelée depuis 4664)
+; port_crtc = mot BIOS 0040:0063, port_etat_video = ce port + 6
 07f67  b8 40 00             mov ax, 0x40
 07f6a  8e c0                mov es, ax
 07f6c  26 a1 63 00          mov ax, word ptr es:[0x63]
-07f70  a3 22 1d             mov word ptr [0x1d22], ax
+07f70  a3 22 1d             mov word ptr [0x1d22], ax    ; port_crtc
 07f73  05 06 00             add ax, 6
-07f76  a3 24 1d             mov word ptr [0x1d24], ax
+07f76  a3 24 1d             mov word ptr [0x1d24], ax    ; port_etat_video
 07f79  c3                   ret
-; ---- 80 octets non atteints (7f7a-7fc9)
 
-; ======== sub_7fca   (appelée depuis 7071)
+; ======== etalonne_joystick   (appelée depuis 6a2f)
+; non appelée (seulement par lit_configuration, morte) : mode texte, « Centre joystick and press fire », masque_joystick = 3 (A) ou C0h (B), centre relevé par joystick_position
+07f7a  32 e4                xor ah, ah
+07f7c  b0 03                mov al, 3
+07f7e  cd 10                int 0x10
+07f80  ba 90 18             mov dx, 0x1890
+07f83  b4 09                mov ah, 9
+07f85  cd 21                int 0x21
+07f87  ba 01 02             mov dx, 0x201
+loc_7f8a:
+07f8a  ec                   in al, dx
+07f8b  a8 10                test al, 0x10
+07f8d  74 0e                je loc_7f9d
+07f8f  a8 20                test al, 0x20
+07f91  74 0a                je loc_7f9d
+07f93  a8 40                test al, 0x40
+07f95  74 0e                je loc_7fa5
+07f97  a8 80                test al, 0x80
+07f99  74 0a                je loc_7fa5
+07f9b  eb ed                jmp loc_7f8a
+loc_7f9d:
+07f9d  c6 06 ac 14 03       mov byte ptr [0x14ac], 3    ; masque_joystick
+07fa2  eb 06                jmp loc_7faa
+; ---- 1 octets non atteints (7fa4-7fa4)
+loc_7fa5:
+07fa5  c6 06 ac 14 c0       mov byte ptr [0x14ac], 0xc0    ; masque_joystick
+loc_7faa:
+07faa  e8 1d 00             call joystick_position
+07fad  80 3e ac 14 03       cmp byte ptr [0x14ac], 3    ; masque_joystick
+07fb2  75 0b                jne loc_7fbf
+07fb4  89 0e ad 14          mov word ptr [0x14ad], cx    ; centre_joystick_y
+07fb8  89 1e af 14          mov word ptr [0x14af], bx    ; centre_joystick_x
+07fbc  eb 0b                jmp loc_7fc9
+; ---- 1 octets non atteints (7fbe-7fbe)
+loc_7fbf:
+07fbf  8b c7                mov ax, di
+07fc1  a3 ad 14             mov word ptr [0x14ad], ax    ; centre_joystick_y
+07fc4  8b c6                mov ax, si
+07fc6  a3 af 14             mov word ptr [0x14af], ax    ; centre_joystick_x
+loc_7fc9:
+07fc9  c3                   ret
+
+; ======== joystick_position   (appelée depuis 7071, 7faa)
+; chronomètre le port 201h, interruptions coupées, masqué par masque_joystick : BX x et CX y du joystick A ; DI et SI du joystick B
 07fca  fa                   cli
 07fcb  33 db                xor bx, bx
 07fcd  33 c9                xor cx, cx
@@ -7088,7 +7284,7 @@ loc_7fdd:
 ; ---- 1 octets non atteints (7fdf-7fdf)
 loc_7fe0:
 07fe0  ec                   in al, dx
-07fe1  22 06 ac 14          and al, byte ptr [0x14ac]
+07fe1  22 06 ac 14          and al, byte ptr [0x14ac]    ; masque_joystick
 07fe5  32 e4                xor ah, ah
 07fe7  8b e8                mov bp, ax
 07fe9  25 01 00             and ax, 1
@@ -7111,7 +7307,8 @@ loc_7fe0:
 0800f  fb                   sti
 08010  c3                   ret
 
-; ======== sub_8011   (appelée depuis 70c9)
+; ======== joystick_boutons   (appelée depuis 70c9)
+; boutons des deux joysticks dans les bits 0 à 3 de AL (port 201h inversé) ; identique à QUEST 0x4755
 08011  fa                   cli
 08012  ba 01 02             mov dx, 0x201
 08015  ec                   in al, dx
@@ -7127,8 +7324,9 @@ loc_7fe0:
 08028  fb                   sti
 08029  c3                   ret
 
-; ======== sub_802a   (appelée depuis 4879)
-0802a  80 3e 42 14 00       cmp byte ptr [0x1442], 0
+; ======== son_arret   (appelée depuis 4879)
+; en quittant : silence (AX=0Bh, port 61h pour le haut-parleur), arrête la poignée DS:144E si musique_coupee, sinon son_poignee (AX=4), puis AX=0Bh et AX=0
+0802a  80 3e 42 14 00       cmp byte ptr [0x1442], 0    ; son_pilote
 0802f  75 0b                jne loc_803c
 08031  b8 0b 00             mov ax, 0xb
 08034  cd 60                int 0x60
@@ -7136,12 +7334,12 @@ loc_7fe0:
 08038  24 fc                and al, 0xfc
 0803a  e6 61                out 0x61, al
 loc_803c:
-0803c  80 3e 42 14 00       cmp byte ptr [0x1442], 0
+0803c  80 3e 42 14 00       cmp byte ptr [0x1442], 0    ; son_pilote
 08041  74 14                je loc_8057
 08043  8b 3e 4e 14          mov di, word ptr [0x144e]
-08047  80 3e 49 14 01       cmp byte ptr [0x1449], 1
+08047  80 3e 49 14 01       cmp byte ptr [0x1449], 1    ; musique_coupee
 0804c  74 04                je loc_8052
-0804e  8b 3e 4c 14          mov di, word ptr [0x144c]
+0804e  8b 3e 4c 14          mov di, word ptr [0x144c]    ; son_poignee
 loc_8052:
 08052  b8 04 00             mov ax, 4
 08055  cd 60                int 0x60
@@ -7152,64 +7350,67 @@ loc_8057:
 0805f  cd 60                int 0x60
 08061  c3                   ret
 
-; ======== sub_8062   (appelée depuis 4667)
-08062  c6 06 49 14 00       mov byte ptr [0x1449], 0
-08067  8a 1e 42 14          mov bl, byte ptr [0x1442]
+; ======== son_charge_pilote   (appelée depuis 4667)
+; réserve 697h paragraphes (int 21h AH=48h), y charge les données (son_donnees), charge le pilote (son_pilotes) au segment 01ECh, l'appelle (son_entree_pilote), puis int 60h AX=0Ah
+08062  c6 06 49 14 00       mov byte ptr [0x1449], 0    ; musique_coupee
+08067  8a 1e 42 14          mov bl, byte ptr [0x1442]    ; son_pilote
 0806b  d0 e3                shl bl, 1
 0806d  32 ff                xor bh, bh
-0806f  8b 9f 80 14          mov bx, word ptr [bx + 0x1480]
+0806f  8b 9f 80 14          mov bx, word ptr [bx + 0x1480]    ; son_donnees
 08073  83 fb 00             cmp bx, 0
 08076  74 28                je loc_80a0
-08078  89 1e 8b 1a          mov word ptr [0x1a8b], bx
+08078  89 1e 8b 1a          mov word ptr [0x1a8b], bx    ; erreur_fichier
 0807c  bb 97 06             mov bx, 0x697
 0807f  b4 48                mov ah, 0x48
 08081  cd 21                int 0x21
 08083  73 01                jae loc_8086
 08085  c3                   ret
 loc_8086:
-08086  a3 4a 14             mov word ptr [0x144a], ax
-08089  8b 1e 8b 1a          mov bx, word ptr [0x1a8b]
-0808d  89 1e a9 1b          mov word ptr [0x1ba9], bx
-08091  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
-08097  a1 4a 14             mov ax, word ptr [0x144a]
-0809a  a3 a3 1b             mov word ptr [0x1ba3], ax
-0809d  e8 a1 f1             call sub_7241
+08086  a3 4a 14             mov word ptr [0x144a], ax    ; son_segment_donnees
+08089  8b 1e 8b 1a          mov bx, word ptr [0x1a8b]    ; erreur_fichier
+0808d  89 1e a9 1b          mov word ptr [0x1ba9], bx    ; fichier_nom
+08091  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
+08097  a1 4a 14             mov ax, word ptr [0x144a]    ; son_segment_donnees
+0809a  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+0809d  e8 a1 f1             call charge_fichier
 loc_80a0:
-080a0  8a 1e 42 14          mov bl, byte ptr [0x1442]
+080a0  8a 1e 42 14          mov bl, byte ptr [0x1442]    ; son_pilote
 080a4  d0 e3                shl bl, 1
 080a6  32 ff                xor bh, bh
-080a8  8b 9f 50 14          mov bx, word ptr [bx + 0x1450]
-080ac  89 1e a9 1b          mov word ptr [0x1ba9], bx
-080b0  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0
+080a8  8b 9f 50 14          mov bx, word ptr [bx + 0x1450]    ; son_pilotes
+080ac  89 1e a9 1b          mov word ptr [0x1ba9], bx    ; fichier_nom
+080b0  c7 06 a5 1b 00 00    mov word ptr [0x1ba5], 0    ; fichier_offset
 080b6  b8 ec 01             mov ax, 0x1ec
-080b9  a3 a3 1b             mov word ptr [0x1ba3], ax
-080bc  e8 82 f1             call sub_7241
-080bf  ff 1e a8 14          lcall [0x14a8]
+080b9  a3 a3 1b             mov word ptr [0x1ba3], ax    ; fichier_segment
+080bc  e8 82 f1             call charge_fichier
+080bf  ff 1e a8 14          lcall [0x14a8]    ; son_entree_pilote
 080c3  b8 0a 00             mov ax, 0xa
 080c6  cd 60                int 0x60
 080c8  f8                   clc
 080c9  c3                   ret
 
-; ======== sub_80ca   (appelée depuis 466a)
-080ca  80 3e 42 14 00       cmp byte ptr [0x1442], 0
+; ======== son_prepare   (appelée depuis 466a)
+; int 60h AX=2 (données, sauf haut-parleur), puis AX=3 morceau son_morceaux[pilote] ; poignée dans son_poignee
+080ca  80 3e 42 14 00       cmp byte ptr [0x1442], 0    ; son_pilote
 080cf  74 0c                je loc_80dd
-080d1  8b 16 4a 14          mov dx, word ptr [0x144a]
+080d1  8b 16 4a 14          mov dx, word ptr [0x144a]    ; son_segment_donnees
 080d5  be 00 00             mov si, 0
 080d8  b8 02 00             mov ax, 2
 080db  cd 60                int 0x60
 loc_80dd:
-080dd  8a 1e 42 14          mov bl, byte ptr [0x1442]
+080dd  8a 1e 42 14          mov bl, byte ptr [0x1442]    ; son_pilote
 080e1  32 ff                xor bh, bh
 080e3  d1 e3                shl bx, 1
-080e5  8b 97 a0 14          mov dx, word ptr [bx + 0x14a0]
+080e5  8b 97 a0 14          mov dx, word ptr [bx + 0x14a0]    ; son_morceaux
 080e9  8b ca                mov cx, dx
 080eb  b8 03 00             mov ax, 3
 080ee  cd 60                int 0x60
-080f0  89 3e 4c 14          mov word ptr [0x144c], di
+080f0  89 3e 4c 14          mov word ptr [0x144c], di    ; son_poignee
 080f4  c3                   ret
 
-; ======== sub_80f5   (appelée depuis 7065)
-080f5  80 3e 49 14 01       cmp byte ptr [0x1449], 1
+; ======== son_musique   (appelée depuis 7065)
+; première pression de F10 : musique_coupee = 1 ; Tandy : AX=3 morceau 0 ; sinon AX=4 (arrête son_poignee), et pour le haut-parleur AX=0Bh + port 61h
+080f5  80 3e 49 14 01       cmp byte ptr [0x1449], 1    ; musique_coupee
 080fa  75 01                jne loc_80fd
 080fc  c3                   ret
 loc_80fd:
@@ -7217,18 +7418,18 @@ loc_80fd:
 08102  74 01                je loc_8105
 08104  c3                   ret
 loc_8105:
-08105  c6 06 49 14 01       mov byte ptr [0x1449], 1
-0810a  80 3e 42 14 03       cmp byte ptr [0x1442], 3
+08105  c6 06 49 14 01       mov byte ptr [0x1449], 1    ; musique_coupee
+0810a  80 3e 42 14 03       cmp byte ptr [0x1442], 3    ; son_pilote
 0810f  75 09                jne loc_811a
 08111  ba 00 00             mov dx, 0
 08114  b8 03 00             mov ax, 3
 08117  cd 60                int 0x60
 08119  c3                   ret
 loc_811a:
-0811a  8b 3e 4c 14          mov di, word ptr [0x144c]
+0811a  8b 3e 4c 14          mov di, word ptr [0x144c]    ; son_poignee
 0811e  b8 04 00             mov ax, 4
 08121  cd 60                int 0x60
-08123  80 3e 42 14 00       cmp byte ptr [0x1442], 0
+08123  80 3e 42 14 00       cmp byte ptr [0x1442], 0    ; son_pilote
 08128  75 0b                jne loc_8135
 0812a  b8 0b 00             mov ax, 0xb
 0812d  cd 60                int 0x60
@@ -7237,3 +7438,18 @@ loc_811a:
 08133  e6 61                out 0x61, al
 loc_8135:
 08135  c3                   ret
+
+; ======== quitte
+; non appelée : retire le clavier, mode texte 3, int 21h AX=4C00h
+08136  e8 78 ee             call restaure_clavier
+08139  32 e4                xor ah, ah
+0813b  b0 03                mov al, 3
+0813d  cd 10                int 0x10
+0813f  b8 00 4c             mov ax, 0x4c00
+08142  cd 21                int 0x21
+08144  00 00                add byte ptr [bx + si], al
+08146  00 00                add byte ptr [bx + si], al
+08148  00 00                add byte ptr [bx + si], al
+0814a  00 00                add byte ptr [bx + si], al
+0814c  00 00                add byte ptr [bx + si], al
+0814e  00 00                add byte ptr [bx + si], al

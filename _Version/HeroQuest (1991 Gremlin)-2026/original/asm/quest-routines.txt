@@ -16,11 +16,11 @@
 006b4  quete_continue              28    5  |     46cb etat_quete numero_quete
 006d0  evenements_et_piege          6    1  |     
 006d6  evenements_tour            126    1  |     3fc3 equipement_repris evenement_b numero_quete personnage_courant
-00756  fin_tour                    50    1  |     fiche_heros_courant fin_du_tour pas_en_file piege_en_cours
+00756  fin_tour                    50    2  |     fiche_heros_courant fin_du_tour pas_en_file piege_en_cours
 00788  teste_porte_reveille         8    4  |     
 00790  porte_reveille              48    1  |     fiche_heros_courant numero_quete
 007c0  ouvre_portes_case          115    1  |     vue_a_refaire
-00833  mode_attaque               259    0  |     3fb1 4289 carte_cible cible cible_validee commandes fiche_heros_courant monstre_designe numero_quete personnage_courant resultat_vise sans_sprites
+00833  mode_attaque               259    1  |     3fb1 4289 carte_cible cible cible_validee commandes fiche_heros_courant monstre_designe numero_quete personnage_courant resultat_vise sans_sprites
 00936  attaque_heros              260    0  |     0e0e attaquant attaque_repetee boucliers choix_menu cible cranes des_attaque_heros des_defense_monstre fiche_heros_courant
 00a3e  portee_attaque             197    1  |     attaque_a_distance carte_simplifiee cible ligne_libre resultat_vise
 00b03  fin_tir                      6    0  |     
@@ -39,20 +39,20 @@
 00c82  etoile_ouest                16    1  |     
 00c92  image_par_table              6    0  |     
 00c98  clic_attaque                26    1  |     cible_validee commandes monstre_designe
-00cb3  mode_regarder               54    0  |     carte_cible commandes
+00cb3  mode_regarder               54    1  |     carte_cible commandes
 00ce9  designe_case               343    2  |     47e9 case_designee case_vide_designee cible cible_validee colonne_curseur commandes curseur_x heros_designe ligne_curseur monstre_designe seg_odds  "UC_CiCsC}CBARBARIAN"
 00e40  adresse_monstre            197    6  |     case_designee cible effet_sort_choisi fiche_heros_courant heros_courant numero_quete resultat_vise sort_en_cours
-00f06  sort_guerison               32    0  |     heros_courant
-00f27  sort_vent                    9    0  |     
-00f31  sort_courage                 9    0  |     
-00f3b  sort_peau_pierre             9    0  |     
-00f45  sort_tempete                45    0  |     cible
-00f76  sort_boule_feu              70    0  |     heros_courant
-00fbc  sort_feu_colere             37    0  |     heros_courant
-00fe1  sort_sommeil                58    0  |     cible heros_courant
-0101c  sort_brume                  10    0  |     
-01026  sort_genie                 139    0  |     case_designee heros_courant seg_odds segment_source
-010b3  sort_traverse_roche         37    0  |     etat_action personnage_courant
+00f06  sort_guerison               32    1  |     heros_courant
+00f27  sort_vent                    9    1  |     
+00f31  sort_courage                 9    1  |     
+00f3b  sort_peau_pierre             9    1  |     
+00f45  sort_tempete                45    1  |     cible
+00f76  sort_boule_feu              70    1  |     heros_courant
+00fbc  sort_feu_colere             37    1  |     heros_courant
+00fe1  sort_sommeil                58    1  |     cible heros_courant
+0101c  sort_brume                  10    1  |     
+01026  sort_genie                 139    1  |     case_designee heros_courant seg_odds segment_source
+010b3  sort_traverse_roche         37    1  |     etat_action personnage_courant
 010d8  mort_heros                  76    4  |     fin_du_tour heros_courant personnage_courant
 01124  pause_250                    6    1  |     
 0112a  retire_or_mine              20    0  |     numero_quete
@@ -140,7 +140,7 @@
 02c16  brume_bas                   16    1  |     pas_brume
 02c26  brume_droite                16    1  |     pas_brume
 02c36  brume_de_mort               62    1  |     heros_courant
-02c74  action_sort                272    0  |     402c 4301 attaque_repetee carte_cible case_vide_designee cible_validee etat_action fiche_heros_courant heros_courant heros_designe mode_inventaire monstre_designe
+02c74  action_sort                272    1  |     402c 4301 attaque_repetee carte_cible case_vide_designee cible_validee etat_action fiche_heros_courant heros_courant heros_designe mode_inventaire monstre_designe
 02d84  retire_sort                 40    2  |     
 02dac  chemin_heros                82    1  |     3fef 3ff1 chemin_cible_x chemin_depart_x chemin_longueur_max chemin_profondeur deplacement_restant erreur_fichier fiche_heros_courant pas_en_file prochain_pas resultat_vise
 02dff  chemin_essaie              184    4  |     3ff1 3ff6 chemin_case_x chemin_cible_x chemin_direction chemin_longueur_max chemin_profondeur pas_en_file
@@ -205,9 +205,9 @@
 047a6  son_charge_pilote          127    1  | 21h/48 60h    3206 3208 erreur_fichier fichier_nom fichier_offset fichier_segment rang_pixel seg_son_donnees son_actif son_pilote
 04825  son_prepare                 43    1  | 60h    seg_son_donnees son_musique_poignee son_pilote
 04850  son_musique                283    1  | 10h/? 21h/4c 60h  0x61  3956 3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie son_actif son_musique_poignee son_pilote
-04968  pas_droite                 199    0  |     3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie
-04a2f  pas_haut                   200    0  |     3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie
-04af7  pas_bas                    689    0  |     0e57 3fce 409b case_apres_porte case_avant_porte deplacement_restant direction_pas etat_action message_en_attente numero_quete pas_en_cours pas_en_file
+04968  pas_droite                 199    1  |     3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie
+04a2f  pas_haut                   200    1  |     3fce case_apres_porte deplacement_restant direction_pas etat_action numero_quete porte_franchie
+04af7  pas_bas                    689    1  |     0e57 3fce 409b case_apres_porte case_avant_porte deplacement_restant direction_pas etat_action message_en_attente numero_quete pas_en_cours pas_en_file
 04daa  tire_teleport               29    2  |     
 04dc7  entre_piege                 72    4  |     case_piege pas_en_file piege_en_cours prochain_pas
 04e10  alloue_memoire             245    1  | 21h/48    5e31 mode_video seg_annexe seg_ecran seg_furn seg_furn_brut seg_graphics seg_monsters seg_odds seg_shopsp  "AND TRY AGAIN"
@@ -296,62 +296,62 @@
 06934  rang_case_heros             34    2  |     coin_zone index_case_courante
 06956  charge_maps                203    1  |     erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille mode_video seg_annexe  "maps.ega"
 06a23  fond_vers_tampon           443   19  |     6a58 6a59 mode_video seg_ecran seg_furn
-06be0  fouille_tresor             385    0  |     3fbc 3fc7 42f5 etat_action fiche_heros_courant heros_courant personnage_courant zone_heros
+06be0  fouille_tresor             385    1  |     3fbc 3fc7 42f5 etat_action fiche_heros_courant heros_courant personnage_courant zone_heros
 06d66  tire_carte                  37    1  |     463b carte_tresor
 06d8b  remet_carte                 15    3  |     carte_tresor
 06d9a  monstre_dans_zone           61    1  |     3fc7 case_coin_zone fiche_heros_courant zone_heros
 06dd7  monstre_actif_case          35    1  |     3fc7
-06dfa  fouille_portes             178    0  |     42ad etat_action fiche_heros_courant ligne_carte personnage_courant position_tuile_carte zone_heros zones_actives
+06dfa  fouille_portes             178    1  |     42ad etat_action fiche_heros_courant ligne_carte personnage_courant position_tuile_carte zone_heros zones_actives
 06eb0  redessin_plateau            92    3  |     3fbc attaquant cible fiche_heros_courant personnage_courant vue_a_refaire
-06f0c  evt_coffre_desarme_2         6    0  |     
-06f12  fouille_vide                38    0  |     4bc2 fiche_heros_courant
-06f38  evt_coffre_potion_50         8    0  |     
-06f40  evt_armoire                 35    0  |     
-06f63  evt_coffre_100              65    0  |     4bc0 fiche_heros_courant heros_courant personnage_courant
-06fa4  evt_lance                   22    0  |     fiche_heros_courant personnage_courant
-06fba  evt_coffre_magnus           64    0  |     4b93 coffres_ramasses fiche_heros_courant
-06ffa  evt_cle_melar               72    0  |     56d2 58d1
-07043  evt_talisman                18    0  |     fiche_heros_courant
-07055  evt_armure_borin            14    0  |     fiche_heros_courant
-07063  evt_coffre_karlen            9    0  |     
-0706c  evt_coffre_course           65    0  |     4b89 coffres_ramasses fiche_heros_courant
-070ad  evt_or_mine                 28    0  |     evenement_b fiche_heros_courant
-070c9  evt_coffre_200               9    0  |     
-070d2  prend_lame_esprit           15    0  |     fiche_heros_courant
-070e1  evt_coffre_200_b             9    0  |     
-070ea  evt_coffre_250               9    0  |     
-070f3  evt_coffre_300               9    0  |     
-070fc  evt_coffre_350               9    0  |     
-07105  evt_trone_500                8    0  |     
-0710e  evt_coffre_400               8    0  |     
-07117  evt_coffre_potion_100        8    0  |     
-07120  coffre_potion               25    0  |     
+06f0c  evt_coffre_desarme_2         6    1  |     
+06f12  fouille_vide                38    1  |     4bc2 fiche_heros_courant
+06f38  evt_coffre_potion_50         8    1  |     
+06f40  evt_armoire                 35    1  |     
+06f63  evt_coffre_100              65    1  |     4bc0 fiche_heros_courant heros_courant personnage_courant
+06fa4  evt_lance                   22    1  |     fiche_heros_courant personnage_courant
+06fba  evt_coffre_magnus           64    1  |     4b93 coffres_ramasses fiche_heros_courant
+06ffa  evt_cle_melar               72    1  |     56d2 58d1
+07043  evt_talisman                18    1  |     fiche_heros_courant
+07055  evt_armure_borin            14    1  |     fiche_heros_courant
+07063  evt_coffre_karlen            9    1  |     
+0706c  evt_coffre_course           65    1  |     4b89 coffres_ramasses fiche_heros_courant
+070ad  evt_or_mine                 28    1  |     evenement_b fiche_heros_courant
+070c9  evt_coffre_200               9    1  |     
+070d2  prend_lame_esprit           15    1  |     fiche_heros_courant
+070e1  evt_coffre_200_b             9    1  |     
+070ea  evt_coffre_250               9    1  |     
+070f3  evt_coffre_300               9    1  |     
+070fc  evt_coffre_350               9    1  |     
+07105  evt_trone_500                8    1  |     
+0710e  evt_coffre_400               8    1  |     
+07117  evt_coffre_potion_100        8    1  |     
+07120  coffre_potion               25    1  |     
 0713a  potion_or_message_b         27    0  |     
-07156  coffre_fleche               35    0  |     4bbc fiche_heros_courant
-07179  coffre_desarme              14    0  |     4b91
-07187  cles_agrain                 57    0  |     3fe8 4b95 fiche_heros_courant
-071c0  evt_baguette                17    0  |     fiche_heros_courant
-071d1  evt_bouclier                32    0  |     4b99 fiche_heros_courant personnage_courant
-071f1  evt_coffre_piege             6    0  |     
-071f7  coffre_gargouille           19    0  |     
+07156  coffre_fleche               35    1  |     4bbc fiche_heros_courant
+07179  coffre_desarme              14    1  |     4b91
+07187  cles_agrain                 57    1  |     3fe8 4b95 fiche_heros_courant
+071c0  evt_baguette                17    1  |     fiche_heros_courant
+071d1  evt_bouclier                32    1  |     4b99 fiche_heros_courant personnage_courant
+071f1  evt_coffre_piege             6    1  |     
+071f7  coffre_gargouille           19    1  |     
 0720a  cherche_portes_pieges       61    1  |     case_coin_zone erreur_fichier fiche_heros_courant zone_heros
 07247  fouille_case               173    1  |     3fcb ligne_carte position_tuile_carte
 072f4  ouvre_porte_secrete         20    2  |     3fcb ligne_carte
 07310  menu_titre                 220    1  |     47f1 commande_type commandes commandes_joueurs pas_en_cours sans_sprites seg_annexe segment_source
 073ed  choix_quete                803    1  |     37f7 4669 4683 469d 46b7 choix_menu commande_type commandes_joueurs erreur_fichier fiche_heros_courant fichier_nom fichier_offset  "bordered.ega"
 07717  ecran_heros                367    1  |     37f1 colonne_carte commandes erreur_fichier heros_selectionne ligne_carte position_tuile_carte seg_annexe seg_shopsp segment_source
-07887  choisit_heros_1             14    0  |     commande_type commandes_joueurs heros_selectionne
-07895  choisit_heros_2             14    0  |     3196 commande_type heros_selectionne
-078a3  choisit_heros_3             14    0  |     3197 commande_type heros_selectionne
-078b1  choisit_heros_4             14    0  |     3198 commande_type heros_selectionne
-078bf  heros_en_jeu                14    0  |     heros_selectionne
-078cd  heros_renouvele             78    0  |     heros_selectionne
-0791b  heros_nomme                 57    0  |     heros_selectionne texte_transparent  "________________"
-07954  sauvegarde_menu            547    0  | 21h/3d 21h/3e 21h/3f    choix_menu erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille heros_selectionne mode_video position_tuile_carte seg_annexe  "quest.sav"
+07887  choisit_heros_1             14    1  |     commande_type commandes_joueurs heros_selectionne
+07895  choisit_heros_2             14    1  |     3196 commande_type heros_selectionne
+078a3  choisit_heros_3             14    1  |     3197 commande_type heros_selectionne
+078b1  choisit_heros_4             14    1  |     3198 commande_type heros_selectionne
+078bf  heros_en_jeu                14    1  |     heros_selectionne
+078cd  heros_renouvele             78    1  |     heros_selectionne
+0791b  heros_nomme                 57    1  |     heros_selectionne texte_transparent  "________________"
+07954  sauvegarde_menu            547    1  | 21h/3d 21h/3e 21h/3f    choix_menu erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille heros_selectionne mode_video position_tuile_carte seg_annexe  "quest.sav"
 07b7a  liste_emplacements         128    2  |     choix_menu heros_selectionne seg_annexe
 07bfa  dessine_cadre              396    1  |     colonne_carte erreur_fichier ligne_carte position_tuile_carte seg_annexe segment_source
 07d86  saisie_texte               456    1  |     47e7 47e9 ab64 ab68 ab79 choix_menu commandes mode_video zones_actives  "________________"
-07f4f  saisie_fin                  37    0  |     ab79 choix_menu  "________________"
+07f4f  saisie_fin                  37    1  |     ab79 choix_menu  "________________"
 07f74  attribue_sorts              93    1  |     44a2 44a3 46a2 46a3 46bc 46bd
 07fd1  choix_elements              89    1  |     3197 3198 44a2 44a3 ac13 ac15 choix_menu commande_type
 0802a  choisit_element             70    1  |     choix_menu
@@ -371,7 +371,7 @@
 08b7d  restaure_boite               8    2  |     ad2a ad2d
 08b85  restaure_lignes             16    2  |     ad28 seg_furn
 08b95  dessine_rouleau            127    2  |     ad24 ad36 saisie_chiffres_lus seg_odds segment_source
-08c20  inventaire_sorts          1923    1  |     42e9 ad44 ad45 ad68 ad6a commandes erreur_fichier fiche_heros_courant fichier_nom fichier_offset fichier_segment fichier_taille  "book.ega"
+08c20  inventaire_sorts          1923    2  |     42e9 ad44 ad45 ad68 ad6a commandes erreur_fichier fiche_heros_courant fichier_nom fichier_offset fichier_segment fichier_taille  "book.ega"
 093b1  choix_arme_mort            326    0  |     4289 428a choix_menu coin_zone etat_action fiche_heros_courant personnage_courant
 094f7  eau_benite_case             47    1  |     choix_menu
 09527  dessine_objets             175    1  |     erreur_fichier mode_inventaire seg_annexe seg_odds segment_source

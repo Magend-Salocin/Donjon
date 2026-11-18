@@ -3,8 +3,8 @@
 // elle rend l'IP suivante à la machine dès que l'exécution quitte la routine.
 /* eslint-disable */
 
-// 0x0000 sub_44b0
-function sub_0000_0000(m, ip) {
+// 0x0000 demarrage_intro : point d'entrée : réduit la mémoire (int 21h AH=4Ah), lit QUEST.CFG ; présent : « Press S to change config » (S l'efface) ; absent : questions (écran, son, commandes des 4 héros) ; mode vidéo, son, intro VGA ou EGA/Tandy ; première configuration : drapeaux et écriture de QUEST.CFG ; quitte (code 0)
+function demarrage_intro_0000(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -243,6 +243,7 @@ function sub_0000_0000(m, ip) {
       case 0x027f: m.t += 2; m.pas -= 2; m.ww(m.ds, 0x0, m.add16(m.rw(m.ds, 0x0), 0x2));  // add word ptr [0], 2
       case 0x0284: m.cx = (m.cx - 1) & 0xffff; if (m.cx !== 0) { ip = 0x023e; continue; }  // loop 0x23e
       case 0x0286: m.t += 1; m.pas -= 1; m.push(0x0289); ip = 0x0b0f; continue;  // call 0xb0f
+      // fin_intro
       case 0x0289: m.t += 5; m.pas -= 5; m.ww(m.ds, 0x1ba9, 0x2);  // mov word ptr [0x1ba9], 2
       case 0x028f: m.ww(m.ds, 0x1ba5, 0x1440);  // mov word ptr [0x1ba5], 0x1440
       case 0x0295: m.ax = ((0x0 + m.L) & 0xffff);  // mov ax, 0
@@ -251,6 +252,7 @@ function sub_0000_0000(m, ip) {
       case 0x029e: m.t += 2; m.pas -= 2; m.sub16(m.rw(m.ds, 0x1a8b), 0x2);  // cmp word ptr [0x1a8b], 2
       case 0x02a3: if (m.zf) { ip = 0x02a8; continue; }  // je 0x2a8
       case 0x02a5: m.t += 1; m.pas -= 1; ip = 0x03c6; continue;  // jmp 0x3c6
+      // ecran_drapeaux
       case 0x02a8: m.t += 4; m.pas -= 4; m.ax = m.rw(m.ds, 0x1440);  // mov ax, word ptr [0x1440]
       case 0x02ab: m.ww(m.ds, 0x10a2, m.ax);  // mov word ptr [0x10a2], ax
       case 0x02ae: m.sub16(m.ax, 0x8);  // cmp ax, 8
@@ -351,6 +353,7 @@ function sub_0000_0000(m, ip) {
       case 0x03bd: m.ww(m.ds, 0x1ba3, m.ax);  // mov word ptr [0x1ba3], ax
       case 0x03c0: m.push(0x03c3); ip = 0x2db0; continue;  // call 0x2db0
       case 0x03c3: m.t += 1; m.pas -= 1; m.push(0x03c6); ip = 0x2b01; continue;  // call 0x2b01
+      // quitte_intro
       case 0x03c6: m.t += 1; m.pas -= 1; m.push(0x03c9); ip = 0x2b01; continue;  // call 0x2b01
       case 0x03c9: m.t += 1; m.pas -= 1; m.push(0x03cc); ip = 0x3b7a; continue;  // call 0x3b7a
       case 0x03cc: m.t += 3; m.pas -= 3; m.xor8(0, 0); m.ax = (m.ax & 0xff) | (0 << 8);  // xor ah, ah
@@ -358,6 +361,7 @@ function sub_0000_0000(m, ip) {
       case 0x03d0: if (!m.interruption(0x10)) { m.pas = 0; ip = 0x03d0; continue; }  // int 0x10
       case 0x03d2: m.t += 2; m.pas -= 2; m.ax = 0x4c00;  // mov ax, 0x4c00
       case 0x03d5: if (!m.interruption(0x21)) { m.pas = 0; ip = 0x03d5; continue; }  // int 0x21
+      // intro_ega
       case 0x03d7: m.t += 2; m.pas -= 2; m.wb(m.ds, 0x19f2, 0x7);  // mov byte ptr [0x19f2], 7
       case 0x03dc: m.push(0x03df); ip = 0x054c; continue;  // call 0x54c
       case 0x03df: m.t += 5; m.pas -= 5; m.ww(m.ds, 0x1ba9, 0xdb);  // mov word ptr [0x1ba9], 0xdb
@@ -408,8 +412,8 @@ function sub_0000_0000(m, ip) {
   }
 }
 
-// 0x0462 sub_4912
-function sub_0462_0462(m, ip) {
+// 0x0462 ecran_texte_ega : EGA/Tandy : fond BORDERED (Tandy : rempli de CCh), écusson SHOPMP si BP = texte_copyright, texte BP, copie à l'écran, palette, attend Espace ou Échap (AL = 1 si Échap)
+function ecran_texte_ega_0462(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -468,8 +472,8 @@ function sub_0462_0462(m, ip) {
   }
 }
 
-// 0x04d0 sub_4980
-function sub_04d0_04d0(m, ip) {
+// 0x04d0 copie_ecran_ega : tampon 0A86:0 vers l'écran : EGA, 4 plans de 40 × 200 octets (port 3C4h) ; Tandy, 32 Ko vers B800h
+function copie_ecran_ega_04d0(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -528,8 +532,8 @@ function sub_04d0_04d0(m, ip) {
   }
 }
 
-// 0x0532 sub_49e2
-function sub_0532_0532(m, ip) {
+// 0x0532 palette_ega : registres de palette (int 10h AX=1002h) : DS:105E en EGA, DS:106F en Tandy
+function palette_ega_0532(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -549,8 +553,8 @@ function sub_0532_0532(m, ip) {
   }
 }
 
-// 0x054c sub_49fc
-function sub_054c_054c(m, ip) {
+// 0x054c palette_ega_noire : registres de palette à zéro (DS:0C5E) : écran noir avant de dessiner
+function palette_ega_noire_054c(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -567,8 +571,8 @@ function sub_054c_054c(m, ip) {
   }
 }
 
-// 0x055c sub_4a0c
-function sub_055c_055c(m, ip) {
+// 0x055c anime_scene : saut vers l'animation de la scène BX (0 à 10, pas 2), table CS:071E (image 0x4BCE)
+function anime_scene_055c(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -578,8 +582,8 @@ function sub_055c_055c(m, ip) {
   }
 }
 
-// 0x0561 sub_4a11
-function sub_0561_0561(m, ip) {
+// 0x0561 scene_flamme : scène 1 (HERO1) : 4 images 16 × 16, flamme en (260, 104), 24 images toutes les 6 trames
+function scene_flamme_0561(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -609,8 +613,8 @@ function sub_0561_0561(m, ip) {
   }
 }
 
-// 0x059d sub_4a4d
-function sub_059d_059d(m, ip) {
+// 0x059d scene_feu : scène 2 (HERO2) : 3 images 32 × 64, feu en (134, 88), 10 tours de 3 images (2 trames)
+function scene_feu_059d(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -631,8 +635,8 @@ function sub_059d_059d(m, ip) {
   }
 }
 
-// 0x05ba sub_4a6a
-function sub_05ba_05ba(m, ip) {
+// 0x05ba scene_visage : scène 3 (HERO4) : 4 images 64 × 64, attend 60 trames, visage qui parle en (128, 32) (4 trames par image), puis 240 trames
+function scene_visage_05ba(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -657,8 +661,8 @@ function sub_05ba_05ba(m, ip) {
   }
 }
 
-// 0x05e2 sub_4a92
-function sub_05e2_05e2(m, ip) {
+// 0x05e2 scene_table : scène 4 (HERO6) : 16 images 16 × 16, 30 images (12 trames) de 4 sprites : deux cycles de 5 (DS:128E), deux de 3 (DS:1290)
+function scene_table_05e2(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -717,8 +721,8 @@ function sub_05e2_05e2(m, ip) {
   }
 }
 
-// 0x0669 sub_4b19
-function sub_0669_0669(m, ip) {
+// 0x0669 scene_deux_sprites : scène 5 (HERO3) : 12 images 16 × 16, 30 images (8 trames) de 2 sprites : cycles de 5 et de 7
+function scene_deux_sprites_0669(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -765,8 +769,8 @@ function sub_0669_0669(m, ip) {
   }
 }
 
-// 0x06d0 sub_4b80
-function sub_06d0_06d0(m, ip) {
+// 0x06d0 scene_finale : scène 6 (HERO7) : 8 images 16 × 16, attend 60 trames, 10 images en (65, 120) qui finissent en boucle sur 6-7, attend 60 trames
+function scene_finale_06d0(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -804,8 +808,8 @@ function sub_06d0_06d0(m, ip) {
   }
 }
 
-// 0x072a sub_4bda
-function sub_072a_072a(m, ip) {
+// 0x072a attend_trames : attend DX retours de trame (attend_trame)
+function attend_trames_072a(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -818,8 +822,8 @@ function sub_072a_072a(m, ip) {
   }
 }
 
-// 0x0731 sub_4be1
-function sub_0731_0731(m, ip) {
+// 0x0731 restaure_fond : redécompresse l'écran de la scène (segment 1A26) dans le tampon 0A86:0
+function restaure_fond_0731(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -839,8 +843,8 @@ function sub_0731_0731(m, ip) {
   }
 }
 
-// 0x074d sub_4bfd
-function sub_074d_074d(m, ip) {
+// 0x074d tampon_vers_ecran : copie le tampon 0A86:0 (64 000 octets) en A000:0
+function tampon_vers_ecran_074d(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -864,8 +868,8 @@ function sub_074d_074d(m, ip) {
   }
 }
 
-// 0x076f sub_4c1f
-function sub_076f_076f(m, ip) {
+// 0x076f sprite_16 : dessine dans le tampon une image 16 × 16 du segment 2A23 (SI = n° × 256) en DI ; couleur 0 transparente
+function sprite_16_076f(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -896,8 +900,8 @@ function sub_076f_076f(m, ip) {
   }
 }
 
-// 0x07a6 sub_4c56
-function sub_07a6_07a6(m, ip) {
+// 0x07a6 anime_32x64 : CX images 32 × 64 en DI : fond restauré, DX trames, image, copie à l'écran (scène 2)
+function anime_32x64_07a6(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -965,8 +969,8 @@ function sub_07a6_07a6(m, ip) {
   }
 }
 
-// 0x0823 sub_4cd3
-function sub_0823_0823(m, ip) {
+// 0x0823 anime_64x64 : même chose en 64 × 64 (scène 3)
+function anime_64x64_0823(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1034,8 +1038,8 @@ function sub_0823_0823(m, ip) {
   }
 }
 
-// 0x08a0 sub_4d50
-function sub_08a0_08a0(m, ip) {
+// 0x08a0 convertit_16 : CX images 16 × 16 de ANIMS (segment 2523, SI) : 5 plans de bits -> un octet par pixel en 2A23:DI
+function convertit_16_08a0(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1074,8 +1078,8 @@ function sub_08a0_08a0(m, ip) {
   }
 }
 
-// 0x08e3 sub_4d93
-function sub_08e3_08e3(m, ip) {
+// 0x08e3 convertit_32x64 : même conversion, images 32 × 64 (plans de 100h octets)
+function convertit_32x64_08e3(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1115,8 +1119,8 @@ function sub_08e3_08e3(m, ip) {
   }
 }
 
-// 0x092c sub_4ddc
-function sub_092c_092c(m, ip) {
+// 0x092c convertit_64x64 : même conversion, images 64 × 64 (plans de 200h octets)
+function convertit_64x64_092c(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1156,8 +1160,8 @@ function sub_092c_092c(m, ip) {
   }
 }
 
-// 0x0975 sub_4e25
-function sub_0975_0975(m, ip) {
+// 0x0975 mode_video_intro : mode vidéo selon mode_video (table DS:1284) : 8 -> 13h, 6 -> 0Dh, 4 -> 09h (Tandy)
+function mode_video_intro_0975(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1181,8 +1185,8 @@ function sub_0975_0975(m, ip) {
   }
 }
 
-// 0x0993 sub_4e43
-function sub_0993_0993(m, ip) {
+// 0x0993 palette_vga : attend un retour de trame, puis 32 couleurs (DAC 0 à 31, ports 3C8h/3C9h) depuis DS:DX
+function palette_vga_0993(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1206,8 +1210,8 @@ function sub_0993_0993(m, ip) {
   }
 }
 
-// 0x09ab sub_4e5b
-function sub_09ab_09ab(m, ip) {
+// 0x09ab ecran_texte_vga : fondu au noir, TEXT1.VGA, texte BP, fondu d'entrée (palette DS:0D86), attend Espace ou Échap (AL = 1 si Échap)
+function ecran_texte_vga_09ab(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1266,8 +1270,8 @@ function sub_09ab_09ab(m, ip) {
   }
 }
 
-// 0x0a1d sub_4ecd
-function sub_0a1d_0a1d(m, ip) {
+// 0x0a1d affiche_ecran_vga : fondu au noir, décompresse l'écran chargé (1A26 -> 0A86), le copie en A000, fondu d'entrée vers la palette DI
+function affiche_ecran_vga_0a1d(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1315,8 +1319,8 @@ function sub_0a1d_0a1d(m, ip) {
   }
 }
 
-// 0x0a6b sub_4f1b
-function sub_0a6b_0a6b(m, ip) {
+// 0x0a6b attend_espace_echap : regarde la touche en attente (int 16h AH=1, sans la retirer), puis attend Espace (AL = 0) ou Échap (AL = 1)
+function attend_espace_echap_0a6b(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1337,8 +1341,8 @@ function sub_0a6b_0a6b(m, ip) {
   }
 }
 
-// 0x0a83 sub_4f33
-function sub_0a83_0a83(m, ip) {
+// 0x0a83 pas_du_fondu : pas du fondu depuis la palette DI (32 × 3 octets) : valeur × 2, en 8.8, dans pas_fondu
+function pas_du_fondu_0a83(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1383,8 +1387,8 @@ function sub_0a83_0a83(m, ip) {
   }
 }
 
-// 0x0ad2 sub_4f82
-function sub_0ad2_0ad2(m, ip) {
+// 0x0ad2 fondu_entree : palette à zéro, puis 128 étapes : ajoute les pas, envoie la palette (une trame par étape)
+function fondu_entree_0ad2(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1419,8 +1423,8 @@ function sub_0ad2_0ad2(m, ip) {
   }
 }
 
-// 0x0b0f sub_4fbf
-function sub_0b0f_0b0f(m, ip) {
+// 0x0b0f fondu_noir : 128 étapes : retire les pas de la palette en cours (les pas de l'écran précédent)
+function fondu_noir_0b0f(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -1449,8 +1453,8 @@ function sub_0b0f_0b0f(m, ip) {
   }
 }
 
-// 0x0b3d sub_4fed
-function sub_0b3d_0b3d(m, ip) {
+// 0x0b3d affiche_tandy : mode 4 seulement (écran des drapeaux) : tampon 0A86 (rangée de 160 octets = 4 plans de 40) -> 4 bits par pixel en B800h, 4 banques de 2000h ; boucle déroulée, compteur de rangées en CS:23EF (image 0x689F)
+function affiche_tandy_0b3d(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -4443,8 +4447,83 @@ function sub_0b3d_0b3d(m, ip) {
   }
 }
 
-// 0x258c sub_6a3c
-function sub_258c_258c(m, ip) {
+// 0x2506 lit_configuration : non appelée : copie de lit_configuration de QUEST (DS:192F « quest.cfg », « Configuration file missing », souris, « No mouse installed », etalonne_joystick)
+function lit_configuration_2506(m, ip) {
+  for (;;) {
+    if (m.pas <= 0) return ip;
+    switch (ip) {
+      case 0x2506: m.t += 1; m.pas -= 1; m.push(0x2509); ip = 0x39cc; continue;  // call 0x39cc
+      case 0x2509: m.t += 5; m.pas -= 5; m.ww(m.ds, 0x1ba9, 0x192f);  // mov word ptr [0x1ba9], 0x192f
+      case 0x250f: m.ww(m.ds, 0x1ba5, 0x1440);  // mov word ptr [0x1ba5], 0x1440
+      case 0x2515: m.ax = ((0x0 + m.L) & 0xffff);  // mov ax, 0
+      case 0x2518: m.ww(m.ds, 0x1ba3, m.ax);  // mov word ptr [0x1ba3], ax
+      case 0x251b: m.push(0x251e); ip = 0x2d91; continue;  // call 0x2d91
+      case 0x251e: m.t += 2; m.pas -= 2; m.sub16(m.rw(m.ds, 0x1a8b), 0x2);  // cmp word ptr [0x1a8b], 2
+      case 0x2523: if (m.zf) { ip = 0x2528; continue; }  // je 0x2528
+      case 0x2525: m.t += 1; m.pas -= 1; ip = 0x253a; continue;  // jmp 0x253a
+      case 0x2528: m.t += 3; m.pas -= 3; m.xor8(0, 0); m.ax = (m.ax & 0xff) | (0 << 8);  // xor ah, ah
+      case 0x252a: m.ax = (m.ax & 0xff00) | 0x3;  // mov al, 3
+      case 0x252c: if (!m.interruption(0x10)) { m.pas = 0; ip = 0x252c; continue; }  // int 0x10
+      case 0x252e: m.t += 3; m.pas -= 3; m.dx = 0x1961;  // mov dx, 0x1961
+      case 0x2531: m.ax = (m.ax & 0xff) | (0x9 << 8);  // mov ah, 9
+      case 0x2533: if (!m.interruption(0x21)) { m.pas = 0; ip = 0x2533; continue; }  // int 0x21
+      case 0x2535: m.t += 1; m.pas -= 1; m.push(0x2538); ip = 0x2b01; continue;  // call 0x2b01
+      case 0x2538: m.t += 2; m.pas -= 2; m.cf = 1;  // stc
+      case 0x2539: ip = m.pop(); continue;  // ret
+      case 0x253a: m.t += 2; m.pas -= 2; m.ax = 0x3533;  // mov ax, 0x3533
+      case 0x253d: if (!m.interruption(0x21)) { m.pas = 0; ip = 0x253d; continue; }  // int 0x21
+      case 0x253f: m.t += 4; m.pas -= 4; m.ax = m.es;  // mov ax, es
+      case 0x2541: m.ax = m.or16(m.ax, m.bx);  // or ax, bx
+      case 0x2543: m.ww(m.ds, 0x14b3, m.ax);  // mov word ptr [0x14b3], ax
+      case 0x2546: if (m.zf) { ip = 0x2551; continue; }  // je 0x2551
+      case 0x2548: m.t += 2; m.pas -= 2; m.xor16(0, 0); m.ax = 0;  // xor ax, ax
+      case 0x254a: if (!m.interruption(0x33)) { m.pas = 0; ip = 0x254a; continue; }  // int 0x33
+      case 0x254c: m.t += 2; m.pas -= 2; m.ax = m.or16(m.ax, m.ax);  // or ax, ax
+      case 0x254e: m.ww(m.ds, 0x14b3, m.ax);  // mov word ptr [0x14b3], ax
+      case 0x2551: m.t += 2; m.pas -= 2; m.cx = 0x4;  // mov cx, 4
+      case 0x2554: m.bx = 0x1445;  // mov bx, 0x1445
+      case 0x2557: m.t += 2; m.pas -= 2; m.sub8(m.rb(m.ds, m.bx), 0x0);  // cmp byte ptr [bx], 0
+      case 0x255a: if (!m.zf) { ip = 0x2563; continue; }  // jne 0x2563
+      case 0x255c: m.t += 2; m.pas -= 2; m.sub16(m.rw(m.ds, 0x14b3), 0x0);  // cmp word ptr [0x14b3], 0
+      case 0x2561: if (m.zf) { ip = 0x2576; continue; }  // je 0x2576
+      case 0x2563: m.t += 2; m.pas -= 2; m.bx = m.inc16(m.bx);  // inc bx
+      case 0x2564: m.cx = (m.cx - 1) & 0xffff; if (m.cx !== 0) { ip = 0x2557; continue; }  // loop 0x2557
+      case 0x2566: m.t += 2; m.pas -= 2; m.cx = 0x4;  // mov cx, 4
+      case 0x2569: m.bx = 0x1445;  // mov bx, 0x1445
+      case 0x256c: m.t += 2; m.pas -= 2; m.sub8(m.rb(m.ds, m.bx), 0x2);  // cmp byte ptr [bx], 2
+      case 0x256f: if (m.zf) { ip = 0x257f; continue; }  // je 0x257f
+      case 0x2571: m.t += 2; m.pas -= 2; m.bx = m.inc16(m.bx);  // inc bx
+      case 0x2572: m.cx = (m.cx - 1) & 0xffff; if (m.cx !== 0) { ip = 0x256c; continue; }  // loop 0x256c
+      case 0x2574: m.t += 2; m.pas -= 2; m.cf = 0;  // clc
+      case 0x2575: ip = m.pop(); continue;  // ret
+      case 0x2576: m.t += 3; m.pas -= 3; m.dx = 0x19a1;  // mov dx, 0x19a1
+      case 0x2579: m.ax = (m.ax & 0xff) | (0x9 << 8);  // mov ah, 9
+      case 0x257b: if (!m.interruption(0x21)) { m.pas = 0; ip = 0x257b; continue; }  // int 0x21
+      case 0x257d: m.t += 1; m.pas -= 1; ip = 0x2535; continue;  // jmp 0x2535
+      case 0x257f: m.t += 1; m.pas -= 1; m.push(0x2582); ip = 0x3aca; continue;  // call 0x3aca
+      case 0x2582: m.t += 2; m.pas -= 2; m.cf = 0;  // clc
+      case 0x2583: ip = m.pop(); continue;  // ret
+      default: return ip;
+    }
+  }
+}
+
+// 0x2584 ligne_ecran : non appelée : BX += AX × 320, copie de ligne_ecran de QUEST
+function ligne_ecran_2584(m, ip) {
+  for (;;) {
+    if (m.pas <= 0) return ip;
+    switch (ip) {
+      case 0x2584: m.t += 4; m.pas -= 4; m.dx = 0x140;  // mov dx, 0x140
+      case 0x2587: m.mul16(m.dx);  // mul dx
+      case 0x2589: m.bx = m.add16(m.bx, m.ax);  // add bx, ax
+      case 0x258b: ip = m.pop(); continue;  // ret
+      default: return ip;
+    }
+  }
+}
+
+// 0x258c affiche_chaine : chaîne DS:BP terminée par 0, chaque caractère passé à affiche_caractere
+function affiche_chaine_258c(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -4460,8 +4539,8 @@ function sub_258c_258c(m, ip) {
   }
 }
 
-// 0x259b sub_6a4b
-function sub_259b_259b(m, ip) {
+// 0x259b affiche_caractere : caractère AL en police 8 × 8 (DS:13B5) à colonne_texte, ligne_texte ; une routine par mode (table DS:19DC) ; codes 1 = segment (mot suivant), 10h = couleurs (encre, fond), 11h = position (ligne, colonne), 12h = position (colonne, ligne + 4)
+function affiche_caractere_259b(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -4474,6 +4553,7 @@ function sub_259b_259b(m, ip) {
       case 0x25ac: m.ww(m.ds, 0x19f8, m.ax);  // mov word ptr [0x19f8], ax
       case 0x25af: m.bp = m.add16(m.bp, 0x2);  // add bp, 2
       case 0x25b2: ip = m.pop(); continue;  // ret
+      // caractere_tandy
       case 0x25b3: m.t += 2; m.pas -= 2; m.sub8((m.ax & 0xff), 0x10);  // cmp al, 0x10
       case 0x25b5: if (!m.zf) { ip = 0x25ba; continue; }  // jne 0x25ba
       case 0x25b7: m.t += 1; m.pas -= 1; ip = 0x26d8; continue;  // jmp 0x26d8
@@ -4604,6 +4684,7 @@ function sub_259b_259b(m, ip) {
       case 0x26e9: m.wb(m.ds, 0x19f3, (m.ax & 0xff));  // mov byte ptr [0x19f3], al
       case 0x26ec: m.bp = m.add16(m.bp, 0x2);  // add bp, 2
       case 0x26ef: ip = m.pop(); continue;  // ret
+      // caractere_ega
       case 0x26f0: m.t += 2; m.pas -= 2; m.sub8((m.ax & 0xff), 0x10);  // cmp al, 0x10
       case 0x26f2: if (!m.zf) { ip = 0x26f7; continue; }  // jne 0x26f7
       case 0x26f4: m.t += 1; m.pas -= 1; ip = 0x28ba; continue;  // jmp 0x28ba
@@ -4799,6 +4880,7 @@ function sub_259b_259b(m, ip) {
       case 0x28c5: m.wb(m.ds, 0x19f3, (m.ax & 0xff));  // mov byte ptr [0x19f3], al
       case 0x28c8: m.bp = m.add16(m.bp, 0x2);  // add bp, 2
       case 0x28cb: ip = m.pop(); continue;  // ret
+      // caractere_vga
       case 0x28cc: m.t += 2; m.pas -= 2; m.sub8((m.ax & 0xff), 0x10);  // cmp al, 0x10
       case 0x28ce: if (!m.zf) { ip = 0x28d3; continue; }  // jne 0x28d3
       case 0x28d0: m.t += 1; m.pas -= 1; ip = 0x299c; continue;  // jmp 0x299c
@@ -4904,8 +4986,8 @@ function sub_259b_259b(m, ip) {
   }
 }
 
-// 0x29ae sub_6e5e
-function sub_29ae_29ae(m, ip) {
+// 0x29ae mode_tandy : non appelée : mode_video = 4, int 10h mode 8 ; copie de mode_tandy de QUEST
+function mode_tandy_29ae(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -4919,8 +5001,8 @@ function sub_29ae_29ae(m, ip) {
   }
 }
 
-// 0x29bb sub_6e6b
-function sub_29bb_29bb(m, ip) {
+// 0x29bb pause_courte : boucle de 1000 nop, registres conservés
+function pause_courte_29bb(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -4953,8 +5035,8 @@ function sub_29bb_29bb(m, ip) {
   }
 }
 
-// 0x29d6 sub_6e86
-function sub_29d6_29d6(m, ip) {
+// 0x29d6 pause_longue : non appelée : même boucle sur 65 535 tours
+function pause_longue_29d6(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -4975,8 +5057,8 @@ function sub_29d6_29d6(m, ip) {
   }
 }
 
-// 0x29e5 sub_6e95
-function sub_29e5_29e5(m, ip) {
+// 0x29e5 attend_touche : attend une touche enfoncée (touche_enfoncee), puis son relâchement ; AH = code de la touche, AL = ASCII
+function attend_touche_29e5(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -4992,8 +5074,8 @@ function sub_29e5_29e5(m, ip) {
   }
 }
 
-// 0x29f2 sub_6ea2
-function sub_29f2_29f2(m, ip) {
+// 0x29f2 touche_enfoncee : première touche à 1 dans etat_touches (128) ; AH = code, AL = ASCII (ascii_touches) ; AX = 0 si aucune
+function touche_enfoncee_29f2(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5025,8 +5107,8 @@ function sub_29f2_29f2(m, ip) {
   }
 }
 
-// 0x2a1b sub_6ecb
-function sub_2a1b_2a1b(m, ip) {
+// 0x2a1b attend_relachement : boucle tant qu'une touche est enfoncée
+function attend_relachement_2a1b(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5039,8 +5121,8 @@ function sub_2a1b_2a1b(m, ip) {
   }
 }
 
-// 0x2a23 sub_6ed3
-function sub_2a23_2a23(m, ip) {
+// 0x2a23 hasard : non appelée : générateur de QUEST (registre à décalage DS:1B9F), nombre de 1 à BL dans AL
+function hasard_2a23(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5067,8 +5149,8 @@ function sub_2a23_2a23(m, ip) {
   }
 }
 
-// 0x2a50 sub_6f00
-function sub_2a50_2a50(m, ip) {
+// 0x2a50 efface_ecran : non appelée : texte en (0, 0), puis efface l'écran selon le mode (table DS:19E6) ; les branches Tandy (A000h rempli de mode_video) et EGA (200 mots) semblent fausses, sans effet puisque mortes
+function efface_ecran_2a50(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5119,8 +5201,8 @@ function sub_2a50_2a50(m, ip) {
   }
 }
 
-// 0x2ab0 sub_6f60
-function sub_2ab0_2ab0(m, ip) {
+// 0x2ab0 attend_retour_trame : attend le retour de trame (port 3DAh, bit 3) ; la suite (6F6D-6F79, attente de sa fin) n'est pas atteinte
+function attend_retour_trame_2ab0(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5138,8 +5220,8 @@ function sub_2ab0_2ab0(m, ip) {
   }
 }
 
-// 0x2aca sub_6f7a
-function sub_2aca_2aca(m, ip) {
+// 0x2aca installe_clavier : si int 9 n'est pas déjà détourné (DS:1C3D ≠ 2B19h) : garde l'ancien en ancien_int9, installe clavier_interruption (CS:2B19), remet etat_touches à 0
+function installe_clavier_2aca(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5175,8 +5257,8 @@ function sub_2aca_2aca(m, ip) {
   }
 }
 
-// 0x2b01 sub_6fb1
-function sub_2b01_2b01(m, ip) {
+// 0x2b01 restaure_clavier : remet l'ancien int 9 s'il a été gardé
+function restaure_clavier_2b01(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5197,7 +5279,7 @@ function sub_2b01_2b01(m, ip) {
   }
 }
 
-// 0x2b19 clavier_interruption : int 9 installé par sub_6f7a (CS:2B19) : lit le port 60h, met à 1 ou 0 l'octet de la touche dans DS:1BB4 (64 touches)
+// 0x2b19 clavier_interruption : int 9 : lit le port 60h, met à 1 ou 0 l'octet de la touche dans etat_touches (128 touches)
 function clavier_interruption_2b19(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
@@ -5253,8 +5335,8 @@ function clavier_interruption_2b19(m, ip) {
   }
 }
 
-// 0x2b62 sub_7012
-function sub_2b62_2b62(m, ip) {
+// 0x2b62 lit_commandes : 6 touches de touches_commandes -> bits de commandes (Entrée 20h, Espace 10h, P 8, O 4, A 2, Q 1) ; Échap + Ctrl -> 40h ; puis lit_joystick, curseur_clavier, lit_souris ; x borné à 12Fh ; son_musique
+function lit_commandes_2b62(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5290,8 +5372,8 @@ function sub_2b62_2b62(m, ip) {
   }
 }
 
-// 0x2bb9 sub_7069
-function sub_2bb9_2bb9(m, ip) {
+// 0x2bb9 lit_joystick : si commande_type = 2 : joystick_position comparé au centre (DS:14AD, DS:14AF) à 16 près ; joystick B si masque_joystick ≠ 3 ; boutons -> 10h et 20h
+function lit_joystick_2bb9(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5344,8 +5426,8 @@ function sub_2bb9_2bb9(m, ip) {
   }
 }
 
-// 0x2c45 sub_70f5
-function sub_2c45_2c45(m, ip) {
+// 0x2c45 curseur_clavier : déplace le curseur de 4 pixels selon les bits de direction (x 4 à 13Bh, y 4 à C2h)
+function curseur_clavier_2c45(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5377,8 +5459,8 @@ function sub_2c45_2c45(m, ip) {
   }
 }
 
-// 0x2c96 sub_7146
-function sub_2c96_2c96(m, ip) {
+// 0x2c96 lit_souris : si commande_type = 0 : int 33h AX=3 ; boutons -> 10h et 20h, directions selon l'écart avec le curseur, puis curseur = souris (x / 2)
+function lit_souris_2c96(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5414,8 +5496,8 @@ function sub_2c96_2c96(m, ip) {
   }
 }
 
-// 0x2ced sub_719d
-function sub_2ced_2ced(m, ip) {
+// 0x2ced souris_position : non appelée : int 33h AX=4 (place le curseur de la souris), si commande_type = 0
+function souris_position_2ced(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5432,8 +5514,8 @@ function sub_2ced_2ced(m, ip) {
   }
 }
 
-// 0x2cff sub_71af
-function sub_2cff_2cff(m, ip) {
+// 0x2cff attend_commande : non appelée : attend que commandes soit non nul
+function attend_commande_2cff(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5446,8 +5528,8 @@ function sub_2cff_2cff(m, ip) {
   }
 }
 
-// 0x2d0a sub_71ba
-function sub_2d0a_2d0a(m, ip) {
+// 0x2d0a attend_relache : attend que commandes revienne à 0
+function attend_relache_2d0a(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5455,6 +5537,7 @@ function sub_2d0a_2d0a(m, ip) {
       case 0x2d0d: m.t += 2; m.pas -= 2; m.sub8(m.rb(m.ds, 0x1c34), 0x0);  // cmp byte ptr [0x1c34], 0
       case 0x2d12: if (!m.zf) { ip = 0x2d0a; continue; }  // jne 0x2d0a
       case 0x2d14: m.t += 1; m.pas -= 1; ip = m.pop(); continue;  // ret
+      // attend_bouton_droit
       case 0x2d15: m.t += 14; m.pas -= 14; m.push(m.drapeaux());  // pushf
       case 0x2d16: m.push(m.ax);  // push ax
       case 0x2d17: m.push(m.bx);  // push bx
@@ -5489,8 +5572,8 @@ function sub_2d0a_2d0a(m, ip) {
   }
 }
 
-// 0x2d3e sub_71ee
-function sub_2d3e_2d3e(m, ip) {
+// 0x2d3e attend_clic : non appelée : attend le bit 10h de commandes, registres conservés
+function attend_clic_2d3e(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5527,8 +5610,8 @@ function sub_2d3e_2d3e(m, ip) {
   }
 }
 
-// 0x2d64 sub_7214
-function sub_2d64_2d64(m, ip) {
+// 0x2d64 attend_relache_boutons : non appelée : attend que les bits 10h et 20h de commandes soient à 0
+function attend_relache_boutons_2d64(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5567,8 +5650,8 @@ function sub_2d64_2d64(m, ip) {
   }
 }
 
-// 0x2d91 sub_7241
-function sub_2d91_2d91(m, ip) {
+// 0x2d91 charge_fichier : retire le clavier, ouvre (mode erreur_fichier = 0), lit FFFFh octets au plus vers fichier_segment:fichier_offset, taille dans fichier_taille, ferme, remet le clavier
+function charge_fichier_2d91(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5586,8 +5669,8 @@ function sub_2d91_2d91(m, ip) {
   }
 }
 
-// 0x2db0 sub_7260
-function sub_2db0_2db0(m, ip) {
+// 0x2db0 sauve_fichier : retire le clavier, crée, écrit fichier_taille octets, ferme, remet le clavier
+function sauve_fichier_2db0(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5603,8 +5686,8 @@ function sub_2db0_2db0(m, ip) {
   }
 }
 
-// 0x2dc6 sub_7276
-function sub_2dc6_2dc6(m, ip) {
+// 0x2dc6 fichier_cree : int 21h AH=3Ch
+function fichier_cree_2dc6(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5621,8 +5704,8 @@ function sub_2dc6_2dc6(m, ip) {
   }
 }
 
-// 0x2dd8 sub_7288
-function sub_2dd8_2dd8(m, ip) {
+// 0x2dd8 fichier_ouvre : int 21h AH=3Dh, mode AL = erreur_fichier ; erreur dans erreur_fichier
+function fichier_ouvre_2dd8(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5641,8 +5724,8 @@ function sub_2dd8_2dd8(m, ip) {
   }
 }
 
-// 0x2df2 sub_72a2
-function sub_2df2_2df2(m, ip) {
+// 0x2df2 fichier_ecrit : int 21h AH=40h
+function fichier_ecrit_2df2(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5662,8 +5745,8 @@ function sub_2df2_2df2(m, ip) {
   }
 }
 
-// 0x2e0c sub_72bc
-function sub_2e0c_2e0c(m, ip) {
+// 0x2e0c fichier_lit : int 21h AH=3Fh
+function fichier_lit_2e0c(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5683,8 +5766,8 @@ function sub_2e0c_2e0c(m, ip) {
   }
 }
 
-// 0x2e24 sub_72d4
-function sub_2e24_2e24(m, ip) {
+// 0x2e24 fichier_ferme : int 21h AH=3Eh
+function fichier_ferme_2e24(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5698,8 +5781,8 @@ function sub_2e24_2e24(m, ip) {
   }
 }
 
-// 0x2e2f sub_72df
-function sub_2e2f_2e2f(m, ip) {
+// 0x2e2f saisie_ligne : DI tampon (rempli d'espaces), CX longueur max ; caractères 20h à 7Ah (chiffres seuls si saisie_chiffres = 1), retour arrière, Entrée termine ; écho par affiche_caractere
+function saisie_ligne_2e2f(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5758,8 +5841,8 @@ function sub_2e2f_2e2f(m, ip) {
   }
 }
 
-// 0x2eb5 sub_7365
-function sub_2eb5_2eb5(m, ip) {
+// 0x2eb5 saisie_nombre : non appelée : 1 ou 2 chiffres dans DS:1A95, recommence si vide ; valeur dans AX
+function saisie_nombre_2eb5(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5787,8 +5870,8 @@ function sub_2eb5_2eb5(m, ip) {
   }
 }
 
-// 0x2ee9 sub_7399
-function sub_2ee9_2ee9(m, ip) {
+// 0x2ee9 adresse_ega : DI = y × 320 + x -> adresse_tampon = y × 160 + x / 8, decalage_pixel = x & 7
+function adresse_ega_2ee9(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5835,8 +5918,8 @@ function sub_2ee9_2ee9(m, ip) {
   }
 }
 
-// 0x2f24 sub_73d4
-function sub_2f24_2f24(m, ip) {
+// 0x2f24 adresse_tandy : DI = y × 320 + x -> adresse_tampon = lignes_tandy[y] + x / 2, decalage_pixel = x impair
+function adresse_tandy_2f24(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -5879,8 +5962,8 @@ function sub_2f24_2f24(m, ip) {
   }
 }
 
-// 0x2f60 sub_7410
-function sub_2f60_2f60(m, ip) {
+// 0x2f60 affiche_sprite : image transparente (couleur 0) : SI source dans segment_source, BP largeur, CX hauteur, DI = y × 320 + x ; table saut_affiche_sprite ; compteurs en CS:2500-2504 (image 0x69B0)
+function affiche_sprite_2f60(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -6549,8 +6632,8 @@ function sub_2f60_2f60(m, ip) {
   }
 }
 
-// 0x34e5 sub_7995
-function sub_34e5_34e5(m, ip) {
+// 0x34e5 copie_image : non appelée : même chose, opaque ; table saut_copie_image
+function copie_image_34e5(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -6926,8 +7009,8 @@ function sub_34e5_34e5(m, ip) {
   }
 }
 
-// 0x3814 sub_7cc4
-function sub_3814_3814(m, ip) {
+// 0x3814 efface_rectangle : non appelée : SI -> position (2 octets), hauteur, largeur, couleur ; remplit d'espaces (chaîne DS:1A33)
+function efface_rectangle_3814(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7015,8 +7098,8 @@ function sub_3814_3814(m, ip) {
   }
 }
 
-// 0x38a7 sub_7d57
-function sub_38a7_38a7(m, ip) {
+// 0x38a7 longueur_texte : non appelée : SI = position du 0 final du texte BP ; identique à QUEST 0x449A
+function longueur_texte_38a7(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7031,8 +7114,8 @@ function sub_38a7_38a7(m, ip) {
   }
 }
 
-// 0x38b4 sub_7d64
-function sub_38b4_38b4(m, ip) {
+// 0x38b4 affiche_registres_attend : non appelée : affiche_registres, puis attend_bouton_droit
+function affiche_registres_attend_38b4(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7043,8 +7126,8 @@ function sub_38b4_38b4(m, ip) {
   }
 }
 
-// 0x38ba sub_7d6a
-function sub_38ba_38ba(m, ip) {
+// 0x38ba affiche_registres : AX à DS en hexadécimal (chaînes DS:17B5 à DS:1805), position et couleurs du texte conservées
+function affiche_registres_38ba(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7135,8 +7218,8 @@ function sub_38ba_38ba(m, ip) {
   }
 }
 
-// 0x397e sub_7e2e
-function sub_397e_397e(m, ip) {
+// 0x397e affiche_hexa : DX en 4 chiffres hexadécimaux
+function affiche_hexa_397e(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7156,8 +7239,8 @@ function sub_397e_397e(m, ip) {
   }
 }
 
-// 0x399c sub_7e4c
-function sub_399c_399c(m, ip) {
+// 0x399c chiffre_hexa_bas : chiffre du quartet bas de AL
+function chiffre_hexa_bas_399c(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7169,8 +7252,8 @@ function sub_399c_399c(m, ip) {
   }
 }
 
-// 0x39a2 sub_7e52
-function sub_39a2_39a2(m, ip) {
+// 0x39a2 chiffre_hexa_haut : chiffre du quartet haut de AL
+function chiffre_hexa_haut_39a2(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7186,8 +7269,8 @@ function sub_39a2_39a2(m, ip) {
   }
 }
 
-// 0x39b0 sub_7e60
-function sub_39b0_39b0(m, ip) {
+// 0x39b0 chiffre_hexa : affiche le chiffre AL (0 à 15) avec chiffres_hexa
+function chiffre_hexa_39b0(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7200,8 +7283,8 @@ function sub_39b0_39b0(m, ip) {
   }
 }
 
-// 0x39b8 sub_7e68
-function sub_39b8_39b8(m, ip) {
+// 0x39b8 numero_bit : non appelée : numéro du premier bit posé de AL (0 à 7) ; identique à QUEST 0x45AB
+function numero_bit_39b8(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7221,8 +7304,8 @@ function sub_39b8_39b8(m, ip) {
   }
 }
 
-// 0x39cc sub_7e7c
-function sub_39cc_39cc(m, ip) {
+// 0x39cc installe_erreur_disque : non appelée : int 24h -> CS:39DA (erreur_disque)
+function installe_erreur_disque_39cc(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7240,8 +7323,20 @@ function sub_39cc_39cc(m, ip) {
   }
 }
 
-// 0x39dd sub_7e8d
-function sub_39dd_39dd(m, ip) {
+// 0x39da erreur_disque : non appelée : AL = 0 (ignorer l'erreur)
+function erreur_disque_39da(m, ip) {
+  for (;;) {
+    if (m.pas <= 0) return ip;
+    switch (ip) {
+      case 0x39da: m.t += 2; m.pas -= 2; m.ax = (m.ax & 0xff00) | 0x0;  // mov al, 0
+      case 0x39dc: ip = m.pop(); continue;  // ret
+      default: return ip;
+    }
+  }
+}
+
+// 0x39dd lz_decompresse : décompression LZ de DS:SI vers ES:DI, CX octets au plus ; identique à QUEST 0x45D1
+function lz_decompresse_39dd(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7343,8 +7438,8 @@ function sub_39dd_39dd(m, ip) {
   }
 }
 
-// 0x3a93 sub_7f43
-function sub_3a93_3a93(m, ip) {
+// 0x3a93 temporise : CX fois pause_courte
+function temporise_3a93(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7358,8 +7453,8 @@ function sub_3a93_3a93(m, ip) {
   }
 }
 
-// 0x3a9b sub_7f4b
-function sub_3a9b_3a9b(m, ip) {
+// 0x3a9b attend_trame : attend le début puis la fin du retour de trame (bit 3 de port_etat_video)
+function attend_trame_3a9b(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7386,8 +7481,8 @@ function sub_3a9b_3a9b(m, ip) {
   }
 }
 
-// 0x3ab7 sub_7f67
-function sub_3ab7_3ab7(m, ip) {
+// 0x3ab7 lit_ports_video : port_crtc = mot BIOS 0040:0063, port_etat_video = ce port + 6
+function lit_ports_video_3ab7(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7403,8 +7498,49 @@ function sub_3ab7_3ab7(m, ip) {
   }
 }
 
-// 0x3b1a sub_7fca
-function sub_3b1a_3b1a(m, ip) {
+// 0x3aca etalonne_joystick : non appelée (seulement par lit_configuration, morte) : mode texte, « Centre joystick and press fire », masque_joystick = 3 (A) ou C0h (B), centre relevé par joystick_position
+function etalonne_joystick_3aca(m, ip) {
+  for (;;) {
+    if (m.pas <= 0) return ip;
+    switch (ip) {
+      case 0x3aca: m.t += 3; m.pas -= 3; m.xor8(0, 0); m.ax = (m.ax & 0xff) | (0 << 8);  // xor ah, ah
+      case 0x3acc: m.ax = (m.ax & 0xff00) | 0x3;  // mov al, 3
+      case 0x3ace: if (!m.interruption(0x10)) { m.pas = 0; ip = 0x3ace; continue; }  // int 0x10
+      case 0x3ad0: m.t += 3; m.pas -= 3; m.dx = 0x1890;  // mov dx, 0x1890
+      case 0x3ad3: m.ax = (m.ax & 0xff) | (0x9 << 8);  // mov ah, 9
+      case 0x3ad5: if (!m.interruption(0x21)) { m.pas = 0; ip = 0x3ad5; continue; }  // int 0x21
+      case 0x3ad7: m.t += 1; m.pas -= 1; m.dx = 0x201;  // mov dx, 0x201
+      case 0x3ada: m.t += 3; m.pas -= 3; m.ax = (m.ax & 0xff00) | m.entree(m.dx, 1);  // in al, dx
+      case 0x3adb: m.and8((m.ax & 0xff), 0x10);  // test al, 0x10
+      case 0x3add: if (m.zf) { ip = 0x3aed; continue; }  // je 0x3aed
+      case 0x3adf: m.t += 2; m.pas -= 2; m.and8((m.ax & 0xff), 0x20);  // test al, 0x20
+      case 0x3ae1: if (m.zf) { ip = 0x3aed; continue; }  // je 0x3aed
+      case 0x3ae3: m.t += 2; m.pas -= 2; m.and8((m.ax & 0xff), 0x40);  // test al, 0x40
+      case 0x3ae5: if (m.zf) { ip = 0x3af5; continue; }  // je 0x3af5
+      case 0x3ae7: m.t += 2; m.pas -= 2; m.and8((m.ax & 0xff), 0x80);  // test al, 0x80
+      case 0x3ae9: if (m.zf) { ip = 0x3af5; continue; }  // je 0x3af5
+      case 0x3aeb: m.t += 1; m.pas -= 1; ip = 0x3ada; continue;  // jmp 0x3ada
+      case 0x3aed: m.t += 2; m.pas -= 2; m.wb(m.ds, 0x14ac, 0x3);  // mov byte ptr [0x14ac], 3
+      case 0x3af2: ip = 0x3afa; continue;  // jmp 0x3afa
+      case 0x3af5: m.t += 1; m.pas -= 1; m.wb(m.ds, 0x14ac, 0xc0);  // mov byte ptr [0x14ac], 0xc0
+      case 0x3afa: m.t += 1; m.pas -= 1; m.push(0x3afd); ip = 0x3b1a; continue;  // call 0x3b1a
+      case 0x3afd: m.t += 2; m.pas -= 2; m.sub8(m.rb(m.ds, 0x14ac), 0x3);  // cmp byte ptr [0x14ac], 3
+      case 0x3b02: if (!m.zf) { ip = 0x3b0f; continue; }  // jne 0x3b0f
+      case 0x3b04: m.t += 3; m.pas -= 3; m.ww(m.ds, 0x14ad, m.cx);  // mov word ptr [0x14ad], cx
+      case 0x3b08: m.ww(m.ds, 0x14af, m.bx);  // mov word ptr [0x14af], bx
+      case 0x3b0c: ip = 0x3b19; continue;  // jmp 0x3b19
+      case 0x3b0f: m.t += 4; m.pas -= 4; m.ax = m.di;  // mov ax, di
+      case 0x3b11: m.ww(m.ds, 0x14ad, m.ax);  // mov word ptr [0x14ad], ax
+      case 0x3b14: m.ax = m.si;  // mov ax, si
+      case 0x3b16: m.ww(m.ds, 0x14af, m.ax);  // mov word ptr [0x14af], ax
+      case 0x3b19: m.t += 1; m.pas -= 1; ip = m.pop(); continue;  // ret
+      default: return ip;
+    }
+  }
+}
+
+// 0x3b1a joystick_position : chronomètre le port 201h, interruptions coupées, masqué par masque_joystick : BX x et CX y du joystick A ; DI et SI du joystick B
+function joystick_position_3b1a(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7446,8 +7582,8 @@ function sub_3b1a_3b1a(m, ip) {
   }
 }
 
-// 0x3b61 sub_8011
-function sub_3b61_3b61(m, ip) {
+// 0x3b61 joystick_boutons : boutons des deux joysticks dans les bits 0 à 3 de AL (port 201h inversé) ; identique à QUEST 0x4755
+function joystick_boutons_3b61(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7470,8 +7606,8 @@ function sub_3b61_3b61(m, ip) {
   }
 }
 
-// 0x3b7a sub_802a
-function sub_3b7a_3b7a(m, ip) {
+// 0x3b7a son_arret : en quittant : silence (AX=0Bh, port 61h pour le haut-parleur), arrête la poignée DS:144E si musique_coupee, sinon son_poignee (AX=4), puis AX=0Bh et AX=0
+function son_arret_3b7a(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7500,8 +7636,8 @@ function sub_3b7a_3b7a(m, ip) {
   }
 }
 
-// 0x3bb2 sub_8062
-function sub_3bb2_3bb2(m, ip) {
+// 0x3bb2 son_charge_pilote : réserve 697h paragraphes (int 21h AH=48h), y charge les données (son_donnees), charge le pilote (son_pilotes) au segment 01ECh, l'appelle (son_entree_pilote), puis int 60h AX=0Ah
+function son_charge_pilote_3bb2(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7544,8 +7680,8 @@ function sub_3bb2_3bb2(m, ip) {
   }
 }
 
-// 0x3c1a sub_80ca
-function sub_3c1a_3c1a(m, ip) {
+// 0x3c1a son_prepare : int 60h AX=2 (données, sauf haut-parleur), puis AX=3 morceau son_morceaux[pilote] ; poignée dans son_poignee
+function son_prepare_3c1a(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7569,8 +7705,8 @@ function sub_3c1a_3c1a(m, ip) {
   }
 }
 
-// 0x3c45 sub_80f5
-function sub_3c45_3c45(m, ip) {
+// 0x3c45 son_musique : première pression de F10 : musique_coupee = 1 ; Tandy : AX=3 morceau 0 ; sinon AX=4 (arrête son_poignee), et pour le haut-parleur AX=0Bh + port 61h
+function son_musique_3c45(m, ip) {
   for (;;) {
     if (m.pas <= 0) return ip;
     switch (ip) {
@@ -7603,95 +7739,123 @@ function sub_3c45_3c45(m, ip) {
   }
 }
 
+// 0x3c86 quitte : non appelée : retire le clavier, mode texte 3, int 21h AX=4C00h
+function quitte_3c86(m, ip) {
+  for (;;) {
+    if (m.pas <= 0) return ip;
+    switch (ip) {
+      case 0x3c86: m.t += 1; m.pas -= 1; m.push(0x3c89); ip = 0x2b01; continue;  // call 0x2b01
+      case 0x3c89: m.t += 3; m.pas -= 3; m.xor8(0, 0); m.ax = (m.ax & 0xff) | (0 << 8);  // xor ah, ah
+      case 0x3c8b: m.ax = (m.ax & 0xff00) | 0x3;  // mov al, 3
+      case 0x3c8d: if (!m.interruption(0x10)) { m.pas = 0; ip = 0x3c8d; continue; }  // int 0x10
+      case 0x3c8f: m.t += 2; m.pas -= 2; m.ax = 0x4c00;  // mov ax, 0x4c00
+      case 0x3c92: if (!m.interruption(0x21)) { m.pas = 0; ip = 0x3c92; continue; }  // int 0x21
+      case 0x3c94: m.t += 6; m.pas -= 6; m.wb(m.ds, ((m.bx + m.si) & 0xffff), m.add8(m.rb(m.ds, ((m.bx + m.si) & 0xffff)), (m.ax & 0xff)));  // add byte ptr [bx + si], al
+      case 0x3c96: m.wb(m.ds, ((m.bx + m.si) & 0xffff), m.add8(m.rb(m.ds, ((m.bx + m.si) & 0xffff)), (m.ax & 0xff)));  // add byte ptr [bx + si], al
+      case 0x3c98: m.wb(m.ds, ((m.bx + m.si) & 0xffff), m.add8(m.rb(m.ds, ((m.bx + m.si) & 0xffff)), (m.ax & 0xff)));  // add byte ptr [bx + si], al
+      case 0x3c9a: m.wb(m.ds, ((m.bx + m.si) & 0xffff), m.add8(m.rb(m.ds, ((m.bx + m.si) & 0xffff)), (m.ax & 0xff)));  // add byte ptr [bx + si], al
+      case 0x3c9c: m.wb(m.ds, ((m.bx + m.si) & 0xffff), m.add8(m.rb(m.ds, ((m.bx + m.si) & 0xffff)), (m.ax & 0xff)));  // add byte ptr [bx + si], al
+      case 0x3c9e: m.wb(m.ds, ((m.bx + m.si) & 0xffff), m.add8(m.rb(m.ds, ((m.bx + m.si) & 0xffff)), (m.ax & 0xff)));  // add byte ptr [bx + si], al
+        ip = 0x3ca0; continue;
+      default: return ip;
+    }
+  }
+}
+
 // Adresse de chaque instruction -> fonction qui la contient.
 export function routines() {
   const table = new Array(0x10000).fill(null);
-  remplir(table, sub_0000_0000, [0x0000, 0x0046, 0x0047, 0x0227, 0x0228, 0x0234, 0x0235, 0x027e, 0x027f, 0x0305, 0x0306, 0x038b, 0x038c, 0x0462]);
-  remplir(table, sub_0462_0462, [0x0462, 0x048c, 0x048d, 0x04d0]);
-  remplir(table, sub_04d0_04d0, [0x04d0, 0x0532]);
-  remplir(table, sub_0532_0532, [0x0532, 0x054c]);
-  remplir(table, sub_054c_054c, [0x054c, 0x055c]);
-  remplir(table, sub_055c_055c, [0x055c, 0x0561]);
-  remplir(table, sub_0561_0561, [0x0561, 0x059d]);
-  remplir(table, sub_059d_059d, [0x059d, 0x05ba]);
-  remplir(table, sub_05ba_05ba, [0x05ba, 0x05e2]);
-  remplir(table, sub_05e2_05e2, [0x05e2, 0x0669]);
-  remplir(table, sub_0669_0669, [0x0669, 0x06d0]);
-  remplir(table, sub_06d0_06d0, [0x06d0, 0x071e]);
-  remplir(table, sub_072a_072a, [0x072a, 0x0731]);
-  remplir(table, sub_0731_0731, [0x0731, 0x074d]);
-  remplir(table, sub_074d_074d, [0x074d, 0x076f]);
-  remplir(table, sub_076f_076f, [0x076f, 0x07a6]);
-  remplir(table, sub_07a6_07a6, [0x07a6, 0x0823]);
-  remplir(table, sub_0823_0823, [0x0823, 0x08a0]);
-  remplir(table, sub_08a0_08a0, [0x08a0, 0x08e3]);
-  remplir(table, sub_08e3_08e3, [0x08e3, 0x092c]);
-  remplir(table, sub_092c_092c, [0x092c, 0x0975]);
-  remplir(table, sub_0975_0975, [0x0975, 0x0993]);
-  remplir(table, sub_0993_0993, [0x0993, 0x09ab]);
-  remplir(table, sub_09ab_09ab, [0x09ab, 0x0a1c]);
-  remplir(table, sub_0a1d_0a1d, [0x0a1d, 0x0a6b]);
-  remplir(table, sub_0a6b_0a6b, [0x0a6b, 0x0a83]);
-  remplir(table, sub_0a83_0a83, [0x0a83, 0x0ad2]);
-  remplir(table, sub_0ad2_0ad2, [0x0ad2, 0x0b0f]);
-  remplir(table, sub_0b0f_0b0f, [0x0b0f, 0x0b3d]);
-  remplir(table, sub_0b3d_0b3d, [0x0b3d, 0x23ef]);
-  remplir(table, sub_258c_258c, [0x258c, 0x259b]);
-  remplir(table, sub_259b_259b, [0x259b, 0x2650, 0x2651, 0x2669, 0x266a, 0x2682, 0x2683, 0x269b, 0x269c, 0x2940, 0x2941, 0x29ae]);
-  remplir(table, sub_29ae_29ae, [0x29ae, 0x29bb]);
-  remplir(table, sub_29bb_29bb, [0x29bb, 0x29d6]);
-  remplir(table, sub_29d6_29d6, [0x29d6, 0x29e5]);
-  remplir(table, sub_29e5_29e5, [0x29e5, 0x29f2]);
-  remplir(table, sub_29f2_29f2, [0x29f2, 0x2a1b]);
-  remplir(table, sub_2a1b_2a1b, [0x2a1b, 0x2a23]);
-  remplir(table, sub_2a23_2a23, [0x2a23, 0x2a50]);
-  remplir(table, sub_2a50_2a50, [0x2a50, 0x2ab0]);
-  remplir(table, sub_2ab0_2ab0, [0x2ab0, 0x2abd]);
-  remplir(table, sub_2aca_2aca, [0x2aca, 0x2b01]);
-  remplir(table, sub_2b01_2b01, [0x2b01, 0x2b19]);
+  remplir(table, demarrage_intro_0000, [0x0000, 0x0046, 0x0047, 0x0227, 0x0228, 0x0234, 0x0235, 0x027e, 0x027f, 0x0305, 0x0306, 0x038b, 0x038c, 0x0462]);
+  remplir(table, ecran_texte_ega_0462, [0x0462, 0x048c, 0x048d, 0x04d0]);
+  remplir(table, copie_ecran_ega_04d0, [0x04d0, 0x0532]);
+  remplir(table, palette_ega_0532, [0x0532, 0x054c]);
+  remplir(table, palette_ega_noire_054c, [0x054c, 0x055c]);
+  remplir(table, anime_scene_055c, [0x055c, 0x0561]);
+  remplir(table, scene_flamme_0561, [0x0561, 0x059d]);
+  remplir(table, scene_feu_059d, [0x059d, 0x05ba]);
+  remplir(table, scene_visage_05ba, [0x05ba, 0x05e2]);
+  remplir(table, scene_table_05e2, [0x05e2, 0x0669]);
+  remplir(table, scene_deux_sprites_0669, [0x0669, 0x06d0]);
+  remplir(table, scene_finale_06d0, [0x06d0, 0x071e]);
+  remplir(table, attend_trames_072a, [0x072a, 0x0731]);
+  remplir(table, restaure_fond_0731, [0x0731, 0x074d]);
+  remplir(table, tampon_vers_ecran_074d, [0x074d, 0x076f]);
+  remplir(table, sprite_16_076f, [0x076f, 0x07a6]);
+  remplir(table, anime_32x64_07a6, [0x07a6, 0x0823]);
+  remplir(table, anime_64x64_0823, [0x0823, 0x08a0]);
+  remplir(table, convertit_16_08a0, [0x08a0, 0x08e3]);
+  remplir(table, convertit_32x64_08e3, [0x08e3, 0x092c]);
+  remplir(table, convertit_64x64_092c, [0x092c, 0x0975]);
+  remplir(table, mode_video_intro_0975, [0x0975, 0x0993]);
+  remplir(table, palette_vga_0993, [0x0993, 0x09ab]);
+  remplir(table, ecran_texte_vga_09ab, [0x09ab, 0x0a1c]);
+  remplir(table, affiche_ecran_vga_0a1d, [0x0a1d, 0x0a6b]);
+  remplir(table, attend_espace_echap_0a6b, [0x0a6b, 0x0a83]);
+  remplir(table, pas_du_fondu_0a83, [0x0a83, 0x0ad2]);
+  remplir(table, fondu_entree_0ad2, [0x0ad2, 0x0b0f]);
+  remplir(table, fondu_noir_0b0f, [0x0b0f, 0x0b3d]);
+  remplir(table, affiche_tandy_0b3d, [0x0b3d, 0x23ef]);
+  remplir(table, lit_configuration_2506, [0x2506, 0x2527, 0x2528, 0x2584]);
+  remplir(table, ligne_ecran_2584, [0x2584, 0x258c]);
+  remplir(table, affiche_chaine_258c, [0x258c, 0x259b]);
+  remplir(table, affiche_caractere_259b, [0x259b, 0x2650, 0x2651, 0x2669, 0x266a, 0x2682, 0x2683, 0x269b, 0x269c, 0x2940, 0x2941, 0x29ae]);
+  remplir(table, mode_tandy_29ae, [0x29ae, 0x29bb]);
+  remplir(table, pause_courte_29bb, [0x29bb, 0x29d6]);
+  remplir(table, pause_longue_29d6, [0x29d6, 0x29e5]);
+  remplir(table, attend_touche_29e5, [0x29e5, 0x29f2]);
+  remplir(table, touche_enfoncee_29f2, [0x29f2, 0x2a1b]);
+  remplir(table, attend_relachement_2a1b, [0x2a1b, 0x2a23]);
+  remplir(table, hasard_2a23, [0x2a23, 0x2a50]);
+  remplir(table, efface_ecran_2a50, [0x2a50, 0x2ab0]);
+  remplir(table, attend_retour_trame_2ab0, [0x2ab0, 0x2abd]);
+  remplir(table, installe_clavier_2aca, [0x2aca, 0x2b01]);
+  remplir(table, restaure_clavier_2b01, [0x2b01, 0x2b19]);
   remplir(table, clavier_interruption_2b19, [0x2b19, 0x2b62]);
-  remplir(table, sub_2b62_2b62, [0x2b62, 0x2bb9]);
-  remplir(table, sub_2bb9_2bb9, [0x2bb9, 0x2be5, 0x2be6, 0x2c0a, 0x2c0b, 0x2c45]);
-  remplir(table, sub_2c45_2c45, [0x2c45, 0x2c96]);
-  remplir(table, sub_2c96_2c96, [0x2c96, 0x2cde, 0x2cdf, 0x2ced]);
-  remplir(table, sub_2ced_2ced, [0x2ced, 0x2cff]);
-  remplir(table, sub_2cff_2cff, [0x2cff, 0x2d0a]);
-  remplir(table, sub_2d0a_2d0a, [0x2d0a, 0x2d3e]);
-  remplir(table, sub_2d3e_2d3e, [0x2d3e, 0x2d64]);
-  remplir(table, sub_2d64_2d64, [0x2d64, 0x2d91]);
-  remplir(table, sub_2d91_2d91, [0x2d91, 0x2da6, 0x2da7, 0x2daf]);
-  remplir(table, sub_2db0_2db0, [0x2db0, 0x2dc6]);
-  remplir(table, sub_2dc6_2dc6, [0x2dc6, 0x2dd8]);
-  remplir(table, sub_2dd8_2dd8, [0x2dd8, 0x2df2]);
-  remplir(table, sub_2df2_2df2, [0x2df2, 0x2e0c]);
-  remplir(table, sub_2e0c_2e0c, [0x2e0c, 0x2e24]);
-  remplir(table, sub_2e24_2e24, [0x2e24, 0x2e2f]);
-  remplir(table, sub_2e2f_2e2f, [0x2e2f, 0x2eb5]);
-  remplir(table, sub_2eb5_2eb5, [0x2eb5, 0x2ee9]);
-  remplir(table, sub_2ee9_2ee9, [0x2ee9, 0x2f24]);
-  remplir(table, sub_2f24_2f24, [0x2f24, 0x2f60]);
-  remplir(table, sub_2f60_2f60, [0x2f60, 0x34e5]);
-  remplir(table, sub_34e5_34e5, [0x34e5, 0x3814]);
-  remplir(table, sub_3814_3814, [0x3814, 0x38a7]);
-  remplir(table, sub_38a7_38a7, [0x38a7, 0x38b4]);
-  remplir(table, sub_38b4_38b4, [0x38b4, 0x38ba]);
-  remplir(table, sub_38ba_38ba, [0x38ba, 0x397e]);
-  remplir(table, sub_397e_397e, [0x397e, 0x399c]);
-  remplir(table, sub_399c_399c, [0x399c, 0x39a2]);
-  remplir(table, sub_39a2_39a2, [0x39a2, 0x39b0]);
-  remplir(table, sub_39b0_39b0, [0x39b0, 0x39b8]);
-  remplir(table, sub_39b8_39b8, [0x39b8, 0x39cc]);
-  remplir(table, sub_39cc_39cc, [0x39cc, 0x39da]);
-  remplir(table, sub_39dd_39dd, [0x39dd, 0x3a93]);
-  remplir(table, sub_3a93_3a93, [0x3a93, 0x3a9b]);
-  remplir(table, sub_3a9b_3a9b, [0x3a9b, 0x3ab7]);
-  remplir(table, sub_3ab7_3ab7, [0x3ab7, 0x3aca]);
-  remplir(table, sub_3b1a_3b1a, [0x3b1a, 0x3b29, 0x3b2a, 0x3b2c, 0x3b2d, 0x3b2f, 0x3b30, 0x3b61]);
-  remplir(table, sub_3b61_3b61, [0x3b61, 0x3b7a]);
-  remplir(table, sub_3b7a_3b7a, [0x3b7a, 0x3bb2]);
-  remplir(table, sub_3bb2_3bb2, [0x3bb2, 0x3c1a]);
-  remplir(table, sub_3c1a_3c1a, [0x3c1a, 0x3c45]);
-  remplir(table, sub_3c45_3c45, [0x3c45, 0x3c86]);
+  remplir(table, lit_commandes_2b62, [0x2b62, 0x2bb9]);
+  remplir(table, lit_joystick_2bb9, [0x2bb9, 0x2be5, 0x2be6, 0x2c0a, 0x2c0b, 0x2c45]);
+  remplir(table, curseur_clavier_2c45, [0x2c45, 0x2c96]);
+  remplir(table, lit_souris_2c96, [0x2c96, 0x2cde, 0x2cdf, 0x2ced]);
+  remplir(table, souris_position_2ced, [0x2ced, 0x2cff]);
+  remplir(table, attend_commande_2cff, [0x2cff, 0x2d0a]);
+  remplir(table, attend_relache_2d0a, [0x2d0a, 0x2d3e]);
+  remplir(table, attend_clic_2d3e, [0x2d3e, 0x2d64]);
+  remplir(table, attend_relache_boutons_2d64, [0x2d64, 0x2d91]);
+  remplir(table, charge_fichier_2d91, [0x2d91, 0x2da6, 0x2da7, 0x2daf]);
+  remplir(table, sauve_fichier_2db0, [0x2db0, 0x2dc6]);
+  remplir(table, fichier_cree_2dc6, [0x2dc6, 0x2dd8]);
+  remplir(table, fichier_ouvre_2dd8, [0x2dd8, 0x2df2]);
+  remplir(table, fichier_ecrit_2df2, [0x2df2, 0x2e0c]);
+  remplir(table, fichier_lit_2e0c, [0x2e0c, 0x2e24]);
+  remplir(table, fichier_ferme_2e24, [0x2e24, 0x2e2f]);
+  remplir(table, saisie_ligne_2e2f, [0x2e2f, 0x2eb5]);
+  remplir(table, saisie_nombre_2eb5, [0x2eb5, 0x2ee9]);
+  remplir(table, adresse_ega_2ee9, [0x2ee9, 0x2f24]);
+  remplir(table, adresse_tandy_2f24, [0x2f24, 0x2f60]);
+  remplir(table, affiche_sprite_2f60, [0x2f60, 0x34e5]);
+  remplir(table, copie_image_34e5, [0x34e5, 0x3814]);
+  remplir(table, efface_rectangle_3814, [0x3814, 0x38a7]);
+  remplir(table, longueur_texte_38a7, [0x38a7, 0x38b4]);
+  remplir(table, affiche_registres_attend_38b4, [0x38b4, 0x38ba]);
+  remplir(table, affiche_registres_38ba, [0x38ba, 0x397e]);
+  remplir(table, affiche_hexa_397e, [0x397e, 0x399c]);
+  remplir(table, chiffre_hexa_bas_399c, [0x399c, 0x39a2]);
+  remplir(table, chiffre_hexa_haut_39a2, [0x39a2, 0x39b0]);
+  remplir(table, chiffre_hexa_39b0, [0x39b0, 0x39b8]);
+  remplir(table, numero_bit_39b8, [0x39b8, 0x39cc]);
+  remplir(table, installe_erreur_disque_39cc, [0x39cc, 0x39da]);
+  remplir(table, erreur_disque_39da, [0x39da, 0x39dd]);
+  remplir(table, lz_decompresse_39dd, [0x39dd, 0x3a93]);
+  remplir(table, temporise_3a93, [0x3a93, 0x3a9b]);
+  remplir(table, attend_trame_3a9b, [0x3a9b, 0x3ab7]);
+  remplir(table, lit_ports_video_3ab7, [0x3ab7, 0x3aca]);
+  remplir(table, etalonne_joystick_3aca, [0x3aca, 0x3af4, 0x3af5, 0x3b0e, 0x3b0f, 0x3b1a]);
+  remplir(table, joystick_position_3b1a, [0x3b1a, 0x3b29, 0x3b2a, 0x3b2c, 0x3b2d, 0x3b2f, 0x3b30, 0x3b61]);
+  remplir(table, joystick_boutons_3b61, [0x3b61, 0x3b7a]);
+  remplir(table, son_arret_3b7a, [0x3b7a, 0x3bb2]);
+  remplir(table, son_charge_pilote_3bb2, [0x3bb2, 0x3c1a]);
+  remplir(table, son_prepare_3c1a, [0x3c1a, 0x3c45]);
+  remplir(table, son_musique_3c45, [0x3c45, 0x3c86]);
+  remplir(table, quitte_3c86, [0x3c86, 0x3ca0]);
   return table;
 }
 

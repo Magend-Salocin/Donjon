@@ -1,89 +1,94 @@
-; Routines de INTRO.EXE : 86, dont 1 nommées dans symboles.txt.
+; Routines de INTRO.EXE : 91, dont 91 nommées dans symboles.txt.
 ; adresse  nom  taille  appelants  | int  ports  variables  chaînes
 
-044b0  sub_44b0                  1116    0  | 10h/00 10h/? 16h 21h/09 21h/3d 21h/3e 21h/41 21h/4a 21h/4c    10a2 1440 1442 1443 1444 1445 1446 1447 1448 19f2 19f8 19fb  "quest.exe"
-04912  sub_4912                   109    3  |     1440 19f0  "uest.exe"
-04980  sub_4980                    98    2  |   dx  1440
-049e2  sub_49e2                    26    1  | 10h/00    1440
-049fc  sub_49fc                    16    2  | 10h/00    
-04a0c  sub_4a0c                     5    1  |     
-04a11  sub_4a11                    60    0  |     128e
-04a4d  sub_4a4d                    29    0  |     
-04a6a  sub_4a6a                    40    0  |     
-04a92  sub_4a92                   135    0  |     128e 1290
-04b19  sub_4b19                   103    0  |     128e 1290
-04b80  sub_4b80                    78    0  |     128e
-04bda  sub_4bda                     7    6  |     
-04be1  sub_4be1                    28    4  |     
-04bfd  sub_4bfd                    34    4  |     
-04c1f  sub_4c1f                    55    8  |     
-04c56  sub_4c56                   125    1  |     
-04cd3  sub_4cd3                   125    1  |     
-04d50  sub_4d50                    67    4  |     
-04d93  sub_4d93                    73    1  |     
-04ddc  sub_4ddc                    73    1  |     
-04e25  sub_4e25                    30    2  | 10h/?    1440
-04e43  sub_4e43                    24    3  |   dx  
-04e5b  sub_4e5b                   113    2  |     1ba3 1ba5 1ba9
-04ecd  sub_4ecd                    78    3  |     
-04f1b  sub_4f1b                    24    1  | 16h    
-04f33  sub_4f33                    79    2  |     
-04f82  sub_4f82                    61    2  |     
-04fbf  sub_4fbf                    46    3  |     
-04fed  sub_4fed                  6322    1  |     23ef
-06a3c  sub_6a3c                    15   14  |     
-06a4b  sub_6a4b                  1038    4  |   dx  1440 19f2 19f3 19f4 19f6 19f8 19fa 19fb
-06e5e  sub_6e5e                    13    0  | 10h/00    1440
-06e6b  sub_6e6b                    27    1  |       " SPACEBAR"
-06e86  sub_6e86                    15    0  |     
-06e95  sub_6e95                    13    1  |     
-06ea2  sub_6ea2                    41    2  |     
-06ecb  sub_6ecb                     8    1  |     
-06ed3  sub_6ed3                    45    0  |     1b9f 1ba0 1ba1 1ba2
-06f00  sub_6f00                    96    0  |   dx  1440 19f3 19f4 19f6
-06f60  sub_6f60                    13    1  |   dx  
-06f7a  sub_6f7a                    55    1  | 21h/25 21h/35    1c3d
-06fb1  sub_6fb1                    24   10  | 21h/25    
+044b0  demarrage_intro           1116    0  | 10h/00 10h/? 16h 21h/09 21h/3d 21h/3e 21h/41 21h/4a 21h/4c    1445 1446 1447 1448 commande_type couleur_encre erreur_fichier fichier_nom fichier_offset fichier_segment fichier_taille langue  "quest.exe"
+04912  ecran_texte_ega            109    3  |     mode_video segment_source  "uest.exe"
+04980  copie_ecran_ega             98    2  |   dx  mode_video
+049e2  palette_ega                 26    1  | 10h/00    mode_video
+049fc  palette_ega_noire           16    2  | 10h/00    
+04a0c  anime_scene                  5    1  |     
+04a11  scene_flamme                60    1  |     image_anim_1
+04a4d  scene_feu                   29    1  |     
+04a6a  scene_visage                40    1  |     
+04a92  scene_table                135    1  |     image_anim_1 image_anim_2
+04b19  scene_deux_sprites         103    1  |     image_anim_1 image_anim_2
+04b80  scene_finale                78    1  |     image_anim_1
+04bda  attend_trames                7    6  |     
+04be1  restaure_fond               28    4  |     
+04bfd  tampon_vers_ecran           34    4  |     
+04c1f  sprite_16                   55    8  |     
+04c56  anime_32x64                125    1  |     
+04cd3  anime_64x64                125    1  |     
+04d50  convertit_16                67    4  |     
+04d93  convertit_32x64             73    1  |     
+04ddc  convertit_64x64             73    1  |     
+04e25  mode_video_intro            30    2  | 10h/?    mode_video
+04e43  palette_vga                 24    3  |   dx  
+04e5b  ecran_texte_vga            113    2  |     fichier_nom fichier_offset fichier_segment
+04ecd  affiche_ecran_vga           78    3  |     
+04f1b  attend_espace_echap         24    1  | 16h    
+04f33  pas_du_fondu                79    2  |     
+04f82  fondu_entree                61    2  |     
+04fbf  fondu_noir                  46    3  |     
+04fed  affiche_tandy             6322    1  |     23ef
+069b6  lit_configuration          125    0  | 10h/? 21h/09 21h/35 33h/?    14b3 erreur_fichier fichier_nom fichier_offset fichier_segment  "quest.cfg"
+06a34  ligne_ecran                  8    0  |     
+06a3c  affiche_chaine              15   14  |     
+06a4b  affiche_caractere         1038    4  |   dx  colonne_texte couleur_encre couleur_fond ligne_texte mode_video segment_texte texte_inverse texte_transparent
+06e5e  mode_tandy                  13    0  | 10h/00    mode_video
+06e6b  pause_courte                27    1  |       " SPACEBAR"
+06e86  pause_longue                15    0  |     
+06e95  attend_touche               13    1  |     
+06ea2  touche_enfoncee             41    2  |     
+06ecb  attend_relachement           8    1  |     
+06ed3  hasard                      45    0  |     1b9f 1ba0 1ba1 1ba2
+06f00  efface_ecran                96    0  |   dx  colonne_texte couleur_fond ligne_texte mode_video
+06f60  attend_retour_trame         13    1  |   dx  
+06f7a  installe_clavier            55    1  | 21h/25 21h/35    1c3d
+06fb1  restaure_clavier            24   12  | 21h/25    
 06fc9  clavier_interruption        73    0  |   0x20 0x60 0x61  
-07012  sub_7012                    87    5  |     1bb5 1bd1 1c34 1c35
-07069  sub_7069                   138    1  |     1443 14ac 14ad 14af 1c34
-070f5  sub_70f5                    81    1  |     1c34 1c35 1c37
-07146  sub_7146                    86    1  | 33h/00    1443 1c34 1c35 1c37
-0719d  sub_719d                    18    0  | 33h/00    1443
-071af  sub_71af                    11    0  |     1c34
-071ba  sub_71ba                    52    1  |     1c34
-071ee  sub_71ee                    38    0  |     1c34
-07214  sub_7214                    45    0  |     1c34
-07241  sub_7241                    29   12  |     1a8b 1ba7
-07260  sub_7260                    22    2  |     1a8b
-07276  sub_7276                    18    1  | 21h/3c    1ba9 1bab
-07288  sub_7288                    26    1  | 21h/3d    1a8b 1ba9 1bab
-072a2  sub_72a2                    26    1  | 21h/40    1ba3 1ba5 1ba7 1bab
-072bc  sub_72bc                    24    1  | 21h/3f    1ba3 1ba5 1bab
-072d4  sub_72d4                    11    1  | 21h/3e    1bab
-072df  sub_72df                   134    1  |     19f4 1d26 1d28 1d2a 1d2c
-07365  sub_7365                    52    0  |     1d2a 1d2c
-07399  sub_7399                    59    1  |     1a9b 1a9d
-073d4  sub_73d4                    60    2  |     1a9b 1a9d
-07410  sub_7410                  1413    1  |     1440 19f0 1a9b 1a9d 2500 2502 2504
-07995  sub_7995                   815    0  |     1440 19f0 1a9b 1a9d 2500 2502 2504
-07cc4  sub_7cc4                   147    0  |     19f2 1a87 1a89
-07d57  sub_7d57                    13    0  |     
-07d64  sub_7d64                     6    0  |     
-07d6a  sub_7d6a                   196    1  |     19f2 19f4 19f6 19fb
-07e2e  sub_7e2e                    30    9  |     1a95
-07e4c  sub_7e4c                     6    2  |     
-07e52  sub_7e52                    14    2  |     
-07e60  sub_7e60                     8    2  |       "0123456789ABCDEF"
-07e68  sub_7e68                    20    0  |     
-07e7c  sub_7e7c                    14    0  | 21h/25    
-07e8d  sub_7e8d                   182    8  |     
-07f43  sub_7f43                     8    1  |     
-07f4b  sub_7f4b                    28    8  |   dx  1d24
-07f67  sub_7f67                    19    1  |     1d22 1d24
-07fca  sub_7fca                    68    1  |   dx  14ac
-08011  sub_8011                    25    1  |   dx  
-0802a  sub_802a                    56    1  | 60h  0x61  1442 1449 144c 144e
-08062  sub_8062                   104    1  | 21h/48 60h    1442 1449 144a 14a8 1a8b 1ba3 1ba5 1ba9
-080ca  sub_80ca                    43    1  | 60h    1442 144a 144c
-080f5  sub_80f5                    65    1  | 60h  0x61  1442 1449 144c 1bf8
+07012  lit_commandes               87    5  |     1bb5 1bd1 commandes curseur_x
+07069  lit_joystick               138    1  |     centre_joystick_x centre_joystick_y commande_type commandes masque_joystick
+070f5  curseur_clavier             81    1  |     commandes curseur_x curseur_y
+07146  lit_souris                  86    1  | 33h/00    commande_type commandes curseur_x curseur_y
+0719d  souris_position             18    0  | 33h/00    commande_type
+071af  attend_commande             11    0  |     commandes
+071ba  attend_relache              52    1  |     commandes
+071ee  attend_clic                 38    0  |     commandes
+07214  attend_relache_boutons      45    0  |     commandes
+07241  charge_fichier              29   13  |     erreur_fichier fichier_taille
+07260  sauve_fichier               22    2  |     erreur_fichier
+07276  fichier_cree                18    1  | 21h/3c    fichier_handle fichier_nom
+07288  fichier_ouvre               26    1  | 21h/3d    erreur_fichier fichier_handle fichier_nom
+072a2  fichier_ecrit               26    1  | 21h/40    fichier_handle fichier_offset fichier_segment fichier_taille
+072bc  fichier_lit                 24    1  | 21h/3f    fichier_handle fichier_offset fichier_segment
+072d4  fichier_ferme               11    1  | 21h/3e    fichier_handle
+072df  saisie_ligne               134    1  |     colonne_texte saisie_chiffres saisie_longueur saisie_max saisie_pointeur
+07365  saisie_nombre               52    0  |     saisie_chiffres saisie_longueur
+07399  adresse_ega                 59    1  |     adresse_tampon decalage_pixel
+073d4  adresse_tandy               60    2  |     adresse_tampon decalage_pixel
+07410  affiche_sprite            1413    1  |     2500 2502 2504 adresse_tampon decalage_pixel mode_video segment_source
+07995  copie_image                815    0  |     2500 2502 2504 adresse_tampon decalage_pixel mode_video segment_source
+07cc4  efface_rectangle           147    0  |     1a87 1a89 couleur_encre
+07d57  longueur_texte              13    0  |     
+07d64  affiche_registres_attend     6    0  |     
+07d6a  affiche_registres          196    1  |     colonne_texte couleur_encre ligne_texte texte_transparent
+07e2e  affiche_hexa                30    9  |     saisie_tampon
+07e4c  chiffre_hexa_bas             6    2  |     
+07e52  chiffre_hexa_haut           14    2  |     
+07e60  chiffre_hexa                 8    2  |       "0123456789ABCDEF"
+07e68  numero_bit                  20    0  |     
+07e7c  installe_erreur_disque      14    1  | 21h/25    
+07e8a  erreur_disque                3    0  |     
+07e8d  lz_decompresse             182    8  |     
+07f43  temporise                    8    1  |     
+07f4b  attend_trame                28    8  |   dx  port_etat_video
+07f67  lit_ports_video             19    1  |     port_crtc port_etat_video
+07f7a  etalonne_joystick           78    1  | 10h/? 21h/09  dx  centre_joystick_x centre_joystick_y masque_joystick
+07fca  joystick_position           68    2  |   dx  masque_joystick
+08011  joystick_boutons            25    1  |   dx  
+0802a  son_arret                   56    1  | 60h  0x61  144e musique_coupee son_pilote son_poignee
+08062  son_charge_pilote          104    1  | 21h/48 60h    erreur_fichier fichier_nom fichier_offset fichier_segment musique_coupee son_entree_pilote son_pilote son_segment_donnees
+080ca  son_prepare                 43    1  | 60h    son_pilote son_poignee son_segment_donnees
+080f5  son_musique                 65    1  | 60h  0x61  1bf8 musique_coupee son_pilote son_poignee
+08136  quitte                      26    0  | 10h/? 21h/4c    

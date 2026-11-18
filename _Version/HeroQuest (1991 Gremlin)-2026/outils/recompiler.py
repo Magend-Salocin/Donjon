@@ -254,7 +254,7 @@ def analyser(prefixe):
     fichier = 'symboles.txt' if prefixe == 'QUEST' else f'symboles-{prefixe.lower()}.txt'
     symboles = D.charger_symboles(RACINE / 'original' / fichier)
     d = D.Desassembleur(image, reglage['entree'], reglage['ds'], symboles, code, reglage['base'],
-                        D.TABLES_ESPACEES.get(prefixe, {}))
+                        D.TABLES_ESPACEES.get(prefixe, {}), D.SAUTS_INDIRECTS.get(prefixe, {}))
     d.parcourir()
     d.zones_non_atteintes()
     return d, reglage
