@@ -16,6 +16,7 @@ Un seul affichage, le VGA, et un seul son, l'AdLib. La page fournit `QUEST.CFG` 
 | --- | --- |
 | `index.html?sans-intro` | lance directement le jeu ; pendant l'intro, Échap ou le bouton « Passer l'intro » font de même |
 | `index.html?langue=en` | langue des textes : `fr` (par défaut), `en`, `es`, `de`, `it` |
+| `index.html?genere` | code généré seul, sans les routines réécrites de `jeu/lisible/` (pour comparer) |
 | `index.html?debug` | affiche sous l'écran le programme, le temps de jeu et l'IP ; expose `window.jeu` (son, machine) |
 
 Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; Ctrl quitte.
@@ -30,6 +31,7 @@ Son : comme dans l'original, la musique joue au départ (dès l'intro) et les ef
 | `jeu/machine.js` | ce que le code attend autour de lui : registres et drapeaux du 8086, mémoire de 1 Mo, pile, DOS (fichiers, mémoire, vecteurs), BIOS (vidéo, clavier, zone de données), VGA 13h, mode texte, souris, ports, IRQ clavier, temps |
 | `jeu/exepack.js` | décompression EXEPACK et relocations, comme DOS au chargement |
 | `jeu/principal.js` | la page : chargement des fichiers, boucle au rythme du temps réel, affichage, entrées |
+| `jeu/lisible/` | le code réécrit à la main, lisible (voir « Code lisible ») |
 | `jeu/clavier.js` | codes clavier du PC |
 | `jeu/son.js` | joue les WAV de `sons/` quand le jeu appelle son pilote (int 60h : jouer, arrêter, silence) ; la musique en boucle |
 | `sons/` | les morceaux du pilote AdLib en WAV (mono, 16 bits, 22 050 Hz), générés (voir « Son »), ignorés par git |
@@ -44,6 +46,30 @@ Son : comme dans l'original, la musique joue au départ (dès l'intro) et les ef
 - Le temps est compté en instructions, 3000 par milliseconde, comme `cycles = fixed 3000` dans `outils/dosbox-x.conf` : attentes, animations et retour de trame (70 Hz) durent comme sous DOSBox-X.
 
 Le résultat est identique à l'original par construction : même mémoire, mêmes adresses, même générateur de hasard. On peut ensuite réécrire une routine à la main en gardant la version générée comme référence.
+
+## Code lisible
+
+`jeu/lisible/` réécrit les routines du jeu en classes et méthodes, avec des noms clairs, pour expliquer le fonctionnement du jeu de 1991. Chaque routine réécrite remplace sa version générée et travaille sur la même mémoire : le reste du jeu, encore généré, ne voit pas la différence.
+
+| Fichier | Contenu |
+| --- | --- |
+| `donnees.js` | vue nommée du segment de données : variables (`numeroQuete`, `desAttaqueHeros`...), fiche d'un personnage (`Fiche`), monstre (`Monstre`), bits des objets et des sorts |
+| `hasard.js` | le générateur de hasard (registre à décalage de 32 bits) |
+| `combat.js` | dés de combat : face d'un dé, dés d'attaque et de défense du héros et du monstre |
+| `routines.js` | branchement : adresse d'origine, registres rendus aux appelants, temps compté |
+
+Réécrites à ce jour (QUEST.EXE) : `hasard`, `de6_moins_un`, `de_combat`, `calcule_des_monstre`, `bonus_attaque_heros`, `calcule_defense_heros`, `calcule_attaque_heros`.
+
+Une routine réécrite s'exécute d'un seul tenant : seules les routines qui n'attendent ni le joueur ni l'écran peuvent l'être ainsi pour l'instant. Elle rend les registres que ses appelants lisent (champ `sortie`), pas les drapeaux du processeur. Le temps du jeu avance du nombre moyen d'instructions de la version générée (champ `cout`), à quelques instructions près selon le chemin suivi.
+
+Vérifier, depuis `outils/` :
+
+```bash
+node lisible.mjs 2000                 # chaque routine réécrite contre sa version générée, 2000 états au hasard
+GENERE=1 node essai.mjs 5 gen.png "…" # le même parcours avec le code généré seul, pour comparer les captures
+```
+
+Au 18 novembre 2026 : les 7 routines sont identiques sur 2000 cas chacune, et un parcours jusqu'au premier lancer de dés donne la même image qu'avec le code généré seul.
 
 ## Son
 

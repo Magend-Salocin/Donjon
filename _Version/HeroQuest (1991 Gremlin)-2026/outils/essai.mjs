@@ -9,6 +9,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { Machine, INSTRUCTIONS_PAR_MS } from '../web/jeu/machine.js';
+import { brancherRoutines } from '../web/jeu/lisible/routines.js';
 
 const ici = path.dirname(fileURLToPath(import.meta.url));
 const JEU = path.join(ici, '..', '..', 'HeroQuest (1991 Gremlin)');
@@ -60,6 +61,7 @@ export async function machine(programme = process.env.PROGRAMME || 'QUEST') {
   const m = new Machine({ fichiers, routines, codeReecrit: CODE_REECRIT });
   m.horloge = () => new Date(2026, 9, 27, 12, 0, 0, 0);    // même graine à chaque essai
   m.charger(`${programme}.EXE`);
+  if (programme === 'QUEST' && !process.env.GENERE) brancherRoutines(m.table);   // GENERE=1 : code généré seul
   return m;
 }
 

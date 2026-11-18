@@ -6,10 +6,12 @@
 //   index.html?sans-intro   lance directement QUEST.EXE (pendant l'intro : Échap ou le bouton)
 //   index.html?langue=en    langue des textes : fr (par défaut), en, es, de, it
 //   index.html?debug        affiche le temps de jeu et l'IP sous l'écran
+//   index.html?genere       code généré seul, sans les routines réécrites de lisible/
 
 import { Machine, INSTRUCTIONS_PAR_MS } from './machine.js';
 import { codeClavier, asciiDe } from './clavier.js';
 import { Son } from './son.js';
+import { brancherRoutines } from './lisible/routines.js';
 
 // VGA, AdLib, souris, français, souris pour les 4 joueurs (format : notes/01-socle.md)
 const CONFIGURATION = Uint8Array.from([8, 0, 1, 0, 1, 0, 0, 0, 0]);
@@ -87,6 +89,7 @@ function passerIntro() {
 async function executer(nom, fichiers, son) {
   const { routines, CODE_REECRIT } = await PROGRAMMES[nom]();
   const m = new Machine({ fichiers, routines, codeReecrit: CODE_REECRIT });
+  if (nom === 'QUEST' && !OPTIONS.has('genere')) brancherRoutines(m.table);
   m.charger(`${nom}.EXE`);
   machine = m;
   programme = nom;

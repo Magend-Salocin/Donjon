@@ -73,7 +73,7 @@ Reste :
 
 1. Comparer des écrans pixel à pixel avec des captures de DOSBox-X (le contrôle prévu), et rejouer une partie avec la même graine sur les deux.
 2. Son : fait en phase 4 (WAV de l'AdLib).
-3. Réécrire à la main, si on le souhaite, les routines qui doivent devenir lisibles ou modifiables, en comparant à la version générée.
+3. Réécrire tout le code à la main, lisible (classes et méthodes), pour le manuel technique : commencé le 18 novembre 2026 dans `web/jeu/lisible/` ([méthode](web/README.md#code-lisible)). Fait : hasard et dés de combat (7 routines). Reste : les routines qui attendent le joueur ou l'écran, qui demandent une exécution par étapes.
 
 ## Phase 4 : PHP et finition
 
