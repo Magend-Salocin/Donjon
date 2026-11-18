@@ -18,6 +18,7 @@ import { Donnees } from './donnees.js';
 import { Hasard } from './hasard.js';
 import { Combat } from './combat.js';
 import { Deplacement } from './deplacement.js';
+import { Tour } from './tour.js';
 import { Fiche } from './donnees.js';
 
 // Adresse de retour réservée : le segment de code de QUEST s'arrête à 0x97C0.
@@ -194,6 +195,32 @@ export const ROUTINES_QUEST = {
     nom: 'chemin_heros', cout: 700, sortie: [],
     executer({ deplacement }) { deplacement.chercherChemin(); },
   },
+
+  // ---- Tour d'un personnage (tour.js)
+  0x0349: {
+    nom: 'tour_personnage', cout: 10, sortie: [], etapes: true, fin: 0x02cd,
+    // Entrée AL numéro du personnage, AH type de commande, BX fiche, DX sprite.
+    executer: ({ tour }, m) => tour.tourPersonnage(m.ax & 0xff, m.bx, m.dx, m.ax >> 8),
+  },
+  0x6413: {
+    nom: 'commandes_tour', cout: 8, sortie: [], etapes: true,
+    executer: ({ tour }) => tour.commandesTour(),
+  },
+  // Atteinte aussi depuis 0x7EC2 ; finit par un saut vers la routine de la zone cliquée
+  // (DI fiche, SI sprite, BX entrée de la zone) ou vers clic_plateau.
+  0x6441: {
+    nom: 'clic_tour', cout: 8, sortie: [], etapes: true,
+    executer: ({ tour }) => tour.clicTour(),
+  },
+  0x64a7: {
+    nom: 'zone_panneau', cout: 60, sortie: ['si', 'ax', 'dx', 'bp', 'cf'],
+    // Sortie SI zone (ou fin de table), AX rang ; survol_icones lit SI et AL (xlat), pas CF.
+    executer({ tour }) { tour.rendreZone(tour.zoneSousLeCurseur()); },
+  },
+  0x0756: {
+    nom: 'fin_tour', cout: 12, sortie: [], etapes: true,
+    executer: ({ tour }) => tour.finTour(),
+  },
 };
 
 // Remplace, dans la table des routines générées, l'entrée de chaque routine réécrite.
@@ -250,5 +277,6 @@ export function creerJeu(machine) {
   const jeu = { machine, donnees, hasard: new Hasard(donnees) };
   jeu.combat = new Combat(jeu);
   jeu.deplacement = new Deplacement(jeu);
+  jeu.tour = new Tour(jeu);
   return jeu;
 }

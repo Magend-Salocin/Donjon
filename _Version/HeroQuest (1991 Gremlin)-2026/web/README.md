@@ -58,16 +58,18 @@ Le résultat est identique à l'original par construction : même mémoire, mêm
 | `hasard.js` | le générateur de hasard (registre à décalage de 32 bits) |
 | `combat.js` | dés de combat, attaque d'un héros, attaque d'un monstre |
 | `deplacement.js` | dés de déplacement, fin du déplacement, flèches, les 4 pas, pièges cachés, téléports des quêtes 10 et 16, clic sur le plateau, chemin automatique |
+| `tour.js` | tour d'un personnage : préparation, tempête, réveil d'un héros endormi, boucle du tour ; clic sur une zone du panneau, fin du tour |
 | `messages.js` | numéros des messages utilisés, avec leur texte |
 | `adresses.gen.js` | adresse de chaque routine nommée, générée par `outils/adresses.py` depuis `original/symboles.txt` |
 | `routines.js` | branchement : adresse d'origine -> méthode, registres rendus aux appelants, temps compté |
 
-Réécrites à ce jour (QUEST.EXE), 25 routines :
+Réécrites à ce jour (QUEST.EXE), 30 routines :
 
 - hasard et combat : `hasard`, `de6_moins_un`, `de_combat`, `compte_cranes`, `calcule_des_monstre`, `bonus_attaque_heros`, `calcule_defense_heros`, `calcule_attaque_heros`, `attaque_heros`, `combat_monstre`, `attaque_contre_heros` ;
-- déplacement : `des_deplacement_tour`, `tirage_deplacement` (avec `lancer_deplacement`), `fin_deplacement`, `arrete_deplacement`, `fleches_deplacement`, `pas_gauche`, `pas_droite`, `pas_haut`, `pas_bas` (avec `pas_fait`, `personnage_en_dx`, `porte_reveille`), `pas_automatique`, `clic_plateau`, `chemin_heros` (avec `chemin_essaie` et `pas_permis`), `tire_teleport`, `entre_piege`.
+- déplacement : `des_deplacement_tour`, `tirage_deplacement` (avec `lancer_deplacement`), `fin_deplacement`, `arrete_deplacement`, `fleches_deplacement`, `pas_gauche`, `pas_droite`, `pas_haut`, `pas_bas` (avec `pas_fait`, `personnage_en_dx`, `porte_reveille`), `pas_automatique`, `clic_plateau`, `chemin_heros` (avec `chemin_essaie` et `pas_permis`), `tire_teleport`, `entre_piege` ;
+- tour d'un personnage : `tour_personnage`, `commandes_tour`, `clic_tour`, `zone_panneau`, `fin_tour`.
 
-`tour_personnage` reste générée.
+Les bogues de l'original rencontrés en route sont dans [bogues-reecriture.md](../original/notes/bogues-reecriture.md) : le code lisible les reproduit.
 
 Deux sortes de routines :
 

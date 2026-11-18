@@ -6,6 +6,7 @@ export const MESSAGE = {
   ennemiMort: 0x004e,           // L'ENNEMI EST MORT
   ennemiSurvecu: 0x0050,        // L'ENEMI A SURVECU
   vousAvezSurvecu: 0x0052,      // VOUS AVEZ SURVECU A L'ATTAQUE
+  reveilSommeilProfond: 0x0066, // VOUS VOUS REVEILLEZ / D'UN SOMMEIL PROFOND
   attaquerANouveau: 0x0122,     // VOULEZ-VOUS ATTAQUER / A NOUVEAU ?  (boutons : 0 OUI, 1 NON)
 };
 

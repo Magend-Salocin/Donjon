@@ -41,8 +41,8 @@ definirVariables({
   casePiege: [0x3fec, MOT],
   resultatVise: [0x3fa8, OCTET],
   coinZone: [0x3fe4, MOT],               // adresse (grille des zones) du coin de la fenêtre de vue
-  sourisX: [0x47e9, MOT],
-  sourisY: [0x47e7, MOT],
+  sourisX: [0x47e7, MOT],               // position du curseur à l'écran
+  sourisY: [0x47e9, MOT],
   distanceChemin: [0x37e9, OCTET],       // |dx| + |dy| vers la case cliquée (écrit seulement ; partage erreur_fichier)
   cheminDepartX: [0x3fee, OCTET],
   cheminDepartY: [0x3fef, OCTET],
@@ -523,14 +523,15 @@ export class Deplacement extends Module {
   // moins de 8), si elle est libre, devient la cible du chemin.
   clicPlateau() {
     const d = this.donnees;
-    // Distance du curseur à chacune des 52 cases visibles : (|dy| / 2 + |dx|) / 2.
+    // Distance du curseur à chacune des 52 cases visibles : (|dx| / 2 + |dy|) / 2.
+    // position_cases range y puis x ; le centre d'une case est à (x + 24, y + 8).
     let meilleure = 0xffff;
     let compteur = 0;
     for (let n = 0; n < 52; n++) {
       const position = POSITION_CASES + 4 * n;
-      const dy = Math.abs(((d.mot(position + 2) + 0x18) & 0xffff) - d.sourisY);
-      const dx = Math.abs(((d.mot(position) + 8) & 0xffff) - d.sourisX);
-      const distance = (((dy >> 1) + dx) & 0xffff) >> 1;
+      const dx = Math.abs(((d.mot(position + 2) + 0x18) & 0xffff) - d.sourisX);
+      const dy = Math.abs(((d.mot(position) + 8) & 0xffff) - d.sourisY);
+      const distance = (((dx >> 1) + dy) & 0xffff) >> 1;
       d.ecrireMot(DISTANCES_CASES + 2 * n, distance);
       if (meilleure >= distance) { meilleure = distance; compteur = 52 - n; }   // à égalité, la dernière
     }

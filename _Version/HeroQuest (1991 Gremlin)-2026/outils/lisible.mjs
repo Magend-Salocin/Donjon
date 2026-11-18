@@ -21,7 +21,33 @@ const LECTURES_PAR_CLIC = 40;                // les boutons changent d'état tou
 // TEMOIN=e0e : compte les cas où cet octet de DS change (pour vérifier qu'un chemin rare est couvert).
 const TEMOIN = process.env.TEMOIN ? parseInt(process.env.TEMOIN, 16) : null;
 // Routines qui attendent un clic gauche (sinon le cas dure jusqu'à LIMITE).
-const CLIC_GAUCHE = new Set(['tirage_deplacement']);
+const CLIC_GAUCHE = new Set(['tirage_deplacement', 'tour_personnage']);
+// Routines qui lisent la zone sous le curseur : le curseur est placé sur une zone du panneau
+// (ou ailleurs, une fois sur trois).
+const CURSEUR_SUR_LES_ZONES = new Set(['zone_panneau', 'clic_tour', 'commandes_tour']);
+const SPRITES_HEROS = [0x4bc6, 0x4bdd, 0x4bf4, 0x4c0b, 0x4cf1];
+// Registres d'entrée propres à une routine (tirés dans preparerCas, mêmes dans les deux versions).
+const octetDS = (cas, offset, valeur) => { cas.memoire[DS * 16 + offset] = valeur; };
+// Bouton gauche enfoncé (DS:3992 bit 0x10), pas de piège ni de pas en file la plupart du temps.
+const clicEnCours = (cas) => {
+  octetDS(cas, 0x3992, alea(4) ? 0x10 : alea(256));
+  if (alea(4)) { octetDS(cas, 0x3fc8, 0); octetDS(cas, 0x3fc2, 0); }
+};
+const ENTREES = {
+  clic_tour: clicEnCours,
+  commandes_tour: clicEnCours,
+  fin_tour: (cas) => {
+    if (alea(4)) { octetDS(cas, 0x3fc8, 0); octetDS(cas, 0x3fc2, 0); }
+  },
+  // AL numéro du personnage, AH type de commande (souris), BX sa fiche, DX son sprite.
+  // Sur le plateau de la 1re quête, seul Sigmar (fiche 0) joue : les autres fiches sont vides.
+  tour_personnage: (cas) => {
+    const n = alea(4) ? 0 : 1 + alea(4);
+    Object.assign(cas.etat, { ax: n, bx: 0x4663 + 26 * n, dx: SPRITES_HEROS[n] });
+    const effets = DS * 16 + 0x4663 + 26 * n + 0x18;
+    if (alea(3)) cas.memoire[effets] &= ~0x06;              // ni endormi ni tempête, deux fois sur trois
+  },
+};
 
 process.env.GENERE = '1';                    // la machine garde le code généré ; la version lisible est branchée ici
 const m = await machine('QUEST');
@@ -166,10 +192,20 @@ function preparerCas() {
   etat.bx = (etat.bx & 0xff00) | (1 + alea(255));    // max de hasard : jamais 0
   etat.dx = (etat.dx & 0x00ff) | ((1 + alea(12)) << 8);  // dés de compte_cranes
   if (alea(4)) { etat.di = fiche; etat.si = sprite; }   // comme clic_tour avant un pas
-  return { etat, memoire, clicGauche: alea(2) === 1 };
+  etat.cf = alea(2);
+  const surUneZone = alea(3) !== 0;
+  const zone = 0x48a4 + 10 * alea(12);
+  const sourisX = surUneZone ? (lireMot(zone) + lireMot(zone + 2)) >> 1 : alea(320);
+  const sourisY = surUneZone ? (lireMot(zone + 4) + lireMot(zone + 6)) >> 1 : alea(200);
+  const curseur = { x: sourisX, y: sourisY, memoire: () => { mot(0x47e7, sourisX); mot(0x47e9, sourisY); } };
+  memoire[base + 0x3f98] = alea(3) === 0 ? 1 : 0;   // pas_en_cours
+  memoire[base + 0x3fc2] = alea(6) === 0 ? 1 : 0;   // piege_en_cours
+  memoire[base + 0x3f9a] = 0;                        // fin_du_tour
+  memoire[base + 0x40cc] = alea(3) === 0 ? alea(4) : 0xff;   // direction_pas
+  return { etat, memoire, curseur, clicGauche: alea(2) === 1 };
 }
 
-function executer(table, adresse, fin, { etat, memoire, clicGauche }) {
+function executer(table, adresse, fin, { etat, memoire, clicGauche, souris }) {
   m.mem.set(memoire);
   m.prochainHandle = machineDeDepart.prochainHandle;     // fichiers ouverts : même numéro dans les deux versions
   m.handles = new Map(machineDeDepart.handles);
@@ -179,8 +215,8 @@ function executer(table, adresse, fin, { etat, memoire, clicGauche }) {
   m.ss = PILE;
   m.lisibles = [];
   m.souris.boutons = 0;
-  m.souris.x = 124 * 2;                               // bouton OUI de « VOULEZ-VOUS ATTAQUER A NOUVEAU? »
-  m.souris.y = 100;
+  m.souris.x = souris ? souris.x * 2 : 124 * 2;      // par défaut : bouton OUI de « VOULEZ-VOUS ATTAQUER A NOUVEAU? »
+  m.souris.y = souris ? souris.y : 100;
   m.push(RETOUR);
   const t = m.t;
   m.pas = 1e12;
@@ -202,6 +238,7 @@ function executer(table, adresse, fin, { etat, memoire, clicGauche }) {
   }
   const resultat = { duree: m.t - t, sp: m.sp, ip, erreur, memoire: m.mem.slice() };
   for (const r of REGISTRES) resultat[r] = m[r];
+  resultat.cf = m.cf;
   return resultat;
 }
 
@@ -219,6 +256,11 @@ for (const [adresse, routine] of Object.entries(ROUTINES_QUEST)) {
   for (let k = 0; k < CAS; k++) {
     const cas = preparerCas();
     if (CLIC_GAUCHE.has(routine.nom)) cas.clicGauche = true;
+    if (ENTREES[routine.nom]) ENTREES[routine.nom](cas);
+    if (CURSEUR_SUR_LES_ZONES.has(routine.nom)) {
+      cas.curseur.memoire();                                // position du curseur en DS:47E7 (x), DS:47E9 (y)
+      cas.souris = cas.curseur;                             // et la souris au même endroit
+    }
     const a = executer(generee, Number(adresse), routine.fin, cas);
     const b = executer(lisible, Number(adresse), routine.fin, cas);
     if (a.erreur) erreurs++;

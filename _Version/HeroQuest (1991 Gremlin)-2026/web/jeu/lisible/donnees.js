@@ -116,7 +116,7 @@ export const ARTEFACT = { armureBorin: 0x01, baguetteRappel: 0x02, talismanSavoi
 export const OBJET_QUETE = { retireParTeleport: 0x10, orDeLaMine: 0x20, objetPorte: 0x40 };
 export const POTION = { force: 0x01, tenacite: 0x02, eauBenite: 0x10, rapidite: 0x20, heroique: 0x40 };
 export const ARMURE = { bouclier: 0x01, casque: 0x02, cotteDeMailles: 0x04, armureDePlates: 0x08 };
-export const EFFET_SORT = { voileDeBrume: 0x01, endormi: 0x02, tempete: 0x04, ventRapide: 0x08, courage: 0x10, traverseeRoche: 0x20, peauDePierre: 0x40 };
+export const EFFET_SORT = { voileDeBrume: 0x01, endormi: 0x02, tempete: 0x04, ventRapide: 0x08, courage: 0x10, traverseeRoche: 0x20, peauDePierre: 0x40, traverseeRocheLancee: 0x80 };
 
 // Monstre (10 octets).
 export class Monstre extends Enregistrement {}
