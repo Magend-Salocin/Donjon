@@ -57,11 +57,17 @@ Le résultat est identique à l'original par construction : même mémoire, mêm
 | `module.js` | base des modules : `appeler` une routine d'origine et attendre son retour, `sauter` vers elle, `afficherMessage` |
 | `hasard.js` | le générateur de hasard (registre à décalage de 32 bits) |
 | `combat.js` | dés de combat, attaque d'un héros, attaque d'un monstre |
+| `deplacement.js` | dés de déplacement, fin du déplacement, flèches, les 4 pas, pièges cachés, téléports des quêtes 10 et 16, clic sur le plateau, chemin automatique |
 | `messages.js` | numéros des messages utilisés, avec leur texte |
 | `adresses.gen.js` | adresse de chaque routine nommée, générée par `outils/adresses.py` depuis `original/symboles.txt` |
 | `routines.js` | branchement : adresse d'origine -> méthode, registres rendus aux appelants, temps compté |
 
-Réécrites à ce jour (QUEST.EXE) : `hasard`, `de6_moins_un`, `de_combat`, `compte_cranes`, `calcule_des_monstre`, `bonus_attaque_heros`, `calcule_defense_heros`, `calcule_attaque_heros`, `attaque_heros`, `combat_monstre`, `attaque_contre_heros`.
+Réécrites à ce jour (QUEST.EXE), 25 routines :
+
+- hasard et combat : `hasard`, `de6_moins_un`, `de_combat`, `compte_cranes`, `calcule_des_monstre`, `bonus_attaque_heros`, `calcule_defense_heros`, `calcule_attaque_heros`, `attaque_heros`, `combat_monstre`, `attaque_contre_heros` ;
+- déplacement : `des_deplacement_tour`, `tirage_deplacement` (avec `lancer_deplacement`), `fin_deplacement`, `arrete_deplacement`, `fleches_deplacement`, `pas_gauche`, `pas_droite`, `pas_haut`, `pas_bas` (avec `pas_fait`, `personnage_en_dx`, `porte_reveille`), `pas_automatique`, `clic_plateau`, `chemin_heros` (avec `chemin_essaie` et `pas_permis`), `tire_teleport`, `entre_piege`.
+
+`tour_personnage` reste générée.
 
 Deux sortes de routines :
 
@@ -81,9 +87,9 @@ TEMOIN=e0e node lisible.mjs 60 attaque_heros # compte aussi les cas où DS:0E0E 
 GENERE=1 node essai.mjs 5 gen.png "…"        # le même parcours avec le code généré seul, pour comparer les captures
 ```
 
-`lisible.mjs` mène d'abord le jeu jusqu'au plateau de la 1re quête, puis tire au hasard la graine, les fiches et le monstre visé. Il compare toute la mémoire (données, écran, images), sauf la pile, et ferme les boîtes de message par des clics simulés (droit, ou OUI aux questions).
+`lisible.mjs` mène d'abord le jeu jusqu'au plateau de la 1re quête, puis tire au hasard la graine, les fiches, le monstre visé, l'état du tour et les alentours du héros (murs, portes, occupants, zones), avec des scénarios ciblés (voie libre, piège caché, téléport du château, pièce tournante). Il compare toute la mémoire (données, écran, images), sauf la pile. Les boîtes de message et les attentes de clic reçoivent des clics simulés (droit, ou gauche sur OUI), réglés sur le nombre de lectures de la souris et non sur le temps, qui diffère de quelques instructions entre les deux versions.
 
-Au 18 novembre 2026 : les 11 routines sont identiques sur 100 cas chacune (la seconde attaque du poison d'orc est couverte), et un parcours jusqu'au premier lancer de dés donne la même image qu'avec le code généré seul.
+Au 18 novembre 2026 : les 25 routines sont identiques sur 100 cas chacune (seconde attaque du poison d'orc, pas réussis, portes, pièges cachés et téléport du château couverts), et un parcours avec lancer de dés, clics sur le plateau et sur les 4 flèches donne la même image qu'avec le code généré seul.
 
 ## Son
 

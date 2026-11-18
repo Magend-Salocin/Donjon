@@ -22,6 +22,9 @@ const VARIABLES = {
 export const TABLES = {
   fichesPersonnages: 0x4663,  // 5 fiches de 26 octets : 4 héros, puis Sir Ragnar
   monstres: 0x4d4a,           // 32 monstres de 10 octets
+  grilleZones: 0x546f,        // 26 × 19 cases : zone de chaque case (bits 0-5), 0x40 vue, 0x80 bord vu
+  grilleMurs: 0x566f,         // même grille : murs et portes (voir deplacement.js)
+  grilleOccupants: 0x586f,    // même grille : monstre (1 à 32), éboulis, piège, escalier, meuble (0x30 et plus)
   facesDe: 0x47f9,            // 6 faces du dé de combat
   desArmes: 0x47ff,           // 7 armes : bits 0-1 = nombre de dés - 1 (0 : dés de la fiche)
   typesMonstres: 0x4806,      // 5 octets par type : déplacement, attaque, défense, routine de mort
@@ -87,6 +90,7 @@ definirChamps(Fiche, {
   x: [0x01, OCTET],
   y: [0x02, OCTET],
   zone: [0x03, OCTET],
+  caseMurs: [0x04, MOT],       // adresse de sa case dans la grille des murs (DS:566F + y × 26 + x)
   pointsCorps: [0x06, OCTET],
   pointsEsprit: [0x07, OCTET],
   image: [0x08, OCTET],
@@ -108,10 +112,11 @@ definirChamps(Fiche, {
 
 // Bits des champs de la fiche.
 export const ARTEFACT = { armureBorin: 0x01, baguetteRappel: 0x02, talismanSavoir: 0x04, poisonOrc: 0x08, lameEsprit: 0x10 };
-export const OBJET_QUETE = { orDeLaMine: 0x20, objetPorte: 0x40 };
+// OBJET_QUETE.retireParTeleport : bit 0x10, effacé par un téléport du château (quête 10) ; son sens reste à confirmer.
+export const OBJET_QUETE = { retireParTeleport: 0x10, orDeLaMine: 0x20, objetPorte: 0x40 };
 export const POTION = { force: 0x01, tenacite: 0x02, eauBenite: 0x10, rapidite: 0x20, heroique: 0x40 };
 export const ARMURE = { bouclier: 0x01, casque: 0x02, cotteDeMailles: 0x04, armureDePlates: 0x08 };
-export const EFFET_SORT = { voileDeBrume: 0x01, endormi: 0x02, tempete: 0x04, ventRapide: 0x08, courage: 0x10, peauDePierre: 0x40 };
+export const EFFET_SORT = { voileDeBrume: 0x01, endormi: 0x02, tempete: 0x04, ventRapide: 0x08, courage: 0x10, traverseeRoche: 0x20, peauDePierre: 0x40 };
 
 // Monstre (10 octets).
 export class Monstre extends Enregistrement {}

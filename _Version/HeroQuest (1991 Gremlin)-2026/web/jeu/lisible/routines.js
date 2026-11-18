@@ -17,6 +17,8 @@
 import { Donnees } from './donnees.js';
 import { Hasard } from './hasard.js';
 import { Combat } from './combat.js';
+import { Deplacement } from './deplacement.js';
+import { Fiche } from './donnees.js';
 
 // Adresse de retour réservée : le segment de code de QUEST s'arrête à 0x97C0.
 export const RETOUR_LISIBLE = 0xfff0;
@@ -104,6 +106,94 @@ export const ROUTINES_QUEST = {
     nom: 'attaque_contre_heros', cout: 10, sortie: [], etapes: true,
     executer: ({ combat }) => combat.attaqueContreHeros(),
   },
+
+  // ---- Déplacement (deplacement.js)
+  0x68ae: {
+    nom: 'des_deplacement_tour', cout: 18, sortie: ['di'],
+    executer({ deplacement, donnees }, m) {
+      deplacement.calculerDesDeplacement();
+      m.di = donnees.adresseFicheCourante;
+    },
+  },
+  0x6049: {
+    nom: 'fin_deplacement', cout: 9, sortie: ['di'],
+    // Entrée DI : lue par l'original quand le héros n'a pas bougé (voir terminerDeplacement).
+    executer({ deplacement }, m) { m.di = deplacement.terminerDeplacement(m.di); },
+  },
+  0x26d7: {
+    nom: 'arrete_deplacement', cout: 3, sortie: [],
+    executer({ deplacement }) { deplacement.arreterDeplacement(); },
+  },
+  0x66f9: {
+    nom: 'tirage_deplacement', cout: 10, sortie: [], etapes: true,
+    executer: ({ deplacement }) => deplacement.tirageDeplacement(),
+  },
+  0x58f4: {
+    nom: 'fleches_deplacement', cout: 51, sortie: ['di', 'cx', 'bp'],
+    executer({ deplacement }, m) {
+      deplacement.calculerFleches();
+      m.di = 0x42bf + 4 * 12;
+      m.cx = 0;
+      m.bp = 0;
+    },
+  },
+  // Les 4 pas sont atteints par un saut depuis clic_tour (DI fiche, SI sprite) ; ils reviennent
+  // par ret, ou continuent par un saut vers vue_alignee ou redessin_plateau.
+  0x48a0: {
+    nom: 'pas_gauche', cout: 30, sortie: [], etapes: true,
+    executer: ({ deplacement }, m) => deplacement.pas('gauche', m.di, m.si),
+  },
+  0x4968: {
+    nom: 'pas_droite', cout: 30, sortie: [], etapes: true,
+    executer: ({ deplacement }, m) => deplacement.pas('droite', m.di, m.si),
+  },
+  0x4a2f: {
+    nom: 'pas_haut', cout: 30, sortie: [], etapes: true,
+    executer: ({ deplacement }, m) => deplacement.pas('haut', m.di, m.si),
+  },
+  0x4af7: {
+    nom: 'pas_bas', cout: 30, sortie: [], etapes: true,
+    executer: ({ deplacement }, m) => deplacement.pas('bas', m.di, m.si),
+  },
+  0x6784: {
+    nom: 'pas_automatique', cout: 15, sortie: [], etapes: true,
+    executer: ({ deplacement }) => deplacement.pasAutomatique(),
+  },
+  0x4daa: {
+    nom: 'tire_teleport', cout: 81, sortie: ['al', 'bx', 'dx'],
+    // Entrée DI : la fiche du héros téléporté. Sortie AL zone, BX téléport, DX décalage dans la table.
+    executer({ deplacement, donnees }, m) {
+      const teleport = deplacement.tirerTeleport(new Fiche(donnees, m.di));
+      m.ax = octetBas(m.ax, donnees.octet(teleport));
+      m.bx = teleport;
+      m.dx = teleport - 0x43b2;
+    },
+  },
+  0x4dc7: {
+    nom: 'entre_piege', cout: 15, sortie: ['ax', 'bx', 'dx', 'bp'],
+    // Entrée AL code de la case, BX son adresse (grille des occupants), DL x et DH y, DI fiche.
+    executer({ deplacement, donnees }, m) {
+      const code = m.ax & 0xff;
+      const fiche = new Fiche(donnees, m.di);
+      const x = m.dx & 0xff;
+      const y = m.dx >> 8;
+      const piegeArme = code < 0x37 && !deplacement.personnageEn(x, y);
+      deplacement.entrerPiege(code, m.bx, x, y, fiche);
+      if (piegeArme) {
+        m.bx = donnees.casePiege;
+        m.dx = (m.dx & 0xff00) | 0x1a;
+        m.bp = 0x45a6 + 2 * ((code - 0x32) & 0xff);
+      }
+    },
+  },
+  0x67b6: {
+    nom: 'clic_plateau', cout: 2600, sortie: [],
+    executer({ deplacement }) { deplacement.clicPlateau(); },
+  },
+  0x2dac: {
+    nom: 'chemin_heros', cout: 700, sortie: [],
+    executer({ deplacement }) { deplacement.chercherChemin(); },
+  },
 };
 
 // Remplace, dans la table des routines générées, l'entrée de chaque routine réécrite.
@@ -159,5 +249,6 @@ export function creerJeu(machine) {
   const donnees = new Donnees(machine);
   const jeu = { machine, donnees, hasard: new Hasard(donnees) };
   jeu.combat = new Combat(jeu);
+  jeu.deplacement = new Deplacement(jeu);
   return jeu;
 }

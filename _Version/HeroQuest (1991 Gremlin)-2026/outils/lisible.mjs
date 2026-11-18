@@ -17,9 +17,11 @@ const DS = 0x1000 + 0x97c;                   // segment de données relogé
 const PILE = 0x9000;                         // pile hors des données : ses restes ne comptent pas
 const REGISTRES = ['ax', 'bx', 'cx', 'dx', 'si', 'di', 'bp'];
 const LIMITE = 300e6;                        // instructions au plus par cas (100 s de jeu)
-const CLIC_DROIT = 300000;
+const LECTURES_PAR_CLIC = 40;                // les boutons changent d'état toutes les 40 lectures de la souris
 // TEMOIN=e0e : compte les cas où cet octet de DS change (pour vérifier qu'un chemin rare est couvert).
-const TEMOIN = process.env.TEMOIN ? parseInt(process.env.TEMOIN, 16) : null;                   // le bouton droit change d'état toutes les 100 ms de jeu
+const TEMOIN = process.env.TEMOIN ? parseInt(process.env.TEMOIN, 16) : null;
+// Routines qui attendent un clic gauche (sinon le cas dure jusqu'à LIMITE).
+const CLIC_GAUCHE = new Set(['tirage_deplacement']);
 
 process.env.GENERE = '1';                    // la machine garde le code généré ; la version lisible est branchée ici
 const m = await machine('QUEST');
@@ -29,6 +31,16 @@ const clic = (x, y) => {
   avancer(m, 0.2); m.souris.boutons = 1; avancer(m, 0.2); m.souris.boutons = 0; avancer(m, 0.3);
 };
 avancer(m, 5); clic(68, 128); avancer(m, 3); clic(160, 44); avancer(m, 4); clic(160, 180); avancer(m, 4);
+// Les clics simulés suivent le nombre de lectures de la souris (int 33h), pas le temps : le temps
+// compté par une routine lisible diffère de quelques instructions de celui de l'original.
+let lectures = 0;
+let sequenceBoutons = [0];
+const pilote33 = m.pilote33.bind(m);
+m.pilote33 = () => {
+  lectures++;
+  m.souris.boutons = sequenceBoutons[Math.floor(lectures / LECTURES_PAR_CLIC) % sequenceBoutons.length];
+  return pilote33();
+};
 const memoireDeDepart = m.mem.slice();
 const machineDeDepart = { prochainHandle: m.prochainHandle, handles: new Map(m.handles), dac: m.dac.slice() };
 const generee = m.table;
@@ -68,10 +80,92 @@ function preparerCas() {
     memoire[base + 0x0e0e] = 0;
   }
   for (let n = 0; n < 5; n++) memoire[base + 0x4663 + 26 * n + 6] = 1 + alea(8);   // points de corps
+  if (alea(4) === 0) memoire[base + 0x3f92] = [4, 9, 15][alea(3)];   // quêtes aux déplacements particuliers
+
+  // Déplacement : état du tour, file du chemin, curseur, et alentours du héros courant.
+  const lireMot = (off) => memoire[base + off] | (memoire[base + off + 1] << 8);
+  memoire[base + 0x3f9b] = alea(16);                 // etat_action
+  memoire[base + 0x3f9c] = alea(13);                 // deplacement_restant
+  memoire[base + 0x3fc4] = alea(8) === 0 ? 0 : 1 + alea(4);   // des_deplacement (0 : 65 536 dés)
+  if (memoire[base + 0x3fc4] === 0 && alea(4)) memoire[base + 0x3fc4] = 2;
+  memoire[base + 0x409f] = alea(4) === 0 ? 1 : 0;
+  memoire[base + 0x3eb4] = alea(2);                  // porte_franchie
+  memoire[base + 0x3fc8] = alea(6);                  // pas en file
+  mot(0x3fcc, 0x4013);
+  for (let n = 0; n < 16; n++) memoire[base + 0x4013 + n] = alea(4);
+  const fiche = lireMot(0x4637);
+  const sprite = lireMot(0x4639);
+  memoire[base + sprite] = alea(3);
+  if (alea(4)) {                                     // héros ailleurs sur le plateau, loin des bords
+    const nx = 1 + alea(24);
+    const ny = 1 + alea(17);
+    memoire[base + fiche + 1] = nx;
+    memoire[base + fiche + 2] = ny;
+    mot(fiche + 4, 0x566f + ny * 26 + nx);
+    memoire[base + 0x546f + ny * 26 + nx] = (memoire[base + 0x546f + ny * 26 + nx] & 0xc0) | memoire[base + fiche + 3];
+  }
+  const x = memoire[base + fiche + 1];
+  const y = memoire[base + fiche + 2];
+  mot(0x3fea, 1 + alea(0xff));                       // message_en_attente : remis à 0 par un téléport
+  mot(0x0e0f, alea(3) === 0 ? lireMot(fiche + 4) : 0xffff);   // case_apres_porte
+  mot(0x0e11, alea(4) === 0 ? lireMot(fiche + 4) - 1 : 0xffff); // case_avant_porte
+  for (let dy = -2; dy <= 2; dy++) {
+    for (let dx = -2; dx <= 2; dx++) {
+      const cx = x + dx;
+      const cy = y + dy;
+      if (cx < 0 || cx > 25 || cy < 0 || cy > 18) continue;
+      const index = cy * 26 + cx;
+      let murs = 0;
+      if (alea(4) === 0) murs |= 0x40;
+      if (alea(4) === 0) murs |= 0x80;
+      if (alea(4) === 0) murs |= 0x10;
+      if (alea(4) === 0) murs |= 0x20;
+      if (alea(2) === 0) murs |= 0x04;
+      if (alea(3) === 0) murs |= 0x08;
+      memoire[base + 0x566f + index] = murs;
+      if (dx === 0 && dy === 0) continue;
+      const occupants = [0, 0, 0, 1 + alea(32), 0x30, 0x32 + alea(5), 0x37 + alea(9), 0x40 + alea(0x20)];
+      memoire[base + 0x586f + index] = occupants[alea(occupants.length)];
+      if (alea(5) === 0) memoire[base + 0x546f + index] &= 0xc0;          // hors zone
+      else if (alea(5) === 0) memoire[base + 0x546f + index] ^= 1 + alea(3);  // autre zone
+    }
+  }
+  // Scénarios de déplacement ciblés : la voie est libre autour du héros, et selon le cas
+  // un pas ordinaire, un piège caché, le téléport du château, la pièce tournante.
+  const scenario = alea(10);
+  if (scenario < 4) {
+    memoire[base + 0x3f9b] = 0;
+    memoire[base + 0x3f9c] = 1 + alea(10);
+    const zoneHeros = memoire[base + fiche + 3];
+    for (const [dx, dy] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1]]) {
+      const cx = x + dx;
+      const cy = y + dy;
+      if (cx < 0 || cx > 25 || cy < 0 || cy > 18) continue;
+      const index = cy * 26 + cx;
+      memoire[base + 0x566f + index] = 0;
+      if (dx === 0 && dy === 0) continue;
+      memoire[base + 0x586f + index] = scenario === 1 ? 0x32 + alea(5) : 0;
+      const zone = scenario === 2 ? 0 : scenario === 3 ? 0x1e : zoneHeros;
+      memoire[base + 0x546f + index] = (memoire[base + 0x546f + index] & 0xc0) | zone;
+    }
+    if (scenario === 2) memoire[base + 0x3f92] = 9;
+    if (scenario === 3) { memoire[base + 0x3f92] = 15; memoire[base + fiche + 3] = 0x1f; }
+  }
+  if (alea(4) === 0) {                               // un autre héros à côté
+    const autre = heros();
+    if (autre !== fiche) {
+      memoire[base + autre + 1] = x + [-1, 1, 0, 0][alea(4)];
+      memoire[base + autre + 2] = y;
+    }
+  }
+  const caseVue = 0x4119 + 4 * alea(52);             // curseur près d'une case visible
+  mot(0x47e9, lireMot(caseVue) + 8 + alea(9) - 4);
+  mot(0x47e7, lireMot(caseVue + 2) + 0x18 + alea(9) - 4);
   const etat = { sp: 0xf000 };
   for (const r of REGISTRES) etat[r] = alea(0x10000);
   etat.bx = (etat.bx & 0xff00) | (1 + alea(255));    // max de hasard : jamais 0
   etat.dx = (etat.dx & 0x00ff) | ((1 + alea(12)) << 8);  // dés de compte_cranes
+  if (alea(4)) { etat.di = fiche; etat.si = sprite; }   // comme clic_tour avant un pas
   return { etat, memoire, clicGauche: alea(2) === 1 };
 }
 
@@ -95,12 +189,10 @@ function executer(table, adresse, fin, { etat, memoire, clicGauche }) {
   try {
     // Cas pairs : clics droits seulement (OK, ou NON aux questions). Cas impairs : le curseur est
     // sur le bouton OUI des questions, et clics gauche et droit alternent.
-    const boutons = clicGauche ? [1, 0, 2, 0] : [2, 0];
-    let prochainClic = t + CLIC_DROIT;
-    let phase = 0;
+    sequenceBoutons = clicGauche ? [0, 1, 0, 2] : [0, 2];
+    lectures = 0;
     while (ip !== RETOUR && ip !== fin) {
       if (m.t > t + LIMITE) { erreur = 'trop long'; break; }
-      if (m.t > prochainClic) { m.souris.boutons = boutons[phase++ % boutons.length]; prochainClic += CLIC_DROIT; }
       const f = table[ip];
       if (!f) throw new Error(`IP ${ip.toString(16)} hors du code`);
       ip = f(m, ip);
@@ -126,6 +218,7 @@ for (const [adresse, routine] of Object.entries(ROUTINES_QUEST)) {
   let exemple = '';
   for (let k = 0; k < CAS; k++) {
     const cas = preparerCas();
+    if (CLIC_GAUCHE.has(routine.nom)) cas.clicGauche = true;
     const a = executer(generee, Number(adresse), routine.fin, cas);
     const b = executer(lisible, Number(adresse), routine.fin, cas);
     if (a.erreur) erreurs++;
