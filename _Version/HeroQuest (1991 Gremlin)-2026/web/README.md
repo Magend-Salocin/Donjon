@@ -53,23 +53,37 @@ Le résultat est identique à l'original par construction : même mémoire, mêm
 
 | Fichier | Contenu |
 | --- | --- |
-| `donnees.js` | vue nommée du segment de données : variables (`numeroQuete`, `desAttaqueHeros`...), fiche d'un personnage (`Fiche`), monstre (`Monstre`), bits des objets et des sorts |
+| `donnees.js` | vue nommée du segment de données : variables communes (`numeroQuete`, `adresseCible`...), fiche d'un personnage (`Fiche`), monstre (`Monstre`), bits des objets et des sorts ; chaque module ajoute ses variables avec `definirVariables` |
+| `module.js` | base des modules : `appeler` une routine d'origine et attendre son retour, `sauter` vers elle, `afficherMessage` |
 | `hasard.js` | le générateur de hasard (registre à décalage de 32 bits) |
-| `combat.js` | dés de combat : face d'un dé, dés d'attaque et de défense du héros et du monstre |
-| `routines.js` | branchement : adresse d'origine, registres rendus aux appelants, temps compté |
+| `combat.js` | dés de combat, attaque d'un héros, attaque d'un monstre |
+| `messages.js` | numéros des messages utilisés, avec leur texte |
+| `adresses.gen.js` | adresse de chaque routine nommée, générée par `outils/adresses.py` depuis `original/symboles.txt` |
+| `routines.js` | branchement : adresse d'origine -> méthode, registres rendus aux appelants, temps compté |
 
-Réécrites à ce jour (QUEST.EXE) : `hasard`, `de6_moins_un`, `de_combat`, `calcule_des_monstre`, `bonus_attaque_heros`, `calcule_defense_heros`, `calcule_attaque_heros`.
+Réécrites à ce jour (QUEST.EXE) : `hasard`, `de6_moins_un`, `de_combat`, `compte_cranes`, `calcule_des_monstre`, `bonus_attaque_heros`, `calcule_defense_heros`, `calcule_attaque_heros`, `attaque_heros`, `combat_monstre`, `attaque_contre_heros`.
 
-Une routine réécrite s'exécute d'un seul tenant : seules les routines qui n'attendent ni le joueur ni l'écran peuvent l'être ainsi pour l'instant. Elle rend les registres que ses appelants lisent (champ `sortie`), pas les drapeaux du processeur. Le temps du jeu avance du nombre moyen d'instructions de la version générée (champ `cout`), à quelques instructions près selon le chemin suivi.
+Deux sortes de routines :
+
+- d'un seul tenant : une méthode qui ne fait que calculer (`Combat.calculerDefenseHeros`). Elle rend les registres que ses appelants lisent (champ `sortie`), pas les drapeaux du processeur ;
+- par étapes : une méthode génératrice (`*attaqueHeros`), pour une routine qui attend le joueur, l'écran ou une animation. `yield* this.appeler(QUEST.charge_men)` pose sur la pile du programme une adresse de retour réservée (`RETOUR_LISIBLE`, 0xFFF0), exécute la routine d'origine au rythme du temps réel, et reprend la méthode quand elle revient. Une méthode qui finit par `return this.sauter(QUEST.fin_action)` continue par un saut, comme le `jmp` d'origine.
+
+Le temps du jeu avance du nombre moyen d'instructions de la version générée (champ `cout`), à quelques instructions près selon le chemin suivi : le rythme reste celui de l'original, pas au cycle près.
+
+Pour réécrire une routine : lire son listing dans `original/asm/quest.asm`, écrire la méthode dans le module du sous-système, l'ajouter à `routines.js`, puis la comparer.
 
 Vérifier, depuis `outils/` :
 
 ```bash
-node lisible.mjs 2000                 # chaque routine réécrite contre sa version générée, 2000 états au hasard
-GENERE=1 node essai.mjs 5 gen.png "…" # le même parcours avec le code généré seul, pour comparer les captures
+node lisible.mjs 100                         # chaque routine réécrite contre sa version générée, 100 états au hasard
+node lisible.mjs 40 attaque_heros            # une seule routine
+TEMOIN=e0e node lisible.mjs 60 attaque_heros # compte aussi les cas où DS:0E0E change (chemin rare couvert ?)
+GENERE=1 node essai.mjs 5 gen.png "…"        # le même parcours avec le code généré seul, pour comparer les captures
 ```
 
-Au 18 novembre 2026 : les 7 routines sont identiques sur 2000 cas chacune, et un parcours jusqu'au premier lancer de dés donne la même image qu'avec le code généré seul.
+`lisible.mjs` mène d'abord le jeu jusqu'au plateau de la 1re quête, puis tire au hasard la graine, les fiches et le monstre visé. Il compare toute la mémoire (données, écran, images), sauf la pile, et ferme les boîtes de message par des clics simulés (droit, ou OUI aux questions).
+
+Au 18 novembre 2026 : les 11 routines sont identiques sur 100 cas chacune (la seconde attaque du poison d'orc est couverte), et un parcours jusqu'au premier lancer de dés donne la même image qu'avec le code généré seul.
 
 ## Son
 

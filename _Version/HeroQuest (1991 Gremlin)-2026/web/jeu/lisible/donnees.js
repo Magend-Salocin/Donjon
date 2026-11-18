@@ -3,20 +3,19 @@
 // le reste du jeu, encore généré, voit donc exactement les mêmes valeurs.
 // Adresses et sens des champs : original/symboles.txt et original/notes/03-regles.md.
 
-const OCTET = 1;
-const MOT = 2;
+export const OCTET = 1;
+export const MOT = 2;
 
-// Variables du jeu : nom lisible -> [offset dans DS, taille].
+// Variables communes à plusieurs modules : nom lisible -> [offset dans DS, taille].
+// Chaque module déclare les siennes avec definirVariables (voir combat.js).
 const VARIABLES = {
-  graine: [0x38fd, MOT],               // les 4 octets du générateur : voir hasard.js
   numeroQuete: [0x3f92, OCTET],        // 0 = Le labyrinthe ; le jeu compte à partir de 0
-  attaqueADistance: [0x3fb7, OCTET],   // 1 : arme lancée ou tirée
-  desAttaqueHeros: [0x3fb8, OCTET],
-  desDefenseHeros: [0x3fb9, OCTET],
-  desAttaqueMonstre: [0x3fba, OCTET],
-  desDefenseMonstre: [0x3fbb, OCTET],
   adresseCible: [0x3fd4, MOT],         // enregistrement du monstre visé
   adresseFicheCourante: [0x4637, MOT], // fiche du héros qui joue
+  adresseAttaquant: [0x3fd6, MOT],     // fiche du héros qui attaque, ou que le monstre attaque
+  herosCourant: [0x3fca, OCTET],       // type (+0x19) du héros concerné par l'action
+  personnageCourant: [0x3fa7, OCTET],  // numéro du personnage qui joue (0 à 4)
+  choixMenu: [0xab7a, OCTET],          // bouton choisi dans une boîte de message (0, 1...), FEh = bouton droit
 };
 
 // Tables du jeu (offset dans DS).
@@ -40,14 +39,20 @@ export class Donnees {
 
   get ficheCourante() { return new Fiche(this, this.adresseFicheCourante); }
   get cible() { return new Monstre(this, this.adresseCible); }
+  get attaquant() { return new Fiche(this, this.adresseAttaquant); }
 }
 
-for (const [nom, [offset, taille]] of Object.entries(VARIABLES)) {
-  Object.defineProperty(Donnees.prototype, nom, {
-    get() { return taille === OCTET ? this.octet(offset) : this.mot(offset); },
-    set(valeur) { if (taille === OCTET) this.ecrireOctet(offset, valeur); else this.ecrireMot(offset, valeur); },
-  });
+// Ajoute des variables nommées à Donnees (donnees.nom en lecture et en écriture).
+export function definirVariables(variables) {
+  for (const [nom, [offset, taille]] of Object.entries(variables)) {
+    if (nom in Donnees.prototype) throw new Error(`variable ${nom} déjà définie`);
+    Object.defineProperty(Donnees.prototype, nom, {
+      get() { return taille === OCTET ? this.octet(offset) : this.mot(offset); },
+      set(valeur) { if (taille === OCTET) this.ecrireOctet(offset, valeur); else this.ecrireMot(offset, valeur); },
+    });
+  }
 }
+definirVariables(VARIABLES);
 
 // Champs d'un enregistrement : nom -> [décalage, taille].
 function definirChamps(classe, champs) {
@@ -121,4 +126,4 @@ definirChamps(Monstre, {
   type: [0x09, OCTET],      // index de types_monstres
 });
 
-export const IMAGE_MONSTRE = { squelette: 4, zombi: 5, momie: 6 };
+export const IMAGE_MONSTRE = { gobelin: 0, orc: 1, squelette: 4, zombi: 5, momie: 6 };
